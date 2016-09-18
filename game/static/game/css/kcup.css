@@ -1,0 +1,21 @@
+body {
+	background: url(../images/squairy_light.png) repeat;
+}
+
+.navbar {
+    font-family: 'Baloo Tamma', cursive;
+}
+
+.title-banner {
+    height: 100%;
+    height: 90px;
+    /*background-color: #222;*/
+    background-position: 0% 40%;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-image: url(../images/logo_fullres_notitle.png);
+}
+
+.content {
+    background-color: #fff;
+}
