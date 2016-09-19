@@ -19,3 +19,28 @@ body {
 .content {
     background-color: #fff;
 }
+
+.list-group-item.active, .list-group-item.active:focus, .list-group-item.active:hover {
+    background-color: #2dd00b;
+    border-color: #2dd00b;
+}
+
+/*.sidemenu {
+    margin-left: -15px;
+    margin-right: -15px;
+}*/
+
+.hover-active {
+    display: none;
+}
+
+.sidemenu .active .hover-active,.sidemenu a:hover .hover-active {
+    display: block;
+}
+@media screen and (max-width: 767px) {
+.sidemenu .active .hover-active,.sidemenu a:hover .hover-active {
+    display: block;
+    -webkit-transform: rotate(90deg);
+    -moz-transform: rotate(90deg);
+}
+}
