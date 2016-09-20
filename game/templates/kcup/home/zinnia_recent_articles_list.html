@@ -1,0 +1,13 @@
+{% load i18n %}
+<div class="panel panel-default">
+    <div class="panel-heading">Infos récentes</div>
+    <div class="panel-body">
+        <ul>
+            {% for entry in entries %}
+            <li>
+                <a href="{{ entry.get_absolute_url }}" title="{{ entry.title }}" rel="bookmark">{{ entry.title }}</a>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>

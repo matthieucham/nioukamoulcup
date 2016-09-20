@@ -9,11 +9,14 @@ body {
 .title-banner {
     height: 100%;
     height: 90px;
-    /*background-color: #222;*/
     background-position: 0% 40%;
     background-size: cover;
     background-repeat: no-repeat;
     background-image: url(../images/logo_fullres_notitle.png);
+}
+
+.navbar-inverse .navbar-brand {
+    color: #f9bee5;
 }
 
 .content {
@@ -21,14 +24,15 @@ body {
 }
 
 .list-group-item.active, .list-group-item.active:focus, .list-group-item.active:hover {
-    background-color: #2dd00b;
-    border-color: #2dd00b;
+    background-color: #83e66e;
+    border-color: #a5f395;
+    color: #222;
 }
 
-/*.sidemenu {
-    margin-left: -15px;
-    margin-right: -15px;
-}*/
+.page-title, .sidemenu a:hover :not(.active) .hover-active {
+    color: #83e66e;
+}
+
 
 .hover-active {
     display: none;
@@ -37,10 +41,49 @@ body {
 .sidemenu .active .hover-active,.sidemenu a:hover .hover-active {
     display: block;
 }
-@media screen and (max-width: 767px) {
-.sidemenu .active .hover-active,.sidemenu a:hover .hover-active {
-    display: block;
-    -webkit-transform: rotate(90deg);
-    -moz-transform: rotate(90deg);
+
+/* Remove the navbar's default margin-bottom and rounded borders */
+.navbar {
+   margin-bottom: 0;
+   border-radius: 0;
 }
+
+.row {
+   margin-left: 0;
+   margin-right: 0;
+}
+
+        /* Set height of the grid so .sidenav can be 100% (adjust as needed) */
+        .row.content {height: 450px}
+
+        /* Set gray background color and 100% height */
+        .sidenav {
+        padding-top: 20px;
+        background-color: #fbedfa;
+        height: 100%;
+        box-shadow: 3px 0 3px #888888;
+        }
+
+        /* Set black background color, white text and some padding */
+        footer {
+        background-color: #555;
+        color: white;
+        padding: 15px;
+        }
+
+@media screen and (max-width: 767px) {
+    /* On small screens, set height to 'auto' for sidenav and grid */
+    .sidenav {
+        height: auto;
+        padding: 15px;
+        box-shadow: 0 3px 3px #888888;
+    }
+
+    .row.content {height:auto;}
+
+    .sidemenu .active .hover-active,.sidemenu a:hover .hover-active {
+        display: block;
+        -webkit-transform: rotate(90deg);
+        -moz-transform: rotate(90deg);
+    }
 }
