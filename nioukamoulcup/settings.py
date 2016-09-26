@@ -42,18 +42,32 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
+    'django.contrib.humanize',
 
+    # dj-userena
     'userena',
     'guardian',
     'easy_thumbnails',
 
+    # dj-blog-zinnia
     'django_comments',
     'mptt',
     'tagging',
     'zinnia',
 
+    # dj-wiki
+    'django_nyt',
+    'sekizai',
+    'sorl.thumbnail',
+    'wiki',
+    'wiki.plugins.attachments',
+    'wiki.plugins.notifications',
+    'wiki.plugins.images',
+    'wiki.plugins.macros',
+
     'game',
     'accounts',
+    'ligue1',
 ]
 
 MIDDLEWARE = [
@@ -87,6 +101,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'django.template.context_processors.i18n',
                 'zinnia.context_processors.version',  # Optional
+                'sekizai.context_processors.sekizai',
             ],
             'loaders': [
                 'app_namespace.Loader',
@@ -97,6 +112,8 @@ TEMPLATES = [
     },
 ]
 
+TEMPLATE_CONTEXT_PROCESSORS = ['django.contrib.auth.context_processors.auth']
+
 WSGI_APPLICATION = 'nioukamoulcup.wsgi.application'
 
 
@@ -104,9 +121,17 @@ WSGI_APPLICATION = 'nioukamoulcup.wsgi.application'
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 
 DATABASES = {
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.sqlite3',
+    #     'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    # },
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'nioukamoulcup',
+        'USER': 'nioukamoulcupuser',
+        'PASSWORD': 'password',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
 
@@ -115,18 +140,18 @@ DATABASES = {
 # https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    # {
+    #     'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+    # },
+    # {
+    #     'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+    # },
+    # {
+    #     'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+    # },
+    # {
+    #     'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+    # },
 ]
 
 
@@ -150,6 +175,8 @@ USE_TZ = True
 #STATIC_URL = 'http://localhost:82/www/static/'
 STATIC_URL = '/static/'
 STATIC_ROOT = 'D:\dev\git\www\static'
+MEDIA_URL = '/media/'
+MEDIA_ROOT = 'D:\dev\git\www\media'
 
 # Sites framework : https://docs.djangoproject.com/en/1.10/ref/contrib/sites/
 SITE_ID = 1
