@@ -29,7 +29,7 @@ body {
     color: #222;
 }
 
-.page-title, .sidemenu a:hover :not(.active) .hover-active {
+.page-title, .sidemenu a:hover:not(.active) .hover-active {
     color: #83e66e;
 }
 
