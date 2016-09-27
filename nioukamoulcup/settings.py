@@ -47,10 +47,11 @@ INSTALLED_APPS = [
     'guardian',
     'easy_thumbnails',
 
-    'django_comments',
+
     'mptt',
     'tagging',
     'zinnia',
+    'django_comments',
 
     'game',
     'accounts',
