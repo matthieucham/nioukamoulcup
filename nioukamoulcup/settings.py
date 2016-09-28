@@ -49,11 +49,11 @@ INSTALLED_APPS = [
     'guardian',
     'easy_thumbnails',
 
-    # dj-blog-zinnia
-    'django_comments',
+
     'mptt',
     'tagging',
     'zinnia',
+    'django_comments',
 
     # dj-wiki
     'django_nyt',

@@ -1,0 +1,13 @@
+[
+    {
+        "model": "ligue1.saison",
+        "pk": 1,
+        "fields": {
+            "derniere_maj": "2016-09-27T15:39:40.477Z",
+            "nom": "Saison 2015-2016",
+            "sn_instance_uuid": "b144e399-1395-40ee-bd81-e089257d4914",
+            "debut": "2015-08-07",
+            "fin": "2016-05-14"
+        }
+    }
+]
