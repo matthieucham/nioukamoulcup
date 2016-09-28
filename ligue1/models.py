@@ -1,8 +1,9 @@
 from django.db import models
 from django.contrib.postgres.fields import JSONField
-import dateutil.parser
 import datetime
 from django.utils import timezone
+
+import dateutil.parser
 
 
 class Importe(models.Model):
@@ -51,6 +52,10 @@ class Journee(Importe):
 
     def import_from_statnuts(self, statnuts_step, sn_client):
         for meeting in statnuts_step['meetings']:
+            r = Rencontre()
+            r.journee = self
+            r.import_from_statnuts(meeting, sn_client)
+
             dom, _ = Club.objects.get_or_create(sn_team_uuid=meeting['home_team'],
                                                 defaults={'nom': meeting[
                                                     'home_team_name']})
@@ -61,7 +66,7 @@ class Journee(Importe):
                         'club_domicile': dom,
                         'club_exterieur': ext,
                         'resultat': {'dom': meeting['home_result'], 'ext': meeting['away_result']}
-            }
+                        }
             rencontre, created = Rencontre.objects.get_or_create(
                 sn_meeting_uuid=meeting['uuid'],
                 journee=self,
@@ -119,10 +124,45 @@ class Rencontre(Importe):
     def __str__(self):
         return '%s - %s' % (self.club_domicile.nom, self.club_exterieur.nom)
 
+    def import_from_statnuts(self, statnuts_data, sn_client=None):
+        meeting = sn_client.get_meeting(statnuts_data['uuid'])
+        dom, _ = Club.objects.get_or_create(sn_team_uuid=meeting['home_team']['uuid'],
+                                            defaults={'nom': meeting[
+                                                'home_team']['name']})
+        ext, _ = Club.objects.get_or_create(sn_team_uuid=meeting['away_team']['uuid'],
+                                            defaults={'nom': meeting[
+                                                'away_team']['name']})
+        defaults = {'date': dateutil.parser.parse(meeting['date']),
+                    'club_domicile': dom,
+                    'club_exterieur': ext,
+                    'resultat': {'dom': meeting['home_result'], 'ext': meeting['away_result']}
+                    }
+        rencontre, created = Rencontre.objects.get_or_create(
+            sn_meeting_uuid=meeting['uuid'],
+            journee=self,
+            defaults=defaults
+        )
+        meeting_update = dateutil.parser.parse(meeting['updated_at'])
+        # TODO import roster
+        for ros in meeting['roster']:
+            # joueur, _ = Joueur.objects.get_or_create(sn_joueur_uuid=ros['player']['uuid'])
+            pass
+
+    pass
+
+
+def save(self, *args, **kwargs):
+    # crée une participation si pas déjà existante
+    for cl in [self.club_domicile, self.club_exterieur]:
+        if not cl.participations_set.filter(journee__saison=self.journee.saison):
+            cl.participations_set.add(self.journee.saison)
+    super(Rencontre, self).save(*args, **kwargs)
+
 
 class Performance(Importe):
     rencontre = models.ForeignKey(Rencontre, null=False)
     joueur = models.ForeignKey(Joueur, null=False)
+    club = models.ForeignKey(Club, null=False)
     note = models.DecimalField(max_digits=4, decimal_places=2)
     bonus = models.DecimalField(max_digits=4, decimal_places=2)
     temps_de_jeu = models.PositiveSmallIntegerField()
