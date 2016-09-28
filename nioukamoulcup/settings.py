@@ -92,7 +92,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [os.path.join(BASE_DIR, 'templates')],
-        #'APP_DIRS': True,
+        # 'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
@@ -122,7 +122,7 @@ WSGI_APPLICATION = 'nioukamoulcup.wsgi.application'
 
 DATABASES = {
     # 'default': {
-    #     'ENGINE': 'django.db.backends.sqlite3',
+    # 'ENGINE': 'django.db.backends.sqlite3',
     #     'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     # },
     'default': {
@@ -141,7 +141,7 @@ DATABASES = {
 
 AUTH_PASSWORD_VALIDATORS = [
     # {
-    #     'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+    # 'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
     # },
     # {
     #     'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
@@ -172,7 +172,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
-#STATIC_URL = 'http://localhost:82/www/static/'
+# STATIC_URL = 'http://localhost:82/www/static/'
 STATIC_URL = '/static/'
 STATIC_ROOT = 'D:\dev\git\www\static'
 MEDIA_URL = '/media/'
@@ -191,3 +191,7 @@ LOGIN_URL = '/accounts/signin/'
 LOGOUT_URL = '/accounts/signout/'
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+STATNUTS_CLIENT_ID = 'aLUoUeBI9Zuj7?JfC0t9U=P3mycANITG@0hvaQlZ'
+STATNUTS_SECRET = 'GsHk=.o2kTu9WkU!a:n1kqkQogZ4lXWitDGn2bZff=?YcdbI-;6h_Grusn@q56@;ttN9OMa9.dWcuBq4lJ8vu7;I9n_f:kJrZ5RUSNkAan088KLyv..7q_.Me94MB?Dy'
+STATNUTS_URL = 'https://statnuts-kcup.rhcloud.com'

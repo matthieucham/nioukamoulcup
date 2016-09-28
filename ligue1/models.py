@@ -19,8 +19,8 @@ class Saison(Importe):
 class Journee(Importe):
     numero = models.PositiveIntegerField()
     sn_step_uuid = models.UUIDField(null=False)
-    debut = models.DateField()
-    fin = models.DateField()
+    debut = models.DateField(null=True)
+    fin = models.DateField(null=True)
     saison = models.ForeignKey(Saison, related_name='journees')
 
 
