@@ -4,7 +4,8 @@ import ligue1
 from ligue1 import models
 from statnuts import StatnutsClient
 from nioukamoulcup import settings
-import datetime
+from django.http import HttpResponseRedirect
+from django.core.urlresolvers import reverse
 
 
 class ImportStatnutsSite(admin.AdminSite):
@@ -12,39 +13,43 @@ class ImportStatnutsSite(admin.AdminSite):
 
 
 class JourneeAdmin(admin.ModelAdmin):
-    list_display = ['get_saison', 'numero', 'sn_step_uuid', 'debut', 'fin', 'derniere_maj']
+    list_display = ['numero', 'get_saison', 'sn_step_uuid', 'debut', 'fin', 'derniere_maj']
+    ordering = ['-saison', '-numero']
+    actions = ['import_step_action']
 
     def has_add_permission(self, request):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
         return False
 
     def get_saison(self, obj):
         return obj.saison.nom
 
+    def import_step_action(self, request, queryset):
+        pass
+
+    import_step_action.short_description = "Importer les données de ces journées"
+
 
 class SaisonAdmin(admin.ModelAdmin):
-    actions = ['import_saison_action']
+    actions = ['import_instance_action', 'delete_selected']
     list_display = ['nom', 'sn_instance_uuid', 'debut', 'fin', 'derniere_maj']
 
-    def import_saison_action(self, request, queryset):
+    def has_delete_permission(self, request, obj=None):
+        if obj is not None:
+            return obj.journees.count() == 0
+        return False
+
+    def import_instance_action(self, request, queryset):
         # appeler Statnuts ici
         client = StatnutsClient(settings.STATNUTS_CLIENT_ID, settings.STATNUTS_SECRET, settings.STATNUTS_URL)
         for saison in queryset:
-            journees = client.get_journees(saison.sn_instance_uuid)
-            for step in journees['steps']:
-                renc = client.get_rencontres(step['uuid'])
-                debut, fin = datetime.date(datetime.MAXYEAR, 1, 1), datetime.date(datetime.MINYEAR, 1, 1)
-                for x in (rencontre['date'] for rencontre in renc['meetings']):
-                    debut, fin = min(x, debut), max(x, fin)
-                defaults = {'numero': int(step['name']), 'debut': debut, 'fin': fin}
-                models.Journee.objects.get_or_create(
-                    sn_step_uuid=step['uuid'],
-                    saison=saison,
-                    defaults=defaults
-                )
-            saison.save()
+            saison.import_from_statnuts(client.get_tournament_instance(saison.sn_instance_uuid), client)
         self.message_user(request, "Import effectué")
+        return HttpResponseRedirect(reverse('import_statnuts:ligue1_journee_changelist'))
 
-    import_saison_action.short_description = "Importer les données de ces saisons"
+    import_instance_action.short_description = "Importer les données de ces saisons"
 
     def changelist_view(self, request, extra_context=None):
         extra_context = extra_context or {}
@@ -53,5 +58,6 @@ class SaisonAdmin(admin.ModelAdmin):
 
 
 admin_site = ImportStatnutsSite('import_statnuts')
+admin_site.disable_action('delete_selected')
 admin_site.register(models.Saison, SaisonAdmin)
 admin_site.register(models.Journee, JourneeAdmin)

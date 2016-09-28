@@ -19,15 +19,15 @@ class StatnutsClient():
                                        client_secret=self.client_secret)
         return token
 
-    def get_journees(self, saison_uuid):
+    def get_tournament_instance(self, saison_uuid):
         journees_url = '/rest/tournament_instances/%s/?expand=steps' % saison_uuid
         if self.access_token is None:
             self.access_token = self._get_access_token()
         data = self.oauth.get(self.sn_base_url+journees_url).json()
         return data
 
-    def get_rencontres(self, journee_uuid):
-        rencontres_url = '/rest/tournament_steps/%s/?expand=meetings' % journee_uuid
+    def get_step(self, journee_uuid):
+        rencontres_url = '/rest/steps/%s/?expand=meetings' % journee_uuid
         if self.access_token is None:
             self.access_token = self._get_access_token()
         data = self.oauth.get(self.sn_base_url+rencontres_url).json()
