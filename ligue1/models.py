@@ -35,7 +35,7 @@ class Saison(Importe):
                 defaults=defaults
             )
             step_update = dateutil.parser.parse(step['updated_at'])
-            if created or step_update > journee.derniere_maj:
+            if created or journee.derniere_maj is None or step_update > journee.derniere_maj:
                 journee.import_from_statnuts(sn_client.get_step(step['uuid']), sn_client)
         super(Saison, self).import_from_statnuts(statnuts_instance, sn_client)
 
@@ -52,26 +52,7 @@ class Journee(Importe):
 
     def import_from_statnuts(self, statnuts_step, sn_client):
         for meeting in statnuts_step['meetings']:
-            r = Rencontre()
-            r.journee = self
-            r.import_from_statnuts(meeting, sn_client)
-
-            dom, _ = Club.objects.get_or_create(sn_team_uuid=meeting['home_team'],
-                                                defaults={'nom': meeting[
-                                                    'home_team_name']})
-            ext, _ = Club.objects.get_or_create(sn_team_uuid=meeting['away_team'],
-                                                defaults={'nom': meeting[
-                                                    'away_team_name']})
-            defaults = {'date': dateutil.parser.parse(meeting['date']),
-                        'club_domicile': dom,
-                        'club_exterieur': ext,
-                        'resultat': {'dom': meeting['home_result'], 'ext': meeting['away_result']}
-                        }
-            rencontre, created = Rencontre.objects.get_or_create(
-                sn_meeting_uuid=meeting['uuid'],
-                journee=self,
-                defaults=defaults
-            )
+            rencontre, created = Rencontre.objects.get_or_create_from_statnuts(meeting)
             meeting_update = dateutil.parser.parse(meeting['updated_at'])
             if created or meeting_update > rencontre.derniere_maj:
                 rencontre.import_from_statnuts(meeting, sn_client)
@@ -112,6 +93,38 @@ class Joueur(Importe):
         return '%s %s (%s)' % (self.prenom, self.nom, self.surnom)
 
 
+class RencontreManager(models.Manager):
+    def get_or_create_from_statnuts(self, statnuts_data):
+        if 'home_team_name' in statnuts_data:
+            # indique le mode résumé
+            ht_uuid = statnuts_data['home_team']
+            ht_name = statnuts_data['home_team_name']
+            at_uuid = statnuts_data['away_team']
+            at_name = statnuts_data['away_team_name']
+        else:
+            # indique le mode détaillé
+            ht_uuid = statnuts_data['home_team']['uuid']
+            ht_name = statnuts_data['home_team']['name']
+            at_uuid = statnuts_data['away_team']['uuid']
+            at_name = statnuts_data['away_team']['name']
+
+        dom, _ = Club.objects.get_or_create(sn_team_uuid=ht_uuid,
+                                            defaults={'nom': ht_name})
+        ext, _ = Club.objects.get_or_create(sn_team_uuid=at_uuid,
+                                            defaults={'nom': at_name})
+
+        defaults = {'date': dateutil.parser.parse(statnuts_data['date']),
+                    'club_domicile': dom,
+                    'club_exterieur': ext,
+                    'resultat': {'dom': statnuts_data['home_result'], 'ext': statnuts_data['away_result']}}
+        return self.get_or_create(
+            sn_meeting_uuid=statnuts_data['uuid'],
+            journee=Journee.objects.get(sn_step_uuid=statnuts_data[
+                'step']),
+            defaults=defaults
+        )
+
+
 class Rencontre(Importe):
     sn_meeting_uuid = models.UUIDField(null=False)
     club_domicile = models.ForeignKey(Club, null=False, related_name='recoit')
@@ -120,43 +133,26 @@ class Rencontre(Importe):
     resultat = JSONField()
     hors_score = models.BooleanField(default=False)
     journee = models.ForeignKey(Journee, null=False, related_name='rencontres')
+    objects = RencontreManager()
 
     def __str__(self):
         return '%s - %s' % (self.club_domicile.nom, self.club_exterieur.nom)
 
     def import_from_statnuts(self, statnuts_data, sn_client=None):
         meeting = sn_client.get_meeting(statnuts_data['uuid'])
-        dom, _ = Club.objects.get_or_create(sn_team_uuid=meeting['home_team']['uuid'],
-                                            defaults={'nom': meeting[
-                                                'home_team']['name']})
-        ext, _ = Club.objects.get_or_create(sn_team_uuid=meeting['away_team']['uuid'],
-                                            defaults={'nom': meeting[
-                                                'away_team']['name']})
-        defaults = {'date': dateutil.parser.parse(meeting['date']),
-                    'club_domicile': dom,
-                    'club_exterieur': ext,
-                    'resultat': {'dom': meeting['home_result'], 'ext': meeting['away_result']}
-                    }
-        rencontre, created = Rencontre.objects.get_or_create(
-            sn_meeting_uuid=meeting['uuid'],
-            journee=self,
-            defaults=defaults
-        )
+        rencontre, created = Rencontre.objects.get_or_create_from_statnuts(statnuts_data)
         meeting_update = dateutil.parser.parse(meeting['updated_at'])
         # TODO import roster
         for ros in meeting['roster']:
             # joueur, _ = Joueur.objects.get_or_create(sn_joueur_uuid=ros['player']['uuid'])
             pass
 
-    pass
-
-
-def save(self, *args, **kwargs):
-    # crée une participation si pas déjà existante
-    for cl in [self.club_domicile, self.club_exterieur]:
-        if not cl.participations_set.filter(journee__saison=self.journee.saison):
-            cl.participations_set.add(self.journee.saison)
-    super(Rencontre, self).save(*args, **kwargs)
+    def save(self, *args, **kwargs):
+        # crée une participation si pas déjà existante
+        for cl in [self.club_domicile, self.club_exterieur]:
+            if not cl.participations.filter(pk=self.journee.saison.pk).exists():
+                cl.participations.add(self.journee.saison)
+        super(Rencontre, self).save(*args, **kwargs)
 
 
 class Performance(Importe):
