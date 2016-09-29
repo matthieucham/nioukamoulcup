@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.postgres.fields import JSONField
 import datetime
 from django.utils import timezone
-
+from django.core.exceptions import ObjectDoesNotExist
 import dateutil.parser
 
 
@@ -54,7 +54,7 @@ class Journee(Importe):
         for meeting in statnuts_step['meetings']:
             rencontre, created = Rencontre.objects.get_or_create_from_statnuts(meeting)
             meeting_update = dateutil.parser.parse(meeting['updated_at'])
-            if created or meeting_update > rencontre.derniere_maj:
+            if created or rencontre.derniere_maj is None or meeting_update > rencontre.derniere_maj:
                 rencontre.import_from_statnuts(meeting, sn_client)
         super(Journee, self).import_from_statnuts(statnuts_step, sn_client)
 
@@ -80,14 +80,35 @@ class Club(Importe):
         return self.nom
 
 
+class JoueurManager(models.Manager):
+    def get_or_create_from_statnuts(self, statnuts_data):
+        defaults = {'prenom': statnuts_data['first_name'],
+                    'nom': statnuts_data['last_name'],
+                    'surnom': statnuts_data['usual_name'],
+                    'poste': 'G'}  # statnuts_data['position']}
+        return self.get_or_create(sn_person_uuid=statnuts_data['uuid'],
+                                  defaults=defaults)
+
+    def set_club_from_statnuts(self, joueur, statnuts_data):
+        for t in statnuts_data['results']:
+            try:
+                club = Club.objects.get(sn_team_uuid=t['uuid'])
+                joueur.club = club
+            except ObjectDoesNotExist:
+                pass
+        joueur.save()
+
+
 class Joueur(Importe):
     POSTES = (('G', 'Gardien'), ('D', 'Défenseur'), ('M', 'Milieu'), ('A', 'Attaquant'))
     prenom = models.CharField(max_length=50, blank=True)
     nom = models.CharField(max_length=50)
     surnom = models.CharField(max_length=50, blank=True)
     sn_person_uuid = models.UUIDField(null=False)
-    club = models.ForeignKey(Club, related_name='joueurs')
+    club = models.ForeignKey(Club, related_name='joueurs', null=True, blank=True)
     poste = models.CharField(max_length=1, choices=POSTES)
+
+    objects = JoueurManager()
 
     def __str__(self):
         return '%s %s (%s)' % (self.prenom, self.nom, self.surnom)
@@ -104,9 +125,9 @@ class RencontreManager(models.Manager):
         else:
             # indique le mode détaillé
             ht_uuid = statnuts_data['home_team']['uuid']
-            ht_name = statnuts_data['home_team']['name']
+            ht_name = statnuts_data['home_team']['short_name']
             at_uuid = statnuts_data['away_team']['uuid']
-            at_name = statnuts_data['away_team']['name']
+            at_name = statnuts_data['away_team']['short_name']
 
         dom, _ = Club.objects.get_or_create(sn_team_uuid=ht_uuid,
                                             defaults={'nom': ht_name})
@@ -140,12 +161,20 @@ class Rencontre(Importe):
 
     def import_from_statnuts(self, statnuts_data, sn_client=None):
         meeting = sn_client.get_meeting(statnuts_data['uuid'])
-        rencontre, created = Rencontre.objects.get_or_create_from_statnuts(statnuts_data)
-        meeting_update = dateutil.parser.parse(meeting['updated_at'])
-        # TODO import roster
+        rencontre, _ = Rencontre.objects.get_or_create_from_statnuts(statnuts_data)
+        # suppr toutes les performances déjà connues : on repart à 0 pour reimporter
+        Performance.objects.filter(rencontre=rencontre).delete()
+
         for ros in meeting['roster']:
-            # joueur, _ = Joueur.objects.get_or_create(sn_joueur_uuid=ros['player']['uuid'])
-            pass
+            joueur, created = Joueur.objects.get_or_create_from_statnuts(ros['player'])
+            if created:  # TODO updated_at ?
+                Joueur.objects.set_club_from_statnuts(joueur, sn_client.get_person_teams(ros['player']['uuid']))
+            club = Club.objects.get(sn_team_uuid=ros['played_for'])
+            tps = ros['stats']['playtime']
+            # TODO notes avec conversion
+            perfs = Performance.objects.create(rencontre=rencontre, joueur=joueur, club=club, temps_de_jeu=tps,
+                                               details=ros['stats'])
+        super(Rencontre, self).import_from_statnuts(statnuts_data, sn_client)
 
     def save(self, *args, **kwargs):
         # crée une participation si pas déjà existante
@@ -159,10 +188,7 @@ class Performance(Importe):
     rencontre = models.ForeignKey(Rencontre, null=False)
     joueur = models.ForeignKey(Joueur, null=False)
     club = models.ForeignKey(Club, null=False)
-    note = models.DecimalField(max_digits=4, decimal_places=2)
-    bonus = models.DecimalField(max_digits=4, decimal_places=2)
     temps_de_jeu = models.PositiveSmallIntegerField()
-    score_verrouille = models.DecimalField(max_digits=4, decimal_places=2)
     details = JSONField()
 
     def __str__(self):

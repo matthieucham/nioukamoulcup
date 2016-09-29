@@ -36,3 +36,7 @@ class StatnutsClient():
     def get_meeting(self, meeting_uuid):
         meeting_url = '/rest/footballmeetings/%s/' % meeting_uuid
         return self._get_data(meeting_url)
+
+    def get_person_teams(self, person_uuid):
+        teams_url = '/rest/football_players/%s/current_teams' % person_uuid
+        return self._get_data(teams_url)
