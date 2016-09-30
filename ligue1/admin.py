@@ -27,7 +27,11 @@ class JourneeAdmin(admin.ModelAdmin):
         return obj.saison.nom
 
     def import_step_action(self, request, queryset):
-        pass
+        client = StatnutsClient(settings.STATNUTS_CLIENT_ID, settings.STATNUTS_SECRET, settings.STATNUTS_URL)
+        for journee in queryset:
+            journee.import_from_statnuts(client.get_step(journee.sn_step_uuid), client, force_import=True)
+        self.message_user(request, "Import effectué")
+        return HttpResponseRedirect(reverse('import_statnuts:ligue1_journee_changelist'))
 
     import_step_action.short_description = "Importer les données de ces journées"
 
