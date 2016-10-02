@@ -1,11 +1,11 @@
 from django.contrib import admin
+from django.http import HttpResponseRedirect
+from django.core.urlresolvers import reverse
 
 import ligue1
 from ligue1 import models
 from statnuts import StatnutsClient
 from nioukamoulcup import settings
-from django.http import HttpResponseRedirect
-from django.core.urlresolvers import reverse
 
 
 class ImportStatnutsSite(admin.AdminSite):
@@ -29,7 +29,8 @@ class JourneeAdmin(admin.ModelAdmin):
     def import_step_action(self, request, queryset):
         client = StatnutsClient(settings.STATNUTS_CLIENT_ID, settings.STATNUTS_SECRET, settings.STATNUTS_URL)
         for journee in queryset:
-            journee.import_from_statnuts(client.get_step(journee.sn_step_uuid), client, force_import=True)
+            models.Journee.objects.import_from_statnuts(journee.saison, client.get_step(journee.sn_step_uuid), client,
+                                                        force_import=True)
         self.message_user(request, "Import effectué")
         return HttpResponseRedirect(reverse('import_statnuts:ligue1_journee_changelist'))
 
@@ -49,7 +50,8 @@ class SaisonAdmin(admin.ModelAdmin):
         # appeler Statnuts ici
         client = StatnutsClient(settings.STATNUTS_CLIENT_ID, settings.STATNUTS_SECRET, settings.STATNUTS_URL)
         for saison in queryset:
-            saison.import_from_statnuts(client.get_tournament_instance(saison.sn_instance_uuid), client)
+            models.Saison.objects.import_from_statnuts(client.get_tournament_instance(saison.sn_instance_uuid), client,
+                                                       force_import=True)
         self.message_user(request, "Import effectué")
         return HttpResponseRedirect(reverse('import_statnuts:ligue1_journee_changelist'))
 

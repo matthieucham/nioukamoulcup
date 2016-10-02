@@ -9,12 +9,19 @@ import dateutil.parser
 class Importe(models.Model):
     derniere_maj = models.DateTimeField(null=True)
 
-    def import_from_statnuts(self, statnuts_data, sn_client=None, force_import=False):
-        self.derniere_maj = dateutil.parser.parse(statnuts_data['updated_at'])
-        self.save()
-
     class Meta:
         abstract = True
+
+
+class SaisonManager(models.Manager):
+    def import_from_statnuts(self, statnuts_instance, sn_client, force_import=False):
+        saison = self.get(sn_instance_uuid=statnuts_instance['uuid'])  # leve une exception si pas trouvé => normal
+        instance_update = dateutil.parser.parse(statnuts_instance['updated_at'])
+        if force_import or saison.derniere_maj is None or instance_update > saison.derniere_maj:
+            for step in statnuts_instance['steps']:
+                Journee.objects.import_from_statnuts(saison, sn_client.get_step(step['uuid']), sn_client)
+        saison.derniere_maj = instance_update
+        saison.save()
 
 
 class Saison(Importe):
@@ -22,22 +29,26 @@ class Saison(Importe):
     sn_instance_uuid = models.UUIDField(null=False)
     debut = models.DateField()
     fin = models.DateField()
+    objects = SaisonManager()
 
     def __str__(self):
         return self.nom
 
-    def import_from_statnuts(self, statnuts_instance, sn_client=None, force_import=False):
-        for step in statnuts_instance['steps']:
-            defaults = {'numero': int(step['name'])}
-            journee, created = Journee.objects.get_or_create(
-                sn_step_uuid=step['uuid'],
-                saison=self,
-                defaults=defaults
-            )
-            step_update = dateutil.parser.parse(step['updated_at'])
-            if force_import or created or journee.derniere_maj is None or step_update > journee.derniere_maj:
-                journee.import_from_statnuts(sn_client.get_step(step['uuid']), sn_client)
-        super(Saison, self).import_from_statnuts(statnuts_instance, sn_client)
+
+class JourneeManager(models.Manager):
+    def import_from_statnuts(self, saison, statnuts_step, sn_client, force_import=False):
+        defaults = {'numero': int(statnuts_step['name'])}
+        journee, created = self.get_or_create(
+            sn_step_uuid=statnuts_step['uuid'],
+            saison=saison,
+            defaults=defaults
+        )
+        step_update = dateutil.parser.parse(statnuts_step['updated_at'])
+        if force_import or created or journee.derniere_maj is None or step_update > journee.derniere_maj:
+            for meeting in statnuts_step['meetings']:
+                Rencontre.objects.import_from_statnuts(journee, sn_client.get_meeting(meeting['uuid']), sn_client)
+        journee.derniere_maj = step_update
+        journee.save()
 
 
 class Journee(Importe):
@@ -46,17 +57,10 @@ class Journee(Importe):
     debut = models.DateField(null=True)
     fin = models.DateField(null=True)
     saison = models.ForeignKey(Saison, related_name='journees')
+    objects = JourneeManager()
 
     def __str__(self):
         return str(self.numero)
-
-    def import_from_statnuts(self, statnuts_step, sn_client, force_import=False):
-        for meeting in statnuts_step['meetings']:
-            rencontre, created = Rencontre.objects.get_or_create_from_statnuts(meeting)
-            meeting_update = dateutil.parser.parse(meeting['updated_at'])
-            if force_import or created or rencontre.derniere_maj is None or meeting_update > rencontre.derniere_maj:
-                rencontre.import_from_statnuts(meeting, sn_client)
-        super(Journee, self).import_from_statnuts(statnuts_step, sn_client)
 
     def save(self, *args, **kwargs):
         if self.pk is not None:
@@ -85,18 +89,18 @@ class JoueurManager(models.Manager):
         defaults = {'prenom': statnuts_data['first_name'],
                     'nom': statnuts_data['last_name'],
                     'surnom': statnuts_data['usual_name'],
-                    'poste': statnuts_data['position'],
-                    'derniere_maj': datetime.datetime.now()}
+                    'poste': statnuts_data['position']}
         return self.get_or_create(sn_person_uuid=statnuts_data['uuid'],
                                   defaults=defaults)
 
-    def set_club_from_statnuts(self, joueur, statnuts_data):
+    def set_club_from_statnuts(self, joueur, statnuts_data, maj):
         for t in statnuts_data['results']:
             try:
                 club = Club.objects.get(sn_team_uuid=t['uuid'])
                 joueur.club = club
             except ObjectDoesNotExist:
                 pass
+        joueur.derniere_maj = maj
         joueur.save()
 
 
@@ -116,19 +120,25 @@ class Joueur(Importe):
 
 
 class RencontreManager(models.Manager):
-    def get_or_create_from_statnuts(self, statnuts_data):
-        if 'home_team_name' in statnuts_data:
-            # indique le mode résumé
-            ht_uuid = statnuts_data['home_team']
-            ht_name = statnuts_data['home_team_name']
-            at_uuid = statnuts_data['away_team']
-            at_name = statnuts_data['away_team_name']
-        else:
-            # indique le mode détaillé
-            ht_uuid = statnuts_data['home_team']['uuid']
-            ht_name = statnuts_data['home_team']['short_name']
-            at_uuid = statnuts_data['away_team']['uuid']
-            at_name = statnuts_data['away_team']['short_name']
+    def import_from_statnuts(self, journee, statnuts_meeting, sn_client, force_import=False):
+        rencontre, created = self._get_or_create_from_statnuts(journee, statnuts_meeting)
+        meeting_update = dateutil.parser.parse(statnuts_meeting['updated_at'])
+        if force_import or created or rencontre.derniere_maj is None or meeting_update > rencontre.derniere_maj:
+            self._delete_and_recreate_performances(rencontre, statnuts_meeting, sn_client)
+
+    def _get_or_create_from_statnuts(self, journee, statnuts_data):
+        # if 'home_team_name' in statnuts_data:
+        # # indique le mode résumé
+        # ht_uuid = statnuts_data['home_team']
+        #     ht_name = statnuts_data['home_team_name']
+        #     at_uuid = statnuts_data['away_team']
+        #     at_name = statnuts_data['away_team_name']
+        # else:
+        # indique le mode détaillé
+        ht_uuid = statnuts_data['home_team']['uuid']
+        ht_name = statnuts_data['home_team']['short_name']
+        at_uuid = statnuts_data['away_team']['uuid']
+        at_name = statnuts_data['away_team']['short_name']
 
         dom, _ = Club.objects.get_or_create(sn_team_uuid=ht_uuid,
                                             defaults={'nom': ht_name})
@@ -140,10 +150,29 @@ class RencontreManager(models.Manager):
                     'club_exterieur': ext}
         return self.get_or_create(
             sn_meeting_uuid=statnuts_data['uuid'],
-            journee=Journee.objects.get(sn_step_uuid=statnuts_data[
-                'step']),
-            defaults=defaults
-        )
+            journee=journee,
+            defaults=defaults)
+
+    def _delete_and_recreate_performances(self, rencontre, statnuts_meeting, sn_client):
+        # suppr toutes les performances déjà connues : on repart à 0 pour reimporter
+        Performance.objects.filter(rencontre=rencontre).delete()
+        dom_or_ext = {statnuts_meeting['home_team']['uuid']: 'dom', statnuts_meeting['away_team']['uuid']: 'ext'}
+        for ros in statnuts_meeting['roster']:
+            joueur, created = Joueur.objects.get_or_create_from_statnuts(ros['player'])
+            joueur_updated_at = dateutil.parser.parse(ros['player']['updated_at'])
+            if created or joueur.derniere_maj is None or joueur.derniere_maj < joueur_updated_at:
+                Joueur.objects.set_club_from_statnuts(joueur, sn_client.get_person_teams(ros['player']['uuid']),
+                                                      joueur_updated_at)
+            club = Club.objects.get(sn_team_uuid=ros['played_for'])
+            if ros['stats'] is None:
+                tps = 0  # TODO ?
+            else:
+                tps = ros['stats']['playtime']
+                Performance.objects.create(rencontre=rencontre, joueur=joueur, club=club, temps_de_jeu=tps,
+                                           details=make_performance_details(ros, dom_or_ext[ros['played_for']]))
+        rencontre.resultat = make_rencontre_resultat(statnuts_meeting)
+        rencontre.derniere_maj = dateutil.parser.parse(statnuts_meeting['updated_at'])
+        rencontre.save()
 
 
 class Rencontre(Importe):
@@ -158,27 +187,6 @@ class Rencontre(Importe):
 
     def __str__(self):
         return '%s - %s' % (self.club_domicile.nom, self.club_exterieur.nom)
-
-    def import_from_statnuts(self, statnuts_data, sn_client=None, force_import=False):
-        meeting = sn_client.get_meeting(statnuts_data['uuid'])
-        rencontre, _ = Rencontre.objects.get_or_create_from_statnuts(meeting)
-        # suppr toutes les performances déjà connues : on repart à 0 pour reimporter
-        Performance.objects.filter(rencontre=rencontre).delete()
-        dom_or_ext = {meeting['home_team']['uuid']: 'dom', meeting['away_team']['uuid']: 'ext'}
-        for ros in meeting['roster']:
-            joueur, created = Joueur.objects.get_or_create_from_statnuts(ros['player'])
-            if force_import or created or joueur.derniere_maj is None or joueur.derniere_maj < dateutil.parser.parse(
-                    ros['player']['updated_at']):
-                Joueur.objects.set_club_from_statnuts(joueur, sn_client.get_person_teams(ros['player']['uuid']))
-            club = Club.objects.get(sn_team_uuid=ros['played_for'])
-            if ros['stats'] is None:
-                tps = 0
-            else:
-                tps = ros['stats']['playtime']
-                Performance.objects.create(rencontre=self, joueur=joueur, club=club, temps_de_jeu=tps,
-                                           details=make_performance_details(ros, dom_or_ext[ros['played_for']]))
-        self.resultat = make_rencontre_resultat(meeting)
-        super(Rencontre, self).import_from_statnuts(statnuts_data, sn_client)
 
     def save(self, *args, **kwargs):
         # crée une participation si pas déjà existante
