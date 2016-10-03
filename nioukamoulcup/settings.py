@@ -44,6 +44,8 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'django.contrib.humanize',
 
+    'inline_actions',
+
     # dj-userena
     'userena',
     'guardian',
