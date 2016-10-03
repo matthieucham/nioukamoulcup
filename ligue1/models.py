@@ -4,6 +4,7 @@ import datetime
 from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
 import dateutil.parser
+from statnuts import note_converter
 
 
 class Importe(models.Model):
@@ -85,6 +86,8 @@ class Club(Importe):
 
 
 class JoueurManager(models.Manager):
+    POSTE_SORT_ORDER = {'G': 0, 'D': 1, 'M': 2, 'A': 3, None: '10'}
+
     def get_or_create_from_statnuts(self, statnuts_data):
         defaults = {'prenom': statnuts_data['first_name'],
                     'nom': statnuts_data['last_name'],
@@ -130,9 +133,9 @@ class RencontreManager(models.Manager):
         # if 'home_team_name' in statnuts_data:
         # # indique le mode résumé
         # ht_uuid = statnuts_data['home_team']
-        #     ht_name = statnuts_data['home_team_name']
-        #     at_uuid = statnuts_data['away_team']
-        #     at_name = statnuts_data['away_team_name']
+        # ht_name = statnuts_data['home_team_name']
+        # at_uuid = statnuts_data['away_team']
+        # at_name = statnuts_data['away_team_name']
         # else:
         # indique le mode détaillé
         ht_uuid = statnuts_data['home_team']['uuid']
@@ -181,7 +184,6 @@ class Rencontre(Importe):
     club_exterieur = models.ForeignKey(Club, null=False, related_name='visite')
     date = models.DateTimeField()
     resultat = JSONField(null=True)
-    hors_score = models.BooleanField(default=False)
     journee = models.ForeignKey(Journee, null=False, related_name='rencontres')
     objects = RencontreManager()
 
@@ -228,5 +230,5 @@ def make_rencontre_resultat(statnuts_meeting):
 
 
 def make_performance_details(statnuts_roster, dom_or_ext):
-    # TODO notes
-    return {'equipe': dom_or_ext, 'stats': statnuts_roster['stats']}
+    return {'equipe': dom_or_ext, 'stats': statnuts_roster['stats'], 'note': note_converter.compute_note(
+        statnuts_roster['ratings'])}

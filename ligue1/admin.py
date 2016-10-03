@@ -1,4 +1,4 @@
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 
@@ -6,16 +6,79 @@ import ligue1
 from ligue1 import models
 from statnuts import StatnutsClient
 from nioukamoulcup import settings
+from inline_actions.admin import InlineActionsMixin
+from inline_actions.admin import InlineActionsModelAdminMixin
 
 
 class ImportStatnutsSite(admin.AdminSite):
     site_header = "Pilotage de l'import des données depuis Statnuts"
 
 
-class JourneeAdmin(admin.ModelAdmin):
+class PerformanceInline(admin.TabularInline):
+    model = models.Performance
+    can_delete = False
+    fields = ('joueur', 'club', 'temps_de_jeu', 'details',)
+    readonly_fields = ('joueur', 'club', 'temps_de_jeu', 'details',)
+    ordering = ('club',)
+
+    def has_add_permission(self, request):
+        return False
+
+
+class RencontreAdmin(admin.ModelAdmin):
+    list_display = ['__str__', 'date', 'resultat', 'sn_meeting_uuid', 'derniere_maj']
+    fields = ('club_domicile', 'club_exterieur', 'date', 'resultat', 'journee', 'sn_meeting_uuid', 'derniere_maj')
+    readonly_fields = (
+        'club_domicile', 'club_exterieur', 'date', 'resultat', 'journee', 'sn_meeting_uuid', 'derniere_maj')
+    ordering = ['date']
+    actions = ['import_meetings_action']
+    inlines = [PerformanceInline]
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def import_meetings_action(self, request, queryset):
+        client = StatnutsClient(settings.STATNUTS_CLIENT_ID, settings.STATNUTS_SECRET, settings.STATNUTS_URL)
+        for rencontre in queryset:
+            models.Rencontre.objects.import_from_statnuts(rencontre.journee,
+                                                          client.get_meeting(rencontre.sn_meeting_uuid),
+                                                          client,
+                                                          force_import=True)
+        self.message_user(request, "Import effectué")
+        return HttpResponseRedirect(reverse('import_statnuts:ligue1_journee_changelist'))
+
+    import_meetings_action.short_description = "Importer les rencontres sélectionnées"
+
+
+class RencontreInline(InlineActionsMixin, admin.TabularInline):
+    model = models.Rencontre
+    can_delete = False
+    fields = ('date', 'resultat', 'sn_meeting_uuid', 'derniere_maj',)
+    readonly_fields = ('date', 'resultat', 'sn_meeting_uuid', 'derniere_maj',)
+
+    actions = ['import_meeting_action']
+
+    def has_add_permission(self, request):
+        return False
+
+    def import_meeting_action(self, request, obj, inline_obj):
+        client = StatnutsClient(settings.STATNUTS_CLIENT_ID, settings.STATNUTS_SECRET, settings.STATNUTS_URL)
+        models.Rencontre.objects.import_from_statnuts(obj, client.get_meeting(inline_obj.sn_meeting_uuid), client,
+                                                      force_import=True)
+        messages.info(request, "Import effectué")
+        return HttpResponseRedirect(reverse('import_statnuts:ligue1_journee_changelist'))
+
+    import_meeting_action.short_description = "Importer ce match"
+
+
+class JourneeAdmin(InlineActionsModelAdminMixin, admin.ModelAdmin):
     list_display = ['numero', 'get_saison', 'sn_step_uuid', 'debut', 'fin', 'derniere_maj']
     ordering = ['-saison', '-numero']
     actions = ['import_step_action']
+    inlines = [RencontreInline, ]
 
     def has_add_permission(self, request):
         return False
@@ -34,7 +97,7 @@ class JourneeAdmin(admin.ModelAdmin):
         self.message_user(request, "Import effectué")
         return HttpResponseRedirect(reverse('import_statnuts:ligue1_journee_changelist'))
 
-    import_step_action.short_description = "Importer les données de ces journées"
+    import_step_action.short_description = "Mettre à jour"
 
 
 class SaisonAdmin(admin.ModelAdmin):
@@ -69,3 +132,4 @@ admin_site.register(models.Saison, SaisonAdmin)
 admin_site.register(models.Journee, JourneeAdmin)
 admin_site.register(models.Joueur)
 admin_site.register(models.Club)
+admin_site.register(models.Rencontre, RencontreAdmin)
