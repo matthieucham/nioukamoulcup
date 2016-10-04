@@ -48,7 +48,7 @@ class RencontreAdmin(admin.ModelAdmin):
                                                           client,
                                                           force_import=True)
         self.message_user(request, "Import effectué")
-        return HttpResponseRedirect(reverse('import_statnuts:ligue1_journee_changelist'))
+        return HttpResponseRedirect(reverse('import_statnuts:ligue1_rencontre_changelist'))
 
     import_meetings_action.short_description = "Importer les rencontres sélectionnées"
 
@@ -69,7 +69,7 @@ class RencontreInline(InlineActionsMixin, admin.TabularInline):
         models.Rencontre.objects.import_from_statnuts(obj, client.get_meeting(inline_obj.sn_meeting_uuid), client,
                                                       force_import=True)
         messages.info(request, "Import effectué")
-        return HttpResponseRedirect(reverse('import_statnuts:ligue1_journee_changelist'))
+        return HttpResponseRedirect(reverse('import_statnuts:ligue1_rencontre_changelist'))
 
     import_meeting_action.short_description = "Importer ce match"
 
@@ -95,7 +95,7 @@ class JourneeAdmin(InlineActionsModelAdminMixin, admin.ModelAdmin):
             models.Journee.objects.import_from_statnuts(journee.saison, client.get_step(journee.sn_step_uuid), client,
                                                         force_import=True)
         self.message_user(request, "Import effectué")
-        return HttpResponseRedirect(reverse('import_statnuts:ligue1_journee_changelist'))
+        return HttpResponseRedirect(reverse('import_statnuts:ligue1_rencontre_changelist'))
 
     import_step_action.short_description = "Mettre à jour"
 
