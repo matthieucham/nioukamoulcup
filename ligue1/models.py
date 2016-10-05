@@ -119,7 +119,7 @@ class Joueur(Importe):
     objects = JoueurManager()
 
     def __str__(self):
-        return '%s %s (%s)' % (self.prenom, self.nom, self.surnom)
+        return '%s %s%s' % (self.prenom, self.nom, (' (%s)' % self.surnom if self.surnom else ''))
 
 
 class RencontreManager(models.Manager):
