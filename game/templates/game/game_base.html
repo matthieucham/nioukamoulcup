@@ -1,0 +1,20 @@
+{% extends "game/skeleton.html" %}
+{% load static %}
+
+{% block content %}
+<div class="col-sm-2 sidenav">
+    {% block left-menu %}{% endblock left-menu %}
+</div>
+<div class="col-sm-10 text-left">
+    <p class="h1 page-title">{% block title-section %}{% endblock title-section %}</p>
+
+    <div class="row">
+        <div class="col-sm-8">
+            {% block content-center %}{% endblock content-center %}
+        </div>
+        <div class="col-sm-4">
+            {% block content-right %}{% endblock content-right %}
+        </div>
+    </div>
+</div>
+{% endblock content %}
