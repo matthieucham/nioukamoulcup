@@ -1,5 +1,6 @@
 __author__ = 'mgrandrie'
 from django.db import models
+
 from ligue1 import models as l1models
 from game.scoring import scoring
 
@@ -34,11 +35,11 @@ class JJScoreManager(models.Manager):
                 bbp = scoring.compute_best_by_position(r)
             for perf in r.performances.all():
                 note, bonus, comp = scoring.compute_score_performance(perf, bbp)
-                jjscore = self.get_or_create(journee_scoring=journee_scoring, joueur=perf.joueur, defaults={
+                self.update_or_create(journee_scoring=journee_scoring, joueur=perf.joueur, defaults={
                     'note': note, 'bonus': bonus, 'compensation': comp})
-        # for cl in journee_scoring.journee.saison.participants:
-        #     if not cl.pk in computed_club_pks:
-        #         # compenser scores matchs reportés ...
+                # for cl in journee_scoring.journee.saison.participants:
+                # if not cl.pk in computed_club_pks:
+                #         # compenser scores matchs reportés ...
 
 
 class JJScore(models.Model):

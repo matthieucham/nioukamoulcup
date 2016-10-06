@@ -1,13 +1,13 @@
 from django.contrib import admin, messages
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
+from inline_actions.admin import InlineActionsMixin
+from inline_actions.admin import InlineActionsModelAdminMixin
 
 import ligue1
 from ligue1 import models
 from statnuts import StatnutsClient
 from nioukamoulcup import settings
-from inline_actions.admin import InlineActionsMixin
-from inline_actions.admin import InlineActionsModelAdminMixin
 
 
 class ImportStatnutsSite(admin.AdminSite):
