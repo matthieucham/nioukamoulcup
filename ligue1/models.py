@@ -199,7 +199,7 @@ class Rencontre(Importe):
 
 
 class Performance(models.Model):
-    rencontre = models.ForeignKey(Rencontre, null=False)
+    rencontre = models.ForeignKey(Rencontre, null=False, related_name='performances')
     joueur = models.ForeignKey(Joueur, null=False)
     club = models.ForeignKey(Club, null=False)
     temps_de_jeu = models.PositiveSmallIntegerField()

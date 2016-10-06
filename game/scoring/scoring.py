@@ -1,7 +1,4 @@
 __author__ = 'mgrandrie'
-from ligue1 import models as l1models
-from game import models
-
 
 BONUS = {
     'COLLECTIVE': {
@@ -26,15 +23,29 @@ PLAYTIME = {'MAX_SHORT': 15, 'MAX_LONG': 30, 'MIN_BONUS': 45}
 COMPENSATION = {'SHORT': 1, 'LONG': 3, 'CANCELLED': 5}
 
 
-def _compute_score(perf, best_note_by_position):
+def compute_best_by_position(rencontre):
+    best_by_position = {'dom': {'G': 0, 'D': 0, 'M': 0, 'A': 0}, 'ext': {'G': 0, 'D': 0, 'M': 0, 'A': 0}}
+    for pj in rencontre.performances.all():
+        if pj.joueur.poste is None:
+            continue
+        if pj.temps_de_jeu >= PLAYTIME['MAX_LONG'] and pj.details['note'] is not None:
+            best_by_position[pj.details['equipe']][pj.joueur.poste] = max(pj.details['note'],
+                                                                          best_by_position[pj.details['equipe']][
+                                                                              pj.joueur.poste])
+    return best_by_position
+
+
+def compute_score_performance(perf, best_note_by_position):
+    if perf.joueur.poste is None:
+            return None, 0, None
     if perf.temps_de_jeu < PLAYTIME['MAX_SHORT']:
-        None, _compute_bonus(perf, False, best_note_by_position), COMPENSATION['SHORT']
+        return None, _compute_bonus(perf, False, best_note_by_position), COMPENSATION['SHORT']
     elif perf.temps_de_jeu < PLAYTIME['MAX_LONG']:
-        None, _compute_bonus(perf, False, best_note_by_position), COMPENSATION['LONG']
+        return None, _compute_bonus(perf, False, best_note_by_position), COMPENSATION['LONG']
     elif perf.temps_de_jeu < PLAYTIME['MIN_BONUS']:
-        perf.details['note'], _compute_bonus(perf, False, best_note_by_position), None
+        return perf.details['note'], _compute_bonus(perf, False, best_note_by_position), None
     else:
-        perf.details['note'], _compute_bonus(perf, True, best_note_by_position), None
+        return perf.details['note'], _compute_bonus(perf, True, best_note_by_position), None
 
 
 def _compute_bonus(perf, has_collective_bonus, best_note_by_position):
@@ -45,7 +56,7 @@ def _compute_bonus(perf, has_collective_bonus, best_note_by_position):
                                                                                                        'penalties_scored'),
                    ('PASS', 'goals_assists'), ('HALFPASS', 'penalties_awarded')]:
         base += (BONUS['PERSONAL'][i][poste] * perf.details['stats'][j])
-    if perf.details['note'] >= best_note_by_position[poste]:
+    if perf.details['note'] >= best_note_by_position[perf.details['equipe']][poste]:
         base += BONUS['PERSONAL']['LEADER'][poste]
     if has_collective_bonus:
         # get from rencontre...
