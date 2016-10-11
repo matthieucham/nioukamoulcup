@@ -1,6 +1,7 @@
 __author__ = 'mgrandrie'
 import operator
 from django import template
+from django.template import defaultfilters
 from ligue1 import models as l1models
 
 register = template.Library()
@@ -27,3 +28,13 @@ def last_journees(nb=1):
     """
     journees = l1models.Journee.objects.order_by('-fin')[:nb]
     return {'journees': sorted(journees, key=operator.attrgetter('fin'))}
+
+
+@register.filter()
+def journee_dates(journee, pattern=None):
+    if journee.debut == journee.fin:
+        return defaultfilters.date(journee.debut, pattern)
+    else:
+        sep_char = '-'
+        return '%s %s %s' % (defaultfilters.date(journee.debut, pattern), sep_char, defaultfilters.date(journee.fin,
+                                                                                                        pattern))

@@ -2,10 +2,10 @@
 {% load static %}
 
 {% block row-content %}
-        <div class="col-sm-8">
+        <div id="centercol" class="col-sm-8">
             {% block content-center %}{% endblock content-center %}
         </div>
-        <div class="col-sm-4">
+        <div id="rightcol" class="col-sm-4 text-center small">
             {% block content-right %}{% endblock content-right %}
         </div>
 </div>
