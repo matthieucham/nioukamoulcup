@@ -1,0 +1,17 @@
+{% load l1results %}
+{% load i18n %}
+<div class="panel panel-default">
+    <div class="panel-heading">Derniers résultats L1</div>
+    <div class="panel-body">
+        {% for journee in journees %}
+            <p>Journée {{ journee.numero }}</p>
+            <ul>
+                {% for r in journee.rencontres.all %}
+                    <li>
+                        {% rencontre_score r %}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endfor %}
+    </div>
+</div>

@@ -1,0 +1,12 @@
+{% extends "game/game_base.html" %}
+{% load static %}
+
+{% block row-content %}
+        <div class="col-sm-8">
+            {% block content-center %}{% endblock content-center %}
+        </div>
+        <div class="col-sm-4">
+            {% block content-right %}{% endblock content-right %}
+        </div>
+</div>
+{% endblock row-content %}

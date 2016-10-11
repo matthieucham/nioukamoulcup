@@ -9,12 +9,7 @@
     <p class="h1 page-title">{% block title-section %}{% endblock title-section %}</p>
 
     <div class="row">
-        <div class="col-sm-8">
-            {% block content-center %}{% endblock content-center %}
-        </div>
-        <div class="col-sm-4">
-            {% block content-right %}{% endblock content-right %}
-        </div>
+        {% block row-content %}{% endblock row-content %}
     </div>
 </div>
 {% endblock content %}
