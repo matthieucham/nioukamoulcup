@@ -17,13 +17,12 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.conf.urls import url, include
 from django.contrib import admin
-from game.frontend import HomePage
 from wiki.urls import get_pattern as get_wiki_pattern
 from django_nyt.urls import get_pattern as get_nyt_pattern
 from ligue1.admin import admin_site
 
 urlpatterns = [
-    url(r'^$', HomePage.as_view(), name="homepage"),
+    url(r'^$', include('game.urls')),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^accounts/', include('userena.urls')),
     url(r'^weblog/', include('zinnia.urls')),
