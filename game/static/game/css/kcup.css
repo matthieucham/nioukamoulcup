@@ -2,6 +2,10 @@ body {
 	background: url(../images/squairy_light.png) repeat;
 }
 
+.wrapper {
+        min-height: 450px;
+}
+
 .navbar {
     font-family: 'Baloo Tamma', cursive;
 }
@@ -33,6 +37,11 @@ body {
     color: #83e66e;
 }
 
+#rightcol .smallbox-title {
+    background-color: #fbedfa;
+    font-weight: bold;
+}
+
 
 .hover-active {
     display: none;
@@ -54,7 +63,7 @@ body {
 }
 
         /* Set height of the grid so .sidenav can be 100% (adjust as needed) */
-        .row.content {height: 450px}
+        .row.content {height: 100%}
 
         /* Set gray background color and 100% height */
         .sidenav {

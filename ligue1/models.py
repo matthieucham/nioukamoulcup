@@ -188,7 +188,11 @@ class Rencontre(Importe):
     objects = RencontreManager()
 
     def __str__(self):
-        return '%s - %s' % (self.club_domicile.nom, self.club_exterieur.nom)
+        if self.resultat is None:
+            return '%s - %s' % (self.club_domicile.nom, self.club_exterieur.nom)
+        else:
+            return '%s %s-%s %s' % (self.club_domicile.nom, self.resultat['dom']['buts_pour'], self.resultat['ext'][
+                'buts_pour'], self.club_exterieur.nom)
 
     def save(self, *args, **kwargs):
         # crée une participation si pas déjà existante
@@ -196,6 +200,9 @@ class Rencontre(Importe):
             if not cl.participations.filter(pk=self.journee.saison.pk).exists():
                 cl.participations.add(self.journee.saison)
         super(Rencontre, self).save(*args, **kwargs)
+
+    class Meta:
+        ordering = ['date']
 
 
 class Performance(models.Model):
