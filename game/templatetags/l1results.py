@@ -15,7 +15,7 @@ def rencontre_score(rencontre):
     else:
         score_dom = rencontre.resultat['dom']['buts_pour']
         score_ext = rencontre.resultat['ext']['buts_pour']
-    return {'club_dom': rencontre.club_domicile.nom, 'club_ext': rencontre.club_exterieur.nom, 'score_dom':
+    return {'rid': rencontre.pk, 'club_dom': rencontre.club_domicile.nom, 'club_ext': rencontre.club_exterieur.nom, 'score_dom':
         score_dom, 'score_ext': score_ext}
 
 

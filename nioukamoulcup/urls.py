@@ -22,7 +22,7 @@ from django_nyt.urls import get_pattern as get_nyt_pattern
 from ligue1.admin import admin_site
 
 urlpatterns = [
-    url(r'^$', include('game.urls')),
+    url(r'^game/', include('game.urls')),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^accounts/', include('userena.urls')),
     url(r'^weblog/', include('zinnia.urls')),
