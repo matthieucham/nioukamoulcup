@@ -5,9 +5,9 @@ from ligue1 import models as l1models
 
 
 class HomePage(TemplateView):
-    template_name = 'game/home.html'
+    template_name = 'game/home/info.html'
 
 
 class ResultRencontreView(DetailView):
     model = l1models.Rencontre
-    template_name = 'game/result_rencontre.html'
+    template_name = 'game/home/result_rencontre.html'

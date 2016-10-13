@@ -1,0 +1,39 @@
+{% load game %}
+
+<nav class="navbar navbar-inverse">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="#" class="navbar-left navbar-brand">Kamoulcup</a>
+        </div>
+
+        <div class="collapse navbar-collapse" id="myNavbar">
+            <ul class="nav navbar-nav">
+                <li class="{% is_navbar_active request 'home' %}"><a href="{% url 'home_info' %}">Maison</a></li>
+                <li class="dropdown {% is_navbar_active request 'league' %}">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">Mes ligues <span
+                            class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#">Liguain</a></li>
+                        <li class="divider"></li>
+                        <li><a href="#">Rejoindre une ligue...</a></li>
+                    </ul>
+                </li>
+                <li class="{% is_navbar_active request 'wiki' %}"><a href="#">Comment ça marche ?</a></li>
+                <li><a href="#">Forum</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li class="dropdown">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">Fier Panpan&nbsp;<span class="glyphicon glyphicon-user pull-right"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#"><span class="glyphicon glyphicon-cog pull-right"></span>Mon compte</a></li>
+                        <li class="divider"></li>
+                        <li><a href="#"><span class="glyphicon glyphicon-log-out pull-right"></span>Déconnexion</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </nav>

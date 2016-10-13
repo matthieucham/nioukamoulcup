@@ -3,14 +3,7 @@
 {% load l1results %}
 
 {% block left-menu %}
-    <div class="list-group sidemenu">
-        <a href="#" class="list-group-item active">Infos <span
-                class="glyphicon glyphicon-chevron-right pull-right hover-active"></span></a>
-        <a href="#" class="list-group-item">Résultats <span
-                class="glyphicon glyphicon-chevron-right pull-right hover-active"></span></a>
-        <a href="#" class="list-group-item">Statistiques <span
-                class="glyphicon glyphicon-chevron-right pull-right hover-active"></span></a>
-    </div>
+    {% include './menu.html' %}
 {% endblock left-menu %}
 
 {% block title-section %}Infos{% endblock title-section %}
