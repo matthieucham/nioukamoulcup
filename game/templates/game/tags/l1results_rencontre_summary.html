@@ -1,0 +1,27 @@
+{% load l1results %}
+<row>
+    {% if 'goals_scored' in summary %}
+    <p>Buts</p>
+    {% for j in summary.goals_scored %}
+    <p>{{ j|format_scorer:summary.goals_scored }}</p>
+    {% endfor %}
+    {% endif %}
+    {% if 'penalties_scored' in summary %}
+    <p>Pénaltys</p>
+    {% for j in summary.penalties_scored %}
+    <p>{{ j|format_scorer:summary.penalties_scored }}</p>
+    {% endfor %}
+    {% endif %}
+    {% if 'goals_assists' in summary %}
+    <p>Passes décisives</p>
+    {% for j in summary.goals_assists %}
+    <p>{{ j|format_scorer:summary.goals_assists }}</p>
+    {% endfor %}
+    {% endif %}
+    {% if 'penalties_assists' in summary %}
+    <p>Pénaltys obtenus</p>
+    {% for j in summary.penalties_assists %}
+    <p>{{ j|format_scorer:summary.penalties_assists }}</p>
+    {% endfor %}
+    {% endif %}
+</row>
