@@ -44,15 +44,37 @@ def journee_dates(journee, pattern=None):
 
 
 @register.inclusion_tag('game/tags/l1results_rencontre_summary.html')
-def rencontre_summary(rencontre, equipe):
+def rencontre_summary(rencontre):
     agglo = {}
-    for perf in rencontre.performances.filter(details__equipe=equipe):
+    for perf in rencontre.performances.all():
         for key in ['goals_scored', 'goals_assists', 'penalties_scored', 'penalties_awarded']:
             if perf.details['stats'][key] > 0:
                 if key not in agglo:
-                    agglo[key] = {}
-                agglo[key][perf.joueur] = perf.details['stats'][key]
-    return {'summary': agglo}
+                    agglo[key] = {'dom': {}, 'ext': {}}
+                agglo[key][perf.details['equipe']][perf.joueur] = perf.details['stats'][key]
+    return \
+        {
+            'summary': agglo,
+            'header': {
+                'dom': rencontre.club_domicile.nom,
+                'ext': rencontre.club_exterieur.nom,
+                'score_dom': rencontre.resultat['dom']['buts_pour'],
+                'score_ext': rencontre.resultat['ext']['buts_pour']}
+        }
+
+
+@register.inclusion_tag('game/tags/l1results_rencontre_team.html')
+def rencontre_team(rencontre, equipe):
+    out = {'G': [], 'D': [], 'M': [], 'A': []}
+    for perf in rencontre.performances.filter(details__equipe=equipe):
+        base_stats = {'time': perf.temps_de_jeu, 'rating': perf.details['note'], 'joueur': perf.joueur}
+        position = perf.joueur.poste
+        if position is not None:
+            if position == 'G':
+                base_stats['against'] = perf.details['stats']['goals_conceded']
+                base_stats['saves'] = perf.details['stats']['goals_saved']
+            out[position].append(base_stats)
+    return out
 
 
 @register.filter()

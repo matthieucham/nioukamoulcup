@@ -1,0 +1,61 @@
+{% load l1results %}
+<div class="row">
+    <table class="table-striped table-hover">
+        <thead>
+        <tr>
+            <th></th>
+            <th>Temps de jeu</th>
+            <th>Note</th>
+            <th>Encaissés</th>
+            <th>Arrêts</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for stat in G %}
+            <tr>
+                <td>{{ stat.joueur }}</td>
+                <td>{{ stat.time }}</td>
+                <td>{{ stat.rating }}</td>
+                <td>{{ stat.against }}</td>
+                <td>{{ stat.saves }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+
+    </table>
+</div>
+<div class="row">
+    <table class="table-striped table-hover">
+        <thead>
+        <tr>
+            <th></th>
+            <th>Temps de jeu</th>
+            <th>Note</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for stat in D %}
+            <tr>
+                <td>{{ stat.joueur }}</td>
+                <td>{{ stat.time }}</td>
+                <td>{{ stat.rating }}</td>
+            </tr>
+        {% endfor %}
+        {% for stat in M %}
+            <tr>
+                <td>{{ stat.joueur }}</td>
+                <td>{{ stat.time }}</td>
+                <td>{{ stat.rating }}</td>
+            </tr>
+        {% endfor %}
+        {% for stat in A %}
+            <tr>
+                <td>{{ stat.joueur }}</td>
+                <td>{{ stat.time }}</td>
+                <td>{{ stat.rating }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+
+    </table>
+</div>

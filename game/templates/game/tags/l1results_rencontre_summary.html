@@ -1,27 +1,22 @@
 {% load l1results %}
-<row>
-    {% if 'goals_scored' in summary %}
-    <p>Buts</p>
-    {% for j in summary.goals_scored %}
-    <p>{{ j|format_scorer:summary.goals_scored }}</p>
-    {% endfor %}
-    {% endif %}
-    {% if 'penalties_scored' in summary %}
-    <p>Pénaltys</p>
-    {% for j in summary.penalties_scored %}
-    <p>{{ j|format_scorer:summary.penalties_scored }}</p>
-    {% endfor %}
-    {% endif %}
-    {% if 'goals_assists' in summary %}
-    <p>Passes décisives</p>
-    {% for j in summary.goals_assists %}
-    <p>{{ j|format_scorer:summary.goals_assists }}</p>
-    {% endfor %}
-    {% endif %}
-    {% if 'penalties_assists' in summary %}
-    <p>Pénaltys obtenus</p>
-    {% for j in summary.penalties_assists %}
-    <p>{{ j|format_scorer:summary.penalties_assists }}</p>
-    {% endfor %}
-    {% endif %}
-</row>
+<div class="row">
+    <div class="col-xs-5 text-right">
+        <h3>{{ header.dom }}</h3>
+    </div>
+    <div class="col-xs-2 text-center"><strong><h3>{{ header.score_dom }}&nbsp;:&nbsp;{{ header.score_ext }}</h3></strong></div>
+    <div class="col-xs-5 text-left">
+        <h3>{{ header.ext }}</h3>
+    </div>
+</div>
+{% if 'goals_scored' in summary %}
+    {% include 'game/tags/l1results_rencontre_summary_row.html' with prop=summary.goals_scored title="Buts" %}
+{% endif %}
+{% if 'penalties_scored' in summary %}
+    {% include 'game/tags/l1results_rencontre_summary_row.html' with prop=summary.penalties_scored title="Pénaltys" %}
+{% endif %}
+{% if 'goals_assists' in summary %}
+    {% include 'game/tags/l1results_rencontre_summary_row.html' with prop=summary.goals_assists title="Passes décisives" %}
+{% endif %}
+{% if 'penalties_awarded' in summary %}
+    {% include 'game/tags/l1results_rencontre_summary_row.html' with prop=summary.penalties_awarded title="Pénaltys obtenus" %}
+{% endif %}

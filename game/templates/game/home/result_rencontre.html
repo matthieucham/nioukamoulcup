@@ -3,61 +3,25 @@
 {% load l1results %}
 
 {% block left-menu %}
-{% include 'game/home/menu.html' %}
+    {% include 'game/home/menu.html' %}
 {% endblock left-menu %}
 
 {% block content-right %}
-{% last_journees 3 %}
+    {% last_journees 3 %}
 {% endblock content-right %}
 
 {% block title-section %}Compte-rendu de match{% endblock title-section %}
 
 {% block content-center %}
-<div class="row text-center">
-    <p>{{rencontre.date}}</p>
-
-    <h3>{{ rencontre.club_domicile.nom }} <strong>{{ rencontre.resultat.dom.buts_pour }} :
-        {{ rencontre.resultat.ext.buts_pour }}</strong> {{ rencontre.club_exterieur.nom }}</h3>
+    <small>{{ rencontre.date }}</small>
+    {% rencontre_summary rencontre %}
 
     <div class="col-md-6">
-        {% rencontre_summary rencontre 'dom' %}
-
-        <div class="row">
-            <table class="table-striped table-hover">
-                <thead>
-                <tr>
-                    <th></th>
-                    <th>Temps de jeu</th>
-                    <th>Note</th>
-                    <th>Buts marqués</th>
-                    <th>Pénaltys marqués</th>
-                    <th>Passes décisives</th>
-                    <th>Pénaltys obtenus</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for perf in rencontre.performances.all %}
-                    {% if perf.details.equipe == 'dom' %}
-                    <tr>
-                        <td>{{ perf.joueur }}</td>
-                        <td>{{ perf.temps_de_jeu }}</td>
-                        <td>{{ perf.details.note }}</td>
-                        <td>{{ perf.details.stats.goals_scored }}</td>
-                        <td>{{ perf.details.stats.penalties_scored }}</td>
-                        <td>{{ perf.details.stats.goals_assists }}</td>
-                        <td>{{ perf.details.stats.penalties_awarded }}</td>
-                    </tr>
-                    {% endif %}
-                {% endfor %}
-                </tbody>
-
-            </table>
-        </div>
+        {% rencontre_team rencontre 'dom' %}
     </div>
 
     <div class="col-md-6">
-        {% rencontre_summary rencontre 'ext' %}
+        {% rencontre_team rencontre 'ext' %}
     </div>
 
-</div>
 {% endblock content-center %}
