@@ -4,6 +4,7 @@ from django import template
 from django.template import defaultfilters
 
 from ligue1 import models as l1models
+from game import scoring
 
 
 register = template.Library()
@@ -67,13 +68,25 @@ def rencontre_summary(rencontre):
 def rencontre_team(rencontre, equipe):
     out = {'G': [], 'D': [], 'M': [], 'A': []}
     for perf in rencontre.performances.filter(details__equipe=equipe):
-        base_stats = {'time': perf.temps_de_jeu, 'rating': perf.details['note'], 'joueur': perf.joueur}
+        base_stats = {'time': perf.temps_de_jeu,
+                      'rating': perf.details['note'] if ('note' in perf.details
+                                                         and perf.temps_de_jeu >= scoring.PLAYTIME['MAX_LONG'])
+                      else None,
+                      'joueur': perf.joueur}
         position = perf.joueur.poste
         if position is not None:
             if position == 'G':
                 base_stats['against'] = perf.details['stats']['goals_conceded']
                 base_stats['saves'] = perf.details['stats']['goals_saved']
             out[position].append(base_stats)
+    # meilleur de chaque poste
+    for pos in ['D', 'M']:
+        best = 0
+        for rt in (st['rating'] for st in out[pos]):
+            if rt is not None:
+                best = max(best, rt)
+        for p in out[pos]:
+            p['best'] = p['rating'] == best
     return out
 
 

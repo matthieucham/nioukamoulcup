@@ -35,25 +35,13 @@
         </thead>
         <tbody>
         {% for stat in D %}
-            <tr>
-                <td>{{ stat.joueur }}</td>
-                <td>{{ stat.time }}</td>
-                <td>{{ stat.rating }}</td>
-            </tr>
+            {% include './l1results_rencontre_team_fieldrow.html' with stat=stat %}
         {% endfor %}
         {% for stat in M %}
-            <tr>
-                <td>{{ stat.joueur }}</td>
-                <td>{{ stat.time }}</td>
-                <td>{{ stat.rating }}</td>
-            </tr>
+            {% include './l1results_rencontre_team_fieldrow.html' with stat=stat %}
         {% endfor %}
         {% for stat in A %}
-            <tr>
-                <td>{{ stat.joueur }}</td>
-                <td>{{ stat.time }}</td>
-                <td>{{ stat.rating }}</td>
-            </tr>
+           {% include './l1results_rencontre_team_fieldrow.html' with stat=stat %}
         {% endfor %}
         </tbody>
 
