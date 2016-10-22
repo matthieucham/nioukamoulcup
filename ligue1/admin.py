@@ -1,6 +1,7 @@
 from django.contrib import admin, messages
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
+from django.contrib.admin.filters import RelatedOnlyFieldListFilter
 from inline_actions.admin import InlineActionsMixin
 from inline_actions.admin import InlineActionsModelAdminMixin
 
@@ -26,7 +27,8 @@ class PerformanceInline(admin.TabularInline):
 
 
 class RencontreAdmin(admin.ModelAdmin):
-    list_display = ['__str__', 'date', 'resultat', 'sn_meeting_uuid', 'derniere_maj']
+    list_display = ['__str__', 'journee', 'date', 'resultat', 'sn_meeting_uuid', 'derniere_maj']
+    list_filter = [('journee', RelatedOnlyFieldListFilter)]
     fields = ('club_domicile', 'club_exterieur', 'date', 'resultat', 'journee', 'sn_meeting_uuid', 'derniere_maj')
     readonly_fields = (
         'club_domicile', 'club_exterieur', 'date', 'resultat', 'journee', 'sn_meeting_uuid', 'derniere_maj')

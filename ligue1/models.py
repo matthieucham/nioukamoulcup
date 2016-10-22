@@ -4,6 +4,7 @@ import datetime
 from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
 import dateutil.parser
+
 from statnuts import note_converter
 
 
@@ -47,7 +48,8 @@ class JourneeManager(models.Manager):
         step_update = dateutil.parser.parse(statnuts_step['updated_at'])
         if force_import or created or journee.derniere_maj is None or step_update > journee.derniere_maj:
             for meeting in statnuts_step['meetings']:
-                Rencontre.objects.import_from_statnuts(journee, sn_client.get_meeting(meeting['uuid']), sn_client)
+                Rencontre.objects.import_from_statnuts(journee, sn_client.get_meeting(meeting['uuid']), sn_client,
+                                                       force_import=force_import)
         journee.derniere_maj = step_update
         journee.save()
 
@@ -60,8 +62,11 @@ class Journee(Importe):
     saison = models.ForeignKey(Saison, related_name='journees')
     objects = JourneeManager()
 
+    class Meta:
+        ordering = ['saison', 'numero']
+
     def __str__(self):
-        return str(self.numero)
+        return '%d @ %s' % (self.numero, self.saison)
 
     def save(self, *args, **kwargs):
         if self.pk is not None:
