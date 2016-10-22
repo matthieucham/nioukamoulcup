@@ -1,8 +1,14 @@
 __author__ = 'mgrandrie'
+from django.utils import timezone
 from django.db import models
 
 from ligue1 import models as l1models
 from game.scoring import scoring
+
+
+class SaisonScoring(models.Model):
+    saison = models.ForeignKey(l1models.Saison, null=False)
+    computed_at = models.DateTimeField(auto_now=True)
 
 
 class JourneeScoring(models.Model):
@@ -10,8 +16,13 @@ class JourneeScoring(models.Model):
 
     status = models.CharField(max_length=10, blank=False, default='OPEN', choices=STATUS_CHOICES)
     journee = models.ForeignKey(l1models.Journee, null=False)
+    saison_scoring = models.ForeignKey(SaisonScoring, null=False)
+    computed_at = models.DateTimeField(null=True)
+    locked_at = models.DateTimeField(null=True)
 
     def save(self, *args, **kwargs):
+        if not self.status == 'LOCKED':
+            self.computed_at = timezone.now()
         super(JourneeScoring, self).save(*args, **kwargs)
         if not self.status == 'LOCKED':
             self.compute_scores()
@@ -19,6 +30,7 @@ class JourneeScoring(models.Model):
     def lock(self):
         self.compute_scores()
         self.status = 'LOCKED'
+        self.locked_at = timezone.now()
         self.save()
 
     def compute_scores(self):

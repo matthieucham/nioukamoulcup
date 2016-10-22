@@ -22,6 +22,10 @@ PLAYTIME = {'MAX_SHORT': 15, 'MAX_LONG': 30, 'MIN_BONUS': 45}
 
 COMPENSATION = {'SHORT': 1, 'LONG': 3, 'CANCELLED': 5}
 
+SALARY_SCORE_BOUNDS = [(6.1, 'cl1'), (6.3, 'cl2'), (6.3, 'cl3'), (6.5, 'cl4'), (6.75, 'cl5'), (7.1, 'cl6'),
+                       (7.6, 'cl7'),
+                       (8, 'cl8'), (8.4, 'cl9'), (8.9, 'cl10')]
+
 
 def compute_best_by_position(rencontre):
     best_by_position = {'dom': {'G': 0, 'D': 0, 'M': 0, 'A': 0}, 'ext': {'G': 0, 'D': 0, 'M': 0, 'A': 0}}
