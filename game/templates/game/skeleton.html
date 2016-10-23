@@ -14,8 +14,10 @@
     <link rel="home" href="{% url 'zinnia:entry_archive_index' %}"/>
     <link href="https://fonts.googleapis.com/css?family=Baloo+Tamma" rel="stylesheet">
     <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <!--<link rel="stylesheet" href="{% static 'game/css/bootstrap.min.css' %}">-->
     <link rel="stylesheet" href="{% static 'game/css/kcup.css' %}">
     {% block link %}{% endblock link %}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     {% block script %}{% endblock script %}
 </head>
 <body>
@@ -36,7 +38,6 @@
 <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </body>
 </html>

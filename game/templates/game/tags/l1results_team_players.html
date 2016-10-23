@@ -1,0 +1,11 @@
+{% load l1results %}
+{% load i18n %}
+
+<div class="panel panel-default">
+    <div class="panel-heading">{{ team }}</div>
+    <div class="list-group">
+        {% for j in players %}
+        <a href="{% url 'stat_joueur-detail' j.pk %}" class="list-group-item">{{ j }}<span class="badge">{{ j.poste }}</span></a>
+        {% endfor %}
+    </div>
+</div>

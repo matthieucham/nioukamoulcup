@@ -67,6 +67,8 @@ INSTALLED_APPS = [
     'wiki.plugins.images',
     'wiki.plugins.macros',
 
+    'chartit',
+
     'game',
     'accounts',
     'ligue1',

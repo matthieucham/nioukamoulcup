@@ -34,6 +34,22 @@ def last_journees(nb=1):
     return {'journees': sorted(journees, key=operator.attrgetter('fin'))}
 
 
+def sort_position_function(joueur):
+    sort_order = {'G': 0, 'D': 1, 'M': 2, 'A': 3, None: 10}
+    return sort_order[joueur.poste]
+
+
+@register.inclusion_tag('game/tags/l1results_team_players.html')
+def joueurs_club(club):
+    """
+    Retourne la liste des joueurs de ce club
+    :param club:
+    :return:
+    """
+    joueurs = l1models.Joueur.objects.filter(club=club).order_by('nom')
+    return {'team': club, 'players': sorted(joueurs, key=sort_position_function)}
+
+
 @register.filter()
 def journee_dates(journee, pattern=None):
     if journee.debut == journee.fin:

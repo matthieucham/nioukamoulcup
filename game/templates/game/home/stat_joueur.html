@@ -1,0 +1,28 @@
+{% extends "game/game_base_2cols.html" %}
+{% load static %}
+{% load l1results %}
+{% load chartit %}
+
+{% block script %}
+<script src="http://code.highcharts.com/highcharts.js"></script>
+{{ scorechart|load_charts:"chtcontainer" }}
+{% endblock script %}
+
+{% block left-menu %}
+{% include 'game/home/menu.html' %}
+{% endblock left-menu %}
+
+{% block content-right %}
+{% joueurs_club joueur.club %}
+{% endblock content-right %}
+
+{% block title-section %}{{ joueur }}{% endblock title-section %}
+
+{% block content-center %}
+<div id='chtcontainer'> Chart will be rendered here </div>
+<ul>
+    {% for sc in scores %}
+    <li>{{ sc.journee_scoring.journee.numero }} : {{ sc.note }}, {{ sc.bonus }}, {{ sc.compensation }}</li>
+    {% endfor %}
+</ul>
+{% endblock content-center %}

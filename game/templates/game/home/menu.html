@@ -1,7 +1,7 @@
 {% load game %}
 {% block left-menu %}
     <div class="list-group sidemenu">
-        <a href="#" class="list-group-item {% is_navbar_active request 'info' %}">Infos <span
+        <a href="{% url 'home_info' %}" class="list-group-item {% is_navbar_active request 'info' %}">Infos <span
                 class="glyphicon glyphicon-chevron-right pull-right hover-active"></span></a>
         <a href="#" class="list-group-item {% is_navbar_active request 'result' %}">Résultats <span
                 class="glyphicon glyphicon-chevron-right pull-right hover-active"></span></a>
