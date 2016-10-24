@@ -1,5 +1,3 @@
-__author__ = 'mgrandrie'
-
 BONUS = {
     'COLLECTIVE': {
         'CLEANSHEET': {'G': 3.4, 'D': 2.5, 'M': 1.0, 'A': 0},
@@ -27,9 +25,9 @@ SALARY_SCORE_BOUNDS = [(6.1, 'cl1'), (6.3, 'cl2'), (6.3, 'cl3'), (6.5, 'cl4'), (
                        (8, 'cl8'), (8.4, 'cl9'), (8.9, 'cl10')]
 
 
-def compute_best_by_position(rencontre):
+def compute_best_by_position(all_perfs):
     best_by_position = {'dom': {'G': 0, 'D': 0, 'M': 0, 'A': 0}, 'ext': {'G': 0, 'D': 0, 'M': 0, 'A': 0}}
-    for pj in rencontre.performances.all():
+    for pj in all_perfs:
         if pj.joueur.poste is None:
             continue
         if 'note' in pj.details and pj.temps_de_jeu >= PLAYTIME['MAX_LONG'] and pj.details['note'] is not None:

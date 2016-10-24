@@ -135,14 +135,6 @@ class RencontreManager(models.Manager):
             self._delete_and_recreate_performances(rencontre, statnuts_meeting, sn_client)
 
     def _get_or_create_from_statnuts(self, journee, statnuts_data):
-        # if 'home_team_name' in statnuts_data:
-        # # indique le mode résumé
-        # ht_uuid = statnuts_data['home_team']
-        # ht_name = statnuts_data['home_team_name']
-        # at_uuid = statnuts_data['away_team']
-        # at_name = statnuts_data['away_team_name']
-        # else:
-        # indique le mode détaillé
         ht_uuid = statnuts_data['home_team']['uuid']
         ht_name = statnuts_data['home_team']['short_name']
         at_uuid = statnuts_data['away_team']['uuid']
@@ -165,6 +157,7 @@ class RencontreManager(models.Manager):
         # suppr toutes les performances déjà connues : on repart à 0 pour reimporter
         Performance.objects.filter(rencontre=rencontre).delete()
         dom_or_ext = {statnuts_meeting['home_team']['uuid']: 'dom', statnuts_meeting['away_team']['uuid']: 'ext'}
+        rosperfs = []
         for ros in statnuts_meeting['roster']:
             joueur, created = Joueur.objects.get_or_create_from_statnuts(ros['player'])
             joueur_updated_at = dateutil.parser.parse(ros['player']['updated_at'])
@@ -176,8 +169,9 @@ class RencontreManager(models.Manager):
                 tps = 0  # TODO ?
             else:
                 tps = ros['stats']['playtime']
-                Performance.objects.create(rencontre=rencontre, joueur=joueur, club=club, temps_de_jeu=tps,
-                                           details=make_performance_details(ros, dom_or_ext[ros['played_for']]))
+                rosperfs.append(Performance(rencontre=rencontre, joueur=joueur, club=club, temps_de_jeu=tps,
+                                            details=make_performance_details(ros, dom_or_ext[ros['played_for']])))
+        Performance.objects.bulk_create(rosperfs)
         rencontre.resultat = make_rencontre_resultat(statnuts_meeting)
         rencontre.derniere_maj = dateutil.parser.parse(statnuts_meeting['updated_at'])
         rencontre.save()
