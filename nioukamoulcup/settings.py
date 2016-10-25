@@ -73,6 +73,8 @@ INSTALLED_APPS = [
     'wiki.plugins.macros',
 
     'chartit',
+    'colorful',
+    'svg',
 
     'game',
     'accounts',

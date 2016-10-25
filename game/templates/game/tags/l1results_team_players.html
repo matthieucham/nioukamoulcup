@@ -5,13 +5,16 @@
 
 <div class="panel panel-default">
     <div class="panel-heading">
-        <div style="width: 64px; float:left;">
+        <div style="width: 48px; float:left;">
             <style type="text/css" scoped>
                 path.bg {
                     fill: {{ team.maillot_color_bg }};
                 }
-                path.motif {
-                    fill: {{ team.maillot_color_motif }};
+                path.color1 {
+                    fill: {{ team.maillot_color1 }};
+                }
+                path.color2 {
+                    fill: {{ team.maillot_color2 }};
                 }
             </style>
             {% svg team.maillot_svg %}

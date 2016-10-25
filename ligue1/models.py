@@ -4,9 +4,10 @@ import datetime
 from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
 import dateutil.parser
+from colorful.fields import RGBColorField
+
 from utils.timer import Timer
 from statnuts import note_converter
-from colorful.fields import RGBColorField
 
 
 class Importe(models.Model):
@@ -84,14 +85,17 @@ class Journee(Importe):
 
 
 class Club(Importe):
-    SVG_TEMPLATES = (('jersey-plain', 'vierge'), ('jersey-stripe-center', 'bande centrale'),)
+    SVG_TEMPLATES = (('jersey-plain', 'vierge'), ('jersey-stripe-center', 'bande centrale'),
+                     ('jersey-stripe-center-double', 'bande centrale bicolore'),
+                     ('jersey-stripes-v', 'rayures verticales'), ('jersey-diag-half', 'moitié diagonale'),)
 
     nom = models.CharField(max_length=100)
     sn_team_uuid = models.UUIDField(null=False)
     participations = models.ManyToManyField(Saison, related_name='participants')
     maillot_svg = models.CharField(max_length=50, choices=SVG_TEMPLATES, blank=False, default='jersey-plain')
     maillot_color_bg = RGBColorField(blank=False, default='#FFFFFF')
-    maillot_color_motif = RGBColorField(blank=True)
+    maillot_color1 = RGBColorField(blank=True)
+    maillot_color2 = RGBColorField(blank=True)
 
     def __str__(self):
         return self.nom
