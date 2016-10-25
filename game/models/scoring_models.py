@@ -34,24 +34,28 @@ class JourneeScoring(models.Model):
         self.save()
 
     def compute_scores(self):
-        JJScore.objects.create_or_update_jjscore_from_ligue1(self)
+        JJScore.objects.filter(journee_scoring=self).delete()
+        JJScore.objects.create_jjscore_from_ligue1(self)
 
 
 class JJScoreManager(models.Manager):
-    def create_or_update_jjscore_from_ligue1(self, journee_scoring):
+    def create_jjscore_from_ligue1(self, journee_scoring):
         computed_club_pks = []
         bbp = None
+        jjscores = []
         for r in journee_scoring.journee.rencontres.all():
             computed_club_pks.extend([r.club_domicile.pk, r.club_exterieur.pk])
-            if bbp is None:
-                bbp = scoring.compute_best_by_position(r)
-            for perf in r.performances.all():
-                note, bonus, comp = scoring.compute_score_performance(perf, bbp)
-                self.update_or_create(journee_scoring=journee_scoring, joueur=perf.joueur, defaults={
-                    'note': note, 'bonus': bonus, 'compensation': comp})
-                # for cl in journee_scoring.journee.saison.participants:
-                # if not cl.pk in computed_club_pks:
-                #         # compenser scores matchs reportés ...
+            all_perfs = r.performances.select_related('joueur').all()
+            if all_perfs:  # perform queryset
+                if bbp is None:
+                    bbp = scoring.compute_best_by_position(all_perfs)
+                for perf in all_perfs:
+                    note, bonus, comp = scoring.compute_score_performance(perf, bbp)
+                    jjscores.append(JJScore(journee_scoring=journee_scoring, joueur=perf.joueur, note=note, bonus=bonus,
+                                            compensation=comp))
+                    # for cl in journee_scoring.journee.saison.participants:
+                    # if not cl.pk in computed_club_pks:                        #         # compenser scores matchs reportés ...
+        JJScore.objects.bulk_create(jjscores)
 
 
 class JJScore(models.Model):
