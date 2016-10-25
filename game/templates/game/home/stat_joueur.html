@@ -20,9 +20,4 @@
 
 {% block content-center %}
 <div id='chtcontainer'> Chart will be rendered here </div>
-<ul>
-    {% for sc in scores %}
-    <li>{{ sc.journee_scoring.journee.numero }} : {{ sc.note }}, {{ sc.bonus }}, {{ sc.compensation }}</li>
-    {% endfor %}
-</ul>
 {% endblock content-center %}
