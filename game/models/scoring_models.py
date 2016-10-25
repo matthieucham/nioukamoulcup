@@ -4,6 +4,7 @@ from django.db import models
 
 from ligue1 import models as l1models
 from game.scoring import scoring
+from utils.timer import Timer
 
 
 class SaisonScoring(models.Model):
@@ -34,7 +35,6 @@ class JourneeScoring(models.Model):
         self.save()
 
     def compute_scores(self):
-        JJScore.objects.filter(journee_scoring=self).delete()
         JJScore.objects.create_jjscore_from_ligue1(self)
 
 
@@ -54,7 +54,9 @@ class JJScoreManager(models.Manager):
                     jjscores.append(JJScore(journee_scoring=journee_scoring, joueur=perf.joueur, note=note, bonus=bonus,
                                             compensation=comp))
                     # for cl in journee_scoring.journee.saison.participants:
-                    # if not cl.pk in computed_club_pks:                        #         # compenser scores matchs reportés ...
+                    # if not cl.pk in computed_club_pks:
+                    # compenser scores matchs reportés ...
+        JJScore.objects.filter(journee_scoring=journee_scoring).delete()
         JJScore.objects.bulk_create(jjscores)
 
 

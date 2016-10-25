@@ -4,7 +4,7 @@ import datetime
 from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
 import dateutil.parser
-
+from utils.timer import Timer
 from statnuts import note_converter
 
 
@@ -48,8 +48,8 @@ class JourneeManager(models.Manager):
         step_update = dateutil.parser.parse(statnuts_step['updated_at'])
         if force_import or created or journee.derniere_maj is None or step_update > journee.derniere_maj:
             for meeting in statnuts_step['meetings']:
-                Rencontre.objects.import_from_statnuts(journee, sn_client.get_meeting(meeting['uuid']), sn_client,
-                                                       force_import=force_import)
+                with Timer(id='Rencontre import_from_statnuts', verbose=True):
+                    Rencontre.objects.import_from_statnuts(journee, sn_client.get_meeting(meeting['uuid']), sn_client)
         journee.derniere_maj = step_update
         journee.save()
 
@@ -154,8 +154,6 @@ class RencontreManager(models.Manager):
             defaults=defaults)
 
     def _delete_and_recreate_performances(self, rencontre, statnuts_meeting, sn_client):
-        # suppr toutes les performances déjà connues : on repart à 0 pour reimporter
-        Performance.objects.filter(rencontre=rencontre).delete()
         dom_or_ext = {statnuts_meeting['home_team']['uuid']: 'dom', statnuts_meeting['away_team']['uuid']: 'ext'}
         rosperfs = []
         for ros in statnuts_meeting['roster']:
@@ -171,6 +169,8 @@ class RencontreManager(models.Manager):
                 tps = ros['stats']['playtime']
                 rosperfs.append(Performance(rencontre=rencontre, joueur=joueur, club=club, temps_de_jeu=tps,
                                             details=make_performance_details(ros, dom_or_ext[ros['played_for']])))
+        # suppr toutes les performances déjà connues : on repart à 0 pour reimporter
+        Performance.objects.filter(rencontre=rencontre).delete()
         Performance.objects.bulk_create(rosperfs)
         rencontre.resultat = make_rencontre_resultat(statnuts_meeting)
         rencontre.derniere_maj = dateutil.parser.parse(statnuts_meeting['updated_at'])
