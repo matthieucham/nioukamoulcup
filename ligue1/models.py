@@ -6,6 +6,7 @@ from django.core.exceptions import ObjectDoesNotExist
 import dateutil.parser
 from utils.timer import Timer
 from statnuts import note_converter
+from colorful.fields import RGBColorField
 
 
 class Importe(models.Model):
@@ -49,7 +50,8 @@ class JourneeManager(models.Manager):
         if force_import or created or journee.derniere_maj is None or step_update > journee.derniere_maj:
             for meeting in statnuts_step['meetings']:
                 with Timer(id='Rencontre import_from_statnuts', verbose=True):
-                    Rencontre.objects.import_from_statnuts(journee, sn_client.get_meeting(meeting['uuid']), sn_client)
+                    Rencontre.objects.import_from_statnuts(journee, sn_client.get_meeting(meeting['uuid']), sn_client,
+                                                           force_import=force_import)
         journee.derniere_maj = step_update
         journee.save()
 
@@ -82,9 +84,14 @@ class Journee(Importe):
 
 
 class Club(Importe):
+    SVG_TEMPLATES = (('jersey-plain', 'vierge'), ('jersey-stripe-center', 'bande centrale'),)
+
     nom = models.CharField(max_length=100)
     sn_team_uuid = models.UUIDField(null=False)
     participations = models.ManyToManyField(Saison, related_name='participants')
+    maillot_svg = models.CharField(max_length=50, choices=SVG_TEMPLATES, blank=False, default='jersey-plain')
+    maillot_color_bg = RGBColorField(blank=False, default='#FFFFFF')
+    maillot_color_motif = RGBColorField(blank=True)
 
     def __str__(self):
         return self.nom
