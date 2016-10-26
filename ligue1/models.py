@@ -87,7 +87,10 @@ class Journee(Importe):
 class Club(Importe):
     SVG_TEMPLATES = (('jersey-plain', 'vierge'), ('jersey-stripe-center', 'bande centrale'),
                      ('jersey-stripe-center-double', 'bande centrale bicolore'),
-                     ('jersey-stripes-v', 'rayures verticales'), ('jersey-diag-half', 'moitié diagonale'),)
+                     ('jersey-stripes-v', 'rayures verticales'), ('jersey-diag-half', 'moitié diagonale'),
+                     ('jersey-stripe-h', 'bande horizontale'), ('jersey-stripe-diag', 'bande en diagonale'),
+                     ('jersey-sleeves', 'manches colorées'), ('jersey-scap', 'scapulaire'), ('jersey-plain-decorated',
+                                                                                             'coutures colorées'),)
 
     nom = models.CharField(max_length=100)
     sn_team_uuid = models.UUIDField(null=False)
