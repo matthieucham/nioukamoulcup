@@ -196,6 +196,10 @@ SITE_ID = 1
 # Required by Guardian
 ANONYMOUS_USER_ID = -1
 
+# For django-wiki customization
+WIKI_ACCOUNT_HANDLING = False
+WIKI_MAX_REVISIONS = 20
+
 # Required by Userena
 AUTH_PROFILE_MODULE = 'accounts.GamerProfile'
 USERENA_SIGNIN_REDIRECT_URL = '/accounts/%(username)s/'
