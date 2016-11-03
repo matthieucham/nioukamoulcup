@@ -72,7 +72,8 @@ INSTALLED_APPS = [
     'wiki.plugins.images',
     'wiki.plugins.macros',
 
-    'chartit',
+    'graphos',
+    
     'colorful',
     'svg',
 
@@ -124,7 +125,7 @@ TEMPLATES = [
     },
 ]
 
-TEMPLATE_CONTEXT_PROCESSORS = ['django.contrib.auth.context_processors.auth']
+#TEMPLATE_CONTEXT_PROCESSORS = ['django.contrib.auth.context_processors.auth']
 
 WSGI_APPLICATION = 'nioukamoulcup.wsgi.application'
 
