@@ -1,11 +1,11 @@
 {% extends "game/game_base_2cols.html" %}
 {% load static %}
 {% load l1results %}
-{% load chartit %}
 
 {% block script %}
-<script src="http://code.highcharts.com/highcharts.js"></script>
-{{ scorechart|load_charts:"chtcontainer" }}
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.css">
+    <script src="//cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.min.js"></script>
 {% endblock script %}
 
 {% block left-menu %}
@@ -19,5 +19,6 @@
 {% block title-section %}{{ joueur }}{% endblock title-section %}
 
 {% block content-center %}
-<div id='chtcontainer'> Chart will be rendered here </div>
+
+<div id='chtcontainer'>{{ chart.as_html }}</div>
 {% endblock content-center %}

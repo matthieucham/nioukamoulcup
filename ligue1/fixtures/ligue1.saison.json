@@ -9,5 +9,12 @@
             "debut": "2015-08-07",
             "fin": "2016-05-14"
         }
+    },
+    {
+        "model": "ligue1.saisoncourante",
+        "pk": 1,
+        "fields": {
+            "saison": 1
+        }
     }
 ]

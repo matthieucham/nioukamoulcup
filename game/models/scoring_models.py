@@ -1,6 +1,7 @@
 __author__ = 'mgrandrie'
 from django.utils import timezone
 from django.db import models
+from django.db.models import Case, When
 
 from ligue1 import models as l1models
 from game.scoring import scoring
@@ -16,7 +17,7 @@ class JourneeScoring(models.Model):
     STATUS_CHOICES = (('OPEN', 'Open'), ('LOCKED', 'locked'),)
 
     status = models.CharField(max_length=10, blank=False, default='OPEN', choices=STATUS_CHOICES)
-    journee = models.ForeignKey(l1models.Journee, null=False)
+    journee = models.ForeignKey(l1models.Journee, null=False, related_name='scoring')
     saison_scoring = models.ForeignKey(SaisonScoring, null=False)
     computed_at = models.DateTimeField(null=True)
     locked_at = models.DateTimeField(null=True)
@@ -58,6 +59,21 @@ class JJScoreManager(models.Manager):
                     # compenser scores matchs reportés ...
         JJScore.objects.filter(journee_scoring=journee_scoring).delete()
         JJScore.objects.bulk_create(jjscores)
+
+    def list_scores_for_joueur(self, joueur, saison_scoring):
+        # raw_query = 'select ligue1_journee.id, numero, note::float, bonus::float, compensation::float, coalesce(bonus + coalesce(note,compensation), 0)::float as points from ligue1_journee inner join game_journeescoring on game_journeescoring.journee_id=ligue1_journee.id left join game_jjscore on game_jjscore.journee_scoring_id=game_journeescoring.id and game_jjscore.joueur_id=%s where ligue1_journee.saison_id=%s order by numero asc'
+        # return self.raw(raw_query, [joueur.pk, saison_scoring.saison.pk])
+
+        jsc_map = {jsc.journee_scoring.journee.pk: jsc for jsc in JJScore.objects.filter(joueur=joueur,
+                                                                                         journee_scoring__saison_scoring=saison_scoring)}
+        result = []
+        for journee in l1models.Journee.objects.filter(saison=saison_scoring.saison).order_by('numero'):
+            if journee.pk in jsc_map:
+                result.append(jsc_map[journee.pk])
+            else:
+                result.append(JJScore(journee_scoring=JourneeScoring(journee=journee, saison_scoring=saison_scoring),
+                                      joueur=joueur, note=0, bonus=0, compensation=0))
+        return result
 
 
 class JJScore(models.Model):

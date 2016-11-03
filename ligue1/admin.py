@@ -128,8 +128,18 @@ class SaisonAdmin(admin.ModelAdmin):
         return super(SaisonAdmin, self).changelist_view(request, extra_context=extra_context)
 
 
+class SaisonCouranteAdmin(admin.ModelAdmin):
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
 admin_site = ImportStatnutsSite('import_statnuts')
 admin_site.disable_action('delete_selected')
+admin_site.register(models.SaisonCourante, SaisonCouranteAdmin)
 admin_site.register(models.Saison, SaisonAdmin)
 admin_site.register(models.Journee, JourneeAdmin)
 admin_site.register(models.Joueur)

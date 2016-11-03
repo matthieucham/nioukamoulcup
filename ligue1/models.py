@@ -39,6 +39,13 @@ class Saison(Importe):
         return self.nom
 
 
+class SaisonCourante(models.Model):
+    saison = models.ForeignKey(Saison, related_name='est_courante')
+
+    def __str__(self):
+        return self.saison.__str__()
+
+
 class JourneeManager(models.Manager):
     def import_from_statnuts(self, saison, statnuts_step, sn_client, force_import=False):
         defaults = {'numero': int(statnuts_step['name'])}
