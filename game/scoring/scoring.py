@@ -1,3 +1,5 @@
+from utils.timer import Timer
+
 BONUS = {
     'COLLECTIVE': {
         'CLEANSHEET': {'G': 3.4, 'D': 2.5, 'M': 1.0, 'A': 0},
@@ -26,32 +28,34 @@ SALARY_SCORE_BOUNDS = [(6.1, 'cl1'), (6.3, 'cl2'), (6.3, 'cl3'), (6.5, 'cl4'), (
 
 
 def compute_best_by_position(all_perfs):
-    best_by_position = {'dom': {'G': 0, 'D': 0, 'M': 0, 'A': 0}, 'ext': {'G': 0, 'D': 0, 'M': 0, 'A': 0}}
-    for pj in all_perfs:
-        if pj.joueur.poste is None:
-            continue
-        if 'note' in pj.details and pj.temps_de_jeu >= PLAYTIME['MAX_LONG'] and pj.details['note'] is not None:
-            best_by_position[pj.details['equipe']][pj.joueur.poste] = max(pj.details['note'],
-                                                                          best_by_position[pj.details['equipe']][
-                                                                              pj.joueur.poste])
-    return best_by_position
+    with Timer(id='compute_best_by_position', verbose=False):
+        best_by_position = {'dom': {'G': 0, 'D': 0, 'M': 0, 'A': 0}, 'ext': {'G': 0, 'D': 0, 'M': 0, 'A': 0}}
+        for pj in all_perfs:
+            if pj.joueur.poste is None:
+                continue
+            if 'note' in pj.details and pj.temps_de_jeu >= PLAYTIME['MAX_LONG'] and pj.details['note'] is not None:
+                best_by_position[pj.details['equipe']][pj.joueur.poste] = max(pj.details['note'],
+                                                                              best_by_position[pj.details['equipe']][
+                                                                                  pj.joueur.poste])
+        return best_by_position
 
 
 def compute_score_performance(perf, best_note_by_position):
-    if perf.joueur.poste is None:
-        return None, 0, None
-    if perf.temps_de_jeu < PLAYTIME['MAX_SHORT']:
-        return None, _compute_bonus(perf, False, best_note_by_position), COMPENSATION['SHORT']
-    elif perf.temps_de_jeu < PLAYTIME['MAX_LONG']:
-        return None, _compute_bonus(perf, False, best_note_by_position), COMPENSATION['LONG']
-    elif perf.temps_de_jeu < PLAYTIME['MIN_BONUS']:
-        return perf.details['note'] if 'note' in perf.details else None, _compute_bonus(perf, False,
-                                                                                        best_note_by_position), None if 'note' in perf.details else \
-                   COMPENSATION['LONG']
-    else:
-        return perf.details['note'] if 'note' in perf.details else None, _compute_bonus(perf, True,
-                                                                                        best_note_by_position), None if 'note' in perf.details else \
-                   COMPENSATION['LONG']
+    with Timer(id='compute_score_performance', verbose=False):
+        if perf.joueur.poste is None:
+            return None, 0, None
+        if perf.temps_de_jeu < PLAYTIME['MAX_SHORT']:
+            return None, _compute_bonus(perf, False, best_note_by_position), COMPENSATION['SHORT']
+        elif perf.temps_de_jeu < PLAYTIME['MAX_LONG']:
+            return None, _compute_bonus(perf, False, best_note_by_position), COMPENSATION['LONG']
+        elif perf.temps_de_jeu < PLAYTIME['MIN_BONUS']:
+            return perf.details['note'] if 'note' in perf.details else None, _compute_bonus(perf, False,
+                                                                                            best_note_by_position), None if 'note' in perf.details else \
+                       COMPENSATION['LONG']
+        else:
+            return perf.details['note'] if 'note' in perf.details else None, _compute_bonus(perf, True,
+                                                                                            best_note_by_position), None if 'note' in perf.details else \
+                       COMPENSATION['LONG']
 
 
 def _compute_bonus(perf, has_collective_bonus, best_note_by_position):

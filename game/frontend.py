@@ -28,11 +28,13 @@ class StatJoueurView(DetailView):
         jjscores = models.JJScore.objects.list_scores_for_joueur(joueur=self.object, saison_scoring=saisonscoring)
         data_source_array = [['J', 'Pts']]
         for jjs in jjscores:
-            data_source_array.append([jjs.journee_scoring.journee.numero, round(float(jjs.note or 0) + float(jjs.compensation or 0) + float(jjs.bonus or 0), 3)])
+            data_source_array.append([jjs.journee_scoring.journee.numero,
+                                      round(float(jjs.note or 0) + float(jjs.compensation or 0) + float(jjs.bonus or 0),
+                                            3)])
         data_source = SimpleDataSource(data_source_array)
         # data_source = ModelDataSource(models.JJScore.objects.list_scores_for_joueur(joueur=self.object,
         # saison_scoring=saisonscoring),
-        # fields=['numero', 'points'])
+        #                               fields=['journee_scoring__journee__numero', 'note'])
         context['chart'] = AreaChart(data_source, width=580,
                                      options={'resize': True, 'hideHover': 'auto', 'parseTime': False,
                                               'fillOpacity': 0.6, 'ymax': 'auto 20', 'grid': False,
