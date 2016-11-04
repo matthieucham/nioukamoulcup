@@ -45,6 +45,7 @@ class JJScoreManager(models.Manager):
             computed_club_pks = []
             bbp = None
             jjscores = []
+            computed_joueurs = []
             for r in journee_scoring.journee.rencontres.all():
                 computed_club_pks.extend([r.club_domicile.pk, r.club_exterieur.pk])
                 all_perfs = r.performances.select_related('joueur').select_related('rencontre').all()
@@ -58,28 +59,16 @@ class JJScoreManager(models.Manager):
                         # for cl in journee_scoring.journee.saison.participants:
                         # if not cl.pk in computed_club_pks:
                         # compenser scores matchs reportés ...
+                        computed_joueurs.append(perf.joueur.pk)
             # "pour les joueurs qui n'ont pas joué lors de cette journée insert 0":
-            # TODO
+            for j in l1models.Joueur.objects.exclude(pk__in=computed_joueurs):
+                jjscores.append(JJScore(journee_scoring=journee_scoring, joueur=j, note=0, bonus=0))
             JJScore.objects.filter(journee_scoring=journee_scoring).delete()
             JJScore.objects.bulk_create(jjscores)
 
     def list_scores_for_joueur(self, joueur, saison_scoring):
         return self.filter(joueur=joueur, journee_scoring__saison_scoring=saison_scoring).order_by(
             'journee_scoring__journee__numero')
-
-        # raw_query = 'select ligue1_journee.id, numero, note::float, bonus::float, compensation::float, coalesce(bonus + coalesce(note,compensation), 0)::float as points from ligue1_journee inner join game_journeescoring on game_journeescoring.journee_id=ligue1_journee.id left join game_jjscore on game_jjscore.journee_scoring_id=game_journeescoring.id and game_jjscore.joueur_id=%s where ligue1_journee.saison_id=%s order by numero asc'
-        # return self.raw(raw_query, [joueur.pk, saison_scoring.saison.pk])
-
-        # jsc_map = {jsc.journee_scoring.journee.pk: jsc for jsc in JJScore.objects.filter(joueur=joueur,
-        # journee_scoring__saison_scoring=saison_scoring)}
-        # result = []
-        # for journee in l1models.Journee.objects.filter(saison=saison_scoring.saison).order_by('numero'):
-        #     if journee.pk in jsc_map:
-        #         result.append(jsc_map[journee.pk])
-        #     else:
-        #         result.append(JJScore(journee_scoring=JourneeScoring(journee=journee, saison_scoring=saison_scoring),
-        #                               joueur=joueur, note=0, bonus=0, compensation=0))
-        # return result
 
 
 class JJScore(models.Model):
