@@ -16,11 +16,7 @@
                 <li class="dropdown {% is_navbar_active request 'league' %}">
                     <a class="dropdown-toggle" data-toggle="dropdown" href="#">Mes ligues <span
                             class="caret"></span></a>
-                    <ul class="dropdown-menu">
-                        <li><a href="#">Liguain</a></li>
-                        <li class="divider"></li>
-                        <li><a href="#">Rejoindre une ligue...</a></li>
-                    </ul>
+                    {% leagues_navbar_content %}
                 </li>
                 <li class="{% is_navbar_active request 'wiki' %}"><a href="{% url 'wiki:root' %}">Comment ça marche ?</a></li>
                 <li><a href="#">Forum</a></li>

@@ -1,3 +1,4 @@
+from game import models
 # Inside custom tag - is_active.py
 from django.template import Library
 register = Library()
@@ -9,3 +10,9 @@ def is_navbar_active(request, token):
     if token in request.path:
         return "active"
     return ""
+
+
+@register.inclusion_tag('game/tags/game_leagues_navbar_content.html')
+def leagues_navbar_content():
+    leagues = models.League.objects.all()
+    return {'leagues': leagues}

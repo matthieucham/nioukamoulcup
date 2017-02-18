@@ -9,4 +9,7 @@ urlpatterns = [
         name="result_rencontre-detail"),
     url(r'^home/stat/joueur/(?P<pk>[0-9]+)/$', frontend.StatJoueurView.as_view(),
         name="stat_joueur-detail"),
+
+    url(r'^league/(?P<pk>[0-9]+)/$', frontend.StatJoueurView.as_view(),
+        name="league-detail"),
 ]

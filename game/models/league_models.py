@@ -15,8 +15,8 @@ class LeagueDivision(models.Model):
     level = models.PositiveSmallIntegerField(null=False)
     name = models.CharField(max_length=100, blank=False)
     capacity = models.PositiveSmallIntegerField()
-    upper_division = models.ForeignKey("self")
-    lower_division = models.ForeignKey("self")
+    upper_division = models.ForeignKey("self", related_name='lower', null=True)
+    lower_division = models.ForeignKey("self", related_name='upper', null=True)
 
 
 class Team(models.Model):
@@ -41,7 +41,7 @@ class LeagueInstancePhase(models.Model):
 
     league_instance = models.ForeignKey(LeagueInstance, null=False)
     name = models.CharField(max_length=100)
-    type = models.CharField(choices=TYPES)
+    type = models.CharField(choices=TYPES, max_length=10)
     journee_first = models.PositiveIntegerField(blank=False)
     journee_last = models.PositiveIntegerField(blank=False)
 
