@@ -1,0 +1,19 @@
+{% extends "game/game_base_2cols.html" %}
+{% load static %}
+
+{% block left-menu %}
+    {% include 'game/league/menu.html' %}
+{% endblock left-menu %}
+
+{% block title-section %}Mur{% endblock title-section %}
+
+{% block content-center %}
+
+    <h3>Test</h3>
+
+    <p>{% lorem %}</p>
+{% endblock content-center %}
+
+{% block content-right %}
+ <p>{% lorem %}</p>
+{% endblock content-right %}

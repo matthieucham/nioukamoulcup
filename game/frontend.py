@@ -66,3 +66,8 @@ class StatJoueurView(DetailView):
         # # 'journee_scoring__journee__numero')
         # context['scorechart'] = cht
         return context
+
+
+class LeagueWallView(DetailView):
+    model = models.League
+    template_name = 'game/league/wall.html'
