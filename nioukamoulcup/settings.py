@@ -52,9 +52,9 @@ INSTALLED_APPS = [
     'inline_actions',
 
     # dj-userena
-    'userena',
-    'guardian',
-    'easy_thumbnails',
+    #'userena',
+    #'guardian',
+    #'easy_thumbnails',
 
 
     'mptt',
@@ -63,14 +63,14 @@ INSTALLED_APPS = [
     'django_comments',
 
     # dj-wiki
-    'django_nyt',
-    'sekizai',
-    'sorl.thumbnail',
-    'wiki',
-    'wiki.plugins.attachments',
-    'wiki.plugins.notifications',
-    'wiki.plugins.images',
-    'wiki.plugins.macros',
+    # 'django_nyt',
+    # 'sekizai',
+    # 'sorl.thumbnail',
+    # 'wiki',
+    # 'wiki.plugins.attachments',
+    # 'wiki.plugins.notifications',
+    # 'wiki.plugins.images',
+    # 'wiki.plugins.macros',
 
     'graphos',
     
@@ -78,7 +78,7 @@ INSTALLED_APPS = [
     'svg',
 
     'game',
-    'accounts',
+    #'accounts',
     'ligue1',
 ]
 
@@ -94,8 +94,8 @@ MIDDLEWARE = [
 ]
 
 AUTHENTICATION_BACKENDS = (
-    'userena.backends.UserenaAuthenticationBackend',
-    'guardian.backends.ObjectPermissionBackend',
+    # 'userena.backends.UserenaAuthenticationBackend',
+    # 'guardian.backends.ObjectPermissionBackend',
     'django.contrib.auth.backends.ModelBackend',
 )
 

@@ -13,23 +13,29 @@
         <div class="collapse navbar-collapse" id="myNavbar">
             <ul class="nav navbar-nav">
                 <li class="{% is_navbar_active request 'home' %}"><a href="{% url 'home_info' %}">Maison</a></li>
-                <li class="dropdown {% is_navbar_active request 'league' %}">
-                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">Mes ligues <span
-                            class="caret"></span></a>
-                    {% leagues_navbar_content %}
-                </li>
-                <li class="{% is_navbar_active request 'wiki' %}"><a href="{% url 'wiki:root' %}">Comment ça marche ?</a></li>
+                 {% if user.is_authenticated %}
+                    <li class="dropdown {% is_navbar_active request 'league' %}">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">Mes ligues <span
+                                class="caret"></span></a>
+                        {% leagues_navbar_content %}
+                    </li>
+                {% endif %}
+                <li class="{% is_navbar_active request 'wiki' %}"><a href="todo">Comment ça marche ?</a></li>
                 <li><a href="#">Forum</a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
-                <li class="dropdown">
-                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">Fier Panpan&nbsp;<span class="glyphicon glyphicon-user pull-right"></span></a>
-                    <ul class="dropdown-menu">
-                        <li><a href="#"><span class="glyphicon glyphicon-cog pull-right"></span>Mon compte</a></li>
-                        <li class="divider"></li>
-                        <li><a href="#"><span class="glyphicon glyphicon-log-out pull-right"></span>Déconnexion</a></li>
-                    </ul>
-                </li>
+                {% if user.is_authenticated %}
+                    <li class="dropdown">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">{{ user.get_username }}&nbsp;<span class="glyphicon glyphicon-user pull-right"></span></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="#"><span class="glyphicon glyphicon-cog pull-right"></span>Mon compte</a></li>
+                            <li class="divider"></li>
+                            <li><a href="#"><span class="glyphicon glyphicon-log-out pull-right"></span>Déconnexion</a></li>
+                        </ul>
+                    </li>
+                {% else %}
+                    <li><a href="todo">Log in please</a></li>
+                {% endif %}
             </ul>
         </div>
     </nav>

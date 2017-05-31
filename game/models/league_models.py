@@ -1,6 +1,7 @@
 from django.db import models
 from ligue1 import models as l1models
 from django.contrib.postgres.fields import JSONField
+from django.contrib.auth.models import User
 
 
 class League(models.Model):
@@ -8,6 +9,14 @@ class League(models.Model):
     name = models.CharField(max_length=100, blank=False)
     official = models.BooleanField(default=False)
     mode = models.CharField(max_length=4, choices=MODES)
+    members = models.ManyToManyField(User, through='LeagueMembership', related_name='leagues')
+
+
+class LeagueMembership(models.Model):
+    user = models.ForeignKey(User)
+    league = models.ForeignKey(League)
+    is_baboon = models.BooleanField(default=False)
+    date_joined = models.DateField()
 
 
 class LeagueDivision(models.Model):

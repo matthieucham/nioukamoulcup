@@ -12,7 +12,7 @@ def is_navbar_active(request, token):
     return ""
 
 
-@register.inclusion_tag('game/tags/game_leagues_navbar_content.html')
-def leagues_navbar_content():
-    leagues = models.League.objects.all()
+@register.inclusion_tag('game/tags/game_leagues_navbar_content.html', takes_context=True)
+def leagues_navbar_content(context):
+    leagues = models.League.objects.filter(members=context.request.user)
     return {'leagues': leagues}
