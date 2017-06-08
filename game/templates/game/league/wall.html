@@ -1,11 +1,12 @@
 {% extends "game/game_base_2cols.html" %}
 {% load static %}
+{% load game %}
 
 {% block left-menu %}
     {% include 'game/league/menu.html' %}
 {% endblock left-menu %}
 
-{% block title-section %}Mur{% endblock title-section %}
+{% block title-section %} {{ league.name }} {% endblock title-section %}
 
 {% block content-center %}
 

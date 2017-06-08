@@ -17,6 +17,7 @@ class LeagueMembership(models.Model):
     league = models.ForeignKey(League)
     is_baboon = models.BooleanField(default=False)
     date_joined = models.DateField()
+    team = models.ForeignKey('Team', related_name='managers', null=True)
 
 
 class LeagueDivision(models.Model):
@@ -32,6 +33,7 @@ class Team(models.Model):
     name = models.CharField(max_length=100, blank=False)
     league = models.ForeignKey(League, null=False)
     division = models.ForeignKey(LeagueDivision)
+    attributes = JSONField()
 
 
 class LeagueInstance(models.Model):
