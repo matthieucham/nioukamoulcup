@@ -1,6 +1,7 @@
 __author__ = 'mgrandrie'
 from django.utils import timezone
 from django.db import models
+from django.core.exceptions import ObjectDoesNotExist
 
 from ligue1 import models as l1models
 from game.scoring import scoring
@@ -38,10 +39,6 @@ class JourneeScoring(models.Model):
         JJScore.objects.create_jjscore_from_ligue1(self)
 
 
-class KJoueur(models.Model):
-    joueur = models.ForeignKey(l1models.Joueur, null=False)
-
-
 class JJScoreManager(models.Manager):
     def create_jjscore_from_ligue1(self, journee_scoring):
         with Timer(id='create_jjscore_from_ligue1', verbose=True):
@@ -57,32 +54,27 @@ class JJScoreManager(models.Manager):
                         bbp = scoring.compute_best_by_position(all_perfs)
                     for perf in all_perfs:
                         note, bonus, comp = scoring.compute_score_performance(perf, bbp)
-                        kj, _ = KJoueur.objects.get_or_create(joueur=perf.joueur)
-                        jjscores.append(
-                            JJScore(journee_scoring=journee_scoring, kjoueur=kj,
-                                    note=note, bonus=bonus,
-                                    compensation=comp))
+                        jjscores.append(JJScore(journee_scoring=journee_scoring, joueur=perf.joueur, note=note, bonus=bonus,
+                                                compensation=comp))
                         # for cl in journee_scoring.journee.saison.participants:
                         # if not cl.pk in computed_club_pks:
                         # compenser scores matchs reportés ...
                         computed_joueurs.append(perf.joueur.pk)
             # "pour les joueurs qui n'ont pas joué lors de cette journée insert 0":
             for j in l1models.Joueur.objects.exclude(pk__in=computed_joueurs):
-                kj, _ = KJoueur.objects.get_or_create(joueur=j)
-                jjscores.append(
-                    JJScore(journee_scoring=journee_scoring, kjoueur=kj, note=0, bonus=0))
+                jjscores.append(JJScore(journee_scoring=journee_scoring, joueur=j, note=0, bonus=0))
             JJScore.objects.filter(journee_scoring=journee_scoring).delete()
             JJScore.objects.bulk_create(jjscores)
 
     def list_scores_for_joueur(self, joueur, saison_scoring):
-        return self.filter(kjoueur__joueur=joueur, journee_scoring__saison_scoring=saison_scoring).order_by(
+        return self.filter(joueur=joueur, journee_scoring__saison_scoring=saison_scoring).order_by(
             'journee_scoring__journee__numero')
 
 
 class JJScore(models.Model):
     computed_at = models.DateTimeField(auto_now=True, null=False)
     journee_scoring = models.ForeignKey(JourneeScoring, null=False)
-    kjoueur = models.ForeignKey(KJoueur, null=False, related_name='scores')
+    joueur = models.ForeignKey(l1models.Joueur, null=False)
     note = models.DecimalField(max_digits=5, decimal_places=3, blank=True, null=True)
     bonus = models.DecimalField(max_digits=5, decimal_places=3, blank=False, null=False, default=0)
     compensation = models.DecimalField(max_digits=5, decimal_places=3, blank=True, null=True)
