@@ -122,8 +122,8 @@ class JoueurManager(models.Manager):
         return self.get_or_create(sn_person_uuid=statnuts_data['uuid'],
                                   defaults=defaults)
 
-    def set_club_from_statnuts(self, joueur, statnuts_data, maj):
-        for t in statnuts_data['results']:
+    def set_club_from_statnuts(self, joueur, statnuts_data_teams, maj):
+        for t in statnuts_data_teams:
             try:
                 club = Club.objects.get(sn_team_uuid=t['uuid'])
                 joueur.club = club
@@ -180,7 +180,7 @@ class RencontreManager(models.Manager):
         for ros in statnuts_meeting['roster']:
             joueur, created = Joueur.objects.get_or_create_from_statnuts(ros['player'])
             joueur_updated_at = dateutil.parser.parse(ros['player']['updated_at'])
-            if created or joueur.derniere_maj is None or joueur.derniere_maj < joueur_updated_at:
+            if created or joueur.derniere_maj is None or joueur.derniere_maj < joueur_updated_at:  # or date de la rencontre > dernier maj du joueur !
                 Joueur.objects.set_club_from_statnuts(joueur, sn_client.get_person_teams(ros['player']['uuid']),
                                                       joueur_updated_at)
             club = Club.objects.get(sn_team_uuid=ros['played_for'])

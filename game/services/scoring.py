@@ -9,8 +9,8 @@ BONUS = {
     },
     'PERSONAL': {
         'LEADER': {'G': 0, 'D': 1.2, 'M': 0.6, 'A': 0},
-        'CONCEDED': {'G': -1.2, 'D': 0, 'M': 0, 'A': 0},
-        'SAVE': {'G': 0.4, 'D': 0, 'M': 0, 'A': 0},
+        '3STOPS': {'G': 0.9, 'D': 0, 'M': 0, 'A': 0},
+        'PENALSTOP': {'G': 3, 'D': 3, 'M': 3, 'A': 3},
         'GOAL': {'G': 3, 'D': 3, 'M': 3, 'A': 3},
         'PENALTY': {'G': 1.5, 'D': 1.5, 'M': 1.5, 'A': 1.5},
         'PASS': {'G': 2, 'D': 2, 'M': 2, 'A': 2},
@@ -20,7 +20,7 @@ BONUS = {
 
 PLAYTIME = {'MAX_SHORT': 15, 'MAX_LONG': 30, 'MIN_BONUS': 45}
 
-COMPENSATION = {'SHORT': 1, 'LONG': 3, 'CANCELLED': 5}
+COMPENSATION = {'SHORT': 1, 'LONG': 2, 'CANCELLED': 5}
 
 SALARY_SCORE_BOUNDS = [(6.1, 'cl1'), (6.3, 'cl2'), (6.3, 'cl3'), (6.5, 'cl4'), (6.75, 'cl5'), (7.1, 'cl6'),
                        (7.6, 'cl7'),
@@ -62,10 +62,12 @@ def _compute_bonus(perf, has_collective_bonus, best_note_by_position):
     poste = perf.joueur.poste
     base = 0
     # bonus individuel
-    for (i, j) in [('CONCEDED', 'goals_conceded'), ('SAVE', 'goals_saved'), ('GOAL', 'goals_scored'), ('PENALTY',
-                                                                                                       'penalties_scored'),
+    for (i, j) in [('PENALSTOP', 'penalty_saved'), ('GOAL', 'goals_scored'), ('PENALTY',
+                                                                              'penalties_scored'),
                    ('PASS', 'goals_assists'), ('HALFPASS', 'penalties_awarded')]:
         base += (BONUS['PERSONAL'][i][poste] * perf.details['stats'][j])
+    if perf.details['stats']['goals_saved'] > 3:
+        base += BONUS['PERSONAL']['3STOPS'][poste]
     if 'note' in perf.details and perf.details['note'] >= best_note_by_position[perf.details['equipe']][poste]:
         base += BONUS['PERSONAL']['LEADER'][poste]
     if has_collective_bonus:

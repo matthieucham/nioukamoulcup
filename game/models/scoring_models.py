@@ -4,7 +4,7 @@ from django.db import models
 from django.core.exceptions import ObjectDoesNotExist
 
 from ligue1 import models as l1models
-from game.scoring import scoring
+from game.services import scoring
 from utils.timer import Timer
 
 

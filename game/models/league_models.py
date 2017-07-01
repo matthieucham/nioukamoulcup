@@ -68,19 +68,3 @@ class TeamDayScore(models.Model):
     day = models.ForeignKey(LeagueInstancePhaseDay, null=False)
     team = models.ForeignKey(Team)
     score = models.DecimalField(decimal_places=3, max_digits=7)
-
-
-class Merkato(models.Model):
-    MODES = (('DRFT', 'Draft'), ('BID', 'Bid'))
-
-    begin = models.DateTimeField(blank=False)
-    end = models.DateTimeField(blank=False)
-    mode = models.CharField(max_length=4, blank=False, choices=MODES)
-    configuration = JSONField()
-    league_instance = models.ForeignKey(LeagueInstance, null=False)
-
-
-class MerkatoSession(models.Model):
-    merkato = models.ForeignKey(Merkato, null=False)
-    number = models.PositiveIntegerField(blank=False)
-    closing = models.DateTimeField(blank=False)

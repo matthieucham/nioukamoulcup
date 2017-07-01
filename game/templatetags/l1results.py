@@ -4,7 +4,7 @@ from django import template
 from django.template import defaultfilters
 
 from ligue1 import models as l1models
-from game import scoring
+from game import services
 
 
 register = template.Library()
@@ -86,7 +86,7 @@ def rencontre_team(rencontre, equipe):
     for perf in rencontre.performances.filter(details__equipe=equipe):
         base_stats = {'time': perf.temps_de_jeu,
                       'rating': perf.details['note'] if ('note' in perf.details
-                                                         and perf.temps_de_jeu >= scoring.PLAYTIME['MAX_LONG'])
+                                                         and perf.temps_de_jeu >= services.PLAYTIME['MAX_LONG'])
                       else None,
                       'joueur': perf.joueur}
         position = perf.joueur.poste
