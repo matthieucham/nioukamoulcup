@@ -27,6 +27,7 @@ class TransferTestCase(TestCase):
         auction_1 = models.Auction(sale=self.sale_to_solve, team=bidder_1, value='5.1')
         auction_2 = models.Auction(sale=self.sale_to_solve, team=bidder_2, value='4.2')
         auction_3 = models.Auction(sale=self.sale_to_solve, team=self.author_team, value='3.4')
+        self.sale_to_solve.auctions.add(auction_1, auction_2, auction_3)
 
         auctions.solve_sale(self.sale_to_solve)
 
