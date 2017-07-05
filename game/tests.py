@@ -1,3 +1,4 @@
+import uuid
 from django.test import TestCase
 
 from game import models
@@ -7,31 +8,43 @@ from ligue1 import models as l1models
 
 class TransferTestCase(TestCase):
     def setUp(self):
-        self.targeted_player = l1models.Joueur(nom='Bamougui', poste='A', sn_person_uuid='uuid')
-        self.league = models.League(name='Test League', mode='KCUP')
-        self.instance = models.LeagueInstance(name='Test Instance', )
-        self.division = models.LeagueDivision(league=self.league, level=1, name='Test division 1', capacity=20)
-        self.merkato_bid = models.Merkato(mode='BID', league_instance=self.instance)
-        self.merkato_bid_session = models.MerkatoSession(merkato=self.merkato_bid, number=1)
+        self.saison = l1models.Saison.objects.create(nom='Saison', sn_instance_uuid=uuid.uuid4(),
+                                                     debut='2017-07-31',
+                                                     fin='2018-06-01')
+        self.targeted_player = l1models.Joueur.objects.create(nom='Bamougui', poste='A',
+                                                              sn_person_uuid=uuid.uuid4())
 
-        self.author_team = models.Team(name='PAMAKER', league=self.league, division=self.division)
-        self.sale_to_solve = models.Sale(player=self.targeted_player, team=self.author_team,
-                                         merkato_session=self.merkato_bid_session)
+        self.league = models.League.objects.create(name='Test League', mode='KCUP')
+        self.instance = models.LeagueInstance.objects.create(name='Test Instance', begin='2017-09-01 09:00',
+                                                             end='2017-10-15 21:00', configuration='{}',
+                                                             league=self.league, saison=self.saison)
+        self.division = models.LeagueDivision.objects.create(league=self.league, level=1, name='Test division 1',
+                                                             capacity=20)
+        self.merkato_bid = models.Merkato.objects.create(mode='BID', league_instance=self.instance,
+                                                         begin='2017-09-01 09:00',
+                                                         end='2017-10-15 21:00', configuration='{}')
+        self.merkato_bid_session = models.MerkatoSession.objects.create(merkato=self.merkato_bid, number=1,
+                                                                        closing='2017-10-01 21:00:00')
 
     def test_pa_nominal_3_auctions(self):
-        self.sale_to_solve.type = 'PA'
-        self.sale_to_solve.min_price = 0.1
+        self.author_team = models.Team.objects.create(name='PAMAKER', league=self.league, division=self.division,
+                                                      attributes='')
+        self.sale_to_solve = models.Sale.objects.create(player=self.targeted_player, team=self.author_team,
+                                                        merkato_session=self.merkato_bid_session, type='PA',
+                                                        min_price=0.1)
 
-        bidder_1 = models.Team(name='BIDDER1', league=self.league, division=self.division)
-        bidder_2 = models.Team(name='BIDDER2', league=self.league, division=self.division)
-        auction_1 = models.Auction(sale=self.sale_to_solve, team=bidder_1, value='5.1')
-        auction_2 = models.Auction(sale=self.sale_to_solve, team=bidder_2, value='4.2')
-        auction_3 = models.Auction(sale=self.sale_to_solve, team=self.author_team, value='3.4')
+        bidder_1 = models.Team.objects.create(name='BIDDER1', league=self.league, division=self.division,
+                                              attributes='')
+        bidder_2 = models.Team.objects.create(name='BIDDER2', league=self.league, division=self.division,
+                                              attributes='')
+        auction_1 = models.Auction.objects.create(sale=self.sale_to_solve, team=bidder_1, value='5.1')
+        auction_2 = models.Auction.objects.create(sale=self.sale_to_solve, team=bidder_2, value='4.2')
+        auction_3 = models.Auction.objects.create(sale=self.sale_to_solve, team=self.author_team, value='3.4')
         self.sale_to_solve.auctions.add(auction_1, auction_2, auction_3)
 
         auctions.solve_sale(self.sale_to_solve)
 
-        self.assertTrue(auction_1.is_valid)
-        self.assertTrue(auction_2.is_valid)
-        self.assertTrue(auction_3.is_valid)
-        self.assertEqual(self.sale_to_solve.winning_auction, auction_1)
+        self.assertTrue(models.Auction.objects.get(pk=auction_1.pk).is_valid)
+        self.assertTrue(models.Auction.objects.get(pk=auction_2.pk).is_valid)
+        self.assertTrue(models.Auction.objects.get(pk=auction_3.pk).is_valid)
+        self.assertEqual(models.Sale.objects.get(pk=self.sale_to_solve.pk).winning_auction.pk, auction_1.pk)

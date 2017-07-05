@@ -1,7 +1,7 @@
 __author__ = 'mgrandrie'
 
 import unittest
-import note_converter
+from . import note_converter
 
 
 class NoteConverterTest(unittest.TestCase):
