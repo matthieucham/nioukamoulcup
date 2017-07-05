@@ -13,6 +13,7 @@ def solve_sale(sale):
     else:
         winner = _find_winner(processed_auctions)
         _set_winning_auction(winner)
+    return sale
 
 
 def _set_winning_auction(auction):
@@ -22,9 +23,9 @@ def _set_winning_auction(auction):
 
 def _find_winner(processed_auctions):
     # sort by highest vaalue
-    sorted(processed_auctions, key=lambda a: a.value, reverse=True)
-    max_val = processed_auctions[0].value
-    possible_winners = [auc for auc in processed_auctions if auc.value == max_val]
+    sorted_auctions = sorted(processed_auctions, key=lambda a: a.value, reverse=True)
+    max_val = sorted_auctions[0].value
+    possible_winners = [auc for auc in sorted_auctions if auc.value == max_val]
     # pick one in possible_winners
     if len(possible_winners) == 1:
         return possible_winners[0]

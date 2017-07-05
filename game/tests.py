@@ -27,24 +27,56 @@ class TransferTestCase(TestCase):
                                                                         closing='2017-10-01 21:00:00')
 
     def test_pa_nominal_3_auctions(self):
-        self.author_team = models.Team.objects.create(name='PAMAKER', league=self.league, division=self.division,
-                                                      attributes='')
-        self.sale_to_solve = models.Sale.objects.create(player=self.targeted_player, team=self.author_team,
-                                                        merkato_session=self.merkato_bid_session, type='PA',
-                                                        min_price=0.1)
+        author_team = models.Team.objects.create(name='PAMAKER', league=self.league, division=self.division,
+                                                 attributes='')
+        sale_to_solve = models.Sale.objects.create(player=self.targeted_player, team=author_team,
+                                                   merkato_session=self.merkato_bid_session, type='PA',
+                                                   min_price=0.1)
 
         bidder_1 = models.Team.objects.create(name='BIDDER1', league=self.league, division=self.division,
                                               attributes='')
         bidder_2 = models.Team.objects.create(name='BIDDER2', league=self.league, division=self.division,
                                               attributes='')
-        auction_1 = models.Auction.objects.create(sale=self.sale_to_solve, team=bidder_1, value='5.1')
-        auction_2 = models.Auction.objects.create(sale=self.sale_to_solve, team=bidder_2, value='4.2')
-        auction_3 = models.Auction.objects.create(sale=self.sale_to_solve, team=self.author_team, value='3.4')
-        self.sale_to_solve.auctions.add(auction_1, auction_2, auction_3)
+        auction_1 = models.Auction.objects.create(sale=sale_to_solve, team=bidder_1, value='5.1')
+        auction_2 = models.Auction.objects.create(sale=sale_to_solve, team=bidder_2, value='4.2')
+        auction_3 = models.Auction.objects.create(sale=sale_to_solve, team=author_team, value='3.4')
+        sale_to_solve.auctions.add(auction_1, auction_2, auction_3)
 
-        auctions.solve_sale(self.sale_to_solve)
+        solved = auctions.solve_sale(sale_to_solve)
 
         self.assertTrue(models.Auction.objects.get(pk=auction_1.pk).is_valid)
         self.assertTrue(models.Auction.objects.get(pk=auction_2.pk).is_valid)
         self.assertTrue(models.Auction.objects.get(pk=auction_3.pk).is_valid)
-        self.assertEqual(models.Sale.objects.get(pk=self.sale_to_solve.pk).winning_auction.pk, auction_1.pk)
+        self.assertEquals(solved.winning_auction.pk, auction_1.pk)
+
+    def test_pa_nominal_no_auction(self):
+        author_team = models.Team.objects.create(name='PAMAKER', league=self.league, division=self.division,
+                                                 attributes='')
+        sale_to_solve = models.Sale.objects.create(player=self.targeted_player, team=author_team,
+                                                   merkato_session=self.merkato_bid_session, type='PA',
+                                                   min_price=0.1)
+        solved = auctions.solve_sale(sale_to_solve)
+
+        self.assertIsNone(solved.winning_auction)
+
+    def test_pa_nominal_3_auctions_with_equality(self):
+        author_team = models.Team.objects.create(name='PAMAKER', league=self.league, division=self.division,
+                                                 attributes='')
+        sale_to_solve = models.Sale.objects.create(player=self.targeted_player, team=author_team,
+                                                   merkato_session=self.merkato_bid_session, type='PA',
+                                                   min_price=0.1)
+
+        bidder_1 = models.Team.objects.create(name='BIDDER1', league=self.league, division=self.division,
+                                              attributes='')
+        bidder_2 = models.Team.objects.create(name='BIDDER2', league=self.league, division=self.division,
+                                              attributes='')
+        auction_1 = models.Auction.objects.create(sale=sale_to_solve, team=bidder_1, value='5.1')
+        auction_2 = models.Auction.objects.create(sale=sale_to_solve, team=bidder_2, value='13.1')
+        auction_3 = models.Auction.objects.create(sale=sale_to_solve, team=author_team, value='13.1')
+        sale_to_solve.auctions.add(auction_1, auction_2, auction_3)
+
+        solved = auctions.solve_sale(sale_to_solve)
+
+        self.assertIsNotNone(solved.winning_auction)
+        self.assertNotEquals(solved.winning_auction.pk, auction_1.pk)
+        print('%s has won' % solved.winning_auction.team.name)
