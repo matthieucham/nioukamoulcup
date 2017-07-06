@@ -39,6 +39,23 @@ class Sale(models.Model):
     min_price = models.DecimalField(max_digits=4, decimal_places=1)
     type = models.CharField(max_length=2, blank=False, default='PA', choices=TYPES)
     winning_auction = models.ForeignKey('Auction', related_name='sale_won', null=True)
+    rank = models.PositiveIntegerField(null=False, default=1)
+
+    def save(self, *args, **kwargs):
+        """
+        Call Sale create operations within LockedAtomicTransaction
+        """
+        if not self.pk:
+            # set rank as max rank of session +1
+            try:
+                max_rank_sale = Sale.objects.filter(merkato_session=self.merkato_session).latest('rank')
+            except Sale.DoesNotExist:
+                max_rank_sale = 0
+            self.rank = max_rank_sale + 1
+        super(Sale, self).save(*args, **kwargs)
+
+    class Meta:
+        unique_together = ('merkato_session', 'rank')
 
 
 class Auction(models.Model):
