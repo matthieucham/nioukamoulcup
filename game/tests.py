@@ -1,5 +1,6 @@
 import uuid
 from django.test import TestCase
+from django.db import utils as dbutils
 
 from game import models
 from game.services import auctions
@@ -80,3 +81,36 @@ class TransferTestCase(TestCase):
         self.assertIsNotNone(solved.winning_auction)
         self.assertNotEquals(solved.winning_auction.pk, auction_1.pk)
         print('%s has won' % solved.winning_auction.team.name)
+
+    def test_not_same_player_in_session(self):
+        author_team = models.Team.objects.create(name='PAMAKER', league=self.league, division=self.division,
+                                                 attributes='')
+        sale_to_solve = models.Sale.objects.create(player=self.targeted_player, team=author_team,
+                                                   merkato_session=self.merkato_bid_session, type='PA',
+                                                   min_price=0.1)
+        with self.assertRaises(dbutils.IntegrityError):
+            sale_that_will_fail = models.Sale.objects.create(player=self.targeted_player, team=author_team,
+                                                             merkato_session=self.merkato_bid_session, type='PA',
+                                                             min_price=0.1)
+
+    def test_solve_session(self):
+        for i in range(4):
+            t = models.Team.objects.create(name='PAMAKER%d' % i, league=self.league, division=self.division,
+                                           attributes='')
+            p = l1models.Joueur.objects.create(nom='BAMOUG%d' % i, poste='A',
+                                               sn_person_uuid=uuid.uuid4())
+
+            sale_to_solve = models.Sale.objects.create(player=p, team=t,
+                                                       merkato_session=self.merkato_bid_session, type='PA',
+                                                       min_price=0.1)
+            sale_to_solve.auctions.add(models.Auction.objects.create(sale=sale_to_solve, team=t, value=1.0))
+        self.merkato_bid_session.refresh_from_db()
+        with self.assertRaises(auctions.SaleSolvingException):  # closing time too early
+            auctions.solve_session(self.merkato_bid_session)
+        self.merkato_bid_session.closing = '2016-01-01 10:00'
+        self.merkato_bid_session.save()
+        self.merkato_bid_session.refresh_from_db()
+        solved = auctions.solve_session(self.merkato_bid_session)
+        for sale in solved.sale_set.all():
+            self.assertIsNotNone(sale.winning_auction)
+        self.assertTrue(solved.is_solved)

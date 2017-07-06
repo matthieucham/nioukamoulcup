@@ -1,10 +1,27 @@
 import random
+from operator import attrgetter
+from django.db import transaction
+from django.utils import timezone
 
 
 class SaleSolvingException(Exception):
     pass
 
 
+@transaction.atomic()
+def solve_session(merkato_session):
+    if merkato_session.closing > timezone.now():
+        raise SaleSolvingException('Merkato session not over yet, closing time is %s' % merkato_session.closing)
+    sales = sorted(merkato_session.sale_set.all(), key=attrgetter('rank'))
+    # resolution must be sequential:
+    for s in sales:
+        solve_sale(s)
+    merkato_session.is_solved = True
+    merkato_session.save()
+    return merkato_session
+
+
+@transaction.atomic()
 def solve_sale(sale):
     auctions = sale.auctions.all()
     processed_auctions = [_validate_auction(auc) for auc in auctions]  # list of (auction, is_valid)

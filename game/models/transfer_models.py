@@ -49,13 +49,17 @@ class Sale(models.Model):
             # set rank as max rank of session +1
             try:
                 max_rank_sale = Sale.objects.filter(merkato_session=self.merkato_session).latest('rank')
+                self.rank = max_rank_sale.rank + 1
             except Sale.DoesNotExist:
-                max_rank_sale = 0
-            self.rank = max_rank_sale + 1
+                self.rank = 1
         super(Sale, self).save(*args, **kwargs)
 
     class Meta:
-        unique_together = ('merkato_session', 'rank')
+        unique_together = (
+            ('merkato_session', 'rank'),
+            ('merkato_session', 'player'),
+        )
+        ordering = ('merkato_session', 'rank', )
 
 
 class Auction(models.Model):
