@@ -10,12 +10,17 @@ class SaleSolvingException(Exception):
 
 @transaction.atomic()
 def solve_session(merkato_session):
+    assert merkato_session.merkato.mode in ['BID', 'DRFT'], merkato_session.merkato.mode
     if merkato_session.closing > timezone.now():
         raise SaleSolvingException('Merkato session not over yet, closing time is %s' % merkato_session.closing)
-    sales = sorted(merkato_session.sale_set.all(), key=attrgetter('rank'))
-    # resolution must be sequential:
-    for s in sales:
-        solve_sale(s)
+    if merkato_session.merkato.mode == 'BID':
+        sales = sorted(merkato_session.sale_set.all(), key=attrgetter('rank'))
+        # resolution must be sequential:
+        for s in sales:
+            solve_sale(s)
+    elif merkato_session.merkato.mode == 'DRFT':
+        # TODO draft
+        pass
     merkato_session.is_solved = True
     merkato_session.save()
     return merkato_session
