@@ -127,7 +127,7 @@ class JoueurManager(models.Manager):
             try:
                 club = Club.objects.get(sn_team_uuid=t['uuid'])
                 joueur.club = club
-            except ObjectDoesNotExist:
+            except Club.DoesNotExist:
                 pass
         joueur.derniere_maj = maj
         joueur.save()
