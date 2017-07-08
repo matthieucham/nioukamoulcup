@@ -3,6 +3,7 @@ from django.contrib.postgres.fields import JSONField
 
 from ..models import league_models
 from ligue1 import models as l1models
+import decimal
 
 
 class Merkato(models.Model):
@@ -71,6 +72,27 @@ class Auction(models.Model):
     value = models.DecimalField(max_digits=4, decimal_places=1)
     is_valid = models.NullBooleanField(null=True)
     reject_cause = models.CharField(max_length=10, null=True)
+
+    class AuctionNotValidException(Exception):
+        def __init__(self, code):
+            super(Exception, self).__init__()
+            self.code = code
+
+    def validate(self):
+        # MIN_PRICE
+        if self.sale.type == 'MV':
+            if self.sale.min_price > self.value:
+                raise Auction.AuctionNotValidException(code='MIN_PRICE')
+        else:
+            if self.sale.min_price >= self.value:
+                raise Auction.AuctionNotValidException(code='MIN_PRICE')
+        # MONEY
+        available = decimal.Decimal(self.team.bank_account.balance + self.team.bank_account.adjust)
+        if self.sale.team.pk == self.team.pk:
+            available += decimal.Decimal(self.sale.min_price)
+        if available < self.value:
+            raise Auction.AuctionNotValidException(code='MONEY')
+        # TODO FULL
 
     class Meta:
         unique_together = ('sale', 'team')

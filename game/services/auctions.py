@@ -3,6 +3,8 @@ from operator import attrgetter
 from django.db import transaction
 from django.utils import timezone
 
+from game.models import transfer_models
+
 
 class SaleSolvingException(Exception):
     pass
@@ -29,11 +31,12 @@ def solve_session(merkato_session):
 @transaction.atomic()
 def solve_sale(sale):
     auctions = sale.auctions.all()
-    processed_auctions = [_validate_auction(auc) for auc in auctions]  # list of (auction, is_valid)
-    if not processed_auctions:
+    processed_auctions = [_validate_auction(auc) for auc in auctions]
+    valid_auctions = [auc for auc in processed_auctions if auc.is_valid]
+    if not valid_auctions:
         _handle_no_auction(sale)
     else:
-        winner = _find_winner(processed_auctions)
+        winner = _find_winner(valid_auctions)
         _set_winning_auction(winner)
     return sale
 
@@ -62,8 +65,14 @@ def _handle_no_auction(sale):
     sale.save()
 
 
+@transaction.atomic()
 def _validate_auction(auction):
-    auction.is_valid = True  # TODO
+    try:
+        auction.validate()
+        auction.is_valid = True
+    except transfer_models.Auction.AuctionNotValidException as e:
+        auction.is_valid = False
+        auction.reject_cause = e.code
     auction.save()
     return auction
 

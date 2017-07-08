@@ -30,14 +30,17 @@ class TransferTestCase(TestCase):
     def test_pa_nominal_3_auctions(self):
         author_team = models.Team.objects.create(name='PAMAKER', league=self.league, division=self.division,
                                                  attributes='')
+        models.BankAccount.objects.init_account(author_team, 100)
         sale_to_solve = models.Sale.objects.create(player=self.targeted_player, team=author_team,
                                                    merkato_session=self.merkato_bid_session, type='PA',
                                                    min_price=0.1)
 
         bidder_1 = models.Team.objects.create(name='BIDDER1', league=self.league, division=self.division,
                                               attributes='')
+        models.BankAccount.objects.init_account(bidder_1, 100)
         bidder_2 = models.Team.objects.create(name='BIDDER2', league=self.league, division=self.division,
                                               attributes='')
+        models.BankAccount.objects.init_account(bidder_2, 100)
         auction_1 = models.Auction.objects.create(sale=sale_to_solve, team=bidder_1, value='5.1')
         auction_2 = models.Auction.objects.create(sale=sale_to_solve, team=bidder_2, value='4.2')
         auction_3 = models.Auction.objects.create(sale=sale_to_solve, team=author_team, value='3.4')
@@ -63,14 +66,17 @@ class TransferTestCase(TestCase):
     def test_pa_nominal_3_auctions_with_equality(self):
         author_team = models.Team.objects.create(name='PAMAKER', league=self.league, division=self.division,
                                                  attributes='')
+        models.BankAccount.objects.init_account(author_team, 100)
         sale_to_solve = models.Sale.objects.create(player=self.targeted_player, team=author_team,
                                                    merkato_session=self.merkato_bid_session, type='PA',
                                                    min_price=0.1)
 
         bidder_1 = models.Team.objects.create(name='BIDDER1', league=self.league, division=self.division,
                                               attributes='')
+        models.BankAccount.objects.init_account(bidder_1, 100)
         bidder_2 = models.Team.objects.create(name='BIDDER2', league=self.league, division=self.division,
                                               attributes='')
+        models.BankAccount.objects.init_account(bidder_2, 100)
         auction_1 = models.Auction.objects.create(sale=sale_to_solve, team=bidder_1, value='5.1')
         auction_2 = models.Auction.objects.create(sale=sale_to_solve, team=bidder_2, value='13.1')
         auction_3 = models.Auction.objects.create(sale=sale_to_solve, team=author_team, value='13.1')
@@ -82,21 +88,11 @@ class TransferTestCase(TestCase):
         self.assertNotEquals(solved.winning_auction.pk, auction_1.pk)
         print('%s has won' % solved.winning_auction.team.name)
 
-    def test_not_same_player_in_session(self):
-        author_team = models.Team.objects.create(name='PAMAKER', league=self.league, division=self.division,
-                                                 attributes='')
-        sale_to_solve = models.Sale.objects.create(player=self.targeted_player, team=author_team,
-                                                   merkato_session=self.merkato_bid_session, type='PA',
-                                                   min_price=0.1)
-        with self.assertRaises(dbutils.IntegrityError):
-            sale_that_will_fail = models.Sale.objects.create(player=self.targeted_player, team=author_team,
-                                                             merkato_session=self.merkato_bid_session, type='PA',
-                                                             min_price=0.1)
-
     def test_solve_session(self):
         for i in range(4):
             t = models.Team.objects.create(name='PAMAKER%d' % i, league=self.league, division=self.division,
                                            attributes='')
+            models.BankAccount.objects.init_account(t, 100)
             p = l1models.Joueur.objects.create(nom='BAMOUG%d' % i, poste='A',
                                                sn_person_uuid=uuid.uuid4())
 
@@ -114,3 +110,31 @@ class TransferTestCase(TestCase):
         for sale in solved.sale_set.all():
             self.assertIsNotNone(sale.winning_auction)
         self.assertTrue(solved.is_solved)
+
+    def test_pa_invalid_auction(self):
+        author_team = models.Team.objects.create(name='PAMAKER', league=self.league, division=self.division,
+                                                 attributes='')
+        models.BankAccount.objects.init_account(author_team, 100)
+        sale_to_solve = models.Sale.objects.create(player=self.targeted_player, team=author_team,
+                                                   merkato_session=self.merkato_bid_session, type='PA',
+                                                   min_price=2.2)
+
+        bidder_1 = models.Team.objects.create(name='BIDDER1', league=self.league, division=self.division,
+                                              attributes='')
+        models.BankAccount.objects.init_account(bidder_1, 100)
+        bidder_2 = models.Team.objects.create(name='BIDDER2', league=self.league, division=self.division,
+                                              attributes='')
+        models.BankAccount.objects.init_account(bidder_2, 100)
+        auction_1 = models.Auction.objects.create(sale=sale_to_solve, team=bidder_1, value='5.1')
+        auction_2 = models.Auction.objects.create(sale=sale_to_solve, team=bidder_2, value='101')  # invalid !
+        auction_3 = models.Auction.objects.create(sale=sale_to_solve, team=author_team, value='2.2')  # invalid !
+        sale_to_solve.auctions.add(auction_1, auction_2, auction_3)
+
+        solved = auctions.solve_sale(sale_to_solve)
+
+        self.assertTrue(models.Auction.objects.get(pk=auction_1.pk).is_valid)
+        self.assertFalse(models.Auction.objects.get(pk=auction_2.pk).is_valid)
+        self.assertEqual(models.Auction.objects.get(pk=auction_2.pk).reject_cause, 'MONEY')
+        self.assertFalse(models.Auction.objects.get(pk=auction_3.pk).is_valid)
+        self.assertEqual(models.Auction.objects.get(pk=auction_3.pk).reject_cause, 'MIN_PRICE')
+        self.assertEqual(solved.winning_auction.pk, auction_1.pk)
