@@ -3,7 +3,7 @@ from operator import attrgetter
 from django.db import transaction
 from django.utils import timezone
 
-from game.models import transfer_models
+from game.models import transfer_models, league_models
 
 
 class SaleSolvingException(Exception):
@@ -16,6 +16,14 @@ def solve_session(merkato_session):
     if merkato_session.closing > timezone.now():
         raise SaleSolvingException('Merkato session not over yet, closing time is %s' % merkato_session.closing)
     if merkato_session.merkato.mode == 'BID':
+        # first, apply releases
+        for release in transfer_models.Release.objects.filter(merkato_session=merkato_session):
+            league_models.BankAccount.objects.release(release)
+            release.signing.end = timezone.now()
+            release.done = True
+            release.signing.save()
+            release.save()
+        # budgets and rosters are done, now solve.
         sales = sorted(merkato_session.sale_set.all(), key=attrgetter('rank'))
         # resolution must be sequential:
         for s in sales:

@@ -41,10 +41,10 @@ class Team(models.Model):
 class BankAccountManager(models.Manager):
     @transaction.atomic
     def init_account(self, team, init_balance):
-        account, created = self.get_or_create(team=team, defaults={'balance': init_balance, 'adjust': 0})
+        account, created = self.get_or_create(team=team, defaults={'balance': init_balance, 'blocked': 0})
         if not created:
             account.balance = init_balance
-            account.adjust = 0
+            account.blocked = 0
             account.save()
         account.bankaccounthistory_set.clear()
         account.bankaccounthistory_set.add(
@@ -54,18 +54,27 @@ class BankAccountManager(models.Manager):
     @transaction.atomic
     def buy(self, team, amount, player):
         account = self.select_for_update().get(team=team)
-        assert (account.balance + account.adjust + amount >= 0)  # amount is negative !
+        assert (account.balance + amount >= 0)  # amount is negative !
         account.balance += amount
         account.bank_account_history_set.add(
             BankAccountHistory.objects.create(amount=amount, new_balance=account.balance,
                                               info=BankAccountHistory.make_info_buy(player)))
         account.save()
 
+    @transaction.atomic
+    def release(self, release_item):
+        account = self.select_for_update().get(team=release_item.signing.team)
+        account.balance += release_item.amount
+        account.bank_account_history_set.add(
+            BankAccountHistory.objects.create(amount=release_item.amount, new_balance=account.balance,
+                                              info=BankAccountHistory.make_info_release(release_item.signing.player)))
+        account.save()
+
 
 class BankAccount(models.Model):
     team = models.OneToOneField(Team, primary_key=True, related_name='bank_account')
     balance = models.DecimalField(max_digits=4, decimal_places=1)
-    adjust = models.DecimalField(max_digits=4, decimal_places=1)
+    blocked = models.DecimalField(max_digits=4, decimal_places=1)
     objects = BankAccountManager()
 
 
@@ -83,6 +92,10 @@ class BankAccountHistory(models.Model):
     @staticmethod
     def make_info_buy(player):
         return json.dumps({'type': 'BUY', 'player_id': player.pk, 'player_name': player.__str__()})
+
+    @staticmethod
+    def make_info_release(player):
+        return json.dumps({'type': 'RELEASE', 'player_id': player.pk, 'player_name': player.__str__()})
 
 
 class LeagueInstance(models.Model):
@@ -117,3 +130,11 @@ class TeamDayScore(models.Model):
     day = models.ForeignKey(LeagueInstancePhaseDay, null=False)
     team = models.ForeignKey(Team)
     score = models.DecimalField(decimal_places=3, max_digits=7)
+
+
+class Signing(models.Model):
+    player = models.ForeignKey(l1models.Joueur, null=False)
+    team = models.ForeignKey(Team, null=False)
+    begin = models.DateField(auto_now_add=True)
+    end = models.DateField(null=True)
+    attributes = JSONField()

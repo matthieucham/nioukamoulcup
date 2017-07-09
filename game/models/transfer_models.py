@@ -23,14 +23,6 @@ class MerkatoSession(models.Model):
     is_solved = models.BooleanField(null=False, default=False)
 
 
-class Signing(models.Model):
-    player = models.ForeignKey(l1models.Joueur, null=False)
-    team = models.ForeignKey(league_models.Team, null=False)
-    date = models.DateField(blank=False)
-    is_current = models.BooleanField(default=True)
-    attributes = JSONField()
-
-
 class Sale(models.Model):
     TYPES = (('PA', 'Proposition d\'achat'), ('MV', 'Mise en vente'), ('AM', 'Achat masqué'))
 
@@ -87,7 +79,7 @@ class Auction(models.Model):
             if self.sale.min_price >= self.value:
                 raise Auction.AuctionNotValidException(code='MIN_PRICE')
         # MONEY
-        available = decimal.Decimal(self.team.bank_account.balance + self.team.bank_account.adjust)
+        available = decimal.Decimal(self.team.bank_account.balance - self.team.bank_account.blocked)
         if self.sale.team.pk == self.team.pk:
             available += decimal.Decimal(self.sale.min_price)
         if available < self.value:
@@ -96,3 +88,10 @@ class Auction(models.Model):
 
     class Meta:
         unique_together = ('sale', 'team')
+
+
+class Release(models.Model):
+    signing = models.ForeignKey(league_models.Signing)
+    merkato_session = models.ForeignKey(MerkatoSession)
+    amount = models.DecimalField(max_digits=4, decimal_places=1)
+    done = models.BooleanField(default=False)
