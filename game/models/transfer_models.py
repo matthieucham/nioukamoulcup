@@ -47,6 +47,21 @@ class Sale(models.Model):
                 self.rank = 1
         super(Sale, self).save(*args, **kwargs)
 
+    def get_buying_price(self):
+        assert self.merkato_session.is_solved
+        if self.winning_auction:
+            return self.winning_auction.value
+        else:
+            assert self.type == 'PA'
+            return self.min_price
+
+    def get_selling_price(self):
+        assert self.merkato_session.is_solved
+        assert self.type == 'MV'
+        assert self.winning_auction is not None
+        # TODO apply factor from self.merkato_session.merkato.config
+        return self.winning_auction.value
+
     class Meta:
         unique_together = (
             ('merkato_session', 'rank'),

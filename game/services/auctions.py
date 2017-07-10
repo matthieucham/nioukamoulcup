@@ -1,9 +1,10 @@
 import random
+import json
 from operator import attrgetter
 from django.db import transaction
 from django.utils import timezone
-from utils import locked_atomic_transaction
 
+from utils import locked_atomic_transaction
 from game.models import transfer_models, league_models
 
 
@@ -12,28 +13,60 @@ class SaleSolvingException(Exception):
 
 
 @transaction.atomic()
+def apply_transfers(merkato_session):
+    assert merkato_session.is_solved
+    for sale in merkato_session.sale_set.all():
+        _do_transfer(sale)
+
+
+@transaction.atomic()
+def _do_transfer(sale):
+    if sale.type == 'PA':
+        if sale.winning_auction is None:
+            # transfer to author
+            league_models.Signing.objects.create(player=sale.player, team=sale.team,
+                                                 attributes=_make_signing_attr(sale))
+        else:
+            league_models.Signing.objects.create(player=sale.player, team=sale.winning_auction,
+                                                 attributes=_make_signing_attr(sale))
+        league_models.BankAccount.objects.buy(sale)
+    elif sale.type == 'MV':
+        if sale.winning_auction is not None:
+            # end contract with selling team:
+            league_models.Signing.objects.filter(player=sale.player, team=sale.team, end__isnull=True).update(
+                end=timezone.now())
+            league_models.BankAccount.objects.sell(sale)
+            # start new contract:
+            league_models.Signing.objects.create(player=sale.player, team=sale.winning_auction,
+                                                 attributes=_make_signing_attr(sale))
+            league_models.BankAccount.objects.buy(sale)
+        else:
+            pass  # nothing to do (no buyer)
+
+
+def _make_signing_attr(sale):
+    return json.dumps({'amount': sale.get_buying_price()})  # TODO
+
+
+@transaction.atomic()
 def solve_session(merkato_session):
-    assert merkato_session.merkato.mode in ['BID', 'DRFT'], merkato_session.merkato.mode
+    assert merkato_session.merkato.mode == 'BID'
     if merkato_session.closing > timezone.now():
         raise SaleSolvingException('Merkato session not over yet, closing time is %s' % merkato_session.closing)
-    if merkato_session.merkato.mode == 'BID':
-        # first, apply releases
-        for release in transfer_models.Release.objects.filter(merkato_session=merkato_session):
-            league_models.BankAccount.objects.release(release)
-            release.signing.end = timezone.now()
-            release.done = True
-            release.signing.save()
-            release.save()
-        with locked_atomic_transaction.LockedAtomicTransaction(
-                league_models.BankAccount):  # prevents changes in BankAccount balance during resolution
-            # budgets and rosters are done, now solve.
-            sales = sorted(merkato_session.sale_set.all(), key=attrgetter('rank'))
-            # resolution must be sequential:
-            for s in sales:
-                solve_sale(s)
-    elif merkato_session.merkato.mode == 'DRFT':
-        # TODO draft
-        pass
+    # first, apply releases
+    for release in transfer_models.Release.objects.filter(merkato_session=merkato_session):
+        league_models.BankAccount.objects.release(release)
+        release.signing.end = timezone.now()
+        release.done = True
+        release.signing.save()
+        release.save()
+    with locked_atomic_transaction.LockedAtomicTransaction(
+            league_models.BankAccount):  # prevents changes in BankAccount balance during resolution
+        # budgets and rosters are done, now solve.
+        sales = sorted(merkato_session.sale_set.all(), key=attrgetter('rank'))
+        # resolution must be sequential:
+        for s in sales:
+            solve_sale(s)
     merkato_session.is_solved = True
     merkato_session.save()
     return merkato_session

@@ -39,7 +39,7 @@ class Team(models.Model):
 
 
 class BankAccountManager(models.Manager):
-    @transaction.atomic
+    @transaction.atomic()
     def init_account(self, team, init_balance):
         account, created = self.get_or_create(team=team, defaults={'balance': init_balance, 'blocked': 0})
         if not created:
@@ -51,23 +51,44 @@ class BankAccountManager(models.Manager):
             BankAccountHistory.objects.create(amount=init_balance, new_balance=init_balance,
                                               info=BankAccountHistory.make_info_init()))
 
-    @transaction.atomic
-    def buy(self, team, amount, player):
-        account = self.select_for_update().get(team=team)
-        assert (account.balance + amount >= 0)  # amount is negative !
-        account.balance += amount
-        account.bankaccounthistory_set.add(
+    @transaction.atomic()
+    def buy(self, sale):
+        if sale.winning_auction is not None:
+            buyer = sale.winning_auction.team
+        else:
+            buyer = sale.team
+        account = self.select_for_update().get(team=buyer)
+        amount = sale.get_buying_price()
+        assert (account.balance - amount >= 0)
+        account.balance -= amount
+        account.bank_account_history_set.add(
             BankAccountHistory.objects.create(amount=amount, new_balance=account.balance,
-                                              info=BankAccountHistory.make_info_buy(player)))
+                                              info=BankAccountHistory.make_info_buy(sale.player,
+                                                                                    seller=sale.team if sale.type == 'MV' else None)))
         account.save()
 
-    @transaction.atomic
+    @transaction.atomic()
     def release(self, release_item):
         account = self.select_for_update().get(team=release_item.signing.team)
         account.balance += release_item.amount
-        account.bankaccounthistory_set.add(
+        account.bank_account_history_set.add(
             BankAccountHistory.objects.create(amount=release_item.amount, new_balance=account.balance,
                                               info=BankAccountHistory.make_info_release(release_item.signing.player)))
+        account.save()
+
+    @transaction.atomic()
+    def sell(self, sale):
+        assert (sale.type == 'MV')
+        assert (sale.winning_auction is not None)
+        amount = sale.get_selling_price()
+        assert (amount >= sale.min_price)
+        account = self.select_for_update().get(team=sale.winning_auction.team)
+        assert (account.balance - amount >= 0)
+        account.balance -= amount
+        account.bank_account_history_set.add(
+            BankAccountHistory.objects.create(amount=amount, new_balance=account.balance,
+                                              info=BankAccountHistory.make_info_sell(sale.player,
+                                                                                     sale.team)))
         account.save()
 
 
@@ -90,8 +111,14 @@ class BankAccountHistory(models.Model):
         return json.dumps({'type': 'INIT'})
 
     @staticmethod
-    def make_info_buy(player):
-        return json.dumps({'type': 'BUY', 'player_id': player.pk, 'player_name': player.__str__()})
+    def make_info_buy(player, seller=None):
+        return json.dumps({'type': 'BUY', 'player_id': player.pk, 'player_name': player.__str__(),
+                           'seller_name': seller.name if seller else None})
+
+    @staticmethod
+    def make_info_sell(player, buyer):
+        return json.dumps({'type': 'SELL', 'player_id': player.pk, 'player_name': player.__str__(),
+                           'buyer_name': buyer.name})
 
     @staticmethod
     def make_info_release(player):
