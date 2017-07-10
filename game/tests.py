@@ -138,3 +138,45 @@ class TransferTestCase(TestCase):
         self.assertFalse(models.Auction.objects.get(pk=auction_3.pk).is_valid)
         self.assertEqual(models.Auction.objects.get(pk=auction_3.pk).reject_cause, 'MIN_PRICE')
         self.assertEqual(solved.winning_auction.pk, auction_1.pk)
+
+    def test_solve_session_with_release(self):
+        author_team = models.Team.objects.create(name='PAMAKER', league=self.league, division=self.division,
+                                                 attributes='')
+        models.BankAccount.objects.init_account(author_team, 100)
+        sale_to_solve = models.Sale.objects.create(player=self.targeted_player, team=author_team,
+                                                   merkato_session=self.merkato_bid_session, type='PA',
+                                                   min_price=2.2)
+
+        bidder_1 = models.Team.objects.create(name='BIDDER1', league=self.league, division=self.division,
+                                              attributes='')
+        models.BankAccount.objects.init_account(bidder_1, 100)
+        bidder_2 = models.Team.objects.create(name='BIDDER2', league=self.league, division=self.division,
+                                              attributes='')
+        models.BankAccount.objects.init_account(bidder_2, 100)
+
+        release = models.Release.objects.create(
+            signing=models.Signing.objects.create(player=l1models.Joueur.objects.create(nom='VIRE', poste='A',
+                                                                                        sn_person_uuid=uuid.uuid4()),
+                                                  team=bidder_1, attributes='{}'),
+            merkato_session=self.merkato_bid_session, amount=20)
+
+        auction_1 = models.Auction.objects.create(sale=sale_to_solve, team=bidder_1,
+                                                  value='120')  # invalid, but must  be valid after release
+        auction_2 = models.Auction.objects.create(sale=sale_to_solve, team=bidder_2,
+                                                  value='91')
+        auction_3 = models.Auction.objects.create(sale=sale_to_solve, team=author_team, value='120')  # invalid !
+        sale_to_solve.auctions.add(auction_1, auction_2, auction_3)
+
+        self.merkato_bid_session.closing = '2016-01-01 10:00'
+        self.merkato_bid_session.save()
+        self.merkato_bid_session.refresh_from_db()
+        auctions.solve_session(self.merkato_bid_session)
+        sale_to_solve.refresh_from_db()
+        self.assertTrue(models.Auction.objects.get(pk=auction_1.pk).is_valid)
+        self.assertTrue(models.Auction.objects.get(pk=auction_2.pk).is_valid)
+        self.assertFalse(models.Auction.objects.get(pk=auction_3.pk).is_valid)
+        self.assertEqual(models.Auction.objects.get(pk=auction_3.pk).reject_cause, 'MONEY')
+        self.assertEqual(sale_to_solve.winning_auction.pk, auction_1.pk)
+        self.assertEqual(models.BankAccount.objects.get(pk=bidder_1.pk).balance, 120)
+        self.assertIsNotNone(models.Release.objects.get(pk=release.pk).signing.end)
+        self.assertTrue(models.Release.objects.get(pk=release.pk).done)

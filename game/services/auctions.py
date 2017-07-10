@@ -2,6 +2,7 @@ import random
 from operator import attrgetter
 from django.db import transaction
 from django.utils import timezone
+from utils import locked_atomic_transaction
 
 from game.models import transfer_models, league_models
 
@@ -23,11 +24,13 @@ def solve_session(merkato_session):
             release.done = True
             release.signing.save()
             release.save()
-        # budgets and rosters are done, now solve.
-        sales = sorted(merkato_session.sale_set.all(), key=attrgetter('rank'))
-        # resolution must be sequential:
-        for s in sales:
-            solve_sale(s)
+        with locked_atomic_transaction.LockedAtomicTransaction(
+                league_models.BankAccount):  # prevents changes in BankAccount balance during resolution
+            # budgets and rosters are done, now solve.
+            sales = sorted(merkato_session.sale_set.all(), key=attrgetter('rank'))
+            # resolution must be sequential:
+            for s in sales:
+                solve_sale(s)
     elif merkato_session.merkato.mode == 'DRFT':
         # TODO draft
         pass

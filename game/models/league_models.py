@@ -56,7 +56,7 @@ class BankAccountManager(models.Manager):
         account = self.select_for_update().get(team=team)
         assert (account.balance + amount >= 0)  # amount is negative !
         account.balance += amount
-        account.bank_account_history_set.add(
+        account.bankaccounthistory_set.add(
             BankAccountHistory.objects.create(amount=amount, new_balance=account.balance,
                                               info=BankAccountHistory.make_info_buy(player)))
         account.save()
@@ -65,7 +65,7 @@ class BankAccountManager(models.Manager):
     def release(self, release_item):
         account = self.select_for_update().get(team=release_item.signing.team)
         account.balance += release_item.amount
-        account.bank_account_history_set.add(
+        account.bankaccounthistory_set.add(
             BankAccountHistory.objects.create(amount=release_item.amount, new_balance=account.balance,
                                               info=BankAccountHistory.make_info_release(release_item.signing.player)))
         account.save()
