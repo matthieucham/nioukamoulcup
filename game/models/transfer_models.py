@@ -12,11 +12,18 @@ class MerkatoManager(models.Manager):
     def setup(self, league_instance, mode, begin, end, roster_size_max, closing_times=['12:00', '20:00'],
               session_duration=48):
         assert mode in ['BID', 'DRFT']
-        Merkato = self.create(mode=mode, begin=begin, end=end, league_instance=league_instance,
+        merkato = self.create(mode=mode, begin=begin, end=end, league_instance=league_instance,
                               configuration=self._make_config(roster_size_max, 10))
         # create sessions
-        session_closing = begin + timedelta(hours=session_duration)
-        # adjust session_closing time of the day to the next wanted closing hour:
+        ticks = [t for t in MerkatoManager._generate_ticks(begin, end, closing_times)]
+        nb = 1
+        for t in ticks:
+            closing = MerkatoManager._find_next_tick_to_close(t, session_duration, ticks)
+            #if closing > ticks[-1]:
+            #    break
+            merkato.merkatosession_set.add(MerkatoSession.objects.create(merkato=merkato, number=nb, closing=closing))
+            nb += 1
+        return merkato
 
     @staticmethod
     def _generate_ticks(begin, end, closing_times):
@@ -56,6 +63,8 @@ class Merkato(models.Model):
     mode = models.CharField(max_length=4, blank=False, choices=MODES)
     configuration = JSONField()
     league_instance = models.ForeignKey(league_models.LeagueInstance, null=False)
+
+    objects = MerkatoManager()
 
 
 class MerkatoSession(models.Model):

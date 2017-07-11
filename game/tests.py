@@ -194,3 +194,8 @@ class TransferTestCase(TestCase):
         tick_1 = models.MerkatoManager._find_next_tick_to_close(test_date_1, 48, ticks_list)
         self.assertEqual(datetime.datetime(2017, 9, 3, 12, 0), tick_1)
 
+        merkato = models.Merkato.objects.setup(self.instance, 'BID', datetime.datetime(2017, 9, 1, 9, 0, 54),
+                                               datetime.datetime(2017, 9, 13, 19, 00, 20), 7)
+        for s in merkato.merkatosession_set.all():
+            print('#%d : %s' % (s.number, s.closing))
+
