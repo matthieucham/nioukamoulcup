@@ -183,8 +183,14 @@ class TransferTestCase(TestCase):
         self.assertTrue(models.Release.objects.get(pk=release.pk).done)
 
     def test_merkato_creation(self):
-        mgr = models.MerkatoManager()
-        for tick in mgr._generate_ticks(datetime.datetime(2017, 9, 1, 9, 0, 54),
-                                        datetime.datetime(2017, 9, 13, 19, 00, 20),
-                                        ['8:00', '15:00', '20:00', '23:35']):
+        ticks = models.MerkatoManager._generate_ticks(datetime.datetime(2017, 9, 1, 9, 0, 54),
+                                                      datetime.datetime(2017, 9, 13, 19, 00, 20),
+                                                      ['12:00', '20:00'])
+        ticks_list = [t for t in ticks]
+        for tick in ticks_list:
             print(tick)
+        self.assertEqual(26, len(ticks_list))
+        test_date_1 = datetime.datetime(2017, 9, 1, 9, 0)
+        tick_1 = models.MerkatoManager._find_next_tick_to_close(test_date_1, 48, ticks_list)
+        self.assertEqual(datetime.datetime(2017, 9, 3, 12, 0), tick_1)
+

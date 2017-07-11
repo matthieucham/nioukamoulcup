@@ -18,14 +18,27 @@ class MerkatoManager(models.Manager):
         session_closing = begin + timedelta(hours=session_duration)
         # adjust session_closing time of the day to the next wanted closing hour:
 
-    def _generate_ticks(self, begin, end, closing_times):
+    @staticmethod
+    def _generate_ticks(begin, end, closing_times):
         assert end > begin
-        delta = end-begin
+        delta = end - begin
         for d in range(delta.days + 1):
             for t in closing_times:
                 tickday = begin + timedelta(days=d)
                 dm = t.split(':')
                 yield tickday.replace(hour=int(dm[0]), minute=int(dm[1]), second=0)
+
+    @staticmethod
+    def _find_next_tick_to_close(date_from, duration, ticks):
+        date_to = date_from + timedelta(hours=duration)
+        # find the next tick _after_ date_to
+        previous_tick = None
+        for t in ticks:
+            previous_tick = t
+            if date_to <= t:
+                break
+        return previous_tick
+
 
     def _make_config(self, roster_size_max, sales_per_session, pa_number=1, mv_number=1, mv_tax_rate=0.1,
                      re_tax_rate=0.5):
