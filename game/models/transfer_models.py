@@ -4,6 +4,35 @@ from django.contrib.postgres.fields import JSONField
 from ..models import league_models
 from ligue1 import models as l1models
 import decimal
+import json
+from datetime import timedelta
+
+
+class MerkatoManager(models.Manager):
+    def setup(self, league_instance, mode, begin, end, roster_size_max, closing_times=['12:00', '20:00'],
+              session_duration=48):
+        assert mode in ['BID', 'DRFT']
+        Merkato = self.create(mode=mode, begin=begin, end=end, league_instance=league_instance,
+                              configuration=self._make_config(roster_size_max, 10))
+        # create sessions
+        session_closing = begin + timedelta(hours=session_duration)
+        # adjust session_closing time of the day to the next wanted closing hour:
+
+    def _generate_ticks(self, begin, end, closing_times):
+        assert end > begin
+        delta = end-begin
+        for d in range(delta.days + 1):
+            for t in closing_times:
+                tickday = begin + timedelta(days=d)
+                dm = t.split(':')
+                yield tickday.replace(hour=int(dm[0]), minute=int(dm[1]), second=0)
+
+    def _make_config(self, roster_size_max, sales_per_session, pa_number=1, mv_number=1, mv_tax_rate=0.1,
+                     re_tax_rate=0.5):
+        return json.dumps(
+            {'roster_size_max': roster_size_max, 'sales_per_session': sales_per_session, 'pa_number': pa_number,
+             'mv_number': mv_number,
+             'mv_tax_rate': mv_tax_rate, 're_tax_rate': re_tax_rate})
 
 
 class Merkato(models.Model):
@@ -99,7 +128,7 @@ class Auction(models.Model):
             available += decimal.Decimal(self.sale.min_price)
         if available < self.value:
             raise Auction.AuctionNotValidException(code='MONEY')
-        # TODO FULL
+            # TODO FULL
 
     class Meta:
         unique_together = ('sale', 'team')

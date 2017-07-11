@@ -1,4 +1,5 @@
 import uuid
+import datetime
 from django.test import TestCase
 from django.db import utils as dbutils
 
@@ -180,3 +181,10 @@ class TransferTestCase(TestCase):
         self.assertEqual(models.BankAccount.objects.get(pk=bidder_1.pk).balance, 120)
         self.assertIsNotNone(models.Release.objects.get(pk=release.pk).signing.end)
         self.assertTrue(models.Release.objects.get(pk=release.pk).done)
+
+    def test_merkato_creation(self):
+        mgr = models.MerkatoManager()
+        for tick in mgr._generate_ticks(datetime.datetime(2017, 9, 1, 9, 0, 54),
+                                        datetime.datetime(2017, 9, 13, 19, 00, 20),
+                                        ['8:00', '15:00', '20:00', '23:35']):
+            print(tick)

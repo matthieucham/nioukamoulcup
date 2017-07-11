@@ -61,7 +61,7 @@ class BankAccountManager(models.Manager):
         amount = sale.get_buying_price()
         assert (account.balance - amount >= 0)
         account.balance -= amount
-        account.bank_account_history_set.add(
+        account.bankaccounthistory_set.add(
             BankAccountHistory.objects.create(amount=amount, new_balance=account.balance,
                                               info=BankAccountHistory.make_info_buy(sale.player,
                                                                                     seller=sale.team if sale.type == 'MV' else None)))
@@ -71,7 +71,7 @@ class BankAccountManager(models.Manager):
     def release(self, release_item):
         account = self.select_for_update().get(team=release_item.signing.team)
         account.balance += release_item.amount
-        account.bank_account_history_set.add(
+        account.bankaccounthistory_set.add(
             BankAccountHistory.objects.create(amount=release_item.amount, new_balance=account.balance,
                                               info=BankAccountHistory.make_info_release(release_item.signing.player)))
         account.save()
@@ -85,7 +85,7 @@ class BankAccountManager(models.Manager):
         account = self.select_for_update().get(team=sale.winning_auction.team)
         assert (account.balance - amount >= 0)
         account.balance -= amount
-        account.bank_account_history_set.add(
+        account.bankaccounthistory_set.add(
             BankAccountHistory.objects.create(amount=amount, new_balance=account.balance,
                                               info=BankAccountHistory.make_info_sell(sale.player,
                                                                                      sale.team)))
