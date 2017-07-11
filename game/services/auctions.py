@@ -51,8 +51,8 @@ def _make_signing_attr(sale):
 @transaction.atomic()
 def solve_session(merkato_session):
     assert merkato_session.merkato.mode == 'BID'
-    if merkato_session.closing > timezone.now():
-        raise SaleSolvingException('Merkato session not over yet, closing time is %s' % merkato_session.closing)
+    if merkato_session.solving > timezone.now():
+        raise SaleSolvingException('Merkato session not over yet, solving time is %s' % merkato_session.solving)
     # first, apply releases
     for release in transfer_models.Release.objects.filter(merkato_session=merkato_session):
         league_models.BankAccount.objects.release(release)

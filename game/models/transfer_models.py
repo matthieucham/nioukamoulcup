@@ -1,11 +1,12 @@
 from django.db import models
 from django.contrib.postgres.fields import JSONField
+import decimal
+import json
+import pytz
+from datetime import timedelta
 
 from ..models import league_models
 from ligue1 import models as l1models
-import decimal
-import json
-from datetime import timedelta
 
 
 class MerkatoManager(models.Manager):
@@ -13,15 +14,17 @@ class MerkatoManager(models.Manager):
               session_duration=48):
         assert mode in ['BID', 'DRFT']
         merkato = self.create(mode=mode, begin=begin, end=end, league_instance=league_instance,
-                              configuration=self._make_config(roster_size_max, 10))
+                              configuration=MerkatoManager._make_config(roster_size_max))
         # create sessions
         ticks = [t for t in MerkatoManager._generate_ticks(begin, end, closing_times)]
         nb = 1
         for t in ticks:
             closing = MerkatoManager._find_next_tick_to_close(t, session_duration, ticks)
-            #if closing > ticks[-1]:
-            #    break
-            merkato.merkatosession_set.add(MerkatoSession.objects.create(merkato=merkato, number=nb, closing=closing))
+            if closing is None:
+                break
+            solving = closing + timedelta(hours=session_duration)
+            merkato.merkatosession_set.add(
+                MerkatoSession.objects.create(merkato=merkato, number=nb, closing=closing, solving=solving))
             nb += 1
         return merkato
 
@@ -33,7 +36,11 @@ class MerkatoManager(models.Manager):
             for t in closing_times:
                 tickday = begin + timedelta(days=d)
                 dm = t.split(':')
-                yield tickday.replace(hour=int(dm[0]), minute=int(dm[1]), second=0)
+                dt = tickday.replace(hour=int(dm[0]), minute=int(dm[1]), second=0)
+                if dt.tzinfo is not None and dt.tzinfo.utcoffset(dt) is not None:
+                    yield dt
+                else:
+                    yield pytz.timezone('Europe/Paris').localize(dt)
 
     @staticmethod
     def _find_next_tick_to_close(date_from, duration, ticks):
@@ -44,10 +51,12 @@ class MerkatoManager(models.Manager):
             previous_tick = t
             if date_to <= t:
                 break
-        return previous_tick
+        if date_to <= previous_tick:
+            return previous_tick
+        return None
 
-
-    def _make_config(self, roster_size_max, sales_per_session, pa_number=1, mv_number=1, mv_tax_rate=0.1,
+    @staticmethod
+    def _make_config(roster_size_max, sales_per_session=-1, pa_number=1, mv_number=1, mv_tax_rate=0.1,
                      re_tax_rate=0.5):
         return json.dumps(
             {'roster_size_max': roster_size_max, 'sales_per_session': sales_per_session, 'pa_number': pa_number,
@@ -71,7 +80,11 @@ class MerkatoSession(models.Model):
     merkato = models.ForeignKey(Merkato, null=False)
     number = models.PositiveIntegerField(blank=False)
     closing = models.DateTimeField(blank=False)
+    solving = models.DateTimeField(blank=False)
     is_solved = models.BooleanField(null=False, default=False)
+
+    def __str__(self):
+        return 'MerkatoSession #%d -> %s -> %s' % (self.number, self.closing, self.solving)
 
 
 class Sale(models.Model):
