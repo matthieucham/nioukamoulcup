@@ -30,7 +30,7 @@ class MerkatoManager(models.Manager):
 
     @staticmethod
     def _generate_ticks(begin, end, closing_times):
-        assert end > begin
+        assert end >= begin
         delta = end - begin
         for d in range(delta.days + 1):
             for t in closing_times:
@@ -163,7 +163,18 @@ class Auction(models.Model):
             available += decimal.Decimal(self.sale.min_price)
         if available < self.value:
             raise Auction.AuctionNotValidException(code='MONEY')
-            # TODO FULL
+        # FULL
+        current_roster_size = league_models.Signing.objects.filter(team=self.team, end__isnull=True).count()
+        current_session_won = Sale.objects.filter(merkato_session=self.sale.merkato_session,
+                                                  rank__lt=self.sale.rank).filter(
+            models.Q(winning_auction__team=self.team) |
+            models.Q(winning_auction__isnull=True, team=self.team)).count()
+        future_pa_locked = Sale.objects.filter(team=self.team).filter(
+            models.Q(merkato_session__solving__gt=self.sale.merkato_session.solving) | models.Q(
+                merkato_session=self.sale.merkato_session, rank__gt=self.sale.rank)).count()
+        merkato_config = json.loads(self.sale.merkato_session.merkato.configuration)
+        if current_roster_size + current_session_won + future_pa_locked >= merkato_config['roster_size_max']:
+            raise Auction.AuctionNotValidException(code='FULL')
 
     class Meta:
         unique_together = ('sale', 'team')

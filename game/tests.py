@@ -24,14 +24,9 @@ class TransferTestCase(TestCase):
                                                              league=self.league, saison=self.saison)
         self.division = models.LeagueDivision.objects.create(league=self.league, level=1, name='Test division 1',
                                                              capacity=20)
-        self.merkato_bid = models.Merkato.objects.create(mode='BID', league_instance=self.instance,
-                                                         begin=datetime.datetime(2017, 9, 1),
-                                                         end=datetime.datetime(2017, 10, 15), configuration='{}')
-        self.merkato_bid_session = models.MerkatoSession.objects.create(merkato=self.merkato_bid, number=1,
-                                                                        closing=datetime.datetime(2017, 10, 1, 18, 0,
-                                                                                                  tzinfo=pytz.UTC),
-                                                                        solving=datetime.datetime(2017, 10, 3, 18, 0,
-                                                                                                  tzinfo=pytz.UTC))
+        self.merkato_bid = models.Merkato.objects.setup(self.instance, 'BID', datetime.datetime(2017, 9, 1),
+                                                        datetime.datetime(2017, 10, 15), 7)
+        self.merkato_bid_session = self.merkato_bid.merkatosession_set.all()[0]
 
     def test_pa_nominal_3_auctions(self):
         author_team = models.Team.objects.create(name='PAMAKER', league=self.league, division=self.division,
@@ -204,3 +199,8 @@ class TransferTestCase(TestCase):
         for s in merkato.merkatosession_set.all():
             print(s)
 
+    def test_valid_auctions_against_FULL(self):
+        merkato = models.Merkato.objects.setup(self.instance, 'BID', datetime.datetime(2017, 9, 1),
+                                                      datetime.datetime(2017, 9, 1), 2)
+        session_1 = merkato.merkatosession_set.all()[0]
+        session_2 = merkato.merkatosession_set.all()[1]
