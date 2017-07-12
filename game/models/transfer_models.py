@@ -19,9 +19,10 @@ class MerkatoManager(models.Manager):
         ticks = [t for t in MerkatoManager._generate_ticks(begin, end, closing_times)]
         nb = 1
         for t in ticks:
-            closing = MerkatoManager._find_next_tick_to_close(t, session_duration, ticks)
-            if closing is None:
-                break
+            # closing = MerkatoManager._find_next_tick_to_close(t, session_duration, ticks)
+            #if closing is None:
+            #    break
+            closing = t
             solving = closing + timedelta(hours=session_duration)
             merkato.merkatosession_set.add(
                 MerkatoSession.objects.create(merkato=merkato, number=nb, closing=closing, solving=solving))
