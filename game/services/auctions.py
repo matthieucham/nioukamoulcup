@@ -49,7 +49,7 @@ def _do_transfer(sale):
 
 
 def _make_signing_attr(sale):
-    return json.dumps({'amount': str(sale.get_buying_price())})  # TODO
+    return json.dumps({'amount': float(sale.get_buying_price())})  # TODO
 
 
 @transaction.atomic()

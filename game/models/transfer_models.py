@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.postgres.fields import JSONField
-import decimal
+# import decimal
 import json
 import pytz
 from datetime import timedelta
@@ -112,25 +112,25 @@ class Sale(models.Model):
     def get_buying_price(self):
         assert self.merkato_session.is_solved
         if self.winning_auction:
-            return decimal.Decimal(self.winning_auction.value)
+            return self.winning_auction.value
         else:
             assert self.type == 'PA'
-            return decimal.Decimal(self.min_price)
+            return self.min_price
 
     def get_selling_price(self):
         assert self.merkato_session.is_solved
         assert self.type == 'MV'
         assert self.winning_auction is not None
-        return decimal.Decimal(decimal.Decimal(self.winning_auction.value) * decimal.Decimal(
-            1.0 - json.loads(self.merkato_session.merkato.configuration)['mv_tax_rate']))
+        return self.winning_auction.value * (
+            1.0 - json.loads(self.merkato_session.merkato.configuration)['mv_tax_rate'])
 
     def get_winner_and_price(self):
         if self.winning_auction is None and self.type == 'PA':
-            return self.team, decimal.Decimal(self.min_price)
+            return self.team, self.min_price
         elif self.winning_auction is None and self.type == 'MV':
             return None, None
         else:
-            return self.winning_auction.team, decimal.Decimal(self.winning_auction.value)
+            return self.winning_auction.team, self.winning_auction.value
 
     class Meta:
         unique_together = (
@@ -164,9 +164,9 @@ class Auction(models.Model):
             if self.sale.min_price >= self.value:
                 raise Auction.AuctionNotValidException(code='MIN_PRICE')
         # MONEY
-        available = decimal.Decimal(self.team.bank_account.balance - self.team.bank_account.blocked)
+        available = float(self.team.bank_account.balance - self.team.bank_account.blocked)
         if self.sale.team.pk == self.team.pk:
-            available += decimal.Decimal(self.sale.min_price)
+            available += float(self.sale.min_price)
         current_session_won = Sale.objects.filter(merkato_session=self.sale.merkato_session,
                                                   rank__lt=self.sale.rank).filter(
             models.Q(winning_auction__team=self.team) |
@@ -175,7 +175,7 @@ class Auction(models.Model):
         for csw in current_session_won:
             _, val = csw.get_winner_and_price()
             if val:
-                current_spent += val
+                current_spent += float(val)
         available -= current_spent
         if available < self.value:
             raise Auction.AuctionNotValidException(code='MONEY')
