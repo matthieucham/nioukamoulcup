@@ -1,6 +1,7 @@
 import uuid
 import datetime
 import pytz
+import decimal
 from django.test import TestCase
 
 from game import models
@@ -223,10 +224,13 @@ class TransferTestCase(TestCase):
                                                         attributes='')
         models.BankAccount.objects.init_account(t_full_and_release, 100)
         _load_signings(t_full_and_release, 2)
-        release = models.Release.objects.create(signing=t_full_and_release.signing_set.all()[0],
-                                                merkato_session=sessions[1],
-                                                amount=1)  # toutes les enchres de celui la doivent etre \
+        models.Release.objects.create(signing=t_full_and_release.signing_set.all()[0],
+                                      merkato_session=sessions[1],
+                                      amount=1)  # toutes les enchres de celui la doivent etre \
         # refusées à la session 1 et acceptées à la session 2
+        t_free2 = models.Team.objects.create(name='TFREE2', league=self.league, division=self.division,
+                                             attributes='')  # 0 joueur
+        models.BankAccount.objects.init_account(t_free2, 100)
 
         # Session1 : 2 ventes, une par t_free, une par t_author_1p
         s1 = _setup_sale(t_free, 'S11', sessions[0])
@@ -241,7 +245,7 @@ class TransferTestCase(TestCase):
         a2 = models.Auction.objects.create(team=t_free, sale=s2, value=2)
         a3 = models.Auction.objects.create(team=t_author_1p, sale=s1, value=6)
         a4 = models.Auction.objects.create(team=t_author_1p, sale=s2, value=8)  # winner
-        a5 = models.Auction.objects.create(team=t_1p, sale=s1, value=10.1)  # winner
+        a5 = models.Auction.objects.create(team=t_1p, sale=s1, value=60)  # winner
         a6 = models.Auction.objects.create(team=t_1p, sale=s2, value=10.1)
         a7 = models.Auction.objects.create(team=t_full, sale=s1, value=5)
         a8 = models.Auction.objects.create(team=t_full, sale=s2, value=5)
@@ -250,9 +254,11 @@ class TransferTestCase(TestCase):
 
         # session2 : 1 vente par t_free
         s3 = _setup_sale(t_free, 'S21', sessions[1])
-        a11 = models.Auction.objects.create(team=t_free, sale=s3, value=5)
-        a12 = models.Auction.objects.create(team=t_full_and_release, sale=s3, value=15)  # winner
+        s4 = _setup_sale(t_free2, 'S22', sessions[1])  # winner
+        a11 = models.Auction.objects.create(team=t_free, sale=s3, value=55)  # winner
+        a12 = models.Auction.objects.create(team=t_full_and_release, sale=s3, value=15)
         a13 = models.Auction.objects.create(team=t_full, sale=s3, value=25)
+        a14 = models.Auction.objects.create(team=t_free, sale=s4, value=55)
 
         for sess in sessions:
             auctions.solve_session(sess)
@@ -270,9 +276,11 @@ class TransferTestCase(TestCase):
         a11.refresh_from_db()
         a12.refresh_from_db()
         a13.refresh_from_db()
+        a14.refresh_from_db()
         s1.refresh_from_db()
         s2.refresh_from_db()
         s3.refresh_from_db()
+        s4.refresh_from_db()
 
         self.assertTrue(a1.is_valid)
         self.assertTrue(a2.is_valid)
@@ -296,7 +304,20 @@ class TransferTestCase(TestCase):
         self.assertTrue(a12.is_valid)
         self.assertFalse(a13.is_valid)
         self.assertEqual(a13.reject_cause, 'FULL')
-        self.assertEqual(s3.winning_auction, a12)
+        self.assertEqual(s3.winning_auction, a11)
+        self.assertFalse(a14.is_valid)
+        self.assertEqual(a14.reject_cause, 'MONEY')
+        self.assertIsNone(s4.winning_auction)
+
+        for sess in sessions:
+            auctions.apply_transfers(sess)
+
+        self.assertEqual(float(models.BankAccount.objects.get(team=t_free).balance), 45.0)
+        self.assertEqual(float(models.BankAccount.objects.get(team=t_full).balance), 100.0)
+        self.assertEqual(float(models.BankAccount.objects.get(team=t_author_1p).balance), 92.0)
+        self.assertEqual(float(models.BankAccount.objects.get(team=t_1p).balance), 40.0)
+        self.assertEqual(float(models.BankAccount.objects.get(team=t_full_and_release).balance), 101.0)
+        self.assertEqual(float(models.BankAccount.objects.get(team=t_free2).balance), 99.9)
 
 
 def _load_signings(team, nb):
@@ -309,4 +330,4 @@ def _setup_sale(author_team, player_name, session):
     p = l1models.Joueur.objects.create(nom=player_name, sn_person_uuid=uuid.uuid4())
     return models.Sale.objects.create(player=p, team=author_team,
                                       merkato_session=session, type='PA',
-                                      min_price=0.1)
+                                      min_price=decimal.Decimal(0.1))

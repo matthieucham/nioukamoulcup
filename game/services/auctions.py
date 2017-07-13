@@ -17,18 +17,22 @@ def apply_transfers(merkato_session):
     assert merkato_session.is_solved
     for sale in merkato_session.sale_set.all():
         _do_transfer(sale)
+        _unblock_min_price(sale)
+
+
+def _unblock_min_price(sale):
+    if sale.type == 'PA':
+        account = league_models.BankAccount.objects.get(team=sale.team)
+        account.blocked -= sale.min_price
+        account.save()
 
 
 @transaction.atomic()
 def _do_transfer(sale):
     if sale.type == 'PA':
-        if sale.winning_auction is None:
-            # transfer to author
-            league_models.Signing.objects.create(player=sale.player, team=sale.team,
-                                                 attributes=_make_signing_attr(sale))
-        else:
-            league_models.Signing.objects.create(player=sale.player, team=sale.winning_auction,
-                                                 attributes=_make_signing_attr(sale))
+        winner, value = sale.get_winner_and_price()  # winner cannot be None (PA)
+        league_models.Signing.objects.create(player=sale.player, team=winner,
+                                             attributes=_make_signing_attr(sale))
         league_models.BankAccount.objects.buy(sale)
     elif sale.type == 'MV':
         if sale.winning_auction is not None:
@@ -45,7 +49,7 @@ def _do_transfer(sale):
 
 
 def _make_signing_attr(sale):
-    return json.dumps({'amount': sale.get_buying_price()})  # TODO
+    return json.dumps({'amount': str(sale.get_buying_price())})  # TODO
 
 
 @transaction.atomic()

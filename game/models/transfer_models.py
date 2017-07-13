@@ -19,9 +19,6 @@ class MerkatoManager(models.Manager):
         ticks = [t for t in MerkatoManager._generate_ticks(begin, end, closing_times)]
         nb = 1
         for t in ticks:
-            # closing = MerkatoManager._find_next_tick_to_close(t, session_duration, ticks)
-            #if closing is None:
-            #    break
             closing = t
             solving = closing + timedelta(hours=session_duration)
             merkato.merkatosession_set.add(
@@ -115,17 +112,25 @@ class Sale(models.Model):
     def get_buying_price(self):
         assert self.merkato_session.is_solved
         if self.winning_auction:
-            return self.winning_auction.value
+            return decimal.Decimal(self.winning_auction.value)
         else:
             assert self.type == 'PA'
-            return self.min_price
+            return decimal.Decimal(self.min_price)
 
     def get_selling_price(self):
         assert self.merkato_session.is_solved
         assert self.type == 'MV'
         assert self.winning_auction is not None
-        # TODO apply factor from self.merkato_session.merkato.config
-        return self.winning_auction.value
+        return decimal.Decimal(decimal.Decimal(self.winning_auction.value) * decimal.Decimal(
+            1.0 - json.loads(self.merkato_session.merkato.configuration)['mv_tax_rate']))
+
+    def get_winner_and_price(self):
+        if self.winning_auction is None and self.type == 'PA':
+            return self.team, decimal.Decimal(self.min_price)
+        elif self.winning_auction is None and self.type == 'MV':
+            return None, None
+        else:
+            return self.winning_auction.team, decimal.Decimal(self.winning_auction.value)
 
     class Meta:
         unique_together = (
@@ -162,19 +167,25 @@ class Auction(models.Model):
         available = decimal.Decimal(self.team.bank_account.balance - self.team.bank_account.blocked)
         if self.sale.team.pk == self.team.pk:
             available += decimal.Decimal(self.sale.min_price)
+        current_session_won = Sale.objects.filter(merkato_session=self.sale.merkato_session,
+                                                  rank__lt=self.sale.rank).filter(
+            models.Q(winning_auction__team=self.team) |
+            models.Q(winning_auction__isnull=True, team=self.team))
+        current_spent = 0
+        for csw in current_session_won:
+            _, val = csw.get_winner_and_price()
+            if val:
+                current_spent += val
+        available -= current_spent
         if available < self.value:
             raise Auction.AuctionNotValidException(code='MONEY')
         # FULL
         current_roster_size = league_models.Signing.objects.filter(team=self.team, end__isnull=True).count()
-        current_session_won = Sale.objects.filter(merkato_session=self.sale.merkato_session,
-                                                  rank__lt=self.sale.rank).filter(
-            models.Q(winning_auction__team=self.team) |
-            models.Q(winning_auction__isnull=True, team=self.team)).count()
         future_pa_locked = Sale.objects.filter(team=self.team).filter(
             models.Q(merkato_session__solving__gt=self.sale.merkato_session.solving) | models.Q(
                 merkato_session=self.sale.merkato_session, rank__gt=self.sale.rank)).count()
         merkato_config = json.loads(self.sale.merkato_session.merkato.configuration)
-        if current_roster_size + current_session_won + future_pa_locked >= merkato_config['roster_size_max']:
+        if current_roster_size + len(current_session_won) + future_pa_locked >= merkato_config['roster_size_max']:
             raise Auction.AuctionNotValidException(code='FULL')
 
     class Meta:
