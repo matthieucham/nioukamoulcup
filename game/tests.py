@@ -200,7 +200,113 @@ class TransferTestCase(TestCase):
             print(s)
 
     def test_valid_auctions_against_FULL(self):
-        merkato = models.Merkato.objects.setup(self.instance, 'BID', datetime.datetime(2017, 9, 1),
-                                                      datetime.datetime(2017, 9, 1), 2)
-        session_1 = merkato.merkatosession_set.all()[0]
-        session_2 = merkato.merkatosession_set.all()[1]
+        merkato = models.Merkato.objects.setup(self.instance, 'BID', datetime.datetime(2016, 9, 1),
+                                               datetime.datetime(2016, 9, 1), 2)
+        sessions = merkato.merkatosession_set.order_by('closing').all()
+        t_full = models.Team.objects.create(name='TFULL', league=self.league, division=self.division,
+                                            attributes='')
+        models.BankAccount.objects.init_account(t_full, 100)
+        _load_signings(t_full, 2)  # equipe full, aucune enchere valide
+        t_author_1p = models.Team.objects.create(name='TAUTHOR', league=self.league, division=self.division,
+                                                 attributes='')
+        models.BankAccount.objects.init_account(t_author_1p, 100)
+        _load_signings(t_author_1p, 1)  # une seule place libre, seule enchere valide = la PA
+        t_1p = models.Team.objects.create(name='T1P', league=self.league, division=self.division,
+                                          attributes='')
+        models.BankAccount.objects.init_account(t_1p, 100)
+        _load_signings(t_1p, 1)  # une place libre, enchre invalide après enchère gagnée
+        t_free = models.Team.objects.create(name='TFREE', league=self.league, division=self.division,
+                                            attributes='')  # 0 joueur
+        models.BankAccount.objects.init_account(t_free, 100)
+        t_full_and_release = models.Team.objects.create(name='TFULLANDRELEASE', league=self.league,
+                                                        division=self.division,
+                                                        attributes='')
+        models.BankAccount.objects.init_account(t_full_and_release, 100)
+        _load_signings(t_full_and_release, 2)
+        release = models.Release.objects.create(signing=t_full_and_release.signing_set.all()[0],
+                                                merkato_session=sessions[1],
+                                                amount=1)  # toutes les enchres de celui la doivent etre \
+        # refusées à la session 1 et acceptées à la session 2
+
+        # Session1 : 2 ventes, une par t_free, une par t_author_1p
+        s1 = _setup_sale(t_free, 'S11', sessions[0])
+        s2 = _setup_sale(t_author_1p, 'S12', sessions[0])
+
+        # Offres de t_free: toutes valides
+        # 0ffres de t_author_1p: valide sur s2 seulement
+        # Offres de t_1p: valide sur s1 qu'il gagne donc invalide sur s2
+        # Offres de t_full: toutes invalides
+        # Offres de t_full_and_release : toutes invalides
+        a1 = models.Auction.objects.create(team=t_free, sale=s1, value=2)
+        a2 = models.Auction.objects.create(team=t_free, sale=s2, value=2)
+        a3 = models.Auction.objects.create(team=t_author_1p, sale=s1, value=6)
+        a4 = models.Auction.objects.create(team=t_author_1p, sale=s2, value=8)  # winner
+        a5 = models.Auction.objects.create(team=t_1p, sale=s1, value=10.1)  # winner
+        a6 = models.Auction.objects.create(team=t_1p, sale=s2, value=10.1)
+        a7 = models.Auction.objects.create(team=t_full, sale=s1, value=5)
+        a8 = models.Auction.objects.create(team=t_full, sale=s2, value=5)
+        a9 = models.Auction.objects.create(team=t_full_and_release, sale=s1, value=5)
+        a10 = models.Auction.objects.create(team=t_full_and_release, sale=s2, value=5)
+
+        # session2 : 1 vente par t_free
+        s3 = _setup_sale(t_free, 'S21', sessions[1])
+        a11 = models.Auction.objects.create(team=t_free, sale=s3, value=5)
+        a12 = models.Auction.objects.create(team=t_full_and_release, sale=s3, value=15)  # winner
+        a13 = models.Auction.objects.create(team=t_full, sale=s3, value=25)
+
+        for sess in sessions:
+            auctions.solve_session(sess)
+
+        a1.refresh_from_db()
+        a2.refresh_from_db()
+        a3.refresh_from_db()
+        a4.refresh_from_db()
+        a5.refresh_from_db()
+        a6.refresh_from_db()
+        a7.refresh_from_db()
+        a8.refresh_from_db()
+        a9.refresh_from_db()
+        a10.refresh_from_db()
+        a11.refresh_from_db()
+        a12.refresh_from_db()
+        a13.refresh_from_db()
+        s1.refresh_from_db()
+        s2.refresh_from_db()
+        s3.refresh_from_db()
+
+        self.assertTrue(a1.is_valid)
+        self.assertTrue(a2.is_valid)
+        self.assertFalse(a3.is_valid)
+        self.assertEqual(a3.reject_cause, 'FULL')
+        self.assertTrue(a4.is_valid)
+        self.assertTrue(a5.is_valid)
+        self.assertFalse(a6.is_valid)
+        self.assertEqual(a6.reject_cause, 'FULL')
+        self.assertFalse(a7.is_valid)
+        self.assertEqual(a7.reject_cause, 'FULL')
+        self.assertFalse(a8.is_valid)
+        self.assertEqual(a8.reject_cause, 'FULL')
+        self.assertFalse(a9.is_valid)
+        self.assertEqual(a9.reject_cause, 'FULL')
+        self.assertFalse(a10.is_valid)
+        self.assertEqual(a10.reject_cause, 'FULL')
+        self.assertEqual(s1.winning_auction, a5)
+        self.assertEqual(s2.winning_auction, a4)
+        self.assertTrue(a11.is_valid)
+        self.assertTrue(a12.is_valid)
+        self.assertFalse(a13.is_valid)
+        self.assertEqual(a13.reject_cause, 'FULL')
+        self.assertEqual(s3.winning_auction, a12)
+
+
+def _load_signings(team, nb):
+    for i in range(nb):
+        p = l1models.Joueur.objects.create(nom='AUTO%d' % i, sn_person_uuid=uuid.uuid4())
+        models.Signing.objects.create(player=p, team=team, attributes='{}')
+
+
+def _setup_sale(author_team, player_name, session):
+    p = l1models.Joueur.objects.create(nom=player_name, sn_person_uuid=uuid.uuid4())
+    return models.Sale.objects.create(player=p, team=author_team,
+                                      merkato_session=session, type='PA',
+                                      min_price=0.1)
