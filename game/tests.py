@@ -2,6 +2,7 @@ import uuid
 import datetime
 import pytz
 import decimal
+import json
 from django.test import TestCase
 
 from game import models
@@ -201,8 +202,9 @@ class TransferTestCase(TestCase):
             print(s)
 
     def test_valid_auctions_against_FULL(self):
-        merkato = models.Merkato.objects.setup(self.instance, 'BID', datetime.datetime(2016, 9, 1),
-                                               datetime.datetime(2016, 9, 1), 2)
+        merkato = models.Merkato.objects.setup(self.instance, 'BID',
+                                               datetime.datetime(2016, 9, 1, tzinfo=pytz.timezone('Europe/Paris')),
+                                               datetime.datetime(2016, 9, 1, tzinfo=pytz.timezone('Europe/Paris')), 2)
         sessions = merkato.merkatosession_set.order_by('closing').all()
         t_full = models.Team.objects.create(name='TFULL', league=self.league, division=self.division,
                                             attributes='')
@@ -318,6 +320,24 @@ class TransferTestCase(TestCase):
         self.assertEqual(float(models.BankAccount.objects.get(team=t_1p).balance), 40.0)
         self.assertEqual(float(models.BankAccount.objects.get(team=t_full_and_release).balance), 101.0)
         self.assertEqual(float(models.BankAccount.objects.get(team=t_free2).balance), 99.9)
+
+    def test_merkatosession_getnext(self):
+        merkato = models.Merkato.objects.setup(self.instance, 'BID',
+                                               datetime.datetime(2016, 9, 1, tzinfo=pytz.timezone('Europe/Paris')),
+                                               datetime.datetime(2016, 9, 1, tzinfo=pytz.timezone('Europe/Paris')), 2)
+        self.assertIsNone(models.MerkatoSession.objects.get_next_available(merkato))
+        merkato = models.Merkato.objects.setup(self.instance, 'BID',
+                                               datetime.datetime.now(pytz.utc) + datetime.timedelta(days=1),
+                                               datetime.datetime.now(pytz.utc) + datetime.timedelta(days=1), 7)
+        self.assertEqual(models.MerkatoSession.objects.get_next_available(merkato).number, 1)
+        old_conf = json.loads(merkato.configuration)
+        old_conf['sales_per_session'] = 1
+        merkato.configuration = json.dumps(old_conf)
+        merkato.save()
+        t = models.Team.objects.create(name='T', league=self.league, division=self.division,
+                                            attributes='')
+        _setup_sale(t, 'Next', models.MerkatoSession.objects.get_next_available(merkato))
+        self.assertEqual(models.MerkatoSession.objects.get_next_available(merkato).number, 2)
 
 
 def _load_signings(team, nb):

@@ -3,6 +3,7 @@ from django.contrib.postgres.fields import JSONField
 # import decimal
 import json
 import pytz
+import datetime
 from datetime import timedelta
 
 from ..models import league_models
@@ -74,6 +75,21 @@ class Merkato(models.Model):
     objects = MerkatoManager()
 
 
+class MerkatoSessionManager(models.Manager):
+    def get_next_available(self, merkato):
+        now = datetime.datetime.now(pytz.utc)
+        max_sales_in_session = json.loads(merkato.configuration)['sales_per_session']
+        sess_gen = (s for s in self.filter(merkato=merkato).prefetch_related('sale_set').order_by('closing') if
+                    s.closing >= now)
+        for sess in sess_gen:
+            if max_sales_in_session < 0:
+                # first found is ok:
+                return sess
+            if len(sess.sale_set.all()) < max_sales_in_session:
+                return sess
+        return None
+
+
 class MerkatoSession(models.Model):
     merkato = models.ForeignKey(Merkato, null=False)
     number = models.PositiveIntegerField(blank=False)
@@ -81,8 +97,13 @@ class MerkatoSession(models.Model):
     solving = models.DateTimeField(blank=False)
     is_solved = models.BooleanField(null=False, default=False)
 
+    objects = MerkatoSessionManager()
+
     def __str__(self):
         return 'MerkatoSession #%d -> %s -> %s' % (self.number, self.closing, self.solving)
+
+    class Meta:
+        ordering = ('closing', )
 
 
 class Sale(models.Model):
