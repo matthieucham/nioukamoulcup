@@ -62,7 +62,7 @@ def _compute_bonus(perf, has_collective_bonus, best_note_by_position):
     poste = perf.joueur.poste
     base = 0
     # bonus individuel
-    for (i, j) in [('PENALSTOP', 'penalty_saved'), ('GOAL', 'goals_scored'), ('PENALTY',
+    for (i, j) in [('PENALSTOP', 'penalties_saved'), ('GOAL', 'goals_scored'), ('PENALTY',
                                                                               'penalties_scored'),
                    ('PASS', 'goals_assists'), ('HALFPASS', 'penalties_awarded')]:
         base += (BONUS['PERSONAL'][i][poste] * perf.details['stats'][j])
