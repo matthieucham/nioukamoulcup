@@ -1,9 +1,9 @@
 __author__ = 'mgrandrie'
 from django.utils import timezone
 from django.db import models
-from django.core.exceptions import ObjectDoesNotExist
 
 from ligue1 import models as l1models
+#from game import models as gamemodels
 from game.services import scoring
 from utils.timer import Timer
 
@@ -80,3 +80,8 @@ class JJScore(models.Model):
     compensation = models.DecimalField(max_digits=5, decimal_places=3, blank=True, null=True)
     objects = JJScoreManager()
 
+
+# class TeamScore(models.Model):
+#     team = models.OneToOneField(gamemodels.Team, primary_key=True)
+#     kcup_score = models.FloatField(default=0.0)
+#     computed_at = models.DateTimeField(auto_now_add=True)

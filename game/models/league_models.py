@@ -31,11 +31,20 @@ class LeagueDivision(models.Model):
     lower_division = models.ForeignKey("self", related_name='upper', null=True)
 
 
+class TeamManager(models.Manager):
+    def setup_formation(self, team, g=1, d=2, m=2, a=2):
+        t = self.select_for_update().get(pk=team.pk)
+        json.loads(t.attributes)['formation'] = {'G': g, 'D': d, 'M': m, 'A': a}
+        t.save()  # todo update score
+
+
 class Team(models.Model):
     name = models.CharField(max_length=100, blank=False)
     league = models.ForeignKey(League, null=False)
     division = models.ForeignKey(LeagueDivision)
     attributes = JSONField()
+
+    objects = TeamManager
 
 
 class BankAccountManager(models.Manager):
@@ -145,18 +154,33 @@ class LeagueInstancePhase(models.Model):
     journee_first = models.PositiveIntegerField(blank=False)
     journee_last = models.PositiveIntegerField(blank=False)
 
+    class Meta:
+        unique_together = (('league_instance', 'journee_first',), ('league_instance', 'journee_last'),)
+
+
+class LeagueInstancePhaseDayManager(models.Manager):
+    def compute_results(self, league_instance, journee):
+        # find the phase
+        phase = LeagueInstancePhase.object.get(league_instance=league_instance, journee_first__lte=journee.numero,
+                                               journee_last_gte=journee.numero)
+        lipd, created = self.get_or_create(league_instance_phase=phase, journee=journee,
+                                           defaults={'number': journee.numero})
+        for team in Team.objects.filter(league=league_instance.league).prefetch_related('signing_set'):
+            sco = _compute_score(team, league_instance.league.mode)  # TODO + composition, positions, tactics...
+
 
 class LeagueInstancePhaseDay(models.Model):
     league_instance_phase = models.ForeignKey(LeagueInstancePhase, null=False)
     number = models.PositiveIntegerField(blank=False)
     journee = models.ForeignKey(l1models.Journee, null=False)
-    results = models.ManyToManyField(Team, through='TeamDayScore')
+    results = models.ManyToManyField(Team, through='TeamDayScore', null=True)
 
 
 class TeamDayScore(models.Model):
     day = models.ForeignKey(LeagueInstancePhaseDay, null=False)
     team = models.ForeignKey(Team)
     score = models.DecimalField(decimal_places=3, max_digits=7)
+    attributes = JSONField()
 
 
 class Signing(models.Model):

@@ -45,8 +45,9 @@ class SaisonScoringAdmin(InlineActionsModelAdminMixin, admin.ModelAdmin):
         for ss in queryset:
             journees = l1models.Journee.objects.filter(saison=ss.saison).order_by('numero')
             # delete all existing journeescorings
-            models.JourneeScoring.objects.filter(saison_scoring=ss).delete()
+            models.JourneeScoring.objects.filter(saison_scoring=ss).delete()  # todo filter locked_at
             for journee in journees:
+                # score des joueurs
                 models.JourneeScoring.objects.create(journee=journee, saison_scoring=ss)
         self.message_user(request, "Calcul effectué")
 
