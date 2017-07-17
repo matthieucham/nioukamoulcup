@@ -2,7 +2,9 @@ from django.db import models, transaction
 from django.contrib.postgres.fields import JSONField
 from django.contrib.auth.models import User
 import json
+from collections import defaultdict
 
+from . import scoring_models
 from ligue1 import models as l1models
 
 
@@ -193,10 +195,24 @@ class LeagueInstancePhaseDayManager(models.Manager):
             # filter signings valid at this time
             signings_at_day = [s for s in team.signing_set if
                                (s.begin <= lipd.journee.debut) and (s.end is None or s.end > lipd.journee.debut)]
-            # TODO get jjscores...
+            # retrieve jjscores for all signings at once in order to limit the number of request
+            all_jjscores = scoring_models.JJScore.objects.filter(
+                journee_scoring__saison_scoring__saison=lipd.league_instance_phase.league_instance.saison,
+                journee_scoring__journee__numero__gte=lipd.league_instance_phase.journee_first,
+                journee_scoring__journee__numero__lte=lipd.journee.numero,
+                joueur__in=[s.player.pk for s in signings_at_day]
+            ).select_related('joueur').order_by('joueur')
+            dscores = defaultdict(list)
+            for jjs in all_jjscores:
+                dscores[jjs.pk].append(jjs)
+            for jjspk in dscores:
+                score = self._compute_score_player(dscores[jjspk], jjscore_max_nb, )
         else:
             # TODO
             return None
+
+    def _compute_score_player(self, jjslist):
+
 
 
 class LeagueInstancePhaseDay(models.Model):
