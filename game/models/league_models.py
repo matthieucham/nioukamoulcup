@@ -37,6 +37,12 @@ class TeamManager(models.Manager):
         json.loads(t.attributes)['formation'] = {'G': g, 'D': d, 'M': m, 'A': a}
         t.save()  # todo update score
 
+    def setup_joker(self, team, joueur):
+        assert Signing.objects.filter(player=joueur, team=team, end__isnull=True) is not None
+        t = self.select_for_update().get(pk=team.pk)
+        json.loads(t.attributes)['joker'] = joueur.pk
+        t.save()
+
 
 class Team(models.Model):
     name = models.CharField(max_length=100, blank=False)
@@ -142,7 +148,7 @@ class LeagueInstance(models.Model):
     begin = models.DateTimeField(blank=False)
     end = models.DateTimeField(blank=False)
     saison = models.ForeignKey(l1models.Saison)
-    configuration = JSONField()
+    configuration = JSONField(default=dict([('notes', [('SEVEN', 13), ('ELEVEN', 26)])]))
 
 
 class LeagueInstancePhase(models.Model):
@@ -161,12 +167,36 @@ class LeagueInstancePhase(models.Model):
 class LeagueInstancePhaseDayManager(models.Manager):
     def compute_results(self, league_instance, journee):
         # find the phase
-        phase = LeagueInstancePhase.object.get(league_instance=league_instance, journee_first__lte=journee.numero,
-                                               journee_last_gte=journee.numero)
-        lipd, created = self.get_or_create(league_instance_phase=phase, journee=journee,
-                                           defaults={'number': journee.numero})
-        for team in Team.objects.filter(league=league_instance.league).prefetch_related('signing_set'):
-            sco = _compute_score(team, league_instance.league.mode)  # TODO + composition, positions, tactics...
+        phases = LeagueInstancePhase.object.filter(league_instance=league_instance, journee_first__lte=journee.numero,
+                                                   journee_last_gte=journee.numero)
+        for ph in phases:
+            lipd, created = self.select_related().get_or_create(league_instance_phase=ph, journee=journee,
+                                                                defaults={'number': journee.numero})
+            team_day_scores = self._compute_scores_for_phaseday(lipd)
+            if created:
+                TeamDayScore.objects.bulk_create(team_day_scores)
+            else:
+                for tds in team_day_scores:
+                    tds.save()
+
+    def _compute_scores_for_phaseday(self, lipd):
+        return [self._compute_teamdayscore(team, lipd) for team in
+                Team.objects.filter(league=lipd.league_instance_phase.league_instance.league).prefetch_related(
+                    'signing_set')]
+
+    def _compute_teamdayscore(self, team, lipd):
+        league_mode = lipd.league_instance_phase.league_instance.league.mode
+        team_config = json.loads(team.attributes)
+        if league_mode == 'KCUP':
+            jjscore_max_nb = json.loads(lipd.league_instance_phase.league_instance.configuration)['notes'][
+                lipd.league_instance_phase.type]
+            # filter signings valid at this time
+            signings_at_day = [s for s in team.signing_set if
+                               (s.begin <= lipd.journee.debut) and (s.end is None or s.end > lipd.journee.debut)]
+            # TODO get jjscores...
+        else:
+            # TODO
+            return None
 
 
 class LeagueInstancePhaseDay(models.Model):
@@ -186,6 +216,6 @@ class TeamDayScore(models.Model):
 class Signing(models.Model):
     player = models.ForeignKey(l1models.Joueur, null=False)
     team = models.ForeignKey(Team, null=False)
-    begin = models.DateField(auto_now_add=True)
-    end = models.DateField(null=True)
+    begin = models.DateTimeField(auto_now_add=True)
+    end = models.DateTimeField(null=True)
     attributes = JSONField()
