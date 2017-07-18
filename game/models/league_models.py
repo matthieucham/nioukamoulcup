@@ -150,11 +150,11 @@ class LeagueInstance(models.Model):
     begin = models.DateTimeField(blank=False)
     end = models.DateTimeField(blank=False)
     saison = models.ForeignKey(l1models.Saison)
-    configuration = JSONField(default=dict([('notes', [('SEVEN', 13), ('ELEVEN', 26)])]))
+    configuration = JSONField(default=dict([('notes', [('HALFSEASON', 13), ('FULLSEASON', 26), ('TOURNAMENT', 3)])]))
 
 
 class LeagueInstancePhase(models.Model):
-    TYPES = (('SEVEN', '7'), ('ELEVEN', '11'))
+    TYPES = (('HALFSEASON', 'Half season'), ('FULLSEASON', 'Whole season'), ('TOURNAMENT', 'Tournament'))
 
     league_instance = models.ForeignKey(LeagueInstance, null=False)
     name = models.CharField(max_length=100)
@@ -172,14 +172,12 @@ class LeagueInstancePhaseDayManager(models.Manager):
         phases = LeagueInstancePhase.object.filter(league_instance=league_instance, journee_first__lte=journee.numero,
                                                    journee_last_gte=journee.numero)
         for ph in phases:
-            lipd, created = self.select_related().get_or_create(league_instance_phase=ph, journee=journee,
-                                                                defaults={'number': journee.numero})
+            lipd, created = self.get_or_create(league_instance_phase=ph, journee=journee,
+                                               defaults={'number': journee.numero})
+            if not created:
+                TeamDayScore.objects.filter(day=lipd).delete()  # delete existing and recompute.
             team_day_scores = self._compute_scores_for_phaseday(lipd)
-            if created:
-                TeamDayScore.objects.bulk_create(team_day_scores)
-            else:
-                for tds in team_day_scores:
-                    tds.save()
+            TeamDayScore.objects.bulk_create(team_day_scores)
 
     def _compute_scores_for_phaseday(self, lipd):
         return [self._compute_teamdayscore(team, lipd) for team in
@@ -189,30 +187,68 @@ class LeagueInstancePhaseDayManager(models.Manager):
     def _compute_teamdayscore(self, team, lipd):
         league_mode = lipd.league_instance_phase.league_instance.league.mode
         team_config = json.loads(team.attributes)
+        # filter signings valid at this time
+        signings_at_day = [s for s in team.signing_set if
+                           (s.begin <= lipd.journee.debut) and (s.end is None or s.end > lipd.journee.debut)]
         if league_mode == 'KCUP':
             jjscore_max_nb = json.loads(lipd.league_instance_phase.league_instance.configuration)['notes'][
                 lipd.league_instance_phase.type]
-            # filter signings valid at this time
-            signings_at_day = [s for s in team.signing_set if
-                               (s.begin <= lipd.journee.debut) and (s.end is None or s.end > lipd.journee.debut)]
-            # retrieve jjscores for all signings at once in order to limit the number of request
-            all_jjscores = scoring_models.JJScore.objects.filter(
-                journee_scoring__saison_scoring__saison=lipd.league_instance_phase.league_instance.saison,
-                journee_scoring__journee__numero__gte=lipd.league_instance_phase.journee_first,
-                journee_scoring__journee__numero__lte=lipd.journee.numero,
-                joueur__in=[s.player.pk for s in signings_at_day]
-            ).select_related('joueur').order_by('joueur')
+            signings_scores = [(signing, self._compute_score_signing_KCUP(lipd, signing, team_config, jjscore_max_nb))
+                               for signing in signings_at_day]
             dscores = defaultdict(list)
-            for jjs in all_jjscores:
-                dscores[jjs.pk].append(jjs)
-            for jjspk in dscores:
-                score = self._compute_score_player(dscores[jjspk], jjscore_max_nb, )
+            for sig, sco in signings_scores:
+                dscores[sig.player.poste].append((sig, sco))
+            teamscore = 0
+            composition = defaultdict(list)
+            for poste in team_config['formation']:
+                scores_at_poste = sorted(dscores[poste], key=lambda x: x[1], reverse=True)
+                for i in range(0, team_config['formation'][poste]):
+                    if i < len(scores_at_poste):
+                        teamscore += scores_at_poste[i][1]
+                        composition[poste].append(scores_at_poste[i])
+                    else:
+                        break  # break poste loop, go to next poste list.
+            return self._make_teamdayscore(team, lipd, teamscore, composition)
         else:
             # TODO
             return None
 
-    def _compute_score_player(self, jjslist):
+    def _compute_score_signing_KCUP(self, lipd, signing, team_config, jjscore_max_nb):
+        jjscores = scoring_models.JJScore.objects.filter(
+            journee_scoring__saison_scoring__saison=lipd.league_instance_phase.league_instance.saison,
+            journee_scoring__journee__numero__gte=lipd.league_instance_phase.journee_first,
+            journee_scoring__journee__numero__lte=lipd.journee.numero,
+            joueur=signing.player
+        ).order_by('note').order_by('compensation')  # to have real notes first and compensations last
+        nb_notes = 0
+        score = 0
+        factor = 1.0
+        if 'score_factor' in json.loads(signing.attributes):
+            factor = json.loads(signing.attributes)['score_factor']
+        for jjs in jjscores:
+            base = jjs.bonus
+            extra_bonus = 0
+            if 'joker' in team_config and team_config['joker'] == jjs.joueur.pk:
+                extra_bonus = jjs.bonus  # doubled bonus
+            if jjs.note and nb_notes <= jjscore_max_nb:
+                nb_notes += 1
+                base += jjs.note
+            elif jjs.compensation and nb_notes <= jjscore_max_nb:
+                base += jjs.compensation
+            score += (base * factor) + extra_bonus
+        return score
 
+    def _make_teamdayscore(self, team, lipd, teamscore, composition):
+        attrs = dict()
+        attrs['composition'] = {}
+        for poste, _ in l1models.Joueur.POSTES:
+            attrs['composition'][poste] = [{'player': sig.player.pk, 'club': sig.player.club.pk, 'score': sco} for
+                                           sig, sco in composition[poste]]
+        team_config = json.loads(team.attributes)
+        if 'joker' in team_config:
+            attrs['joker'] = team_config['joker']
+        attrs['formation'] = team_config['formation']
+        return TeamDayScore(team=team, day=lipd, score=teamscore, attributes=json.dumps(attrs))
 
 
 class LeagueInstancePhaseDay(models.Model):
