@@ -3,11 +3,96 @@ import datetime
 import pytz
 import decimal
 import json
+from django.utils import timezone
 from django.test import TestCase
 
 from game import models
 from game.services import auctions
 from ligue1 import models as l1models
+
+
+class ScoringTestCase(TestCase):
+    def setUp(self):
+        self.g1 = l1models.Joueur.objects.create(nom='G1', poste='G',
+                                                 sn_person_uuid=uuid.uuid4())
+        self.d1 = l1models.Joueur.objects.create(nom='G1', poste='D',
+                                                 sn_person_uuid=uuid.uuid4())
+        self.m1 = l1models.Joueur.objects.create(nom='G1', poste='M',
+                                                 sn_person_uuid=uuid.uuid4())
+        self.a1 = l1models.Joueur.objects.create(nom='G1', poste='A',
+                                                 sn_person_uuid=uuid.uuid4())
+        self.saison = l1models.Saison.objects.create(nom='Saison', sn_instance_uuid=uuid.uuid4(),
+                                                     debut=datetime.date(2017, 7, 31),
+                                                     fin=datetime.date(2018, 6, 1))
+        self.saison_scoring = models.SaisonScoring.objects.create(saison=self.saison)
+        self.j1 = l1models.Journee.objects.create(numero=1, debut=timezone.make_aware(datetime.datetime(2017, 8, 1, 21),
+                                                                                      timezone.get_default_timezone()),
+                                                  fin=timezone.make_aware(datetime.datetime(2017, 8, 3, 21),
+                                                                          timezone.get_default_timezone()),
+                                                  saison=self.saison, sn_step_uuid=uuid.uuid4())
+        self.j2 = l1models.Journee.objects.create(numero=2, debut=timezone.make_aware(datetime.datetime(2017, 8, 8, 21),
+                                                                                      timezone.get_default_timezone()),
+                                                  fin=timezone.make_aware(datetime.datetime(2017, 8, 10, 21),
+                                                                          timezone.get_default_timezone()),
+                                                  saison=self.saison, sn_step_uuid=uuid.uuid4())
+        self.j3 = l1models.Journee.objects.create(numero=3,
+                                                  debut=timezone.make_aware(datetime.datetime(2017, 8, 15, 21),
+                                                                            timezone.get_default_timezone()),
+                                                  fin=timezone.make_aware(datetime.datetime(2017, 8, 17, 21),
+                                                                          timezone.get_default_timezone()),
+                                                  saison=self.saison, sn_step_uuid=uuid.uuid4())
+        self.js1 = models.JourneeScoring.objects.create(journee=self.j1, saison_scoring=self.saison_scoring)
+        self.js2 = models.JourneeScoring.objects.create(journee=self.j2, saison_scoring=self.saison_scoring)
+        self.js3 = models.JourneeScoring.objects.create(journee=self.j3, saison_scoring=self.saison_scoring)
+
+        self._generate_jjscores(self.g1, [(5.5, 2.0, None), (6.5, 4, None), (6, 0, None)])
+        self._generate_jjscores(self.d1, [(3, 0, None), (4.5, 1, None), (None, 0, 1)])
+        self._generate_jjscores(self.m1, [(8.0, 3.5, None), (5.0, 1, None), (6, 2, None)])
+        self._generate_jjscores(self.a1, [(None, 2.0, 2), (None, 3.0, 2), (7.5, 1.5, None)])
+
+        self.league = models.League.objects.create(name='Test League', mode='KCUP')
+        self.instance = models.LeagueInstance.objects.create(name='Test Instance',
+                                                             begin=datetime.datetime(2017, 9, 1, 9, 0, tzinfo=pytz.UTC),
+                                                             end=datetime.datetime(2017, 10, 15, 9, 0, tzinfo=pytz.UTC),
+                                                             league=self.league, saison=self.saison)
+        self.phase = models.LeagueInstancePhase.objects.create(name="Apertura", type="HALFSEASON", journee_first=1,
+                                                               journee_last=19, league_instance=self.instance)
+        self.division = models.LeagueDivision.objects.create(league=self.league, level=1, name='Test division 1',
+                                                             capacity=20)
+        self.t1 = models.Team.objects.create(name='T1', league=self.league, division=self.division, attributes='{}')
+        self.t2 = models.Team.objects.create(name='T2', league=self.league, division=self.division, attributes='{}')
+        models.Team.objects.setup_formation(self.t1)
+        models.Team.objects.setup_formation(self.t2)
+        self.t1.refresh_from_db()
+        self.t2.refresh_from_db()
+
+    def _generate_jjscores(self, player, perfs_list):
+        jslist = [self.js1, self.js2, self.js3]
+        for js, (n, b, c) in zip(jslist, perfs_list):
+            models.JJScore.objects.create(journee_scoring=js, joueur=player, note=n, bonus=b, compensation=c)
+
+    def test_teamscoring_allsigningscurrent(self):
+        models.Signing.objects.create(player=self.g1, team=self.t1,
+                                      begin=timezone.make_aware(datetime.datetime(2017, 7, 15, 21),
+                                                                timezone.get_default_timezone()))
+        models.Signing.objects.create(player=self.d1, team=self.t1,
+                                      begin=timezone.make_aware(datetime.datetime(2017, 7, 15, 21),
+                                                                timezone.get_default_timezone()))
+        models.Signing.objects.create(player=self.m1, team=self.t2,
+                                      begin=timezone.make_aware(datetime.datetime(2017, 7, 15, 21),
+                                                                timezone.get_default_timezone()))
+        models.Signing.objects.create(player=self.a1, team=self.t2,
+                                      begin=timezone.make_aware(datetime.datetime(2017, 7, 15, 21),
+                                                                timezone.get_default_timezone()))
+        models.LeagueInstancePhaseDay.objects.compute_results(self.instance, self.j1)
+        lipd1 = models.LeagueInstancePhaseDay.objects.filter(league_instance_phase=self.phase,
+                                                             journee=self.j1).prefetch_related('results')
+        self.assertEqual(len(lipd1[0].results.all()), 2)
+        for tds in lipd1[0].results.all():
+            if tds.team == self.t1:
+                self.assertEqual(tds.score, 10.5)
+            else:
+                self.assertEqual(tds.score, 15.5)
 
 
 class TransferTestCase(TestCase):
@@ -335,7 +420,7 @@ class TransferTestCase(TestCase):
         merkato.configuration = json.dumps(old_conf)
         merkato.save()
         t = models.Team.objects.create(name='T', league=self.league, division=self.division,
-                                            attributes='')
+                                       attributes='')
         _setup_sale(t, 'Next', models.MerkatoSession.objects.get_next_available(merkato))
         self.assertEqual(models.MerkatoSession.objects.get_next_available(merkato).number, 2)
 

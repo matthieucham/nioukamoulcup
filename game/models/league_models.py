@@ -36,13 +36,16 @@ class LeagueDivision(models.Model):
 class TeamManager(models.Manager):
     def setup_formation(self, team, g=1, d=2, m=2, a=2):
         t = self.select_for_update().get(pk=team.pk)
-        json.loads(t.attributes)['formation'] = {'G': g, 'D': d, 'M': m, 'A': a}
+        team_config = json.loads(t.attributes)
+        team_config['formation'] = {'G': g, 'D': d, 'M': m, 'A': a}
+        t.attributes = json.dumps(team_config)
         t.save()  # todo update score
 
     def setup_joker(self, team, joueur):
         assert Signing.objects.filter(player=joueur, team=team, end__isnull=True) is not None
         t = self.select_for_update().get(pk=team.pk)
-        json.loads(t.attributes)['joker'] = joueur.pk
+        team_config = json.loads(t.attributes)['joker'] = joueur.pk
+        t.attributes = json.dumps(team_config)
         t.save()
 
 
@@ -52,7 +55,7 @@ class Team(models.Model):
     division = models.ForeignKey(LeagueDivision)
     attributes = JSONField()
 
-    objects = TeamManager
+    objects = TeamManager()
 
 
 class BankAccountManager(models.Manager):
@@ -150,7 +153,8 @@ class LeagueInstance(models.Model):
     begin = models.DateTimeField(blank=False)
     end = models.DateTimeField(blank=False)
     saison = models.ForeignKey(l1models.Saison)
-    configuration = JSONField(default=dict([('notes', [('HALFSEASON', 13), ('FULLSEASON', 26), ('TOURNAMENT', 3)])]))
+    configuration = JSONField(
+        default=json.dumps({'notes': {'HALFSEASON': 13, 'FULLSEASON': 26, 'TOURNAMENT': 3}}))
 
 
 class LeagueInstancePhase(models.Model):
@@ -162,15 +166,12 @@ class LeagueInstancePhase(models.Model):
     journee_first = models.PositiveIntegerField(blank=False)
     journee_last = models.PositiveIntegerField(blank=False)
 
-    class Meta:
-        unique_together = (('league_instance', 'journee_first',), ('league_instance', 'journee_last'),)
-
 
 class LeagueInstancePhaseDayManager(models.Manager):
     def compute_results(self, league_instance, journee):
         # find the phase
-        phases = LeagueInstancePhase.object.filter(league_instance=league_instance, journee_first__lte=journee.numero,
-                                                   journee_last_gte=journee.numero)
+        phases = LeagueInstancePhase.objects.filter(league_instance=league_instance, journee_first__lte=journee.numero,
+                                                    journee_last__gte=journee.numero)
         for ph in phases:
             lipd, created = self.get_or_create(league_instance_phase=ph, journee=journee,
                                                defaults={'number': journee.numero})
@@ -188,7 +189,7 @@ class LeagueInstancePhaseDayManager(models.Manager):
         league_mode = lipd.league_instance_phase.league_instance.league.mode
         team_config = json.loads(team.attributes)
         # filter signings valid at this time
-        signings_at_day = [s for s in team.signing_set if
+        signings_at_day = [s for s in team.signing_set.all() if
                            (s.begin <= lipd.journee.debut) and (s.end is None or s.end > lipd.journee.debut)]
         if league_mode == 'KCUP':
             jjscore_max_nb = json.loads(lipd.league_instance_phase.league_instance.configuration)['notes'][
@@ -235,15 +236,16 @@ class LeagueInstancePhaseDayManager(models.Manager):
                 base += jjs.note
             elif jjs.compensation and nb_notes <= jjscore_max_nb:
                 base += jjs.compensation
-            score += (base * factor) + extra_bonus
+            score += (float(base) * factor) + float(extra_bonus)
         return score
 
     def _make_teamdayscore(self, team, lipd, teamscore, composition):
         attrs = dict()
         attrs['composition'] = {}
         for poste, _ in l1models.Joueur.POSTES:
-            attrs['composition'][poste] = [{'player': sig.player.pk, 'club': sig.player.club.pk, 'score': sco} for
-                                           sig, sco in composition[poste]]
+            attrs['composition'][poste] = [
+                {'player': sig.player.pk, 'club': sig.player.club.pk if sig.player.club else None, 'score': sco} for
+                sig, sco in composition[poste]]
         team_config = json.loads(team.attributes)
         if 'joker' in team_config:
             attrs['joker'] = team_config['joker']
@@ -256,6 +258,8 @@ class LeagueInstancePhaseDay(models.Model):
     number = models.PositiveIntegerField(blank=False)
     journee = models.ForeignKey(l1models.Journee, null=False)
     results = models.ManyToManyField(Team, through='TeamDayScore', null=True)
+
+    objects = LeagueInstancePhaseDayManager()
 
 
 class TeamDayScore(models.Model):
@@ -270,4 +274,4 @@ class Signing(models.Model):
     team = models.ForeignKey(Team, null=False)
     begin = models.DateTimeField(auto_now_add=True)
     end = models.DateTimeField(null=True)
-    attributes = JSONField()
+    attributes = JSONField(default=json.dumps({'score_factor': 1.0}))
