@@ -34,6 +34,7 @@ class LeagueDivision(models.Model):
 
 
 class TeamManager(models.Manager):
+    @transaction.atomic()
     def setup_formation(self, team, g=1, d=2, m=2, a=2):
         t = self.select_for_update().get(pk=team.pk)
         team_config = json.loads(t.attributes)
@@ -41,6 +42,7 @@ class TeamManager(models.Manager):
         t.attributes = json.dumps(team_config)
         t.save()  # todo update score
 
+    @transaction.atomic()
     def setup_joker(self, team, joueur):
         assert Signing.objects.filter(player=joueur, team=team, end__isnull=True) is not None
         t = self.select_for_update().get(pk=team.pk)
@@ -220,7 +222,10 @@ class LeagueInstancePhaseDayManager(models.Manager):
             journee_scoring__journee__numero__gte=lipd.league_instance_phase.journee_first,
             journee_scoring__journee__numero__lte=lipd.journee.numero,
             joueur=signing.player
-        ).order_by('note').order_by('compensation')  # to have real notes first and compensations last
+        ).annotate(no_note=models.Count('note')).annotate(no_comp=models.Count('compensation')).order_by('-no_note',
+                                                                                                         '-note',
+                                                                                                         '-no_comp',
+                                                                                                         '-compensation')  # to have real notes first and compensations last
         nb_notes = 0
         score = 0
         factor = 1.0
@@ -231,11 +236,11 @@ class LeagueInstancePhaseDayManager(models.Manager):
             extra_bonus = 0
             if 'joker' in team_config and team_config['joker'] == jjs.joueur.pk:
                 extra_bonus = jjs.bonus  # doubled bonus
-            if jjs.note and nb_notes <= jjscore_max_nb:
-                nb_notes += 1
+            if jjs.note is not None and nb_notes < jjscore_max_nb:
                 base += jjs.note
-            elif jjs.compensation and nb_notes <= jjscore_max_nb:
+            elif jjs.compensation is not None and nb_notes < jjscore_max_nb:
                 base += jjs.compensation
+            nb_notes += 1
             score += (float(base) * factor) + float(extra_bonus)
         return score
 

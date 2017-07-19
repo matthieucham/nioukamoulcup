@@ -62,7 +62,7 @@ class JJScoreManager(models.Manager):
                         computed_joueurs.append(perf.joueur.pk)
             # "pour les joueurs qui n'ont pas joué lors de cette journée insert 0":
             for j in l1models.Joueur.objects.exclude(pk__in=computed_joueurs):
-                jjscores.append(JJScore(journee_scoring=journee_scoring, joueur=j, note=0, bonus=0))
+                jjscores.append(JJScore(journee_scoring=journee_scoring, joueur=j, compensation=0, bonus=0))
             JJScore.objects.filter(journee_scoring=journee_scoring).delete()
             JJScore.objects.bulk_create(jjscores)
 

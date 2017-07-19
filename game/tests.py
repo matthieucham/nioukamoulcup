@@ -4,22 +4,24 @@ import pytz
 import decimal
 import json
 from django.utils import timezone
-from django.test import TestCase
+from django.test import TestCase, TransactionTestCase
 
 from game import models
 from game.services import auctions
 from ligue1 import models as l1models
 
 
-class ScoringTestCase(TestCase):
+class ScoringTestCase(TransactionTestCase):
     def setUp(self):
         self.g1 = l1models.Joueur.objects.create(nom='G1', poste='G',
                                                  sn_person_uuid=uuid.uuid4())
-        self.d1 = l1models.Joueur.objects.create(nom='G1', poste='D',
+        self.g2 = l1models.Joueur.objects.create(nom='G2', poste='G',
                                                  sn_person_uuid=uuid.uuid4())
-        self.m1 = l1models.Joueur.objects.create(nom='G1', poste='M',
+        self.d1 = l1models.Joueur.objects.create(nom='D1', poste='D',
                                                  sn_person_uuid=uuid.uuid4())
-        self.a1 = l1models.Joueur.objects.create(nom='G1', poste='A',
+        self.m1 = l1models.Joueur.objects.create(nom='M1', poste='M',
+                                                 sn_person_uuid=uuid.uuid4())
+        self.a1 = l1models.Joueur.objects.create(nom='A1', poste='A',
                                                  sn_person_uuid=uuid.uuid4())
         self.saison = l1models.Saison.objects.create(nom='Saison', sn_instance_uuid=uuid.uuid4(),
                                                      debut=datetime.date(2017, 7, 31),
@@ -45,7 +47,8 @@ class ScoringTestCase(TestCase):
         self.js2 = models.JourneeScoring.objects.create(journee=self.j2, saison_scoring=self.saison_scoring)
         self.js3 = models.JourneeScoring.objects.create(journee=self.j3, saison_scoring=self.saison_scoring)
 
-        self._generate_jjscores(self.g1, [(5.5, 2.0, None), (6.5, 4, None), (6, 0, None)])
+        self._generate_jjscores(self.g1, [(5.5, 2.0, None), (5.5, 2.0, None), (None, 0, 0)])
+        self._generate_jjscores(self.g2, [(3, 0, None), (8, 0, None), (6, 0, None)])
         self._generate_jjscores(self.d1, [(3, 0, None), (4.5, 1, None), (None, 0, 1)])
         self._generate_jjscores(self.m1, [(8.0, 3.5, None), (5.0, 1, None), (6, 2, None)])
         self._generate_jjscores(self.a1, [(None, 2.0, 2), (None, 3.0, 2), (7.5, 1.5, None)])
@@ -63,8 +66,6 @@ class ScoringTestCase(TestCase):
         self.t2 = models.Team.objects.create(name='T2', league=self.league, division=self.division, attributes='{}')
         models.Team.objects.setup_formation(self.t1)
         models.Team.objects.setup_formation(self.t2)
-        self.t1.refresh_from_db()
-        self.t2.refresh_from_db()
 
     def _generate_jjscores(self, player, perfs_list):
         jslist = [self.js1, self.js2, self.js3]
@@ -84,15 +85,37 @@ class ScoringTestCase(TestCase):
         models.Signing.objects.create(player=self.a1, team=self.t2,
                                       begin=timezone.make_aware(datetime.datetime(2017, 7, 15, 21),
                                                                 timezone.get_default_timezone()))
-        models.LeagueInstancePhaseDay.objects.compute_results(self.instance, self.j1)
-        lipd1 = models.LeagueInstancePhaseDay.objects.filter(league_instance_phase=self.phase,
-                                                             journee=self.j1).prefetch_related('results')
-        self.assertEqual(len(lipd1[0].results.all()), 2)
-        for tds in lipd1[0].results.all():
-            if tds.team == self.t1:
-                self.assertEqual(tds.score, 10.5)
-            else:
-                self.assertEqual(tds.score, 15.5)
+        # J1
+        self._assert_scores(self.j1, [(self.t1, 10.5), (self.t2, 15.5)])
+        # extra G with lower score : no change expected
+        models.Signing.objects.create(player=self.g2, team=self.t1,
+                                      begin=timezone.make_aware(datetime.datetime(2017, 7, 15, 21),
+                                                                timezone.get_default_timezone()))
+        self._assert_scores(self.j1, [(self.t1, 10.5), (self.t2, 15.5)])
+        # J2
+        self._assert_scores(self.j2, [(self.t1, 23.5), (self.t2, 26.5)])
+        # J3 : G2 doit devenir titulaire
+        self._assert_scores(self.j3, [(self.t1, 26.5), (self.t2, 43.5)])
+        # change le nombre de notes prises en compte pour le score : max=2
+        inst_conf = json.loads(self.instance.configuration)
+        inst_conf['notes']['HALFSEASON'] = 2
+        self.instance.configuration = json.dumps(inst_conf)
+        self.instance.save()
+        self.phase.refresh_from_db()
+        # J2 doit être identique
+        self._assert_scores(self.j2, [(self.t1, 23.5), (self.t2, 26.5)])
+        # J3 doit changer : 2 meilleures notes seulement + tous les bonus
+        self._assert_scores(self.j3, [(self.t1, 23.5), (self.t2, 36.5)])
+
+
+    def _assert_scores(self, journee, team_expected):
+        models.LeagueInstancePhaseDay.objects.compute_results(self.instance, journee)
+        lipd = models.LeagueInstancePhaseDay.objects.filter(league_instance_phase=self.phase,
+                                                            journee=journee)
+        for team, expected in team_expected:
+            tds = models.TeamDayScore.objects.get(team=team, day=lipd)
+            print(json.loads(tds.attributes))
+            self.assertEqual(tds.score, expected)
 
 
 class TransferTestCase(TestCase):
@@ -274,8 +297,6 @@ class TransferTestCase(TestCase):
                                                       datetime.datetime(2017, 9, 13, 19, 00, 20, tzinfo=pytz.UTC),
                                                       ['12:00', '20:00'])
         ticks_list = [t for t in ticks]
-        for tick in ticks_list:
-            print(tick)
         self.assertEqual(26, len(ticks_list))
         test_date_1 = datetime.datetime(2017, 9, 1, 9, 0, tzinfo=pytz.UTC)
         tick_1 = models.MerkatoManager._find_next_tick_to_close(test_date_1, 48, ticks_list)
@@ -283,8 +304,6 @@ class TransferTestCase(TestCase):
 
         merkato = models.Merkato.objects.setup(self.instance, 'BID', datetime.datetime(2017, 9, 1),
                                                datetime.datetime(2017, 9, 13), 7)
-        for s in merkato.merkatosession_set.all():
-            print(s)
 
     def test_valid_auctions_against_FULL(self):
         merkato = models.Merkato.objects.setup(self.instance, 'BID',

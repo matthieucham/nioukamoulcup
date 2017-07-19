@@ -67,8 +67,8 @@ class JourneeManager(models.Manager):
 class Journee(Importe):
     numero = models.PositiveIntegerField()
     sn_step_uuid = models.UUIDField(null=False)
-    debut = models.DateField(null=True)
-    fin = models.DateField(null=True)
+    debut = models.DateTimeField(null=True)
+    fin = models.DateTimeField(null=True)
     saison = models.ForeignKey(Saison, related_name='journees')
     objects = JourneeManager()
 
