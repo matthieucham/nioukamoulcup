@@ -23,6 +23,8 @@ class ScoringTestCase(TransactionTestCase):
                                                  sn_person_uuid=uuid.uuid4())
         self.a1 = l1models.Joueur.objects.create(nom='A1', poste='A',
                                                  sn_person_uuid=uuid.uuid4())
+        self.a2 = l1models.Joueur.objects.create(nom='A2', poste='A',
+                                                 sn_person_uuid=uuid.uuid4())
         self.saison = l1models.Saison.objects.create(nom='Saison', sn_instance_uuid=uuid.uuid4(),
                                                      debut=datetime.date(2017, 7, 31),
                                                      fin=datetime.date(2018, 6, 1))
@@ -52,6 +54,7 @@ class ScoringTestCase(TransactionTestCase):
         self._generate_jjscores(self.d1, [(3, 0, None), (4.5, 1, None), (None, 0, 1)])
         self._generate_jjscores(self.m1, [(8.0, 3.5, None), (5.0, 1, None), (6, 2, None)])
         self._generate_jjscores(self.a1, [(None, 2.0, 2), (None, 3.0, 2), (7.5, 1.5, None)])
+        self._generate_jjscores(self.a2, [(5, 0, None), (10, 5.0, None), (6, 1.0, None)])
 
         self.league = models.League.objects.create(name='Test League', mode='KCUP')
         self.instance = models.LeagueInstance.objects.create(name='Test Instance',
@@ -73,24 +76,34 @@ class ScoringTestCase(TransactionTestCase):
             models.JJScore.objects.create(journee_scoring=js, joueur=player, note=n, bonus=b, compensation=c)
 
     def test_teamscoring_allsigningscurrent(self):
-        models.Signing.objects.create(player=self.g1, team=self.t1,
-                                      begin=timezone.make_aware(datetime.datetime(2017, 7, 15, 21),
-                                                                timezone.get_default_timezone()))
-        models.Signing.objects.create(player=self.d1, team=self.t1,
-                                      begin=timezone.make_aware(datetime.datetime(2017, 7, 15, 21),
-                                                                timezone.get_default_timezone()))
-        models.Signing.objects.create(player=self.m1, team=self.t2,
-                                      begin=timezone.make_aware(datetime.datetime(2017, 7, 15, 21),
-                                                                timezone.get_default_timezone()))
-        models.Signing.objects.create(player=self.a1, team=self.t2,
-                                      begin=timezone.make_aware(datetime.datetime(2017, 7, 15, 21),
-                                                                timezone.get_default_timezone()))
+        s1 = models.Signing.objects.create(player=self.g1, team=self.t1,
+                                           )
+        s1.begin = timezone.make_aware(datetime.datetime(2017, 7, 15, 21),
+                                       timezone.get_default_timezone())
+        s1.save()
+        s2 = models.Signing.objects.create(player=self.d1, team=self.t1,
+                                           )
+        s2.begin = timezone.make_aware(datetime.datetime(2017, 7, 15, 21),
+                                       timezone.get_default_timezone())
+        s2.save()
+        s3 = models.Signing.objects.create(player=self.m1, team=self.t2,
+                                           )
+        s3.begin = timezone.make_aware(datetime.datetime(2017, 7, 15, 21),
+                                       timezone.get_default_timezone())
+        s3.save()
+        s4 = models.Signing.objects.create(player=self.a1, team=self.t2,
+                                           )
+        s4.begin = timezone.make_aware(datetime.datetime(2017, 7, 15, 21),
+                                       timezone.get_default_timezone())
+        s4.save()
         # J1
         self._assert_scores(self.j1, [(self.t1, 10.5), (self.t2, 15.5)])
         # extra G with lower score : no change expected
-        models.Signing.objects.create(player=self.g2, team=self.t1,
-                                      begin=timezone.make_aware(datetime.datetime(2017, 7, 15, 21),
-                                                                timezone.get_default_timezone()))
+        s5 = models.Signing.objects.create(player=self.g2, team=self.t1,
+                                           )
+        s5.begin = timezone.make_aware(datetime.datetime(2017, 7, 15, 21),
+                                       timezone.get_default_timezone())
+        s5.save()
         self._assert_scores(self.j1, [(self.t1, 10.5), (self.t2, 15.5)])
         # J2
         self._assert_scores(self.j2, [(self.t1, 23.5), (self.t2, 26.5)])
@@ -106,7 +119,14 @@ class ScoringTestCase(TransactionTestCase):
         self._assert_scores(self.j2, [(self.t1, 23.5), (self.t2, 26.5)])
         # J3 doit changer : 2 meilleures notes seulement + tous les bonus
         self._assert_scores(self.j3, [(self.t1, 23.5), (self.t2, 36.5)])
-
+        # nouvelle signature avec un facteur bonifié à 5%
+        s6 = models.Signing.objects.create(player=self.a2, team=self.t1,
+                                           attributes=json.dumps({'score_factor': 1.05}))
+        s6.begin = timezone.make_aware(datetime.datetime(2017, 8, 14, 21),
+                                       timezone.get_default_timezone())
+        s6.save()
+        self._assert_scores(self.j2, [(self.t1, 23.5), (self.t2, 26.5)])
+        self._assert_scores(self.j3, [(self.t1, 46.6), (self.t2, 36.5)])
 
     def _assert_scores(self, journee, team_expected):
         models.LeagueInstancePhaseDay.objects.compute_results(self.instance, journee)
@@ -115,7 +135,7 @@ class ScoringTestCase(TransactionTestCase):
         for team, expected in team_expected:
             tds = models.TeamDayScore.objects.get(team=team, day=lipd)
             print(json.loads(tds.attributes))
-            self.assertEqual(tds.score, expected)
+            self.assertEqual(float(tds.score), expected)
 
 
 class TransferTestCase(TestCase):
