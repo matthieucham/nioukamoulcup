@@ -6,6 +6,7 @@ from collections import defaultdict
 
 from . import scoring_models
 from ligue1 import models as l1models
+from utils.timer import Timer
 
 
 class League(models.Model):
@@ -170,17 +171,19 @@ class LeagueInstancePhase(models.Model):
 
 
 class LeagueInstancePhaseDayManager(models.Manager):
+
     def compute_results(self, league_instance, journee):
-        # find the phase
-        phases = LeagueInstancePhase.objects.filter(league_instance=league_instance, journee_first__lte=journee.numero,
-                                                    journee_last__gte=journee.numero)
-        for ph in phases:
-            lipd, created = self.get_or_create(league_instance_phase=ph, journee=journee,
-                                               defaults={'number': journee.numero})
-            if not created:
-                TeamDayScore.objects.filter(day=lipd).delete()  # delete existing and recompute.
-            team_day_scores = self._compute_scores_for_phaseday(lipd)
-            TeamDayScore.objects.bulk_create(team_day_scores)
+        with Timer(id='compute_results', verbose=True):
+            # find the phase
+            phases = LeagueInstancePhase.objects.filter(league_instance=league_instance, journee_first__lte=journee.numero,
+                                                        journee_last__gte=journee.numero)
+            for ph in phases:
+                lipd, created = self.get_or_create(league_instance_phase=ph, journee=journee,
+                                                   defaults={'number': journee.numero})
+                if not created:
+                    TeamDayScore.objects.filter(day=lipd).delete()  # delete existing and recompute.
+                team_day_scores = self._compute_scores_for_phaseday(lipd)
+                TeamDayScore.objects.bulk_create(team_day_scores)
 
     def _compute_scores_for_phaseday(self, lipd):
         return [self._compute_teamdayscore(team, lipd) for team in

@@ -3,6 +3,7 @@ import datetime
 import pytz
 import decimal
 import json
+import random
 from django.utils import timezone
 from django.test import TestCase, TransactionTestCase
 
@@ -75,24 +76,24 @@ class ScoringTestCase(TransactionTestCase):
         for js, (n, b, c) in zip(jslist, perfs_list):
             models.JJScore.objects.create(journee_scoring=js, joueur=player, note=n, bonus=b, compensation=c)
 
-    def test_teamscoring_allsigningscurrent(self):
+    def test_teamscoring(self):
         s1 = models.Signing.objects.create(player=self.g1, team=self.t1,
-                                           )
+        )
         s1.begin = timezone.make_aware(datetime.datetime(2017, 7, 15, 21),
                                        timezone.get_default_timezone())
         s1.save()
         s2 = models.Signing.objects.create(player=self.d1, team=self.t1,
-                                           )
+        )
         s2.begin = timezone.make_aware(datetime.datetime(2017, 7, 15, 21),
                                        timezone.get_default_timezone())
         s2.save()
         s3 = models.Signing.objects.create(player=self.m1, team=self.t2,
-                                           )
+        )
         s3.begin = timezone.make_aware(datetime.datetime(2017, 7, 15, 21),
                                        timezone.get_default_timezone())
         s3.save()
         s4 = models.Signing.objects.create(player=self.a1, team=self.t2,
-                                           )
+        )
         s4.begin = timezone.make_aware(datetime.datetime(2017, 7, 15, 21),
                                        timezone.get_default_timezone())
         s4.save()
@@ -100,7 +101,7 @@ class ScoringTestCase(TransactionTestCase):
         self._assert_scores(self.j1, [(self.t1, 10.5), (self.t2, 15.5)])
         # extra G with lower score : no change expected
         s5 = models.Signing.objects.create(player=self.g2, team=self.t1,
-                                           )
+        )
         s5.begin = timezone.make_aware(datetime.datetime(2017, 7, 15, 21),
                                        timezone.get_default_timezone())
         s5.save()
@@ -127,6 +128,59 @@ class ScoringTestCase(TransactionTestCase):
         s6.save()
         self._assert_scores(self.j2, [(self.t1, 23.5), (self.t2, 26.5)])
         self._assert_scores(self.j3, [(self.t1, 46.6), (self.t2, 36.5)])
+        # test avec un contrat terminé après la J1:
+        s1.end = timezone.make_aware(datetime.datetime(2017, 8, 7, 12), timezone.get_default_timezone())
+        s1.save()
+        self._assert_scores(self.j1, [(self.t1, 10.5)])
+        self._assert_scores(self.j2, [(self.t1, 19.5)])  # il n'y plus G1 mais on a G2
+
+    def _jjscore_generator(self, nb):
+        for i in range(0, nb):
+            yield (random.randrange(3, 9, 1), random.randrange(0, 4, 1), None)
+
+    def _js_generator(self, nb, saison):
+        sscoring = models.SaisonScoring.objects.create(saison=saison)
+        for i in range(0, nb):
+            j = l1models.Journee.objects.create(numero=i + 1,
+                                                debut=timezone.make_aware(datetime.datetime(2017, 8, 1, 21),
+                                                                          timezone.get_default_timezone()),
+                                                fin=timezone.make_aware(datetime.datetime(2017, 8, 3, 21),
+                                                                        timezone.get_default_timezone()),
+                                                saison=saison, sn_step_uuid=uuid.uuid4())
+            yield models.JourneeScoring.objects.create(journee=j, saison_scoring=sscoring)
+
+    def _generate_signings(self, team, date, nb):
+        for i in range(0, nb):
+            poste = random.choice(['G', 'D', 'M', 'A'])
+            p = l1models.Joueur.objects.create(nom='PERF%d' % i, poste=poste,
+                                               sn_person_uuid=uuid.uuid4())
+            s1 = models.Signing.objects.create(player=p, team=team)
+            s1.begin = date
+            s1.save()
+            yield s1
+
+    def test_perfos_teamscoring(self):
+        saison = l1models.Saison.objects.create(nom='SPERF', sn_instance_uuid=uuid.uuid4(),
+                                                debut=datetime.date(2017, 7, 31),
+                                                fin=datetime.date(2018, 6, 1))
+        instance = models.LeagueInstance.objects.create(name='Test Instance',
+                                                        begin=datetime.datetime(2017, 9, 1, 9, 0, tzinfo=pytz.UTC),
+                                                        end=datetime.datetime(2017, 10, 15, 9, 0, tzinfo=pytz.UTC),
+                                                        league=self.league, saison=saison)
+        for s in self._generate_signings(self.t1, timezone.make_aware(datetime.datetime(2017, 7, 15, 21),
+                                                                      timezone.get_default_timezone()), 14):
+            for js, (n, b, c) in zip(self._js_generator(100, saison), self._jjscore_generator(38)):
+                models.JJScore.objects.create(journee_scoring=js, joueur=s.player, note=n, bonus=b, compensation=c)
+        phase = models.LeagueInstancePhase.objects.create(name="Perf", type="FULLSEASON", journee_first=1,
+                                                          journee_last=100, league_instance=instance)
+        j100 = l1models.Journee.objects.filter(numero=38, saison=saison)[0]
+        models.LeagueInstancePhaseDay.objects.compute_results(instance, j100)
+        jh = l1models.Journee.objects.filter(numero=19, saison=saison)[0]
+        models.LeagueInstancePhaseDay.objects.compute_results(instance, jh)
+        lipd = models.LeagueInstancePhaseDay.objects.filter(league_instance_phase=phase,
+                                                            journee=j100)
+        tds = models.TeamDayScore.objects.get(team=self.t1, day=lipd)
+        print('perf_score= %d' % tds.score)
 
     def _assert_scores(self, journee, team_expected):
         models.LeagueInstancePhaseDay.objects.compute_results(self.instance, journee)
@@ -134,7 +188,7 @@ class ScoringTestCase(TransactionTestCase):
                                                             journee=journee)
         for team, expected in team_expected:
             tds = models.TeamDayScore.objects.get(team=team, day=lipd)
-            print(json.loads(tds.attributes))
+            # print(json.loads(tds.attributes))
             self.assertEqual(float(tds.score), expected)
 
 

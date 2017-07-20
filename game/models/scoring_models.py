@@ -41,7 +41,7 @@ class JourneeScoring(models.Model):
 
 class JJScoreManager(models.Manager):
     def create_jjscore_from_ligue1(self, journee_scoring):
-        with Timer(id='create_jjscore_from_ligue1', verbose=True):
+        with Timer(id='create_jjscore_from_ligue1', verbose=False):
             computed_club_pks = []
             bbp = None
             jjscores = []
