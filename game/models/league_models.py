@@ -171,18 +171,18 @@ class LeagueInstancePhase(models.Model):
 
 
 class LeagueInstancePhaseDayManager(models.Manager):
-
     def compute_results(self, league_instance, journee):
         with Timer(id='compute_results', verbose=True):
             # find the phase
-            phases = LeagueInstancePhase.objects.filter(league_instance=league_instance, journee_first__lte=journee.numero,
+            phases = LeagueInstancePhase.objects.filter(league_instance=league_instance,
+                                                        journee_first__lte=journee.numero,
                                                         journee_last__gte=journee.numero)
             for ph in phases:
                 lipd, created = self.get_or_create(league_instance_phase=ph, journee=journee,
                                                    defaults={'number': journee.numero})
+                team_day_scores = self._compute_scores_for_phaseday(lipd)
                 if not created:
                     TeamDayScore.objects.filter(day=lipd).delete()  # delete existing and recompute.
-                team_day_scores = self._compute_scores_for_phaseday(lipd)
                 TeamDayScore.objects.bulk_create(team_day_scores)
 
     def _compute_scores_for_phaseday(self, lipd):
@@ -192,23 +192,32 @@ class LeagueInstancePhaseDayManager(models.Manager):
 
     def _compute_teamdayscore(self, team, lipd):
         league_mode = lipd.league_instance_phase.league_instance.league.mode
-        team_config = json.loads(team.attributes)
         # filter signings valid at this time
         signings_at_day = [s for s in team.signing_set.all() if
                            (s.begin <= lipd.journee.debut) and (s.end is None or s.end > lipd.journee.debut)]
         if league_mode == 'KCUP':
             jjscore_max_nb = json.loads(lipd.league_instance_phase.league_instance.configuration)['notes'][
                 lipd.league_instance_phase.type]
-            signings_scores = [(signing, self._compute_score_signing_KCUP(lipd, signing, team_config, jjscore_max_nb))
-                               for signing in signings_at_day]
+            try:
+                existing_tds = TeamDayScore.objects.get(day=lipd, team=team)
+                tds_config = json.loads(existing_tds.attributes)
+                joker = tds_config['joker'] if 'joker' in tds_config else None
+                formation = tds_config['formation']
+            except TeamDayScore.DoesNotExist:  # joker and formation mustn't be modified afterwards
+                team_config = json.loads(team.attributes)
+                joker = team_config['joker'] if 'joker' in team_config else None
+                formation = team_config['formation']
+            signings_scores = [
+                (signing, self._compute_score_signing_KCUP(lipd, signing, formation, jjscore_max_nb, joker))
+                for signing in signings_at_day]
             dscores = defaultdict(list)
             for sig, sco in signings_scores:
                 dscores[sig.player.poste].append((sig, sco))
             teamscore = 0
             composition = defaultdict(list)
-            for poste in team_config['formation']:
+            for poste in formation:
                 scores_at_poste = sorted(dscores[poste], key=lambda x: x[1], reverse=True)
-                for i in range(0, team_config['formation'][poste]):
+                for i in range(0, formation[poste]):
                     if i < len(scores_at_poste):
                         teamscore += scores_at_poste[i][1]
                         composition[poste].append(scores_at_poste[i])
@@ -219,7 +228,7 @@ class LeagueInstancePhaseDayManager(models.Manager):
             # TODO
             return None
 
-    def _compute_score_signing_KCUP(self, lipd, signing, team_config, jjscore_max_nb):
+    def _compute_score_signing_KCUP(self, lipd, signing, formation, jjscore_max_nb, joker):
         jjscores = scoring_models.JJScore.objects.filter(
             journee_scoring__saison_scoring__saison=lipd.league_instance_phase.league_instance.saison,
             journee_scoring__journee__numero__gte=lipd.league_instance_phase.journee_first,
@@ -237,7 +246,7 @@ class LeagueInstancePhaseDayManager(models.Manager):
         for jjs in jjscores:
             base = jjs.bonus
             extra_bonus = 0
-            if 'joker' in team_config and team_config['joker'] == jjs.joueur.pk:
+            if joker and joker == jjs.joueur.pk:
                 extra_bonus = jjs.bonus  # doubled bonus
             if jjs.note is not None and nb_notes < jjscore_max_nb:
                 base += jjs.note
