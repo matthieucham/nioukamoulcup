@@ -2,6 +2,7 @@ from django.views.generic import TemplateView, DetailView
 # from chartit import DataPool, Chart
 from graphos.sources.model import SimpleDataSource
 from graphos.renderers.morris import AreaChart
+from rules.contrib.views import PermissionRequiredMixin
 
 from . import models
 from ligue1 import models as l1models
@@ -68,9 +69,10 @@ class StatJoueurView(DetailView):
         return context
 
 
-class LeagueWallView(DetailView):
+class LeagueWallView(PermissionRequiredMixin, DetailView):
     model = models.League
     template_name = 'game/league/wall.html'
+    permission_required = 'game.view_league'
 
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get a context

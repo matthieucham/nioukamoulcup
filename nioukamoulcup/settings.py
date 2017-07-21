@@ -49,6 +49,7 @@ INSTALLED_APPS = [
 
     #'debug_toolbar',
 
+    'rules.apps.AutodiscoverRulesConfig',
     'inline_actions',
 
     # dj-userena
@@ -96,6 +97,7 @@ MIDDLEWARE = [
 AUTHENTICATION_BACKENDS = (
     # 'userena.backends.UserenaAuthenticationBackend',
     # 'guardian.backends.ObjectPermissionBackend',
+    'rules.permissions.ObjectPermissionBackend',
     'django.contrib.auth.backends.ModelBackend',
 )
 
