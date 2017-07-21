@@ -47,14 +47,15 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'django.contrib.humanize',
 
-    'debug_toolbar',
+    #'debug_toolbar',
 
+    'rules.apps.AutodiscoverRulesConfig',
     'inline_actions',
 
     # dj-userena
-    'userena',
-    'guardian',
-    'easy_thumbnails',
+    #'userena',
+    #'guardian',
+    #'easy_thumbnails',
 
 
     'mptt',
@@ -63,14 +64,14 @@ INSTALLED_APPS = [
     'django_comments',
 
     # dj-wiki
-    'django_nyt',
-    'sekizai',
-    'sorl.thumbnail',
-    'wiki',
-    'wiki.plugins.attachments',
-    'wiki.plugins.notifications',
-    'wiki.plugins.images',
-    'wiki.plugins.macros',
+    # 'django_nyt',
+    # 'sekizai',
+    # 'sorl.thumbnail',
+    # 'wiki',
+    # 'wiki.plugins.attachments',
+    # 'wiki.plugins.notifications',
+    # 'wiki.plugins.images',
+    # 'wiki.plugins.macros',
 
     'graphos',
     
@@ -78,12 +79,12 @@ INSTALLED_APPS = [
     'svg',
 
     'game',
-    'accounts',
+    #'accounts',
     'ligue1',
 ]
 
 MIDDLEWARE = [
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
+    #'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -94,8 +95,9 @@ MIDDLEWARE = [
 ]
 
 AUTHENTICATION_BACKENDS = (
-    'userena.backends.UserenaAuthenticationBackend',
-    'guardian.backends.ObjectPermissionBackend',
+    # 'userena.backends.UserenaAuthenticationBackend',
+    # 'guardian.backends.ObjectPermissionBackend',
+    'rules.permissions.ObjectPermissionBackend',
     'django.contrib.auth.backends.ModelBackend',
 )
 

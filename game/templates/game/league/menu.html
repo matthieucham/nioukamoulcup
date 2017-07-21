@@ -1,0 +1,14 @@
+{% load game %}
+{% block left-menu %}
+    <div class="list-group sidemenu">
+        {{ league.name }}
+        <a href="{% url 'league_wall' object.id %}" class="list-group-item {% is_navbar_active request 'wall' %}">Mur <span
+                class="glyphicon glyphicon-chevron-right pull-right hover-active"></span></a>
+        <a href="#" class="list-group-item {% is_navbar_active request 'ekyp' %}">{{ team.name }} <span
+                class="glyphicon glyphicon-chevron-right pull-right hover-active"></span></a>
+        <a href="#" class="list-group-item {% is_navbar_active request 'standings' %}">Classement <span
+                class="glyphicon glyphicon-chevron-right pull-right hover-active"></span></a>
+        <a href="#" class="list-group-item {% is_navbar_active request 'merkato' %}">Merkato <span
+                class="glyphicon glyphicon-chevron-right pull-right hover-active"></span></a>
+    </div>
+{% endblock left-menu %}

@@ -1,7 +1,8 @@
 from django.views.generic import TemplateView, DetailView
 # from chartit import DataPool, Chart
-from graphos.sources.model import ModelDataSource, SimpleDataSource
-from graphos.renderers.morris import AreaChart, LineChart
+from graphos.sources.model import SimpleDataSource
+from graphos.renderers.morris import AreaChart
+from rules.contrib.views import PermissionRequiredMixin
 
 from . import models
 from ligue1 import models as l1models
@@ -34,7 +35,7 @@ class StatJoueurView(DetailView):
         data_source = SimpleDataSource(data_source_array)
         # data_source = ModelDataSource(models.JJScore.objects.list_scores_for_joueur(joueur=self.object,
         # saison_scoring=saisonscoring),
-        #                               fields=['journee_scoring__journee__numero', 'note'])
+        # fields=['journee_scoring__journee__numero', 'note'])
         context['chart'] = AreaChart(data_source, width=580,
                                      options={'resize': True, 'hideHover': 'auto', 'parseTime': False,
                                               'fillOpacity': 0.6, 'ymax': 'auto 20', 'grid': False,
@@ -65,4 +66,22 @@ class StatJoueurView(DetailView):
         # # context['scores'] = models.JJScore.objects.filter(joueur=self.object).order_by(
         # # 'journee_scoring__journee__numero')
         # context['scorechart'] = cht
+        return context
+
+
+class LeagueWallView(PermissionRequiredMixin, DetailView):
+    model = models.League
+    template_name = 'game/league/wall.html'
+    permission_required = 'game.view_league'
+
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get a context
+        context = super(LeagueWallView, self).get_context_data(**kwargs)
+        league = self.object
+        # Get active team from league
+        try:
+            mb = models.LeagueMembership.objects.get(user=self.request.user, league=league)
+            context['team'] = mb.team
+        except models.LeagueMembership.DoesNotExist:
+            pass
         return context
