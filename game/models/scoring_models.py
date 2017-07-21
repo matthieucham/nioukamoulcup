@@ -3,7 +3,7 @@ from django.utils import timezone
 from django.db import models
 
 from ligue1 import models as l1models
-#from game import models as gamemodels
+# from game import models as gamemodels
 from game.services import scoring
 from utils.timer import Timer
 
@@ -11,6 +11,21 @@ from utils.timer import Timer
 class SaisonScoring(models.Model):
     saison = models.ForeignKey(l1models.Saison, null=False)
     computed_at = models.DateTimeField(auto_now=True)
+
+    def compute(self):
+        journees = l1models.Journee.objects.filter(saison=self.saison).order_by('numero')
+        journees_to_recompute = []
+        # delete obsolete journeescorings
+        for j in journees:
+            js = JourneeScoring.objects.filter(saison_scoring=self, journee=j).first()
+            if js:
+                if js.computed_at < j.derniere_maj:
+                    journees_to_recompute.append(j)
+                    js.delete()
+            else:
+                journees_to_recompute.append(j)
+        return [JourneeScoring.objects.select_related('journee').create(journee=journee, saison_scoring=self) for journee in
+                journees_to_recompute]
 
 
 class JourneeScoring(models.Model):
@@ -54,8 +69,9 @@ class JJScoreManager(models.Manager):
                         bbp = scoring.compute_best_by_position(all_perfs)
                     for perf in all_perfs:
                         note, bonus, comp = scoring.compute_score_performance(perf, bbp)
-                        jjscores.append(JJScore(journee_scoring=journee_scoring, joueur=perf.joueur, note=note, bonus=bonus,
-                                                compensation=comp))
+                        jjscores.append(
+                            JJScore(journee_scoring=journee_scoring, joueur=perf.joueur, note=note, bonus=bonus,
+                                    compensation=comp))
                         # for cl in journee_scoring.journee.saison.participants:
                         # if not cl.pk in computed_club_pks:
                         # compenser scores matchs reportés ...
@@ -81,7 +97,7 @@ class JJScore(models.Model):
     objects = JJScoreManager()
 
 
-# class TeamScore(models.Model):
-#     team = models.OneToOneField(gamemodels.Team, primary_key=True)
-#     kcup_score = models.FloatField(default=0.0)
-#     computed_at = models.DateTimeField(auto_now_add=True)
+    # class TeamScore(models.Model):
+    # team = models.OneToOneField(gamemodels.Team, primary_key=True)
+    #     kcup_score = models.FloatField(default=0.0)
+    #     computed_at = models.DateTimeField(auto_now_add=True)

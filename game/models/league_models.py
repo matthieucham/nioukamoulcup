@@ -274,7 +274,7 @@ class LeagueInstancePhaseDay(models.Model):
     league_instance_phase = models.ForeignKey(LeagueInstancePhase, null=False)
     number = models.PositiveIntegerField(blank=False)
     journee = models.ForeignKey(l1models.Journee, null=False)
-    results = models.ManyToManyField(Team, through='TeamDayScore', null=True)
+    results = models.ManyToManyField(Team, through='TeamDayScore')
 
     objects = LeagueInstancePhaseDayManager()
 
