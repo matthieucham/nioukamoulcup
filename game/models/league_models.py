@@ -166,8 +166,8 @@ class LeagueInstancePhase(models.Model):
     league_instance = models.ForeignKey(LeagueInstance, null=False)
     name = models.CharField(max_length=100)
     type = models.CharField(choices=TYPES, max_length=10)
-    journee_first = models.PositiveIntegerField(blank=False)
-    journee_last = models.PositiveIntegerField(blank=False)
+    journee_first = models.PositiveIntegerField(blank=False, db_index=True)
+    journee_last = models.PositiveIntegerField(blank=False, db_index=True)
 
 
 class LeagueInstancePhaseDayManager(models.Manager):
@@ -289,6 +289,6 @@ class TeamDayScore(models.Model):
 class Signing(models.Model):
     player = models.ForeignKey(l1models.Joueur, null=False)
     team = models.ForeignKey(Team, null=False)
-    begin = models.DateTimeField(auto_now_add=True)
-    end = models.DateTimeField(null=True)
+    begin = models.DateTimeField(auto_now_add=True, db_index=True)
+    end = models.DateTimeField(null=True, db_index=True)
     attributes = JSONField(default=json.dumps({'score_factor': 1.0}))
