@@ -47,7 +47,7 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'django.contrib.humanize',
 
-    #'debug_toolbar',
+    # 'debug_toolbar',
 
     'rules.apps.AutodiscoverRulesConfig',
     'inline_actions',
@@ -74,9 +74,11 @@ INSTALLED_APPS = [
     # 'wiki.plugins.macros',
 
     'graphos',
-    
+
     'colorful',
     'svg',
+
+    'webpack_loader',
 
     'game',
     #'accounts',
@@ -84,7 +86,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    #'debug_toolbar.middleware.DebugToolbarMiddleware',
+    # 'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -127,7 +129,7 @@ TEMPLATES = [
     },
 ]
 
-#TEMPLATE_CONTEXT_PROCESSORS = ['django.contrib.auth.context_processors.auth']
+# TEMPLATE_CONTEXT_PROCESSORS = ['django.contrib.auth.context_processors.auth']
 
 WSGI_APPLICATION = 'nioukamoulcup.wsgi.application'
 
@@ -187,6 +189,10 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'assets'),
+    # We do this so that django's collectstatic copies or our bundles to the STATIC_ROOT or syncs them to whatever storage we use.
+)
 # STATIC_URL = 'http://localhost:82/www/static/'
 STATIC_URL = '/static/'
 STATIC_ROOT = 'D:\dev\git\www\static'
@@ -214,3 +220,11 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 STATNUTS_CLIENT_ID = 'aLUoUeBI9Zuj7?JfC0t9U=P3mycANITG@0hvaQlZ'
 STATNUTS_SECRET = 'GsHk=.o2kTu9WkU!a:n1kqkQogZ4lXWitDGn2bZff=?YcdbI-;6h_Grusn@q56@;ttN9OMa9.dWcuBq4lJ8vu7;I9n_f:kJrZ5RUSNkAan088KLyv..7q_.Me94MB?Dy'
 STATNUTS_URL = 'https://statnuts-kcup.rhcloud.com'
+
+
+WEBPACK_LOADER = {
+    'DEFAULT': {
+        'BUNDLE_DIR_NAME': 'bundles/',
+        'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats.json'),
+    }
+}

@@ -1,6 +1,7 @@
 {% extends "game/game_base_2cols.html" %}
 {% load static %}
 {% load game %}
+{% load render_bundle from webpack_loader %}
 
 {% block left-menu %}
     {% include 'game/league/menu.html' %}
@@ -16,5 +17,6 @@
 {% endblock content-center %}
 
 {% block content-right %}
- <p>{% lorem %}</p>
+    <div id="react-app"></div>
+    {% render_bundle 'main' %}
 {% endblock content-right %}
