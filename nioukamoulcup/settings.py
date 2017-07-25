@@ -78,11 +78,11 @@ INSTALLED_APPS = [
     'colorful',
     'svg',
 
-    'webpack_loader',
-
     'game',
     #'accounts',
     'ligue1',
+
+    'webpack_loader',
 ]
 
 MIDDLEWARE = [
@@ -224,7 +224,11 @@ STATNUTS_URL = 'https://statnuts-kcup.rhcloud.com'
 
 WEBPACK_LOADER = {
     'DEFAULT': {
+        'CACHE': not DEBUG,
         'BUNDLE_DIR_NAME': 'bundles/',
         'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats.json'),
+        'POLL_INTERVAL': 0.1,
+        'TIMEOUT': None,
+        'IGNORE': ['.+\.hot-update.js', '.+\.map']
     }
 }
