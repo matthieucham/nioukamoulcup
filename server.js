@@ -10,10 +10,10 @@ new WebpackDevServer(webpack(config), {
 	headers: {
 		'Access-Control-Allow-Origin': '*',
 	},
-}).listen(3030, '0.0.0.0', function(err, result) {
+}).listen(3000, '0.0.0.0', function(err, result) {
 	if (err) {
 		console.log(err)
 	}
 
-	console.log('Listening at 0.0.0.0:3030')
+	console.log('Listening at 0.0.0.0:3000')
 })

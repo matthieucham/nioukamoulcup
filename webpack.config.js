@@ -7,7 +7,7 @@ const config = {
 
   entry: [
     'react-hot-loader/patch',
-    'webpack-dev-server/client?http://localhost:3030',
+    'webpack-dev-server/client?http://localhost:3000',
     'webpack/hot/only-dev-server',
     './assets/js/index.js', // entry point of our app. assets/js/index.js should require other js modules and dependencies it needs
   ],
@@ -15,7 +15,7 @@ const config = {
   output: {
       path: path.resolve('./assets/bundles/'),
       filename: "[name]-[hash].js",
-      publicPath: 'http://localhost:3030/assets/bundles/' // Tell django to use this URL to load packages and not use STATIC_URL + bundle_name
+      publicPath: 'http://localhost:3000/assets/bundles/' // Tell django to use this URL to load packages and not use STATIC_URL + bundle_name
   },
 
   plugins: [
@@ -34,6 +34,11 @@ const config = {
   resolve: {
     modules: ['node_modules', 'bower_components'],
     extensions: ['.js', '.jsx']
+  },
+
+  devServer: {
+    hot: true,
+    contentBase: './assets/js',
   }
 }
 
