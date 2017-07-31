@@ -1,9 +1,11 @@
-from django.conf.urls import url
+from django.conf.urls import url, include
+from rest_framework.urlpatterns import format_suffix_patterns
 
 from . import frontend
 
 
 urlpatterns = [
+    url(r'^rest/', include('game.rest.urls')),
     url(r'^home/info/$', frontend.HomePage.as_view(), name="home_info"),
     url(r'^home/result/rencontre/(?P<pk>[0-9]+)/$', frontend.ResultRencontreView.as_view(),
         name="result_rencontre-detail"),

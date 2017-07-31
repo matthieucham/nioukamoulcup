@@ -78,6 +78,8 @@ INSTALLED_APPS = [
     'colorful',
     'svg',
 
+    'rest_framework',
+
     'game',
     #'accounts',
     'ligue1',

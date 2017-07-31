@@ -60,6 +60,9 @@ class Team(models.Model):
 
     objects = TeamManager()
 
+    def __str__(self):
+        return self.name
+
 
 class BankAccountManager(models.Manager):
     @transaction.atomic()
