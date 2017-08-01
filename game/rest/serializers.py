@@ -1,11 +1,11 @@
 from rest_framework import serializers
 from django.db import models
-from game.models import league_models
 import json
+
+from game.models import league_models
 
 
 class TeamSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = league_models.Team
         fields = ('id', 'name')
@@ -21,10 +21,10 @@ class TeamDayScoreByDivisionSerializer(serializers.ListSerializer):
             return super().to_representation(instance)
         one_tds = iterable[0]
         for div in league_models.LeagueDivision.objects.filter(
-                league=one_tds.day.league_instance_phase.league_instance.league):
+                league=one_tds.day.league_instance_phase.league_instance.league).order_by('upper_division'):
             div_ranking = super().to_representation(
                 league_models.TeamDayScore.objects.filter(day=one_tds.day, team__division=div).order_by('-score'))
-            yield {div.name: div_ranking}
+            yield {'id': div.id, 'name': div.name, 'ranking': div_ranking}
 
 
 class TeamDayScoreSerializer(serializers.ModelSerializer):
