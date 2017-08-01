@@ -33,6 +33,9 @@ class LeagueDivision(models.Model):
     upper_division = models.ForeignKey("self", related_name='lower', null=True)
     lower_division = models.ForeignKey("self", related_name='upper', null=True)
 
+    def __str__(self):
+        return self.name
+
 
 class TeamManager(models.Manager):
     @transaction.atomic()
