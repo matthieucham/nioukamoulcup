@@ -79,6 +79,7 @@ INSTALLED_APPS = [
     'svg',
 
     'webpack_loader',
+    'rest_framework',
 
     'game',
     #'accounts',
