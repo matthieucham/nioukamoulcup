@@ -130,7 +130,7 @@ class LeagueRankingWidget extends Component {
   constructor(props) {
     super(props);
     this.state={
-      'selected_phase_idx': 0
+      'selected_phase_idx': 1
     };
 
     this.handlePhaseFilterSelected = this.handlePhaseFilterSelected.bind(this);
