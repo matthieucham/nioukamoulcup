@@ -69,6 +69,9 @@ class Team(models.Model):
     def has_object_read_permission(self, request):
         return request.user in self.league.members.all()
 
+    def has_object_write_permission(self, request):
+        return LeagueMembership.objects.filter(user=request.user, team=self).count() > 0
+
     def __str__(self):
         return self.name
 

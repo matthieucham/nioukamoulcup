@@ -1,5 +1,7 @@
 from rest_framework import serializers
+from dry_rest_permissions.generics import DRYPermissionsField
 from django.db import models
+from django.contrib.auth.models import User
 import json
 
 from game.models import league_models
@@ -26,10 +28,19 @@ class PlayerHdrSerializer(serializers.ModelSerializer):
         fields = ('id', 'prenom', 'nom', 'surnom', 'poste', 'club')
 
 
+class TeamManagerSerializer(serializers.ModelSerializer):
+    user = serializers.StringRelatedField()
+
+    class Meta:
+        model = league_models.LeagueMembership
+        fields = ('user', )
+
+
 class TeamHdrSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = league_models.Team
-        fields = ('id', 'name')
+        fields = ('id', 'name',)
 
 
 class TeamDayScoreByDivisionSerializer(serializers.ListSerializer):
@@ -95,10 +106,12 @@ class JourneeHdrSerializer(serializers.ModelSerializer):
 
 class DayHdrSerializer(serializers.ModelSerializer):
     journee = JourneeHdrSerializer()
+    phase = serializers.SlugRelatedField(source='league_instance_phase', slug_field='name', read_only=True)
+    phase_id = serializers.PrimaryKeyRelatedField(source='league_instance_phase', read_only=True)
 
     class Meta:
         model = league_models.LeagueInstancePhaseDay
-        fields = ('id', 'number', 'journee')
+        fields = ('id', 'number', 'journee', 'phase_id', 'phase', )
 
 
 class TeamDayScoreSerializer(serializers.ModelSerializer):
@@ -119,9 +132,11 @@ class TeamDayScoreSerializer(serializers.ModelSerializer):
 
 
 class TeamDetailSerializer(serializers.ModelSerializer):
+    permissions = DRYPermissionsField()
     signings = SigningSerializer(source='signing_set', many=True, read_only=True)
     scores = TeamDayScoreSerializer(source='teamdayscore_set', many=True, read_only=True)
+    managers = TeamManagerSerializer(many=True, read_only=True)
 
     class Meta:
         model = league_models.Team
-        fields = ('name', 'signings', 'scores')
+        fields = ('name', 'managers', 'permissions', 'signings', 'scores', )
