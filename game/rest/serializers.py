@@ -3,9 +3,30 @@ from django.db import models
 import json
 
 from game.models import league_models
+from ligue1 import models as l1models
 
 
-class TeamSerializer(serializers.ModelSerializer):
+class ClubSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = l1models.Club
+        fields = ('id', 'nom', 'maillot_svg', 'maillot_color_bg', 'maillot_color1', 'maillot_color2')
+
+
+class ClubHdrSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = l1models.Club
+        fields = ('id', 'nom')
+
+
+class PlayerHdrSerializer(serializers.ModelSerializer):
+    club = ClubHdrSerializer()
+
+    class Meta:
+        model = l1models.Joueur
+        fields = ('id', 'prenom', 'nom', 'surnom', 'poste', 'club')
+
+
+class TeamHdrSerializer(serializers.ModelSerializer):
     class Meta:
         model = league_models.Team
         fields = ('id', 'name')
@@ -28,7 +49,7 @@ class TeamDayScoreByDivisionSerializer(serializers.ListSerializer):
 
 
 class TeamDayScoreSerializer(serializers.ModelSerializer):
-    team = TeamSerializer(read_only=True)
+    team = TeamHdrSerializer(read_only=True)
     is_complete = serializers.SerializerMethodField()
 
     def get_is_complete(self, obj):
@@ -55,3 +76,52 @@ class LeagueInstancePhaseDaySerializer(serializers.ModelSerializer):
     class Meta:
         model = league_models.LeagueInstancePhaseDay
         fields = ('league_instance_phase', 'phase_name', 'number', 'results')
+
+
+class SigningSerializer(serializers.ModelSerializer):
+    player = PlayerHdrSerializer()
+    team = TeamHdrSerializer()
+
+    class Meta:
+        model = league_models.Signing
+        fields = ('player', 'team', 'begin', 'end', 'attributes')
+
+
+class JourneeHdrSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = l1models.Journee
+        fields = ('id', 'numero', 'debut', 'fin')
+
+
+class DayHdrSerializer(serializers.ModelSerializer):
+    journee = JourneeHdrSerializer()
+
+    class Meta:
+        model = league_models.LeagueInstancePhaseDay
+        fields = ('id', 'number', 'journee')
+
+
+class TeamDayScoreSerializer(serializers.ModelSerializer):
+    team = TeamHdrSerializer()
+    day = DayHdrSerializer()
+    compo = serializers.SerializerMethodField()
+    formation = serializers.SerializerMethodField()
+
+    def get_formation(self, obj):
+        return json.loads(obj.attributes)['formation']
+
+    def get_compo(self, obj):
+        return json.loads(obj.attributes)['composition']
+
+    class Meta:
+        model = league_models.TeamDayScore
+        fields = ('team', 'score', 'day', 'formation', 'compo')
+
+
+class TeamDetailSerializer(serializers.ModelSerializer):
+    signings = SigningSerializer(source='signing_set', many=True, read_only=True)
+    scores = TeamDayScoreSerializer(source='teamdayscore_set', many=True, read_only=True)
+
+    class Meta:
+        model = league_models.Team
+        fields = ('name', 'signings', 'scores')

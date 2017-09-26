@@ -16,6 +16,9 @@ class League(models.Model):
     mode = models.CharField(max_length=4, choices=MODES)
     members = models.ManyToManyField(User, through='LeagueMembership', related_name='leagues')
 
+    def has_object_read_permission(self, request):
+        return request.user in self.members.all()
+
 
 class LeagueMembership(models.Model):
     user = models.ForeignKey(User)
@@ -62,6 +65,9 @@ class Team(models.Model):
     attributes = JSONField()
 
     objects = TeamManager()
+
+    def has_object_read_permission(self, request):
+        return request.user in self.league.members.all()
 
     def __str__(self):
         return self.name
@@ -267,7 +273,9 @@ class LeagueInstancePhaseDayManager(models.Manager):
         attrs['composition'] = {}
         for poste, _ in l1models.Joueur.POSTES:
             attrs['composition'][poste] = [
-                {'player': sig.player.pk, 'club': sig.player.club.pk if sig.player.club else None, 'score': sco} for
+                {'player': {'id': sig.player.pk, 'name': sig.player.display_name()},
+                 'club': {'id': sig.player.club.pk, 'name': sig.player.club.nom} if sig.player.club else None,
+                 'score': sco} for
                 sig, sco in composition[poste]]
         team_config = json.loads(team.attributes)
         if 'joker' in team_config:
@@ -284,12 +292,18 @@ class LeagueInstancePhaseDay(models.Model):
 
     objects = LeagueInstancePhaseDayManager()
 
+    class Meta:
+        ordering = ['journee']
+
 
 class TeamDayScore(models.Model):
     day = models.ForeignKey(LeagueInstancePhaseDay, null=False)
     team = models.ForeignKey(Team)
     score = models.DecimalField(decimal_places=3, max_digits=7)
     attributes = JSONField()
+
+    class Meta:
+        ordering = ['-day']
 
 
 class Signing(models.Model):

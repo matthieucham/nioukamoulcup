@@ -144,6 +144,13 @@ class Joueur(Importe):
 
     objects = JoueurManager()
 
+    def display_name(self):
+        if self.surnom:
+            return self.surnom
+        if self.prenom:
+            return '%s. %s' % (self.prenom[:1], self.nom)
+        return self.nom
+
     def __str__(self):
         return '%s %s%s' % (self.prenom, self.nom, (' (%s)' % self.surnom if self.surnom else ''))
 
