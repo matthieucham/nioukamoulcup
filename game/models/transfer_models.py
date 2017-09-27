@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.postgres.fields import JSONField
 # import decimal
-import json
+# import json
 import pytz
 import datetime
 from datetime import timedelta
@@ -57,10 +57,9 @@ class MerkatoManager(models.Manager):
     @staticmethod
     def _make_config(roster_size_max, sales_per_session=-1, pa_number=1, mv_number=1, mv_tax_rate=0.1,
                      re_tax_rate=0.5):
-        return json.dumps(
-            {'roster_size_max': roster_size_max, 'sales_per_session': sales_per_session, 'pa_number': pa_number,
-             'mv_number': mv_number,
-             'mv_tax_rate': mv_tax_rate, 're_tax_rate': re_tax_rate})
+        return {'roster_size_max': roster_size_max, 'sales_per_session': sales_per_session, 'pa_number': pa_number,
+                'mv_number': mv_number,
+                'mv_tax_rate': mv_tax_rate, 're_tax_rate': re_tax_rate}
 
 
 class Merkato(models.Model):
@@ -78,7 +77,7 @@ class Merkato(models.Model):
 class MerkatoSessionManager(models.Manager):
     def get_next_available(self, merkato):
         now = datetime.datetime.now(pytz.utc)
-        max_sales_in_session = json.loads(merkato.configuration)['sales_per_session']
+        max_sales_in_session = merkato.configuration['sales_per_session']
         sess_gen = (s for s in self.filter(merkato=merkato).prefetch_related('sale_set').order_by('closing') if
                     s.closing >= now)
         for sess in sess_gen:
@@ -143,7 +142,7 @@ class Sale(models.Model):
         assert self.type == 'MV'
         assert self.winning_auction is not None
         return self.winning_auction.value * (
-            1.0 - json.loads(self.merkato_session.merkato.configuration)['mv_tax_rate'])
+            1.0 - self.merkato_session.merkato.configuration['mv_tax_rate'])
 
     def get_winner_and_price(self):
         if self.winning_auction is None and self.type == 'PA':
@@ -205,7 +204,7 @@ class Auction(models.Model):
         future_pa_locked = Sale.objects.filter(team=self.team).filter(
             models.Q(merkato_session__solving__gt=self.sale.merkato_session.solving) | models.Q(
                 merkato_session=self.sale.merkato_session, rank__gt=self.sale.rank)).count()
-        merkato_config = json.loads(self.sale.merkato_session.merkato.configuration)
+        merkato_config = self.sale.merkato_session.merkato.configuration
         if current_roster_size + len(current_session_won) + future_pa_locked >= merkato_config['roster_size_max']:
             raise Auction.AuctionNotValidException(code='FULL')
 

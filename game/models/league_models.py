@@ -1,7 +1,7 @@
 from django.db import models, transaction
 from django.contrib.postgres.fields import JSONField
 from django.contrib.auth.models import User
-import json
+#import json
 from collections import defaultdict
 
 from . import scoring_models
@@ -44,17 +44,17 @@ class TeamManager(models.Manager):
     @transaction.atomic()
     def setup_formation(self, team, g=1, d=2, m=2, a=2):
         t = self.select_for_update().get(pk=team.pk)
-        team_config = json.loads(t.attributes)
+        team_config = t.attributes
         team_config['formation'] = {'G': g, 'D': d, 'M': m, 'A': a}
-        t.attributes = json.dumps(team_config)
+        t.attributes = team_config
         t.save()  # todo update score
 
     @transaction.atomic()
     def setup_joker(self, team, joueur):
         assert Signing.objects.filter(player=joueur, team=team, end__isnull=True) is not None
         t = self.select_for_update().get(pk=team.pk)
-        team_config = json.loads(t.attributes)['joker'] = joueur.pk
-        t.attributes = json.dumps(team_config)
+        team_config = t.attributes['joker'] = joueur.pk
+        t.attributes = team_config
         t.save()
 
 
@@ -146,21 +146,21 @@ class BankAccountHistory(models.Model):
 
     @staticmethod
     def make_info_init():
-        return json.dumps({'type': 'INIT'})
+        return {'type': 'INIT'}
 
     @staticmethod
     def make_info_buy(player, seller=None):
-        return json.dumps({'type': 'BUY', 'player_id': player.pk, 'player_name': player.__str__(),
-                           'seller_name': seller.name if seller else None})
+        return {'type': 'BUY', 'player_id': player.pk, 'player_name': player.__str__(),
+                           'seller_name': seller.name if seller else None}
 
     @staticmethod
     def make_info_sell(player, buyer):
-        return json.dumps({'type': 'SELL', 'player_id': player.pk, 'player_name': player.__str__(),
-                           'buyer_name': buyer.name})
+        return {'type': 'SELL', 'player_id': player.pk, 'player_name': player.__str__(),
+                           'buyer_name': buyer.name}
 
     @staticmethod
     def make_info_release(player):
-        return json.dumps({'type': 'RELEASE', 'player_id': player.pk, 'player_name': player.__str__()})
+        return {'type': 'RELEASE', 'player_id': player.pk, 'player_name': player.__str__()}
 
 
 class LeagueInstance(models.Model):
@@ -172,7 +172,7 @@ class LeagueInstance(models.Model):
     end = models.DateTimeField(blank=False)
     saison = models.ForeignKey(l1models.Saison)
     configuration = JSONField(
-        default=json.dumps({'notes': {'HALFSEASON': 13, 'FULLSEASON': 26, 'TOURNAMENT': 3}}))
+        default=dict({'notes': {'HALFSEASON': 13, 'FULLSEASON': 26, 'TOURNAMENT': 3}}))
 
 
 class LeagueInstancePhase(models.Model):
@@ -211,15 +211,15 @@ class LeagueInstancePhaseDayManager(models.Manager):
         signings_at_day = [s for s in team.signing_set.all() if
                            (s.begin <= lipd.journee.debut) and (s.end is None or s.end > lipd.journee.debut)]
         if league_mode == 'KCUP':
-            jjscore_max_nb = json.loads(lipd.league_instance_phase.league_instance.configuration)['notes'][
+            jjscore_max_nb = lipd.league_instance_phase.league_instance.configuration['notes'][
                 lipd.league_instance_phase.type]
             try:
                 existing_tds = TeamDayScore.objects.get(day=lipd, team=team)
-                tds_config = json.loads(existing_tds.attributes)
+                tds_config = existing_tds.attributes
                 joker = tds_config['joker'] if 'joker' in tds_config else None
                 formation = tds_config['formation']
             except TeamDayScore.DoesNotExist:  # joker and formation mustn't be modified afterwards
-                team_config = json.loads(team.attributes)
+                team_config = team.attributes
                 joker = team_config['joker'] if 'joker' in team_config else None
                 formation = team_config['formation']
             signings_scores = [
@@ -256,8 +256,8 @@ class LeagueInstancePhaseDayManager(models.Manager):
         nb_notes = 0
         score = 0
         factor = 1.0
-        if 'score_factor' in json.loads(signing.attributes):
-            factor = json.loads(signing.attributes)['score_factor']
+        if 'score_factor' in signing.attributes:
+            factor = signing.attributes['score_factor']
         for jjs in jjscores:
             base = jjs.bonus
             extra_bonus = 0
@@ -280,11 +280,11 @@ class LeagueInstancePhaseDayManager(models.Manager):
                  'club': {'id': sig.player.club.pk, 'name': sig.player.club.nom} if sig.player.club else None,
                  'score': sco} for
                 sig, sco in composition[poste]]
-        team_config = json.loads(team.attributes)
+        team_config = team.attributes
         if 'joker' in team_config:
             attrs['joker'] = team_config['joker']
         attrs['formation'] = team_config['formation']
-        return TeamDayScore(team=team, day=lipd, score=teamscore, attributes=json.dumps(attrs))
+        return TeamDayScore(team=team, day=lipd, score=teamscore, attributes=attrs)
 
 
 class LeagueInstancePhaseDay(models.Model):
@@ -314,4 +314,4 @@ class Signing(models.Model):
     team = models.ForeignKey(Team, null=False)
     begin = models.DateTimeField(auto_now_add=True, db_index=True)
     end = models.DateTimeField(null=True, db_index=True)
-    attributes = JSONField(default=json.dumps({'score_factor': 1.0}))
+    attributes = JSONField(default=dict({'score_factor': 1.0}))

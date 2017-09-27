@@ -8,7 +8,7 @@
       "current": true,
       "begin": "2017-01-01T09:00:00.000Z",
       "end": "2017-01-06T09:00:00.000Z",
-      "configuration": "{}",
+      "configuration": {},
       "league_id": 1,
       "saison_id": 1
     }
@@ -20,7 +20,7 @@
       "name": "Ministry of Madness",
       "league_id": 1,
       "division_id": 1,
-      "attributes": "{}"
+      "attributes": {}
     }
   },
   {
@@ -30,7 +30,7 @@
       "name": "Le ZOO NAZI du FLAN FRAPPE",
       "league_id": 1,
       "division_id": 1,
-      "attributes": "{}"
+      "attributes": {}
     }
   },
   {
@@ -40,7 +40,7 @@
       "name": "Béjon14",
       "league_id": 1,
       "division_id": 1,
-      "attributes": "{}"
+      "attributes": {}
     }
   },
   {
@@ -50,7 +50,7 @@
       "name": "Ventre mou",
       "league_id": 1,
       "division_id": 1,
-      "attributes": "{}"
+      "attributes": {}
     }
   },
   {
@@ -60,7 +60,7 @@
       "name": "El Brutal Principe",
       "league_id": 1,
       "division_id": 1,
-      "attributes": "{}"
+      "attributes": {}
     }
   },
   {
@@ -70,7 +70,7 @@
       "name": "Pan Bagnat FC",
       "league_id": 1,
       "division_id": 1,
-      "attributes": "{}"
+      "attributes": {}
     }
   },
   {
@@ -80,7 +80,7 @@
       "name": "Damn ! United",
       "league_id": 1,
       "division_id": 1,
-      "attributes": "{}"
+      "attributes": {}
     }
   },
   {
@@ -90,7 +90,7 @@
       "name": "Lulu Society",
       "league_id": 1,
       "division_id": 1,
-      "attributes": "{}"
+      "attributes": {}
     }
   },
   {
@@ -100,7 +100,7 @@
       "name": "Liv, t'as l'heure ?",
       "league_id": 1,
       "division_id": 1,
-      "attributes": "{}"
+      "attributes": {}
     }
   },
   {
@@ -110,7 +110,7 @@
       "name": "Chamystador",
       "league_id": 1,
       "division_id": 1,
-      "attributes": "{}"
+      "attributes": {}
     }
   },
   {
@@ -120,7 +120,7 @@
       "name": "Cramponakelamour",
       "league_id": 1,
       "division_id": 1,
-      "attributes": "{}"
+      "attributes": {}
     }
   },
   {
@@ -130,7 +130,7 @@
       "name": "Nation of Breizh",
       "league_id": 1,
       "division_id": 1,
-      "attributes": "{}"
+      "attributes": {}
     }
   },
   {
@@ -140,7 +140,7 @@
       "name": "The Dashing Otter",
       "league_id": 1,
       "division_id": 1,
-      "attributes": "{}"
+      "attributes": {}
     }
   },
   {
@@ -150,7 +150,7 @@
       "name": "Willy Wahbi Vinci",
       "league_id": 1,
       "division_id": 1,
-      "attributes": "{}"
+      "attributes": {}
     }
   },
   {
@@ -160,7 +160,7 @@
       "name": "The Gipsy Queens",
       "league_id": 1,
       "division_id": 1,
-      "attributes": "{}"
+      "attributes": {}
     }
   },
   {
@@ -170,7 +170,7 @@
       "name": "Boistou",
       "league_id": 1,
       "division_id": 1,
-      "attributes": "{}"
+      "attributes": {}
     }
   },
   {
@@ -180,7 +180,7 @@
       "name": "Hippoceros & Rhinoppotame",
       "league_id": 1,
       "division_id": 1,
-      "attributes": "{}"
+      "attributes": {}
     }
   },
   {
@@ -190,7 +190,7 @@
       "name": "Party Malin",
       "league_id": 1,
       "division_id": 1,
-      "attributes": "{}"
+      "attributes": {}
     }
   },
   {
@@ -200,7 +200,7 @@
       "name": "Remontée Grenat",
       "league_id": 1,
       "division_id": 1,
-      "attributes": "{}"
+      "attributes": {}
     }
   },
   {

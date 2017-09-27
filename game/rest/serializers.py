@@ -2,7 +2,7 @@ from rest_framework import serializers
 from dry_rest_permissions.generics import DRYPermissionsField
 from django.db import models
 from django.contrib.auth.models import User
-import json
+#import json
 
 from game.models import league_models
 from ligue1 import models as l1models
@@ -67,7 +67,7 @@ class TeamDayScoreSerializer(serializers.ModelSerializer):
         """
         Check if team roster is complete
         """
-        attrs = json.loads(obj.attributes)
+        attrs = obj.attributes
         # for each position in 'formation', check if there is enough players in 'composition'
         for pos, req_nb in attrs['formation'].items():
             if len(attrs['composition'][pos]) < req_nb:
@@ -121,10 +121,10 @@ class TeamDayScoreSerializer(serializers.ModelSerializer):
     formation = serializers.SerializerMethodField()
 
     def get_formation(self, obj):
-        return json.loads(obj.attributes)['formation']
+        return obj.attributes['formation']
 
     def get_compo(self, obj):
-        return json.loads(obj.attributes)['composition']
+        return obj.attributes['composition']
 
     class Meta:
         model = league_models.TeamDayScore
