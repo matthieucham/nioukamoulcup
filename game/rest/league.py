@@ -12,7 +12,6 @@ from game.rest import serializers
 
 
 class CurrentLeagueInstanceMixin():
-
     def _get_current_league_instance(self, pk):
         try:
             return league_models.LeagueInstance.objects.get(league=pk, current=True)
@@ -25,14 +24,9 @@ class LeagueInstanceRankingView(CurrentLeagueInstanceMixin, APIView):
 
     def get(self, request, league_pk, format=None):
         instance = self._get_current_league_instance(league_pk)
-        latest_days = []
-        for ph in league_models.LeagueInstancePhase.objects.filter(league_instance=instance):
-            latest_day = league_models.LeagueInstancePhaseDay.objects.filter(league_instance_phase=ph,
-                                                                             results__isnull=False).prefetch_related(
-                'teamdayscore_set').order_by('-number').first()
-            if latest_day:
-                latest_days.append(latest_day)
-        serializer = serializers.LeagueInstancePhaseDaySerializer(latest_days, many=True)
+        serializer = serializers.LeagueInstancePhaseDaySerializer(
+            league_models.LeagueInstancePhaseDay.objects.get_latest_day_for_phases(
+                league_models.LeagueInstancePhase.objects.filter(league_instance=instance)), many=True)
         return Response(serializer.data)
 
 

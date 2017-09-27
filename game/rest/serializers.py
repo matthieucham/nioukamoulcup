@@ -2,7 +2,7 @@ from rest_framework import serializers
 from dry_rest_permissions.generics import DRYPermissionsField
 from django.db import models
 from django.contrib.auth.models import User
-#import json
+# import json
 
 from game.models import league_models
 from ligue1 import models as l1models
@@ -37,7 +37,6 @@ class TeamManagerSerializer(serializers.ModelSerializer):
 
 
 class TeamHdrSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = league_models.Team
         fields = ('id', 'name',)
@@ -134,9 +133,20 @@ class TeamDayScoreSerializer(serializers.ModelSerializer):
 class TeamDetailSerializer(serializers.ModelSerializer):
     permissions = DRYPermissionsField()
     signings = SigningSerializer(source='signing_set', many=True, read_only=True)
-    scores = TeamDayScoreSerializer(source='teamdayscore_set', many=True, read_only=True)
+    # scores = TeamDayScoreSerializer(source='teamdayscore_set', many=True, read_only=True)
+    latest_scores = serializers.SerializerMethodField()
     managers = TeamManagerSerializer(many=True, read_only=True)
+
+    def get_latest_scores(self, obj):
+        try:
+            current_instance = league_models.LeagueInstance.objects.get(league=obj.league, current=True)
+            days = league_models.LeagueInstancePhaseDay.objects.get_latest_day_for_phases(
+                league_models.LeagueInstancePhase.objects.filter(league_instance=current_instance))
+            return TeamDayScoreSerializer(many=True, read_only=True).to_representation(
+                league_models.TeamDayScore.objects.filter(day__in=days, team=obj))
+        except league_models.LeagueInstance.DoesNotExist:
+            return None
 
     class Meta:
         model = league_models.Team
-        fields = ('name', 'managers', 'permissions', 'signings', 'scores', )
+        fields = ('name', 'managers', 'permissions', 'signings', 'latest_scores', )

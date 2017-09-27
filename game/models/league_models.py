@@ -1,7 +1,7 @@
 from django.db import models, transaction
 from django.contrib.postgres.fields import JSONField
 from django.contrib.auth.models import User
-#import json
+# import json
 from collections import defaultdict
 
 from . import scoring_models
@@ -151,12 +151,12 @@ class BankAccountHistory(models.Model):
     @staticmethod
     def make_info_buy(player, seller=None):
         return {'type': 'BUY', 'player_id': player.pk, 'player_name': player.__str__(),
-                           'seller_name': seller.name if seller else None}
+                'seller_name': seller.name if seller else None}
 
     @staticmethod
     def make_info_sell(player, buyer):
         return {'type': 'SELL', 'player_id': player.pk, 'player_name': player.__str__(),
-                           'buyer_name': buyer.name}
+                'buyer_name': buyer.name}
 
     @staticmethod
     def make_info_release(player):
@@ -285,6 +285,15 @@ class LeagueInstancePhaseDayManager(models.Manager):
             attrs['joker'] = team_config['joker']
         attrs['formation'] = team_config['formation']
         return TeamDayScore(team=team, day=lipd, score=teamscore, attributes=attrs)
+
+    def get_latest_day_for_phases(self, phases):
+        latest_days = []
+        for ph in phases:
+            latest_day = self.filter(league_instance_phase=ph,
+                                     results__isnull=False).prefetch_related('teamdayscore_set').order_by('-number').first()
+            if latest_day:
+                latest_days.append(latest_day)
+        return latest_days
 
 
 class LeagueInstancePhaseDay(models.Model):
