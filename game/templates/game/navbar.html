@@ -30,11 +30,11 @@
                         <ul class="dropdown-menu">
                             <li><a href="#"><span class="glyphicon glyphicon-cog pull-right"></span>Mon compte</a></li>
                             <li class="divider"></li>
-                            <li><a href="#"><span class="glyphicon glyphicon-log-out pull-right"></span>Déconnexion</a></li>
+                            <li><a href="{% url 'userena_signout' %}"><span class="glyphicon glyphicon-log-out pull-right"></span>Déconnexion</a></li>
                         </ul>
                     </li>
                 {% else %}
-                    <li><a href="todo">Log in please</a></li>
+                    <li><a href="{% url 'userena_signin' %}">Log in please</a></li>
                 {% endif %}
             </ul>
         </div>

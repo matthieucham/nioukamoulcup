@@ -53,9 +53,9 @@ INSTALLED_APPS = [
     'inline_actions',
 
     # dj-userena
-    #'userena',
-    #'guardian',
-    #'easy_thumbnails',
+    'userena',
+    'guardian',
+    'easy_thumbnails',
 
 
     'mptt',
@@ -83,7 +83,7 @@ INSTALLED_APPS = [
     'dry_rest_permissions',
 
     'game',
-    #'accounts',
+    'accounts',
     'ligue1',
 ]
 
@@ -99,8 +99,8 @@ MIDDLEWARE = [
 ]
 
 AUTHENTICATION_BACKENDS = (
-    # 'userena.backends.UserenaAuthenticationBackend',
-    # 'guardian.backends.ObjectPermissionBackend',
+    'userena.backends.UserenaAuthenticationBackend',
+    'guardian.backends.ObjectPermissionBackend',
     'rules.permissions.ObjectPermissionBackend',
     'django.contrib.auth.backends.ModelBackend',
 )
@@ -212,8 +212,8 @@ WIKI_ACCOUNT_HANDLING = False
 WIKI_MAX_REVISIONS = 20
 
 # Required by Userena
-AUTH_PROFILE_MODULE = 'accounts.GamerProfile'
-USERENA_SIGNIN_REDIRECT_URL = '/accounts/%(username)s/'
+AUTH_PROFILE_MODULE = 'accounts.KcupUserProfile'
+USERENA_SIGNIN_REDIRECT_URL = '/game/home/info/'
 LOGIN_URL = '/accounts/signin/'
 LOGOUT_URL = '/accounts/signout/'
 
