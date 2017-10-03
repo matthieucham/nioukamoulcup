@@ -1,13 +1,36 @@
 {
-  "name": "front",
+  "name": "nioukamoulcup",
   "version": "1.0.0",
+  "description": "",
   "main": "index.js",
-  "license": "MIT",
-  "dependencies": {
+  "dependencies": {},
+  "devDependencies": {
+    "babel": "^6.23.0",
+    "babel-core": "^6.0.0",
+    "babel-loader": "^7.1.1",
+    "babel-preset-env": "^1.6.0",
+    "babel-preset-es2015": "^6.24.1",
     "babel-preset-react": "^6.24.1",
-    "babelify": "^7.3.0",
     "react": "^16.0.0",
     "react-dom": "^16.0.0",
-    "react-icons": "^2.2.5"
-  }
+    "react-icons": "^2.2.5",
+    "webpack": "^3.3.0",
+    "webpack-bundle-tracker": "^0.2.0",
+    "webpack-dev-server": "^2.6.1"
+  },
+  "scripts": {
+    "build": "webpack --config webpack.config.js --progress --colors",
+    "build-production": "webpack --config webpack.prod.config.js --progress --colors",
+    "watch": "webpack --config webpack.config.js --progress --colors --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/matthieucham/nioukamoulcup.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/matthieucham/nioukamoulcup/issues"
+  },
+  "homepage": "https://github.com/matthieucham/nioukamoulcup#readme"
 }

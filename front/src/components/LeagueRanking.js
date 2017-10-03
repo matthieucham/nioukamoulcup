@@ -53,11 +53,11 @@ class RankingTable extends Component {
   render() {
     let rows = [];
     this.props.ranking.forEach(function(result, index) {
-      rows.push(<RankingRow
-        rank={index + 1}
-        key={result.team.id}
-        teamId={result.team.id}
-        teamName={result.team.name}
+      rows.push(<RankingRow 
+        rank={index + 1} 
+        key={result.team.id} 
+        teamId={result.team.id} 
+        teamName={result.team.name} 
         score={result.score}
         complete={result.is_complete}
         />)
@@ -115,7 +115,7 @@ class RankingPhaseFilter extends Component {
   }
 
   render() {
-    const items = this.props.phases.map((phase, index) =>
+    const items = this.props.phases.map((phase, index) => 
     <li key={ phase.league_instance_phase }>
       <button data-idx={ index } onClick={ this.handleFilterLinkClicked }>{ phase.phase_name }</button>
     </li>);
@@ -126,7 +126,7 @@ class RankingPhaseFilter extends Component {
   }
 }
 
-class LeagueRanking extends Component {
+class LeagueRankingWidget extends Component {
   constructor(props) {
     super(props);
     this.state={
@@ -150,4 +150,4 @@ class LeagueRanking extends Component {
   }
 }
 
-export default LeagueRanking;
+export default LeagueRankingWidget;

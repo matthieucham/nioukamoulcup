@@ -142,7 +142,7 @@ WSGI_APPLICATION = 'nioukamoulcup.wsgi.application'
 DATABASES = {
     # 'default': {
     # 'ENGINE': 'django.db.backends.sqlite3',
-    #     'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    # 'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     # },
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
@@ -163,7 +163,7 @@ AUTH_PASSWORD_VALIDATORS = [
     # 'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
     # },
     # {
-    #     'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+    # 'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
     # },
     # {
     #     'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
@@ -223,10 +223,15 @@ STATNUTS_CLIENT_ID = 'aLUoUeBI9Zuj7?JfC0t9U=P3mycANITG@0hvaQlZ'
 STATNUTS_SECRET = 'GsHk=.o2kTu9WkU!a:n1kqkQogZ4lXWitDGn2bZff=?YcdbI-;6h_Grusn@q56@;ttN9OMa9.dWcuBq4lJ8vu7;I9n_f:kJrZ5RUSNkAan088KLyv..7q_.Me94MB?Dy'
 STATNUTS_URL = 'https://statnuts-kcup.rhcloud.com'
 
-
 WEBPACK_LOADER = {
     'DEFAULT': {
         'BUNDLE_DIR_NAME': 'bundles/',
-        'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats.json'),
+        'STATS_FILE': os.path.join(BASE_DIR, 'front', 'webpack-stats.json'),
     }
 }
+
+if not DEBUG:
+    WEBPACK_LOADER['DEFAULT'].update({
+        'BUNDLE_DIR_NAME': 'dist/',
+        'STATS_FILE': os.path.join(BASE_DIR, 'front', 'webpack-stats-prod.json'),
+    })
