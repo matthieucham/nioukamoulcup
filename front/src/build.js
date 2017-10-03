@@ -5,6 +5,6 @@ import App from './pages/TestPage';
 // ========================================
 
 ReactDOM.render(
-  <App/>, 
-  document.getElementById('react-app')
+  React.createElement(App, window.props),
+  window.react_mount
 );

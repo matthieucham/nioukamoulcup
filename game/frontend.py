@@ -84,4 +84,6 @@ class LeagueWallView(PermissionRequiredMixin, DetailView):
             context['team'] = mb.team
         except models.LeagueMembership.DoesNotExist:
             pass
+        context['props'] = {'toto': 'titi'}
+        context['component'] = 'App'
         return context
