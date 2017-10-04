@@ -1,10 +1,14 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import App from './pages/TestPage';
+import { TestPage } from './pages/TestPage';
 
 // ========================================
 
+const pages = {
+    'test': TestPage
+};
+
 ReactDOM.render(
-  React.createElement(App, window.props),
+  React.createElement(pages[window.component], window.props),
   window.react_mount
 );

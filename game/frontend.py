@@ -98,5 +98,5 @@ class LeagueWallView(PermissionRequiredMixin, CurrentLeagueInstanceMixin, Detail
         except models.LeagueMembership.DoesNotExist:
             pass
 
-        context['component'] = 'App'
+        context['component'] = 'test'
         return context

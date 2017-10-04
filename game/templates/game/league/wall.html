@@ -24,6 +24,7 @@
     </div>
 
     <script>
+        window.component = '{{ component }}';
         window.props = {{props|json}};  // make sure to escape your props to prevent XSS!
         window.react_mount = document.getElementById('react');
     </script>
