@@ -7,7 +7,7 @@ var RANKING = [{"league_instance_phase":2,"phase_name":"Clausura 2017","number":
 class App extends Component {
   render() {
     return (
-      <LeagueRankingWidget ranking={ RANKING }/>
+      <LeagueRankingWidget ranking={ this.props.ranking }/>
     );
   }
 }

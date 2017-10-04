@@ -3,9 +3,13 @@ from django.views.generic import TemplateView, DetailView
 from graphos.sources.model import SimpleDataSource
 from graphos.renderers.morris import AreaChart
 from rules.contrib.views import PermissionRequiredMixin
+from rest_framework.renderers import JSONRenderer
+import json
 
 from . import models
 from ligue1 import models as l1models
+from .rest.league import CurrentLeagueInstanceMixin
+from .rest import serializers
 
 
 class HomePage(TemplateView):
@@ -47,10 +51,10 @@ class StatJoueurView(DetailView):
         # saison_scoring=saisonscoring
         # )},
         # 'terms': [
-        #                            'numero',
-        #                            'points',
-        #                            'bonus']}
-        #                      ])
+        # 'numero',
+        # 'points',
+        # 'bonus']}
+        # ])
         # # Step 2: Create the Chart object
         # cht = Chart(datasource=scoredata,
         #             series_options=[{'options': {'type': 'line', 'stacking': False},
@@ -69,7 +73,7 @@ class StatJoueurView(DetailView):
         return context
 
 
-class LeagueWallView(PermissionRequiredMixin, DetailView):
+class LeagueWallView(PermissionRequiredMixin, CurrentLeagueInstanceMixin, DetailView):
     model = models.League
     template_name = 'game/league/wall.html'
     permission_required = 'game.view_league'
@@ -78,12 +82,21 @@ class LeagueWallView(PermissionRequiredMixin, DetailView):
         # Call the base implementation first to get a context
         context = super(LeagueWallView, self).get_context_data(**kwargs)
         league = self.object
+
+        instance = self._get_current_league_instance(league)
+        serializer = serializers.LeagueInstancePhaseDaySerializer(
+            models.LeagueInstancePhaseDay.objects.get_latest_day_for_phases(
+                models.LeagueInstancePhase.objects.filter(league_instance=instance)), many=True)
+        context['props'] = {
+            'ranking': json.loads(str(JSONRenderer().render(serializer.data), 'utf-8'))
+        }
+
         # Get active team from league
         try:
             mb = models.LeagueMembership.objects.get(user=self.request.user, league=league)
             context['team'] = mb.team
         except models.LeagueMembership.DoesNotExist:
             pass
-        context['props'] = {'toto': 'titi'}
+
         context['component'] = 'App'
         return context

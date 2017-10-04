@@ -1,9 +1,11 @@
 import bleach
+import html.parser
 import json as jsonlib
 from django.utils.safestring import mark_safe
 from game import models
 # Inside custom tag - is_active.py
 from django.template import Library
+
 register = Library()
 
 
@@ -25,5 +27,5 @@ def leagues_navbar_content(context):
 def json(value):
     """safe jsonify filter, bleaches the json string using the bleach html tag remover"""
     uncleaned = jsonlib.dumps(value)
-    clean = bleach.clean(uncleaned)
+    clean = html.parser.unescape(bleach.clean(uncleaned))
     return mark_safe(clean)
