@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "dependencies": {},
+  "dependencies": {
+    "react-svg": "^2.1.22"
+  },
   "devDependencies": {
     "babel": "^6.23.0",
     "babel-core": "^6.0.0",
