@@ -1,6 +1,7 @@
 {% extends "game/game_base_2cols.html" %}
 {% load static %}
 {% load game %}
+{% load render_bundle from webpack_loader %}
 
 {% block left-menu %}
     {% include 'game/league/menu.html' %}
@@ -17,16 +18,12 @@
 {% endblock content-center %}
 
 {% block content-right %}
-    <div id="react">
-        <!-- Contents get replaced by mounted React.Component -->
-        <i class="fa fa-lg fa-spinner fa-spin"></i><br><br>
-        <i class="pending">Loading components...</i><br><br>
-    </div>
+    <div id="react-app"></div>
 
     <script>
         window.component = '{{ component }}';
         window.props = {{props|json}};  // make sure to escape your props to prevent XSS!
-        window.react_mount = document.getElementById('react');
+        window.react_mount = document.getElementById('react-app');
     </script>
-    <script src="/static/bundles/NKCUP.js"></script>
+    {% render_bundle 'main' %}
 {% endblock content-right %}

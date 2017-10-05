@@ -9,7 +9,7 @@ const config = {
 
   output: {
       path: path.resolve('../assets/bundles/'),
-      filename: "NKCUP.js",
+      filename: "[name]-[hash].js",
   },
 
   plugins: [
