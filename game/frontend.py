@@ -100,3 +100,20 @@ class LeagueWallView(PermissionRequiredMixin, CurrentLeagueInstanceMixin, Detail
 
         context['component'] = 'test'
         return context
+
+
+class LeagueEkypView(PermissionRequiredMixin, CurrentLeagueInstanceMixin, DetailView):
+    model = models.League
+    template_name = 'game/league/ekyp.html'
+    permission_required = 'game.view_league'
+
+    def _get_my_team(self):
+        return models.LeagueMembership.objects.get(user=self.request.user, league=self.object).team
+
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get a context
+        context = super(LeagueEkypView, self).get_context_data(**kwargs)
+        my_team = self._get_my_team()
+        context['team'] = my_team
+        context['component'] = 'myekyp'
+        return context
