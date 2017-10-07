@@ -5,23 +5,12 @@ import ReactSVG from 'react-svg'
 class Jersey extends Component {
 
 	render() {
-		const svgPath = 'svg/'+this.props.club.maillot_svg+'.svg';
-		/*const svgStyle = {
-			bg: {
-				fill: this.props.club.maillot_color_bg
-			},
-			color1: {
-				fill: this.props.club.maillot_color1
-			},
-			color2: {
-				fill: this.props.club.maillot_color2
-			},
-		}*/
+		const svgPath = '/static/svg/'+this.props.club.maillot_svg+'.svg';
 		return (
-			<ReactSVG
-    			path={ svgPath }
-    			/*style={ svgStyle }*/
-  			/>
+				<ReactSVG
+	    			path={ svgPath }
+	    			style={{ fill:this.props.club.maillot_color1 }}
+	  			/>
 		);
 	}
 }

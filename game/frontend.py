@@ -115,5 +115,5 @@ class LeagueEkypView(PermissionRequiredMixin, CurrentLeagueInstanceMixin, Detail
         context = super(LeagueEkypView, self).get_context_data(**kwargs)
         my_team = self._get_my_team()
         context['team'] = my_team
-        context['component'] = 'myekyp'
+        context['component'] = 'test'
         return context
