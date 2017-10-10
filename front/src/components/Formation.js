@@ -9,7 +9,7 @@ class Jersey extends Component {
 		return (
 				<ReactSVG
 	    			path={ svgPath }
-	    			style={{ fill:this.props.club.maillot_color1 }}
+	    			style={{ width:128, height:128, fill:this.props.club.maillot_color_bg, stroke:this.props.club.maillot_color1 }}
 	  			/>
 		);
 	}
