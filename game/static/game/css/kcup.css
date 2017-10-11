@@ -96,3 +96,30 @@ body {
         -moz-transform: rotate(90deg);
     }
 }
+
+
+/* FROM HERE : NEW KCUP DESIGN (NO BOOTSTRAP) */
+
+div.jersey svg{
+    filter: drop-shadow( 1px 1px 2px grey );
+}
+
+.fieldPlayer {
+    position: relative;
+    display: inline-block;
+}
+
+.fieldPlayer h1 {
+    text-align: center;
+    text-shadow: 1px 1px 2px grey;
+}
+
+.fieldPlayer .details {
+    display: none;
+    position: absolute;
+    background-color: rgba(0,0,0,0.2);
+    z-index: 1;
+}
+
+/* Show the dropdown menu (use JS to add this class to the .dropdown-content container when the user clicks on the dropdown button) */
+.show {display:block;}
