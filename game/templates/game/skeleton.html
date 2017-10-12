@@ -12,32 +12,20 @@
           content="{% block meta-keywords %}Fantasy, football, ligue 1, game, roto, rotisserie, Jean-Jacques Gosso{% endblock meta-keywords %}"/>
     {% block meta %}{% endblock meta %}
     <link rel="home" href="{% url 'zinnia:entry_archive_index' %}"/>
-    <link href="https://fonts.googleapis.com/css?family=Baloo+Tamma" rel="stylesheet">
-    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <!--<link rel="stylesheet" href="{% static 'game/css/bootstrap.min.css' %}">-->
-    <link rel="stylesheet" href="{% static 'game/css/kcup.css' %}">
+    <link href="https://fonts.googleapis.com/css?family=Catamaran" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'game/css/nkcup-layout.css' %}">
+    <link rel="stylesheet" href="{% static 'game/css/nkcup-style.css' %}">
     {% block link %}{% endblock link %}
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     {% block script %}{% endblock script %}
 </head>
-<body>
-<div class="container">
+<body class="hg">
+  <header class="hg__header">
     <div class="title-banner"></div>
     {% block navbar %}{% include './navbar.html' %}{% endblock navbar %}
-</div>
-
-<div class="container wrapper text-center">
-    <div class="row content">
-        {% block gamecontent%}{% endblock gamecontent %}
-    </div>
-
-    <footer class="container text-center">
-        <p>Footer Text</p>
-    </footer>
-</div>
-<!-- Bootstrap core JavaScript
-    ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
-    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  </header>
+  <main class="hg__main">Content</main>
+  <aside class="hg__left">Menu</aside>
+  <aside class="hg__right">Ads</aside>
+  <footer class="hg__footer">Footer</footer>
 </body>
 </html>

@@ -1,0 +1,19 @@
+body {
+    font-family: 'Catamaran', sans-serif;
+}
+
+.hg__header {
+    background-color: #98CA32;
+}
+.hg__footer {
+    background-color: #091D34;
+}
+.hg__main {
+    background-color: #EBF7D4;
+}
+.hg__left {
+    background-color: #559E54;
+}
+.hg__right {
+    background-color: #236AB9;
+}
