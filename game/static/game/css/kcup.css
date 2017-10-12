@@ -99,8 +99,9 @@ body {
 
 
 /* FROM HERE : NEW KCUP DESIGN (NO BOOTSTRAP) */
-
 div.jersey svg{
+    position: relative;
+    margin: 0 auto;
     filter: drop-shadow( 1px 1px 2px grey );
 }
 
@@ -111,15 +112,17 @@ div.jersey svg{
 
 .fieldPlayer h1 {
     text-align: center;
-    text-shadow: 1px 1px 2px grey;
 }
 
 .fieldPlayer .details {
     display: none;
     position: absolute;
+    margin: auto;
+    padding: 3px;
     background-color: rgba(0,0,0,0.2);
     z-index: 1;
 }
 
-/* Show the dropdown menu (use JS to add this class to the .dropdown-content container when the user clicks on the dropdown button) */
-.show {display:block;}
+.fieldPlayer:hover .details {
+    display: block;
+}
