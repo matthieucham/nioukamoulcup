@@ -92,3 +92,5 @@ db.sqlite3
 node_modules
 webpack-stats.json
 assets/bundles/*
+**/webpack-stats-prod.json
+**/yarn.lock

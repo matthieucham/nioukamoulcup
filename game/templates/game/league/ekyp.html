@@ -7,17 +7,10 @@
     {% include 'game/league/menu.html' %}
 {% endblock left-menu %}
 
-{% block title-section %} {{ league.name }} {% endblock title-section %}
+{% block title-section %} {{ team.name }} {% endblock title-section %}
 
 {% block content-center %}
 
-    <h3>Test</h3>
-
-    <p>{% lorem %}</p>
-
-{% endblock content-center %}
-
-{% block content-right %}
     <div id="react-app"></div>
 
     <script>
@@ -26,4 +19,12 @@
         window.react_mount = document.getElementById('react-app');
     </script>
     {% render_bundle 'main' %}
+
+{% endblock content-center %}
+
+{% block content-right %}
+    <h3>Test</h3>
+
+    <p>{% lorem %}</p>
+
 {% endblock content-right %}
