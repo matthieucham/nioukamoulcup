@@ -18,14 +18,18 @@
     {% block link %}{% endblock link %}
     {% block script %}{% endblock script %}
 </head>
+
 <body class="hg">
   <header class="hg__header">
     <div class="title-banner"></div>
     {% block navbar %}{% include './navbar.html' %}{% endblock navbar %}
   </header>
-  <main class="hg__main">Content</main>
-  <aside class="hg__left">Menu</aside>
-  <aside class="hg__right">Ads</aside>
+  <div class="hg__body">
+    <main class="hg__main">Content</main>
+    <nav class="hg__left">Menu</nav>
+    <aside class="hg__right">Ads</aside>
+  </div>
   <footer class="hg__footer">Footer</footer>
 </body>
+
 </html>

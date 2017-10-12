@@ -9,20 +9,53 @@ body {
 .hg__right { grid-area: ads; }
 
 .hg {
-    display: grid;
+    /*display: grid;
     grid-template-areas: "header header header"
                          "navigation main ads"
                          "footer footer footer";
     grid-template-columns: 190px 1fr 160px;
     grid-template-rows: 100px
                         1fr
-                        30px;
+                        30px;*/
+    display: flex;
+    flex-direction: column;
     min-height: 100vh;
+    margin: 0 auto;
+    width: 963px;
+    border: 1px solid #000;
 }
 
-@media screen and (max-width: 600px) {
+.hg__body {
+    display: flex;
+    flex: 1;
+}
+
+.hg__main {
+    flex: 1;
+}
+
+.hg__left {
+    /* 12em is the width of the columns */
+    flex: 0 0 12em;
+}
+
+.hg__right {
+    /* 12em is the width of the columns */
+    flex: 0 0 18em;
+}
+
+
+.hg__left {
+    order: -1;
+}
+
+.hg__header {
+    height: 100px;
+}
+
+@media screen and (max-width: 768px) {
     .hg {
-        grid-template-areas: "header"
+        /*grid-template-areas: "header"
                              "navigation"
                              "main"
                              "ads"
@@ -32,6 +65,15 @@ body {
                             50px
                             1fr
                             50px
-                            30px;
+                            30px;*/
+    }
+
+    .hg__body {
+        flex-direction: column;
+        flex: 0 1 auto;
+    }
+
+    .hg__main, .hg__left, .hg__right {
+        flex: 0 1 auto;
     }
 }
