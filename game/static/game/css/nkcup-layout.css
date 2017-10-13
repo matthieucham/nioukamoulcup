@@ -64,7 +64,7 @@ body {
 }
 
 .hg__header {
-    height: 100px;
+    /*height: 100px;*/
     flex: none; /* 2 */
 }
 
@@ -181,14 +181,8 @@ nav ul ul li {
 		display: block;
 	}
 
-    /* put submenus */
-	nav ul {
-		float: none;
-	}
-
 	/* Change menu item's width to 100% */
 	nav ul li {
-        float: none;
 		display: block;
 		width: 100%;
 	}
