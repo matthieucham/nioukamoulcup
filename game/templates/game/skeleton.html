@@ -12,7 +12,6 @@
           content="{% block meta-keywords %}Fantasy, football, ligue 1, game, roto, rotisserie, Jean-Jacques Gosso{% endblock meta-keywords %}"/>
     {% block meta %}{% endblock meta %}
     <link rel="home" href="{% url 'zinnia:entry_archive_index' %}"/>
-    <link href="https://fonts.googleapis.com/css?family=Catamaran" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'game/css/nkcup-layout.css' %}">
     <link rel="stylesheet" href="{% static 'game/css/nkcup-style.css' %}">
     {% block link %}{% endblock link %}
@@ -21,7 +20,6 @@
 
 <body class="hg">
   <header class="hg__header">
-    <div class="title-banner"></div>
     {% block navbar %}{% include './navbar.html' %}{% endblock navbar %}
   </header>
   <div class="hg__body">

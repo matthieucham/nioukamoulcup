@@ -1,5 +1,9 @@
+@import url(https://fonts.googleapis.com/css?family=Catamaran);
+
 body {
     font-family: 'Catamaran', sans-serif;
+    font-size:22px;
+    word-wrap:break-word !important;
 }
 
 .hg__header {
@@ -16,4 +20,61 @@ body {
 }
 .hg__right {
     background-color: #236AB9;
+}
+
+#logo {
+	padding: 0 30px;
+	font-size:20px;
+	line-height: 60px;
+}
+
+/* Styling the links */
+nav a {
+	display:block;
+	padding:14px 20px;
+	text-decoration:none;
+}
+nav ul li ul li:hover { background: #000000; }
+
+@media all and (max-width : 768px) {
+    /* Styling the toggle label */
+	.toggle {
+		display: block;
+		text-decoration:none;
+		border:none;
+	}
+
+    .toggle:hover {
+		background-color: #000000;
+	}
+
+/*
+	nav ul ul .toggle,
+	nav ul ul a {
+		padding: 0 40px;
+	}
+
+	nav ul ul ul a {
+		padding: 0 80px;
+	}
+
+	nav a:hover,
+ 	nav ul ul ul a {
+		background-color: #000000;
+	}
+
+	nav ul li ul li .toggle,
+	nav ul ul a,
+  nav ul ul ul a{
+		padding:14px 20px;
+		color:#FFF;
+		font-size:17px;
+	}
+
+
+	nav ul li ul li .toggle,
+	nav ul ul a {
+		background-color: #212121;
+	}
+	*/
 }
