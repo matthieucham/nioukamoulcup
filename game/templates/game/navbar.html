@@ -3,7 +3,7 @@
     <nav>
     <div id="logo">Kamoulcup</div>
 
-    <label for="drop" class="toggle">Navbar</label>
+    <label id="navbarDropLink" for="drop" class="toggle">Navbar</label>
     <input type="checkbox" id="drop" />
     <ul class="menu">
         <li class="{% is_navbar_active request 'home' %}"><a href="{% url 'home_info' %}">Maison</a></li>

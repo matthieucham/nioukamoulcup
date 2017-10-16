@@ -104,9 +104,18 @@ body {
 	display: none;
 }
 
+.hg__header > nav {
+    display: flex;
+    justify-content: space-between;
+}
+
 #logo {
 	display: block;
-	float: left;
+	/*float: left;*/
+}
+
+#navbarDropLink {
+    float:right;
 }
 
 /* Since we'll have the "ul li" "float:left"
@@ -121,18 +130,20 @@ nav:after {
 /* Removing padding, margin and "list-style" from the "ul",
  * and adding "position:reltive" */
 nav ul {
-	float: right;
+	/*float: right;*/
 	padding:0;
 	margin:0;
 	list-style: none;
 	position: relative;
+    /*text-align: right;*/
+    flex-grow: 2;
 	}
 
 /* Positioning the navigation items inline */
 nav ul li {
 	margin: 0px;
 	display:inline-block;
-	float: left;
+	/*float: left;*/
 	}
 
 /* Hide Dropdowns by Default
@@ -140,8 +151,9 @@ nav ul li {
 nav ul ul {
 	display: none;
 	position: absolute;
+    /*text-align: left;*/
 	/* has to be the same number as the "line-height" of "nav a" */
-	top: 60px;
+	/*top: 60px;*/
 }
 
 /* Display Dropdowns on Hover */
@@ -152,7 +164,7 @@ nav ul li:hover > ul {
 /* Fisrt Tier Dropdown */
 nav ul ul li {
 	/*width:170px;*/
-	float:none;
+	/*float:none;*/
 	display:list-item;
 	position: relative;
 }
@@ -160,7 +172,7 @@ nav ul ul li {
 @media all and (max-width : 768px) {
 	#logo {
 		padding: 0;
-		width: 100%;
+		/*width: 100%;*/
 		text-align: center;
 		float: none;
 	}
