@@ -14,7 +14,7 @@ body {
     color: #f1f1f1;
     font-family: 'Russo One', sans-serif;
     z-index: 2;
-    box-shadow: 0 2px 5px 0 rgba(0,0,0,0.16);
+    box-shadow: 0 2px 5px 0 rgba(0,0,0,0.3);
 }
 .hg__footer {
     background-color: #22333b;
@@ -64,6 +64,11 @@ nav a:hover, nav ul li ul li:hover { background: #0a0908; }
 		background-color: #000000;
 	}
 
+    nav ul .toggle,
+	nav ul a {
+	    line-height: 60px;
+		padding: 0 20px;
+	}
 
 	nav ul ul .toggle,
 	nav ul ul a {
@@ -79,13 +84,13 @@ nav a:hover, nav ul li ul li:hover { background: #0a0908; }
 		background-color: #000000;
 	}
 
-	nav ul li ul li .toggle,
+	/*nav ul li ul li .toggle,
 	nav ul ul a,
   nav ul ul ul a{
 		padding:14px 20px;
 		color:#FFF;
 		font-size:17px;
-	}
+	}*/
 
 
 	nav ul li ul li .toggle,
