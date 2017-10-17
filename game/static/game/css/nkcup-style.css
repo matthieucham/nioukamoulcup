@@ -1,40 +1,56 @@
-@import url(https://fonts.googleapis.com/css?family=Catamaran);
+@import url(https://fonts.googleapis.com/css?family=PT+Sans);
+@import url(https://fonts.googleapis.com/css?family=Russo+One);
 
 body {
-    font-family: 'Catamaran', sans-serif;
+    font-family: 'PT Sans', sans-serif;
     font-size:16px;
     word-wrap:break-word !important;
+    color: #0a0908;
+    background-color: #cccccc;
 }
 
 .hg__header {
-    background-color: #98CA32;
+    background-color: #5f5f5f;
+    color: #f1f1f1;
+    font-family: 'Russo One', sans-serif;
+    z-index: 2;
+    box-shadow: 0 2px 5px 0 rgba(0,0,0,0.16);
 }
 .hg__footer {
-    background-color: #091D34;
+    background-color: #22333b;
 }
 .hg__main {
-    background-color: #EBF7D4;
+    background-color: #FFFFFF;
 }
 .hg__left {
-    background-color: #559E54;
+    background-color: #f1f1f1;
 }
 .hg__right {
-    background-color: #236AB9;
+    background-color: #FFFFFF;
+}
+
+nav ul{
+	background-color: #5f5f5f;
 }
 
 #logo {
 	padding: 0 30px;
-	font-size:20px;
+	font-size:24px;
 	line-height: 60px;
+    color: #f9bee5;
 }
 
 /* Styling the links */
 nav a {
-	display:block;
-	padding:14px 20px;
 	text-decoration:none;
+    color: inherit;
 }
-nav ul li ul li:hover { background: #000000; }
+
+nav li.active {
+    color: #f9bee5;
+}
+
+nav a:hover, nav ul li ul li:hover { background: #0a0908; }
 
 @media all and (max-width : 768px) {
     /* Styling the toggle label */

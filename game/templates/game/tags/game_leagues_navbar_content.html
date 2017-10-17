@@ -4,6 +4,5 @@
     {% for league in leagues %}
         <li><a href="{% url 'league_wall' league.id %}">{{ league.name }}</a></li>
     {% endfor %}
-    <li class="divider"></li>
     <li><a href="#">Rejoindre une ligue...</a></li>
 </ul>

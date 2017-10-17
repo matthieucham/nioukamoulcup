@@ -14,29 +14,13 @@ body {
 
 /* PAGE LAYOUT */
 
-/*.hg__header { grid-area: header; }
-.hg__footer { grid-area: footer; }
-.hg__main { grid-area: main; }
-.hg__left { grid-area: navigation; }
-.hg__right { grid-area: ads; }
-*/
-
 .hg {
-    /*display: grid;
-    grid-template-areas: "header header header"
-                         "navigation main ads"
-                         "footer footer footer";
-    grid-template-columns: 190px 1fr 160px;
-    grid-template-rows: 100px
-                        1fr
-                        30px;*/
     display: flex;
     flex-direction: column;
     min-height: 100vh;
     height: 100%; /*1, 3*/
     margin: 0 auto;
     max-width: 1150px;
-    border: 1px solid #000;
 }
 
 .hg__body {
@@ -64,8 +48,8 @@ body {
 }
 
 .hg__header {
-    /*height: 100px;*/
     flex: none; /* 2 */
+    height: 60px;
 }
 
 .hg__footer {
@@ -74,23 +58,13 @@ body {
 }
 
 @media screen and (max-width: 768px) {
-    .hg {
-        /*grid-template-areas: "header"
-                             "navigation"
-                             "main"
-                             "ads"
-                             "footer";
-        grid-template-columns: 100%;
-        grid-template-rows: 100px
-                            50px
-                            1fr
-                            50px
-                            30px;*/
-    }
-
     .hg__body {
         flex-direction: column;
         flex: 0 1 auto;
+    }
+
+    .hg__header {
+        height: initial;
     }
 
     .hg__main, .hg__left, .hg__right {
@@ -104,18 +78,15 @@ body {
 	display: none;
 }
 
-.hg__header > nav {
+nav {
     display: flex;
     justify-content: space-between;
+	margin:0;
+	padding: 0;
 }
 
 #logo {
 	display: block;
-	/*float: left;*/
-}
-
-#navbarDropLink {
-    float:right;
 }
 
 /* Since we'll have the "ul li" "float:left"
@@ -129,31 +100,35 @@ nav:after {
 
 /* Removing padding, margin and "list-style" from the "ul",
  * and adding "position:reltive" */
-nav ul {
-	/*float: right;*/
+nav ul.menu {
 	padding:0;
 	margin:0;
 	list-style: none;
 	position: relative;
-    /*text-align: right;*/
     flex-grow: 2;
+    text-align: right;
 	}
 
 /* Positioning the navigation items inline */
 nav ul li {
 	margin: 0px;
 	display:inline-block;
-	/*float: left;*/
+    text-align: left;
 	}
 
-/* Hide Dropdowns by Default
- * and giving it a position of absolute */
+nav a {
+	display:block;
+	padding:0 20px;
+    line-height: 60px;
+}
+
 nav ul ul {
 	display: none;
 	position: absolute;
-    /*text-align: left;*/
 	/* has to be the same number as the "line-height" of "nav a" */
-	/*top: 60px;*/
+	top: 60px;
+    list-style: none;
+    padding: 0px;
 }
 
 /* Display Dropdowns on Hover */
@@ -163,8 +138,6 @@ nav ul li:hover > ul {
 
 /* Fisrt Tier Dropdown */
 nav ul ul li {
-	/*width:170px;*/
-	/*float:none;*/
 	display:list-item;
 	position: relative;
 }
@@ -172,13 +145,19 @@ nav ul ul li {
 @media all and (max-width : 768px) {
 	#logo {
 		padding: 0;
-		/*width: 100%;*/
 		text-align: center;
-		float: none;
 	}
+
+    #navbarDropLink {
+        margin: 3px;
+        float: left;
+        position: absolute;
+    }
+
 
 	nav {
 		margin: 0;
+        flex-direction: column;
 	}
 
 	/* Hide the navigation menu by default */
@@ -193,6 +172,10 @@ nav ul ul li {
 		display: block;
 	}
 
+    nav .toggle {
+        line-height: 60px;
+    }
+
 	/* Change menu item's width to 100% */
 	nav ul li {
 		display: block;
@@ -201,10 +184,7 @@ nav ul ul li {
 
 	/* Hide Dropdowns by Default */
 	nav ul ul {
-		float: none;
 		position:static;
-		color: #ffffff;
-		/* has to be the same number as the "line-height" of "nav a" */
 	}
 
 	/* Hide menus on hover */
@@ -218,9 +198,4 @@ nav ul ul li {
 		display: block;
 		width: 100%;
 	}
-
-	nav ul ul ul li {
-		position: static;
-	}
-
 }
