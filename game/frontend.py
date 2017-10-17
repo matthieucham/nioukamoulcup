@@ -99,6 +99,7 @@ class LeagueWallView(PermissionRequiredMixin, CurrentLeagueInstanceMixin, Detail
             pass
 
         context['component'] = 'test'
+        context['instance'] = instance
         return context
 
 

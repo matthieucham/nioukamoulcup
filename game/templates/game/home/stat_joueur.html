@@ -1,4 +1,4 @@
-{% extends "game/game_base.html" %}
+{% extends "game/home/home_base.html" %}
 {% load static %}
 {% load l1results %}
 
@@ -9,17 +9,11 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.min.js"></script>
 {% endblock script %}
 
-{% block left-menu %}
-{% include 'game/home/menu.html' %}
-{% endblock left-menu %}
-
 {% block content-right %}
 {% joueurs_club joueur.club %}
 {% endblock content-right %}
 
-{% block title-section %}{{ joueur }}{% endblock title-section %}
-
 {% block content-center %}
-
+{{ joueur }}
 <div id='chtcontainer'>{{ chart.as_html }}</div>
 {% endblock content-center %}

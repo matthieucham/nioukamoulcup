@@ -1,12 +1,48 @@
 @import url(https://fonts.googleapis.com/css?family=PT+Sans);
 @import url(https://fonts.googleapis.com/css?family=Russo+One);
 
+/* RESET */
+
+/* http://meyerweb.com/eric/tools/css/reset/
+   v2.0 | 20110126
+   License: none (public domain)
+*/
+
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header, hgroup,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font-size: 100%;
+	font: inherit;
+	vertical-align: baseline;
+}
+
+
+/* END RESET */
+
 body {
     font-family: 'PT Sans', sans-serif;
     font-size:16px;
     word-wrap:break-word !important;
     color: #0a0908;
     background-color: #cccccc;
+    margin: 0;
+}
+
+h1 {
+    font-size: 2em;
 }
 
 .hg__header {
@@ -97,4 +133,28 @@ nav a:hover, nav ul li ul li:hover { background: #0a0908; }
 	nav ul ul a {
 		background-color: #212121;
 	}
+}
+
+.cover {
+  position: relative;
+  background-color: #b5b5b5;
+  height: 80px;
+  background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(../images/logo_fullres_notitle.png) ;
+  /* Create the parallax scrolling effect */
+  background-attachment: fixed;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+
+  color: #f1f1f1;
+  text-align: center;
+  line-height: 80px;
+  text-shadow: 2px 2px #000000;
+}
+
+/* Turn off parallax scrolling for tablets and phones. Increase/decrease the pixels if needed */
+@media only screen and (max-device-width: 768px) {
+    .cover {
+        background-attachment: scroll;
+    }
 }

@@ -1,16 +1,10 @@
-{% extends "game/game_base.html" %}
+{% extends "game/home/home_base.html" %}
 {% load static %}
 {% load l1results %}
-
-{% block left-menu %}
-    {% include 'game/home/menu.html' %}
-{% endblock left-menu %}
 
 {% block content-right %}
     {% last_journees 3 %}
 {% endblock content-right %}
-
-{% block title-section %}Compte-rendu de match{% endblock title-section %}
 
 {% block content-center %}
     <small>{{ rencontre.date }}</small>
