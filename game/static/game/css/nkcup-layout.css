@@ -78,7 +78,7 @@ body {
 	display: none;
 }
 
-nav {
+header nav {
     display: flex;
     justify-content: space-between;
 	margin:0;
@@ -92,7 +92,7 @@ nav {
 /* Since we'll have the "ul li" "float:left"
  * we need to add a clear after the container. */
 
-nav:after {
+header nav:after {
 	content:"";
 	display:table;
 	clear:both;
@@ -100,7 +100,7 @@ nav:after {
 
 /* Removing padding, margin and "list-style" from the "ul",
  * and adding "position:reltive" */
-nav ul.menu {
+header nav ul.menu {
 	padding:0;
 	margin:0;
 	list-style: none;
@@ -110,19 +110,19 @@ nav ul.menu {
 	}
 
 /* Positioning the navigation items inline */
-nav ul li {
+header nav ul li {
 	margin: 0px;
 	display:inline-block;
     text-align: left;
 	}
 
-nav a {
+header nav a {
 	display:block;
 	padding:0 20px;
     line-height: 60px;
 }
 
-nav ul ul {
+header nav ul ul {
 	display: none;
 	position: absolute;
 	/* has to be the same number as the "line-height" of "nav a" */
@@ -132,12 +132,12 @@ nav ul ul {
 }
 
 /* Display Dropdowns on Hover */
-nav ul li:hover > ul {
+header nav ul li:hover > ul {
 	display:inherit;
 }
 
 /* Fisrt Tier Dropdown */
-nav ul ul li {
+header nav ul ul li {
 	display:list-item;
 	position: relative;
 }
@@ -155,7 +155,7 @@ nav ul ul li {
     }
 
 
-	nav {
+	header nav {
 		margin: 0;
         flex-direction: column;
 	}
@@ -172,30 +172,52 @@ nav ul ul li {
 		display: block;
 	}
 
-    nav .toggle {
+    header nav .toggle {
         line-height: 60px;
     }
 
 	/* Change menu item's width to 100% */
-	nav ul li {
+	header nav ul li {
 		display: block;
 		width: 100%;
 	}
 
 	/* Hide Dropdowns by Default */
-	nav ul ul {
+	header nav ul ul {
 		position:static;
 	}
 
 	/* Hide menus on hover */
-	nav ul ul li:hover > ul,
-	nav ul li:hover > ul {
+	header nav ul ul li:hover > ul,
+	header nav ul li:hover > ul {
 		display: none;
 	}
 
 	/* Fisrt Tier Dropdown */
-	nav ul ul li {
+	header nav ul ul li {
 		display: block;
 		width: 100%;
 	}
+}
+
+/* LEFT CONTEXTUAL SUBMENU */
+
+nav.hg__left header {
+    min-height: 80px;
+    line-height: 80px;
+    text-align: center;
+}
+
+nav.hg__left h1, .cover h1 {
+    line-height: 1.5;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+/* MAIN CONTENT LAYOUT */
+
+.cover {
+    position: relative;
+    height: 80px;
+    line-height: 80px;
 }
