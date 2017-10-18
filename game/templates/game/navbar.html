@@ -1,41 +1,33 @@
 {% load game %}
 
-<nav class="navbar navbar-inverse">
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            <a href="{% url 'home_info' %}" class="navbar-left navbar-brand">Kamoulcup</a>
-        </div>
-
-        <div class="collapse navbar-collapse" id="myNavbar">
-            <ul class="nav navbar-nav">
-                <li class="{% is_navbar_active request 'home' %}"><a href="{% url 'home_info' %}">Maison</a></li>
-                 {% if user.is_authenticated %}
-                    <li class="dropdown {% is_navbar_active request 'league' %}">
-                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">Mes ligues <span
-                                class="caret"></span></a>
-                        {% leagues_navbar_content %}
-                    </li>
-                {% endif %}
-                <li class="{% is_navbar_active request 'wiki' %}"><a href="todo">Comment ça marche ?</a></li>
-                <li><a href="#">Forum</a></li>
-            </ul>
-            <ul class="nav navbar-nav navbar-right">
-                {% if user.is_authenticated %}
-                    <li class="dropdown">
-                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">{{ user.get_username }}&nbsp;<span class="glyphicon glyphicon-user pull-right"></span></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="#"><span class="glyphicon glyphicon-cog pull-right"></span>Mon compte</a></li>
-                            <li class="divider"></li>
-                            <li><a href="{% url 'userena_signout' %}"><span class="glyphicon glyphicon-log-out pull-right"></span>Déconnexion</a></li>
-                        </ul>
-                    </li>
-                {% else %}
-                    <li><a href="{% url 'userena_signin' %}">Log in please</a></li>
-                {% endif %}
-            </ul>
-        </div>
+    <nav>
+    <label id="navbarDropLink" for="drop" class="toggle"><i class="fa fa fa-ellipsis-h fa-2x fa-border"></i></label>
+    <div id="logo">Kamoulcup</div>
+    <input type="checkbox" id="drop" />
+    <ul class="menu">
+        <li class="{% is_navbar_active request 'home' %}"><a href="{% url 'home_info' %}">Maison</a></li>
+        {% if user.is_authenticated %}
+            <li class="dropdown {% is_navbar_active request 'league' %}">
+                <!-- First Tier Drop Down -->
+                <label for="drop-1" class="toggle">Mes ligues</label>
+                <a href="#">Mes ligues <i class="fa fa-caret-down"></i></a>
+                <input type="checkbox" id="drop-1"/>
+                {% leagues_navbar_content %}
+            </li>
+        {% endif %}
+        <li class="{% is_navbar_active request 'wiki' %}"><a href="#">Wiki</a></li>
+        {% if user.is_authenticated %}
+            <li>
+                <label for="drop-2" class="toggle">{{ user.get_username }}&nbsp;<i class="fa fa fa-gear"></i></label>
+                <a href="#">{{ user.get_username }}&nbsp;<i class="fa fa fa-gear"></i></a>
+                <input type="checkbox" id="drop-2"/>
+                <ul>
+                    <li><a href="#">Mon compte</a></li>
+                    <li><a href="{% url 'userena_signout' %}">Déconnexion</a></li>
+                </ul>
+            </li>
+        {% else %}
+            <li><a href="{% url 'userena_signin' %}">Log in please</a></li>
+        {% endif %}
+    </ul>
     </nav>

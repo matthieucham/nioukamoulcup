@@ -1,24 +1,19 @@
-{% extends "game/game_base_2cols.html" %}
+{% extends "game/home/home_base.html" %}
 {% load static %}
 {% load l1results %}
 
 {% block script %}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.css">
     <script src="//cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.min.js"></script>
 {% endblock script %}
 
-{% block left-menu %}
-{% include 'game/home/menu.html' %}
-{% endblock left-menu %}
-
 {% block content-right %}
 {% joueurs_club joueur.club %}
 {% endblock content-right %}
 
-{% block title-section %}{{ joueur }}{% endblock title-section %}
-
 {% block content-center %}
-
+{{ joueur }}
 <div id='chtcontainer'>{{ chart.as_html }}</div>
 {% endblock content-center %}

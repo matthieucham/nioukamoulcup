@@ -166,7 +166,139 @@ var CURRENT_CLUBS = [
     }
 ];
 var CLUB = {"id": 20, "nom": "Monaco", "maillot_svg": "jersey-diag-half-white2", "maillot_color_bg": "#ff0000", "maillot_color1": "#ffffff"};
-var PLAYER = {"club": {"id": 20, "name": "Monaco"}, "score": 49.52535000000001, "player": {"id": 275, "name": "T. Lemar"}};
+var PLAYER = {"club": {"id": 20, "name": "Monaco"}, "score": 49.53, "player": {"id": 275, "name": "T. Lemar"}};
+var COMPOSITION = {
+                "M": [
+                    {
+                        "player": {
+                            "id": 186,
+                            "name": "V. Vada"
+                        },
+                        "score": 105.6,
+                        "club": {
+                            "id": 14,
+                            "name": "Bordeaux"
+                        }
+                    },
+                    {
+                        "player": {
+                            "id": 233,
+                            "name": "A. Di Maria"
+                        },
+                        "score": 98.566,
+                        "club": {
+                            "id": 17,
+                            "name": "Paris SG"
+                        }
+                    },
+                    {
+                        "player": {
+                            "id": 250,
+                            "name": "V. Bessat"
+                        },
+                        "score": 86.59899999999999,
+                        "club": {
+                            "id": 18,
+                            "name": "Caen"
+                        }
+                    },
+                    {
+                        "player": {
+                            "id": 368,
+                            "name": "P. Capelle"
+                        },
+                        "score": 62.831999999999994,
+                        "club": {
+                            "id": 11,
+                            "name": "Angers"
+                        }
+                    }
+                ],
+                "D": [
+                    {
+                        "player": {
+                            "id": 141,
+                            "name": "R. Thomas"
+                        },
+                        "score": 92.384,
+                        "club": {
+                            "id": 11,
+                            "name": "Angers"
+                        }
+                    },
+                    {
+                        "player": {
+                            "id": 113,
+                            "name": "R. Fanni"
+                        },
+                        "score": 90.2,
+                        "club": {
+                            "id": 9,
+                            "name": "Marseille"
+                        }
+                    },
+                    {
+                        "player": {
+                            "id": 87,
+                            "name": "J. Morel"
+                        },
+                        "score": 83.852,
+                        "club": {
+                            "id": 7,
+                            "name": "Lyon"
+                        }
+                    },
+                    {
+                        "player": {
+                            "id": 169,
+                            "name": "M. Peybernes"
+                        },
+                        "score": 79.96600000000001,
+                        "club": {
+                            "id": 13,
+                            "name": "Lorient"
+                        }
+                    }
+                ],
+                "G": [
+                    {
+                        "player": {
+                            "id": 124,
+                            "name": "J. Leca"
+                        },
+                        "score": 97.96395000000003,
+                        "club": {
+                            "id": 10,
+                            "name": "Bastia"
+                        }
+                    }
+                ],
+                "A": [
+                    {
+                        "player": {
+                            "id": 120,
+                            "name": "B. Gomis"
+                        },
+                        "score": 115.41075000000002,
+                        "club": {
+                            "id": 9,
+                            "name": "Marseille"
+                        }
+                    },
+                    {
+                        "player": {
+                            "id": 357,
+                            "name": "M. Balotelli"
+                        },
+                        "score": 92.05035,
+                        "club": {
+                            "id": 8,
+                            "name": "Nice"
+                        }
+                    }
+                ]
+            };
+var FORMATION = {"M": 4,"D": 4,"G": 1,"A": 2}
 
 class App extends Component {
   render() {

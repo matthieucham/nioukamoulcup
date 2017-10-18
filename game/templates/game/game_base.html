@@ -2,14 +2,7 @@
 {% load static %}
 
 {% block gamecontent %}
-<div class="col-sm-2 sidenav">
-    {% block left-menu %}{% endblock left-menu %}
-</div>
-<div class="col-sm-10 text-left">
-    <p class="h1 page-title">{% block title-section %}{% endblock title-section %}</p>
-
-    <div class="row">
-        {% block row-content %}{% endblock row-content %}
-    </div>
-</div>
+    {% block col-center %}<main class="hg__main">{% block content-center %}{% endblock content-center %}</main>{% endblock col-center %}
+    {% block col-left %}<nav class="hg__left">{% block left-menu %}{% endblock left-menu %}</nav>{% endblock col-left %}
+    {% block col-right %}{% endblock col-right %}
 {% endblock gamecontent %}

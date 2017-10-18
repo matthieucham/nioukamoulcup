@@ -1,0 +1,214 @@
+/**
+ * 1. Avoid the IE 10-11 `min-height` bug.
+ * 2. Set `flex-shrink` to `0` to prevent some browsers from
+ *    letting these items shrink to smaller than their content's default
+ *    minimum size. See http://bit.ly/1Mn35US for details.
+ * 3. Use `%` instead of `vh` since `vh` is buggy in older mobile Safari.
+ */
+
+
+body {
+    margin: 0;
+    padding: 0;
+}
+
+/* PAGE LAYOUT */
+
+.hg {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    height: 100%; /*1, 3*/
+    margin: 0 auto;
+    max-width: 1150px;
+}
+
+.hg__body {
+    display: flex;
+    flex: 1 0 auto; /* 2 */
+}
+
+.hg__main {
+    flex: 1;
+}
+
+.hg__left {
+    /* 12em is the width of the columns */
+    flex: 0 0 12em;
+}
+
+.hg__right {
+    /* 18em is the width of the columns */
+    flex: 0 0 18em;
+}
+
+
+.hg__left {
+    order: -1;
+}
+
+.hg__header {
+    flex: none; /* 2 */
+    height: 60px;
+}
+
+.hg__footer {
+    height: 30px;
+    flex: none; /* 2 */
+}
+
+@media screen and (max-width: 768px) {
+    .hg__body {
+        flex-direction: column;
+        flex: 0 1 auto;
+    }
+
+    .hg__header {
+        height: initial;
+    }
+
+    .hg__main, .hg__left, .hg__right {
+        flex: 0 1 auto;
+    }
+}
+
+
+/* MENU NAVBAR */
+.toggle,[id^=drop] {
+	display: none;
+}
+
+header nav {
+    display: flex;
+    justify-content: space-between;
+	margin:0;
+	padding: 0;
+}
+
+#logo {
+	display: block;
+}
+
+/* Removing padding, margin and "list-style" from the "ul",
+ * and adding "position:reltive" */
+header nav ul.menu {
+	padding:0;
+	margin:0;
+	list-style: none;
+	position: relative;
+    flex-grow: 2;
+    text-align: right;
+	}
+
+/* Positioning the navigation items inline */
+header nav ul li {
+	margin: 0px;
+	display:inline-block;
+    text-align: left;
+	}
+
+header nav a {
+	display:block;
+	padding:0 20px;
+    line-height: 60px;
+}
+
+header nav ul ul {
+	display: none;
+	position: absolute;
+	/* has to be the same number as the "line-height" of "nav a" */
+	top: 60px;
+    list-style: none;
+    padding: 0px;
+}
+
+/* Display Dropdowns on Hover */
+header nav ul li:hover > ul {
+	display:inherit;
+}
+
+/* Fisrt Tier Dropdown */
+header nav ul ul li {
+	display:list-item;
+	position: relative;
+}
+
+@media all and (max-width : 768px) {
+	#logo {
+		padding: 0;
+		text-align: center;
+	}
+
+    #navbarDropLink {
+        margin: 3px;
+        float: left;
+        position: absolute;
+    }
+
+
+	header nav {
+		margin: 0;
+        flex-direction: column;
+	}
+
+	/* Hide the navigation menu by default */
+	/* Also hide the  */
+	.toggle + a,
+	.menu {
+		display: none;
+	}
+
+	/* Display Dropdown when clicked on Parent Label */
+	[id^=drop]:checked + ul {
+		display: block;
+	}
+
+    header nav .toggle {
+        line-height: 60px;
+    }
+
+	/* Change menu item's width to 100% */
+	header nav ul li {
+		display: block;
+		width: 100%;
+	}
+
+	/* Hide Dropdowns by Default */
+	header nav ul ul {
+		position:static;
+	}
+
+	/* Hide menus on hover */
+	header nav ul ul li:hover > ul,
+	header nav ul li:hover > ul {
+		display: none;
+	}
+
+	/* Fisrt Tier Dropdown */
+	header nav ul ul li {
+		display: block;
+		width: 100%;
+	}
+}
+
+/* LEFT CONTEXTUAL SUBMENU */
+
+nav.hg__left header {
+    min-height: 80px;
+    line-height: 80px;
+    text-align: center;
+}
+
+nav.hg__left h1, .cover h1 {
+    line-height: 1.5;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+/* MAIN CONTENT LAYOUT */
+
+.cover {
+    position: relative;
+    height: 80px;
+    line-height: 80px;
+}

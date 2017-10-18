@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import ReactSVG from 'react-svg'
 
 
-export class Jersey extends Component {
+class Jersey extends Component {
 
 	render() {
 		const svgPath = '/static/svg/'+this.props.club.maillot_svg+'.svg';
@@ -17,6 +17,18 @@ export class Jersey extends Component {
 	}
 }
 
+class FieldPlayerDetails extends Component {
+	render() {
+		return (
+			<div className="details">
+			<h1>{ this.props.player.player.name }</h1>
+			<p>{ this.props.player.score }</p>
+			<p>{ this.props.club.nom }</p>
+			</div>
+		);
+	}
+}
+
 export class FieldPlayer extends Component {
 
 	constructor(props) {
@@ -28,16 +40,14 @@ export class FieldPlayer extends Component {
 			<div className="fieldPlayer">
 			<Jersey club={this.props.club} />
 			<h1>{ this.props.player.player.name }</h1>
-			<div className="details">
-			<h1>{ this.props.player.player.name }</h1>
 			<p>{ this.props.player.score }</p>
 			<p>{ this.props.club.nom }</p>
 			</div>
-			</div>
-			);
+		);
 	}
 
-
 }
+
+
 
 /* https://stackoverflow.com/questions/29913387/show-hide-components-in-reactjs */
