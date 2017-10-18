@@ -117,4 +117,5 @@ class LeagueEkypView(PermissionRequiredMixin, CurrentLeagueInstanceMixin, Detail
         my_team = self._get_my_team()
         context['team'] = my_team
         context['component'] = 'test'
+        context['instance'] = self._get_current_league_instance(self.object)
         return context

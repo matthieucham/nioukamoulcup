@@ -180,3 +180,21 @@ nav.hg__left .button {
 nav.hg__left .button:hover,  nav.hg__left .button.active{
     background-color: #f9bee5;
 }
+
+
+/*  LEAGUE - ekyp  */
+.fieldPlayer {
+    display: inline-block;
+    padding: 5px;
+    text-align: center;
+    text-shadow: 2px 2px #ffffff;
+}
+.fieldPlayer svg {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+.fieldPlayer h1, .fieldPlayer p {
+    position:relative;
+    top: -15px;
+}

@@ -38,9 +38,10 @@ export class FieldPlayer extends Component {
 	render() {
 		return (
 			<div className="fieldPlayer">
-			<FieldPlayerDetails club={ this.props.club } player={ this.props.player } />
 			<Jersey club={this.props.club} />
 			<h1>{ this.props.player.player.name }</h1>
+			<p>{ this.props.player.score }</p>
+			<p>{ this.props.club.nom }</p>
 			</div>
 		);
 	}
