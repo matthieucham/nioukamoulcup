@@ -29,7 +29,7 @@ class FieldPlayerDetails extends Component {
 	}
 }
 
-export class FieldPlayer extends Component {
+class FieldPlayer extends Component {
 
 	constructor(props) {
 		super(props);
@@ -48,6 +48,40 @@ export class FieldPlayer extends Component {
 
 }
 
+export class PlayersLine extends Component {
+	constructor(props) {
+		super(props);
+	}
 
+	getClub(id) {
+		var found = null;
+		if (id) {
+			found = this.props.clubsMap.get(+id);
+		} 
+		if (found) {
+			return found;
+		} else {
+			return this.props.clubsMap.get(0); /* special Key for "no club" */
+		}
+	}
 
-/* https://stackoverflow.com/questions/29913387/show-hide-components-in-reactjs */
+	render () {
+		const fieldPlayers = this.props.players.map( (pl) => <FieldPlayer key={pl.player.id} player={pl} club={ this.getClub(pl.club.id) } />);
+		return (
+			<div className={`compoLine ${ this.props.position }`}>{fieldPlayers}</div>
+			);
+	}
+}
+
+export class Composition extends Component {
+	constructor(props) {
+		super(props);
+		this.state = {clubsMap: new Map( props.clubs.map((cl) => [cl.id, cl]) )};
+	}
+
+	render() {
+		const positionOrder = ['G', 'D', 'M', 'A'];
+		const lines = positionOrder.map( (pos) => <PlayersLine key={pos} clubsMap={this.state.clubsMap} players={this.props.composition[pos]} />)
+		return (<div className="composition">{ lines }</div>)
+	}
+}

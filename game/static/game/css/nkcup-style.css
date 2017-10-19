@@ -198,3 +198,7 @@ nav.hg__left .button:hover,  nav.hg__left .button.active{
     position:relative;
     top: -15px;
 }
+.compoLine {
+    display: flex;
+    justify-content: space-around;
+}

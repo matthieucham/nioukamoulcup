@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import LeagueRankingWidget from '../components/LeagueRanking';
-import { FieldPlayer } from '../components/Formation';
+import { Composition } from '../components/Formation';
 
 
 var CURRENT_CLUBS = [
@@ -299,12 +299,57 @@ var COMPOSITION = {
                 ]
             };
 var FORMATION = {"M": 4,"D": 4,"G": 1,"A": 2}
+var LINE = [
+                    {
+                        "player": {
+                            "id": 186,
+                            "name": "V. Vada"
+                        },
+                        "score": 105.6,
+                        "club": {
+                            "id": 14,
+                            "name": "Bordeaux"
+                        }
+                    },
+                    {
+                        "player": {
+                            "id": 233,
+                            "name": "A. Di Maria"
+                        },
+                        "score": 98.57,
+                        "club": {
+                            "id": 17,
+                            "name": "Paris SG"
+                        }
+                    },
+                    {
+                        "player": {
+                            "id": 250,
+                            "name": "V. Bessat"
+                        },
+                        "score": 86.60,
+                        "club": {
+                            "id": 18,
+                            "name": "Caen"
+                        }
+                    },
+                    {
+                        "player": {
+                            "id": 368,
+                            "name": "P. Capelle"
+                        },
+                        "score": 62.83,
+                        "club": {
+                            "id": 11,
+                            "name": "Angers"
+                        }
+                    }
+                ];
 
 class App extends Component {
   render() {
     return (
-      <FieldPlayer club={ CLUB } player={ PLAYER } />
-
+    	<Composition clubs={ CURRENT_CLUBS } composition={ COMPOSITION } />
     );
   }
 }
