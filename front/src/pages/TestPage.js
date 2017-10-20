@@ -87,7 +87,7 @@ var CURRENT_CLUBS = [
     {
         "id": 11,
         "nom": "Angers",
-        "maillot_svg": "jersey-plain2",
+        "maillot_svg": "jersey-stripes-v2",
         "maillot_color_bg": "#000000",
         "maillot_color1": "#FFFFFF",
         "maillot_color2": ""
