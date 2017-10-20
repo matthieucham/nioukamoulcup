@@ -1,5 +1,7 @@
-import React, { Component } from 'react'
-import ReactSVG from 'react-svg'
+import React, { Component } from 'react';
+import ReactSVG from 'react-svg';
+import Tabs from 'muicss/lib/react/tabs';
+import Tab from 'muicss/lib/react/tab';
 
 
 class Jersey extends Component {
@@ -50,7 +52,7 @@ class FieldPlayer extends Component {
 
 }
 
-export class PlayersLine extends Component {
+class PlayersLine extends Component {
 	constructor(props) {
 		super(props);
 	}
@@ -83,7 +85,26 @@ export class Composition extends Component {
 
 	render() {
 		const positionOrder = ['G', 'D', 'M', 'A'];
-		const lines = positionOrder.map( (pos) => <PlayersLine key={pos} clubsMap={this.state.clubsMap} players={this.props.composition[pos]} />)
-		return (<div className="composition">{ lines }</div>)
+		const lines = positionOrder.map( (pos) => <PlayersLine key={pos} clubsMap={this.state.clubsMap} players={this.props.phaseResult['compo'][pos]} />);
+		const formationLabel = this.props.phaseResult['formation']['D'] + ' - ' + this.props.phaseResult['formation']['M'] + ' - ' + this.props.phaseResult['formation']['A'];
+		return (<div className="composition">
+				<h1>{ formationLabel }</h1>
+				{ lines }
+				<h1>Total: { this.props.phaseResult['score'] }</h1>
+				</div>)
+	}
+}
+
+export class CompoTabs extends Component {
+	render() {
+		const compositions = this.props.latestScores.map( (lsc) => 
+			<Tab label={ lsc['day']['phase'] } key={ lsc['day']['id'] }>
+				<Composition clubs={this.props.clubs} phaseResult={ lsc }/>
+			</Tab>);
+		return (
+			<Tabs>
+			{compositions}
+			</Tabs>
+		);
 	}
 }

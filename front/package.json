@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
+    "muicss": "^0.9.27",
     "react-svg": "^2.1.22"
   },
   "devDependencies": {
