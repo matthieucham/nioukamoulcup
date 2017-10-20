@@ -183,11 +183,16 @@ nav.hg__left .button:hover,  nav.hg__left .button.active{
 
 
 /*  LEAGUE - ekyp  */
+.composition {
+    background: radial-gradient(circle, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.4)), url(../images/pitch.jpg);
+    /*background-attachment: fixed;*/
+    background-repeat: no-repeat;
+}
 .fieldPlayer {
     display: inline-block;
     padding: 5px;
     text-align: center;
-    text-shadow: 2px 2px #ffffff;
+    /*text-shadow: 2px 2px #ffffff;*/
 }
 .fieldPlayer svg {
     display: block;

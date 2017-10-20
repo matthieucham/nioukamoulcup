@@ -8,7 +8,7 @@ var CURRENT_CLUBS = [
         "id": 1,
         "nom": "Toulouse",
         "maillot_svg": "jersey-plain2",
-        "maillot_color_bg": "#FFFFFF",
+        "maillot_color_bg": "#6E4CA9",
         "maillot_color1": "",
         "maillot_color2": ""
     },
@@ -16,7 +16,7 @@ var CURRENT_CLUBS = [
         "id": 2,
         "nom": "Dijon",
         "maillot_svg": "jersey-plain2",
-        "maillot_color_bg": "#FFFFFF",
+        "maillot_color_bg": "#B71520",
         "maillot_color1": "",
         "maillot_color2": ""
     },
@@ -32,23 +32,23 @@ var CURRENT_CLUBS = [
         "id": 4,
         "nom": "Saint Etienne",
         "maillot_svg": "jersey-plain2",
-        "maillot_color_bg": "#FFFFFF",
+        "maillot_color_bg": "#559E54",
         "maillot_color1": "",
         "maillot_color2": ""
     },
     {
         "id": 5,
         "nom": "Guingamp",
-        "maillot_svg": "jersey-plain2",
-        "maillot_color_bg": "#FFFFFF",
-        "maillot_color1": "",
+        "maillot_svg": "jersey-shoulders2",
+        "maillot_color_bg": "#E60A18",
+        "maillot_color1": "#000000",
         "maillot_color2": ""
     },
     {
         "id": 6,
         "nom": "Metz",
         "maillot_svg": "jersey-plain2",
-        "maillot_color_bg": "#FFFFFF",
+        "maillot_color_bg": "#940023",
         "maillot_color1": "",
         "maillot_color2": ""
     },
@@ -63,24 +63,24 @@ var CURRENT_CLUBS = [
     {
         "id": 8,
         "nom": "Nice",
-        "maillot_svg": "jersey-plain2",
-        "maillot_color_bg": "#FFFFFF",
-        "maillot_color1": "",
+        "maillot_svg": "jersey-stripes-v2",
+        "maillot_color_bg": "#000000",
+        "maillot_color1": "#FF0000",
         "maillot_color2": ""
     },
     {
         "id": 9,
         "nom": "Marseille",
-        "maillot_svg": "jersey-plain2",
+        "maillot_svg": "jersey-shoulders2",
         "maillot_color_bg": "#FFFFFF",
-        "maillot_color1": "",
+        "maillot_color1": "#70CCF0",
         "maillot_color2": ""
     },
     {
         "id": 10,
         "nom": "Bastia",
         "maillot_svg": "jersey-plain2",
-        "maillot_color_bg": "#FFFFFF",
+        "maillot_color_bg": "#1258DC",
         "maillot_color1": "",
         "maillot_color2": ""
     },
@@ -88,8 +88,8 @@ var CURRENT_CLUBS = [
         "id": 11,
         "nom": "Angers",
         "maillot_svg": "jersey-plain2",
-        "maillot_color_bg": "#FFFFFF",
-        "maillot_color1": "",
+        "maillot_color_bg": "#000000",
+        "maillot_color1": "#FFFFFF",
         "maillot_color2": ""
     },
     {
@@ -111,9 +111,9 @@ var CURRENT_CLUBS = [
     {
         "id": 14,
         "nom": "Bordeaux",
-        "maillot_svg": "jersey-plain2",
-        "maillot_color_bg": "#FFFFFF",
-        "maillot_color1": "",
+        "maillot_svg": "jersey-scap2",
+        "maillot_color_bg": "#0B29C1",
+        "maillot_color1": "#FFFFFF",
         "maillot_color2": ""
     },
     {
