@@ -77,7 +77,7 @@ class PlayersLine extends Component {
 	}
 }
 
-export class Composition extends Component {
+class Composition extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {clubsMap: new Map( props.clubs.map((cl) => [cl.id, cl]) )};
@@ -97,14 +97,18 @@ export class Composition extends Component {
 
 export class CompoTabs extends Component {
 	render() {
-		const compositions = this.props.latestScores.map( (lsc) => 
-			<Tab label={ lsc['day']['phase'] } key={ lsc['day']['id'] }>
-				<Composition clubs={this.props.clubs} phaseResult={ lsc }/>
-			</Tab>);
-		return (
-			<Tabs>
-			{compositions}
-			</Tabs>
-		);
+		if (this.props.latestScores.length == 1) {
+			return (<Composition clubs={this.props.clubs} phaseResult={ this.props.latestScores[0] } />);
+		} else {
+			const compositions = this.props.latestScores.map( (lsc) => 
+				<Tab label={ lsc['day']['phase'] } key={ lsc['day']['id'] }>
+					<Composition clubs={this.props.clubs} phaseResult={ lsc }/>
+				</Tab>);
+			return (
+				<Tabs>
+				{compositions}
+				</Tabs>
+			);
+		}
 	}
 }
