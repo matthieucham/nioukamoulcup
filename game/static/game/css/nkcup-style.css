@@ -46,10 +46,35 @@ h1 {
     font-size: 1.5em;
 }
 
+a.navlink {
+    color: #5f5f5f;
+    display: block;
+    text-align: right;
+}
 a.navlink::before {
-    content: "<i class='fa fa-angle-double-right'></i>&nbsp";
+    font-family: FontAwesome;
+    content: "\f101";
 }
 
+/* RiGHT COLUMN */
+.hg__right > section {
+    border-bottom: solid #5f5f5f;
+    /*background-color: #f1f1f1;*/
+    padding: 5px;
+    margin: 3px;
+}
+
+.hg__right > section h1, .hg__right > section h2 {
+    text-align: center;
+}
+
+.hg__right li {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+/* HEADER */
 .hg__header {
     background-color: #5f5f5f;
     color: #f1f1f1;
@@ -71,7 +96,7 @@ a.navlink::before {
 }
 
 .hg__right {
-    background-color: #FFFFFF;
+    background-color: #f1f1f1;
 }
 
 header nav ul {
@@ -159,11 +184,11 @@ header nav a:hover, nav ul li ul li:hover {
 
 /* LEFT CONTEXTUAL SUBMENU */
 
-nav.hg__left {
+.hg__left nav{
     padding: 3px;
 }
 
-nav.hg__left .button {
+.hg__left nav .button {
     background-color: #FFFFFF;
     border: 2px solid #f9bee5;
     border-radius: 4px;
@@ -177,13 +202,13 @@ nav.hg__left .button {
 
 @media all and (max-width : 768px) {
 
-    nav.hg__left .button {
+    .hg__left nav .button {
         display: inline-block;
         padding: 5px 8px;
     }
 }
 
-nav.hg__left .button:hover,  nav.hg__left .button.active{
+.hg__left nav .button:hover,  nav.hg__left .button.active{
     background-color: #f9bee5;
 }
 

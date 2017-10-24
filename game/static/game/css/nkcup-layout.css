@@ -50,6 +50,9 @@ body {
 .hg__header {
     flex: none; /* 2 */
     height: 60px;
+    position: -webkit-sticky; /* Safari */
+    position: sticky;
+    top: 0;
 }
 
 .hg__footer {
@@ -193,13 +196,19 @@ header nav ul ul li {
 
 /* LEFT CONTEXTUAL SUBMENU */
 
-nav.hg__left header {
+.hg__left > nav {
+    position: -webkit-sticky; /* Safari */
+    position: sticky;
+    top: 63px;
+}
+
+.hg__left nav header {
     min-height: 80px;
     line-height: 80px;
     text-align: center;
 }
 
-nav.hg__left h1, .cover h1 {
+.hg__left nav h1, .cover h1 {
     line-height: 1.5;
     display: inline-block;
     vertical-align: middle;
