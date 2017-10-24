@@ -168,10 +168,10 @@ var CURRENT_CLUBS = [
 var LATEST_SCORES = [
         {
             "team": {
-                "id": 3,
-                "name": "Béjon14"
+                "id": 9,
+                "name": "Liv, t'as l'heure ?"
             },
-            "score": "1027.163",
+            "score": "993.217",
             "day": {
                 "id": 57,
                 "number": 38,
@@ -185,138 +185,149 @@ var LATEST_SCORES = [
                 "phase": "Clausura 2017"
             },
             "formation": {
-                "G": 1,
-                "M": 4,
                 "A": 2,
-                "D": 4
+                "M": 5,
+                "G": 1,
+                "D": 3
             },
             "compo": {
-                "G": [
+                "A": [
                     {
-                        "player": {
-                            "id": 414,
-                            "name": "T. Didillon"
-                        },
-                        "score": 86.0,
                         "club": {
-                            "id": 6,
-                            "name": "Metz"
+                            "name": "Nancy",
+                            "id": 3
+                        },
+                        "score": "93.75",
+                        "player": {
+                            "name": "I. Dia",
+                            "id": 306
+                        }
+                    },
+                    {
+                        "club": {
+                            "name": "Lille",
+                            "id": 15
+                        },
+                        "score": "77.75",
+                        "player": {
+                            "name": "Y. Benzia",
+                            "id": 204
+                        }
+                    },
+                    {
+                        "club": {
+                            "name": "Lyon",
+                            "id": 7
+                        },
+                        "score": "35.83",
+                        "player": {
+                            "name": "R. Ghezzal",
+                            "id": 383
                         }
                     }
                 ],
                 "M": [
                     {
-                        "player": {
-                            "id": 105,
-                            "name": "J. Seri"
-                        },
-                        "score": 98.18300000000002,
                         "club": {
-                            "id": 8,
-                            "name": "Nice"
+                            "name": "Bordeaux",
+                            "id": 14
+                        },
+                        "score": "93.27",
+                        "player": {
+                            "name": "J. Toulalan",
+                            "id": 187
                         }
                     },
                     {
-                        "player": {
-                            "id": 334,
-                            "name": "S. Marveaux"
-                        },
-                        "score": 91.833,
                         "club": {
-                            "id": 13,
-                            "name": "Lorient"
+                            "name": "Marseille",
+                            "id": 9
+                        },
+                        "score": "92.55",
+                        "player": {
+                            "name": "W. Vainqueur",
+                            "id": 118
                         }
                     },
                     {
-                        "player": {
-                            "id": 62,
-                            "name": "E. Didot"
-                        },
-                        "score": 85.29799999999999,
                         "club": {
-                            "id": 5,
-                            "name": "Guingamp"
+                            "name": "Monaco",
+                            "id": 20
+                        },
+                        "score": "82.97",
+                        "player": {
+                            "name": "T. Bakayoko",
+                            "id": 272
                         }
                     },
                     {
-                        "player": {
-                            "id": 201,
-                            "name": "I. Amadou"
-                        },
-                        "score": 84.433,
                         "club": {
-                            "id": 15,
-                            "name": "Lille"
+                            "name": "Caen",
+                            "id": 18
+                        },
+                        "score": "76.58",
+                        "player": {
+                            "name": "J. Féret",
+                            "id": 245
+                        }
+                    },
+                    {
+                        "club": {
+                            "name": "Guingamp",
+                            "id": 5
+                        },
+                        "score": "76.20",
+                        "player": {
+                            "name": "M. Diallo",
+                            "id": 63
                         }
                     }
                 ],
-                "A": [
+                "G": [
                     {
-                        "player": {
-                            "id": 93,
-                            "name": "A. Lacazette"
-                        },
-                        "score": 128.833,
                         "club": {
-                            "id": 7,
-                            "name": "Lyon"
-                        }
-                    },
-                    {
-                        "player": {
-                            "id": 247,
-                            "name": "R. Rodelin"
+                            "name": "Toulouse",
+                            "id": 1
                         },
-                        "score": 86.25,
-                        "club": {
-                            "id": 18,
-                            "name": "Caen"
+                        "score": "105.42",
+                        "player": {
+                            "name": "A. Lafont",
+                            "id": 345
                         }
                     }
                 ],
                 "D": [
                     {
-                        "player": {
-                            "id": 268,
-                            "name": "Jemerson"
-                        },
-                        "score": 114.8175,
                         "club": {
-                            "id": 20,
-                            "name": "Monaco"
+                            "name": "Toulouse",
+                            "id": 1
+                        },
+                        "score": "112.72",
+                        "player": {
+                            "name": "C. Jullien",
+                            "id": 4
                         }
                     },
                     {
-                        "player": {
-                            "id": 112,
-                            "name": "H. Sakai"
-                        },
-                        "score": 94.6,
                         "club": {
-                            "id": 9,
-                            "name": "Marseille"
+                            "name": "Toulouse",
+                            "id": 1
+                        },
+                        "score": "93.42",
+                        "player": {
+                            "name": "i. Diop",
+                            "id": 346
                         }
                     },
                     {
-                        "player": {
-                            "id": 143,
-                            "name": "V. Manceau"
-                        },
-                        "score": 87.58300000000001,
                         "club": {
-                            "id": 11,
-                            "name": "Angers"
-                        }
-                    },
-                    {
-                        "player": {
-                            "id": 386,
-                            "name": "E. Mammana"
+                            "name": "Nancy",
+                            "id": 3
                         },
-                        "score": 69.333,
-                        "club": {
-                            "id": 7,
-                            "name": "Lyon"
+                        "score": "88.60",
+                        "player": {
+                            "name": "J. Cétout",
+                            "id": 34
                         }
                     }
                 ]
@@ -324,10 +335,10 @@ var LATEST_SCORES = [
         },
         {
             "team": {
-                "id": 3,
-                "name": "Béjon14"
+                "id": 9,
+                "name": "Liv, t'as l'heure ?"
             },
-            "score": "2076.266",
+            "score": "1942.637",
             "day": {
                 "id": 37,
                 "number": 38,
@@ -341,138 +352,149 @@ var LATEST_SCORES = [
                 "phase": "Saison 2016-17"
             },
             "formation": {
-                "G": 1,
-                "M": 4,
                 "A": 2,
-                "D": 4
+                "M": 5,
+                "G": 1,
+                "D": 3
             },
             "compo": {
-                "G": [
+                "A": [
                     {
-                        "player": {
-                            "id": 414,
-                            "name": "T. Didillon"
-                        },
-                        "score": 181.96800000000007,
                         "club": {
-                            "id": 6,
-                            "name": "Metz"
+                            "name": "Nancy",
+                            "id": 3
+                        },
+                        "score": "162.58",
+                        "player": {
+                            "name": "I. Dia",
+                            "id": 306
+                        }
+                    },
+                    {
+                        "club": {
+                            "name": "Lille",
+                            "id": 15
+                        },
+                        "score": "138.42",
+                        "player": {
+                            "name": "Y. Benzia",
+                            "id": 204
+                        }
+                    },
+                    {
+                        "club": {
+                            "name": "Lyon",
+                            "id": 7
+                        },
+                        "score": "124.91",
+                        "player": {
+                            "name": "R. Ghezzal",
+                            "id": 383
                         }
                     }
                 ],
                 "M": [
                     {
-                        "player": {
-                            "id": 105,
-                            "name": "J. Seri"
-                        },
-                        "score": 222.93199999999993,
                         "club": {
-                            "id": 8,
-                            "name": "Nice"
+                            "name": "Monaco",
+                            "id": 20
+                        },
+                        "score": "181.23",
+                        "player": {
+                            "name": "T. Bakayoko",
+                            "id": 272
                         }
                     },
                     {
-                        "player": {
-                            "id": 334,
-                            "name": "S. Marveaux"
-                        },
-                        "score": 163.783,
                         "club": {
-                            "id": 13,
-                            "name": "Lorient"
+                            "name": "Marseille",
+                            "id": 9
+                        },
+                        "score": "179.48",
+                        "player": {
+                            "name": "W. Vainqueur",
+                            "id": 118
                         }
                     },
                     {
-                        "player": {
-                            "id": 201,
-                            "name": "I. Amadou"
-                        },
-                        "score": 161.552,
                         "club": {
-                            "id": 15,
-                            "name": "Lille"
+                            "name": "Caen",
+                            "id": 18
+                        },
+                        "score": "174.68",
+                        "player": {
+                            "name": "J. Féret",
+                            "id": 245
                         }
                     },
                     {
-                        "player": {
-                            "id": 62,
-                            "name": "E. Didot"
-                        },
-                        "score": 152.148,
                         "club": {
-                            "id": 5,
-                            "name": "Guingamp"
+                            "name": "Bordeaux",
+                            "id": 14
+                        },
+                        "score": "165.00",
+                        "player": {
+                            "name": "J. Toulalan",
+                            "id": 187
+                        }
+                    },
+                    {
+                        "club": {
+                            "name": "Guingamp",
+                            "id": 5
+                        },
+                        "score": "155.83",
+                        "player": {
+                            "name": "M. Diallo",
+                            "id": 63
                         }
                     }
                 ],
-                "A": [
+                "G": [
                     {
-                        "player": {
-                            "id": 93,
-                            "name": "A. Lacazette"
-                        },
-                        "score": 251.584,
                         "club": {
-                            "id": 7,
-                            "name": "Lyon"
-                        }
-                    },
-                    {
-                        "player": {
-                            "id": 247,
-                            "name": "R. Rodelin"
+                            "name": "Toulouse",
+                            "id": 1
                         },
-                        "score": 183.919,
-                        "club": {
-                            "id": 18,
-                            "name": "Caen"
+                        "score": "205.89",
+                        "player": {
+                            "name": "A. Lafont",
+                            "id": 345
                         }
                     }
                 ],
                 "D": [
                     {
-                        "player": {
-                            "id": 268,
-                            "name": "Jemerson"
-                        },
-                        "score": 226.01250000000002,
                         "club": {
-                            "id": 20,
-                            "name": "Monaco"
+                            "name": "Toulouse",
+                            "id": 1
+                        },
+                        "score": "228.95",
+                        "player": {
+                            "name": "C. Jullien",
+                            "id": 4
                         }
                     },
                     {
-                        "player": {
-                            "id": 112,
-                            "name": "H. Sakai"
-                        },
-                        "score": 199.20199999999997,
                         "club": {
-                            "id": 9,
-                            "name": "Marseille"
+                            "name": "Toulouse",
+                            "id": 1
+                        },
+                        "score": "185.75",
+                        "player": {
+                            "name": "i. Diop",
+                            "id": 346
                         }
                     },
                     {
-                        "player": {
-                            "id": 33,
-                            "name": "T. Badila"
-                        },
-                        "score": 168.116,
                         "club": {
-                            "id": 3,
-                            "name": "Nancy"
-                        }
-                    },
-                    {
-                        "player": {
-                            "id": 143,
-                            "name": "V. Manceau"
+                            "name": "Nancy",
+                            "id": 3
                         },
-                        "score": 165.05,
-                        "club": {
-                            "id": 11,
-                            "name": "Angers"
+                        "score": "164.81",
+                        "player": {
+                            "name": "J. Cétout",
+                            "id": 34
                         }
                     }
                 ]

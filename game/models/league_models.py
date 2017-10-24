@@ -232,12 +232,10 @@ class LeagueInstancePhaseDayManager(models.Manager):
             composition = defaultdict(list)
             for poste in formation:
                 scores_at_poste = sorted(dscores[poste], key=lambda x: x[1], reverse=True)
-                for i in range(0, formation[poste]):
-                    if i < len(scores_at_poste):
+                for i in range(0, len(scores_at_poste)):
+                    if i < formation[poste]:
                         teamscore += scores_at_poste[i][1]
-                        composition[poste].append(scores_at_poste[i])
-                    else:
-                        break  # break poste loop, go to next poste list.
+                    composition[poste].append(scores_at_poste[i])
             return self._make_teamdayscore(team, lipd, teamscore, composition)
         else:
             # TODO
@@ -278,7 +276,7 @@ class LeagueInstancePhaseDayManager(models.Manager):
             attrs['composition'][poste] = [
                 {'player': {'id': sig.player.pk, 'name': sig.player.display_name()},
                  'club': {'id': sig.player.club.pk, 'name': sig.player.club.nom} if sig.player.club else None,
-                 'score': sco} for
+                 'score': "{0:.2f}".format(sco)} for
                 sig, sco in composition[poste]]
         team_config = team.attributes
         if 'joker' in team_config:

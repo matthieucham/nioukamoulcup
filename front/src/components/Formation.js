@@ -85,7 +85,7 @@ class Composition extends Component {
 
 	render() {
 		const positionOrder = ['G', 'D', 'M', 'A'];
-		const lines = positionOrder.map( (pos) => <PlayersLine key={pos} clubsMap={this.state.clubsMap} players={this.props.phaseResult['compo'][pos]} />);
+		const lines = positionOrder.map( (pos) => <PlayersLine key={pos} clubsMap={this.state.clubsMap} players={this.props.phaseResult['compo'][pos].slice(0, this.props.phaseResult['formation'][pos])} />);
 		const formationLabel = this.props.phaseResult['formation']['D'] + ' - ' + this.props.phaseResult['formation']['M'] + ' - ' + this.props.phaseResult['formation']['A'];
 		return (<div className="composition">
 				<h1>{ formationLabel }</h1>
