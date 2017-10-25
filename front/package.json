@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
+    "moment": "^2.19.1",
     "rc-tabs": "^9.1.4",
     "react-svg": "^2.1.22"
   },

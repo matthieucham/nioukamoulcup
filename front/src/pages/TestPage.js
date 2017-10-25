@@ -502,11 +502,294 @@ var LATEST_SCORES = [
         }
     ];
 
+var SIGNINGS = [
+        {
+            "player": {
+                "id": 245,
+                "prenom": "Julien",
+                "nom": "Féret",
+                "surnom": "",
+                "poste": "M",
+                "club": {
+                    "id": 18,
+                    "nom": "Caen"
+                }
+            },
+            "team": {
+                "id": 9,
+                "name": "Liv, t'as l'heure ?"
+            },
+            "begin": "2016-10-13T22:00:00Z",
+            "end": null,
+            "attributes": {
+                "score_factor": 1.0,
+                "amount": 15.0
+            }
+        },
+        {
+            "player": {
+                "id": 345,
+                "prenom": "Alban",
+                "nom": "Lafont",
+                "surnom": "",
+                "poste": "G",
+                "club": {
+                    "id": 1,
+                    "nom": "Toulouse"
+                }
+            },
+            "team": {
+                "id": 9,
+                "name": "Liv, t'as l'heure ?"
+            },
+            "begin": "2016-09-06T22:00:00Z",
+            "end": null,
+            "attributes": {
+                "score_factor": 1.05,
+                "amount": 26.1
+            }
+        },
+        {
+            "player": {
+                "id": 4,
+                "prenom": "Christopher",
+                "nom": "Jullien",
+                "surnom": "",
+                "poste": "D",
+                "club": {
+                    "id": 1,
+                    "nom": "Toulouse"
+                }
+            },
+            "team": {
+                "id": 9,
+                "name": "Liv, t'as l'heure ?"
+            },
+            "begin": "2016-09-22T22:00:00Z",
+            "end": null,
+            "attributes": {
+                "score_factor": 1.05,
+                "amount": 23.9
+            }
+        },
+        {
+            "player": {
+                "id": 63,
+                "prenom": "Mustapha",
+                "nom": "Diallo",
+                "surnom": "",
+                "poste": "M",
+                "club": {
+                    "id": 5,
+                    "nom": "Guingamp"
+                }
+            },
+            "team": {
+                "id": 9,
+                "name": "Liv, t'as l'heure ?"
+            },
+            "begin": "2016-09-29T22:00:00Z",
+            "end": null,
+            "attributes": {
+                "score_factor": 1.0,
+                "amount": 3.3
+            }
+        },
+        {
+            "player": {
+                "id": 346,
+                "prenom": "issa",
+                "nom": "Diop",
+                "surnom": "",
+                "poste": "D",
+                "club": {
+                    "id": 1,
+                    "nom": "Toulouse"
+                }
+            },
+            "team": {
+                "id": 9,
+                "name": "Liv, t'as l'heure ?"
+            },
+            "begin": "2016-10-10T22:00:00Z",
+            "end": null,
+            "attributes": {
+                "score_factor": 1.0,
+                "amount": 15.5
+            }
+        },
+        {
+            "player": {
+                "id": 204,
+                "prenom": "Yassine",
+                "nom": "Benzia",
+                "surnom": "",
+                "poste": "A",
+                "club": {
+                    "id": 15,
+                    "nom": "Lille"
+                }
+            },
+            "team": {
+                "id": 9,
+                "name": "Liv, t'as l'heure ?"
+            },
+            "begin": "2017-02-12T23:00:00Z",
+            "end": null,
+            "attributes": {
+                "score_factor": 1.0,
+                "amount": 4.1
+            }
+        },
+        {
+            "player": {
+                "id": 34,
+                "prenom": "Julien",
+                "nom": "Cétout",
+                "surnom": "",
+                "poste": "D",
+                "club": {
+                    "id": 3,
+                    "nom": "Nancy"
+                }
+            },
+            "team": {
+                "id": 9,
+                "name": "Liv, t'as l'heure ?"
+            },
+            "begin": "2017-03-06T23:00:00Z",
+            "end": null,
+            "attributes": {
+                "score_factor": 1.0,
+                "amount": 5.9
+            }
+        },
+        {
+            "player": {
+                "id": 272,
+                "prenom": "Tiémoué",
+                "nom": "Bakayoko",
+                "surnom": "",
+                "poste": "M",
+                "club": {
+                    "id": 20,
+                    "nom": "Monaco"
+                }
+            },
+            "team": {
+                "id": 9,
+                "name": "Liv, t'as l'heure ?"
+            },
+            "begin": "2017-02-16T23:00:00Z",
+            "end": null,
+            "attributes": {
+                "score_factor": 1.0,
+                "amount": 36.1
+            }
+        },
+        {
+            "player": {
+                "id": 187,
+                "prenom": "Jérémy",
+                "nom": "Toulalan",
+                "surnom": "",
+                "poste": "M",
+                "club": {
+                    "id": 14,
+                    "nom": "Bordeaux"
+                }
+            },
+            "team": {
+                "id": 9,
+                "name": "Liv, t'as l'heure ?"
+            },
+            "begin": "2017-02-21T23:00:00Z",
+            "end": null,
+            "attributes": {
+                "score_factor": 1.0,
+                "amount": 18.1
+            }
+        },
+        {
+            "player": {
+                "id": 118,
+                "prenom": "William",
+                "nom": "Vainqueur",
+                "surnom": "",
+                "poste": "M",
+                "club": {
+                    "id": 9,
+                    "nom": "Marseille"
+                }
+            },
+            "team": {
+                "id": 9,
+                "name": "Liv, t'as l'heure ?"
+            },
+            "begin": "2017-02-21T23:00:00Z",
+            "end": null,
+            "attributes": {
+                "score_factor": 1.0,
+                "amount": 24.7
+            }
+        },
+        {
+            "player": {
+                "id": 383,
+                "prenom": "Rachid",
+                "nom": "Ghezzal",
+                "surnom": "",
+                "poste": "A",
+                "club": {
+                    "id": 7,
+                    "nom": "Lyon"
+                }
+            },
+            "team": {
+                "id": 9,
+                "name": "Liv, t'as l'heure ?"
+            },
+            "begin": "2017-03-05T23:00:00Z",
+            "end": null,
+            "attributes": {
+                "score_factor": 1.0,
+                "amount": 0.1
+            }
+        },
+        {
+            "player": {
+                "id": 306,
+                "prenom": "Issiar",
+                "nom": "Dia",
+                "surnom": "",
+                "poste": "A",
+                "club": {
+                    "id": 3,
+                    "nom": "Nancy"
+                }
+            },
+            "team": {
+                "id": 9,
+                "name": "Liv, t'as l'heure ?"
+            },
+            "begin": "2017-03-12T23:00:00Z",
+            "end": null,
+            "attributes": {
+                "score_factor": 1.0,
+                "amount": 7.2
+            }
+        }
+    ];
+
 
 class App extends Component {
   render() {
     return (
-    	<CompoTabs clubs={ CURRENT_CLUBS } latestScores={ LATEST_SCORES } />
+    	<div className="react-app-inner">
+    		<CompoTabs clubs={ CURRENT_CLUBS } latestScores={ LATEST_SCORES } />
+    		<aside class="hg__right"><p>Coucou</p></aside>
+    	</div>
+
     );
   }
 }
