@@ -2,12 +2,12 @@
 {% load i18n %}
 
     {% for journee in journees %}
-        <section>
+        <section class="fixtures">
             <h1>Journée {{ journee.numero }}</h1>
             <h2>{{ journee|journee_dates:'d M Y' }}</h2>
             <ul>
                 {% for r in journee.rencontres.all %}
-                    {% rencontre_score r %}
+                    <li>{% rencontre_score r %}</li>
                 {% endfor %}
             </ul>
             <a href="#" class="navlink">Tous les résultats</a>

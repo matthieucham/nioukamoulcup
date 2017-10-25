@@ -68,11 +68,48 @@ a.navlink::before {
     text-align: center;
 }
 
-.hg__right li {
+.hg__right .fixtures ul {
+    margin: 1em 0;
+}
+
+.hg__right .fixtures li {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     flex-wrap: wrap;
 }
+
+.hg__right .fixtures li > a:last-child {
+    flex: 1;
+    text-align: left;
+}
+.hg__right .fixtures li > a:first-child {
+    flex: 1;
+    text-align: right;
+}
+
+@media all and (max-width: 768px) {
+    .hg__right a {
+        display: block;
+        margin: 0.3em;
+        padding: 0.5em;
+        text-align: center;
+    }
+
+    .hg__right .navlink {
+        background-color: #5f5f5f;
+        color: #FFFFFF;
+    }
+
+    .hg__right li {
+        /*min-height: 1em;*/
+        /*padding: 0.5em;*/
+    }
+
+    .hg__right li > * {
+        /*margin: 0.5em;*/
+    }
+}
+
 
 /* HEADER */
 .hg__header {
