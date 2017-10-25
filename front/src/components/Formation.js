@@ -1,9 +1,7 @@
-import 'rc-tabs/assets/index.css';
 import React, { Component } from 'react';
 import ReactSVG from 'react-svg';
-import Tabs, { TabPane } from 'rc-tabs';
-import TabContent from 'rc-tabs/lib/TabContent';
-import TabBar from 'rc-tabs/lib/TabBar';
+import Tabs from 'muicss/lib/react/tabs';
+import Tab from 'muicss/lib/react/tab';
 
 
 class Jersey extends Component {
@@ -103,13 +101,11 @@ export class CompoTabs extends Component {
 			return (<Composition clubs={this.props.clubs} phaseResult={ this.props.latestScores[0] } />);
 		} else {
 			const compositions = this.props.latestScores.map( (lsc) => 
-				<TabPane tab={ lsc['day']['phase'] } key={ lsc['day']['id'] }>
+				<Tab label={ lsc['day']['phase'] } key={ lsc['day']['id'] }>
 					<Composition clubs={this.props.clubs} phaseResult={ lsc }/>
-				</TabPane>);
+				</Tab>);
 			return (
-				<Tabs
-					renderTabBar={() => <TabBar />}
-          			renderTabContent={() => <TabContent animatedWithMargin />}>
+				<Tabs>
 				{compositions}
 				</Tabs>
 			);

@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { MdStar, MdStarBorder } from 'react-icons/lib/md';
 
 class RankingPhaseHeader extends Component {
   render() {
@@ -38,7 +37,7 @@ class RankingDivisionSelector extends Component {
 
 class RankingRow extends Component {
   render() {
-    const compIcon = this.props.complete ? <MdStar color="green"/> : <MdStarBorder color="red"/>;
+    const compIcon = this.props.complete ? <i className="circle"></i> : <i className="circle-o"></i>;
     const score = parseFloat(this.props.score).toFixed(2);
     return (<tr>
       <td>{this.props.rank}</td>

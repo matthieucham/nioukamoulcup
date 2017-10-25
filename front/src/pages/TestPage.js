@@ -787,7 +787,7 @@ class App extends Component {
     return (
     	<div className="react-app-inner">
     		<CompoTabs clubs={ CURRENT_CLUBS } latestScores={ LATEST_SCORES } />
-    		<aside class="hg__right"><p>Coucou</p></aside>
+    		<aside className="hg__right"><p>Coucou</p></aside>
     	</div>
 
     );
