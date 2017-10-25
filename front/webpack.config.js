@@ -19,6 +19,7 @@ const config = {
   module: {
     rules: [
       { test: /\.jsx?$/, exclude: /node_modules/, use: 'babel-loader'}, // to transform JSX into JS
+      { test: /\.css?$/, use: ['style-loader', 'css-loader']}, 
     ],
   },
 }

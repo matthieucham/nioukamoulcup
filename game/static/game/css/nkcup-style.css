@@ -245,7 +245,7 @@ header nav a:hover, nav ul li ul li:hover {
     }
 }
 
-.hg__left nav .button:hover,  nav.hg__left .button.active{
+.hg__left nav .button:hover,  .hg__left nav .button.active{
     background-color: #f9bee5;
 }
 
