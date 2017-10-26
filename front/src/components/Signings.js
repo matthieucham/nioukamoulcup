@@ -15,7 +15,8 @@ class SigningPanel extends Component{
 		const bonus = signing.attributes.score_factor && signing.attributes.score_factor > 1.0 ? ((signing.attributes.score_factor - 1.0) * 100).toFixed(0) : 0
 		Moment.locale('fr');
 		return (
-			<dl>
+			<div>
+			<dl className="inline-flex">
 			<dt>Montant</dt>
 			<dd>{ signing.attributes.amount } Ka</dd>
 			{ bonus > 0 && <dt>Bonus</dt>}
@@ -24,8 +25,9 @@ class SigningPanel extends Component{
 			<dd>{ Moment(signing.begin).format('DD/MM/YYYY HH:mm') }</dd>
 			{ hasLeft && <dt>Départ</dt>}
 			{ hasLeft && <dd>{ Moment(signing.end).format('DD/MM/YYYY HH:mm') }</dd> }
-			<a className="navlink" href={ signing.player.url }>Fiche du joueur</a>
 			</dl>
+			<a className="navlink" href={ signing.player.url }>Fiche du joueur</a>
+			</div>
 		);
 	}
 }
@@ -56,12 +58,12 @@ class PositionSignings extends Component {
 	render() {
 		const pos = this.props.position;
 		const signings = this.props.signings.filter( (s) => s.player.poste==pos).map( (s) => 
-			<Panel key={s.player.id+'_'+s.player.begin} header={ this.getSigningHeader(s) } className={ this.getClassName(s) } showArrow={false}>
+			<Panel key={s.player.id+'_'+s.player.begin} header={ this.getSigningHeader(s) } className={ this.getClassName(s) } showArrow>
 				<SigningPanel signing={s} />
 			</Panel>);
 		return (
 			<div className="position-signings">
-				<h2>{ this.state.dico[this.props.position] }</h2>
+				<h3>{ this.state.dico[this.props.position] }</h3>
 				<Collapse accordion={true}>
 				{signings}
 				</Collapse>

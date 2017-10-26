@@ -704,7 +704,7 @@ var SIGNINGS = [
                 "name": "Liv, t'as l'heure ?"
             },
             "begin": "2017-02-21T23:00:00Z",
-            "end": null,
+            "end": "2017-03-09T11:00:00Z",
             "attributes": {
                 "score_factor": 1.0,
                 "amount": 18.1
@@ -759,6 +759,7 @@ var SIGNINGS = [
         {
             "player": {
                 "id": 306,
+                "url": "http://127.0.0.1:8000/game/home/stat/joueur/259/",
                 "prenom": "Issiar",
                 "nom": "Dia",
                 "surnom": "",
