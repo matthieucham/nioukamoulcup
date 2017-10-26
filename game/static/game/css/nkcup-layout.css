@@ -64,7 +64,7 @@ body {
 
 #react-app {
     flex: 1;
-    /*display: flex;*/
+    display: flex;
 }
 
 div.react-app-inner {
