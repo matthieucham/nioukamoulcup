@@ -86,6 +86,19 @@ a.navlink::before {
     text-align: right;
 }
 
+.hg__right .rc-collapse {
+    background-color: inherit;
+    border: none;
+}
+
+.hg__right .rc-collapse-header {
+    color: #5f5f5f;
+}
+
+.hg__right .rc-collapse-content {
+    color: inherit;
+}
+
 @media all and (max-width: 768px) {
     .hg__right a {
         display: block;
@@ -97,15 +110,6 @@ a.navlink::before {
     .hg__right .navlink {
         background-color: #5f5f5f;
         color: #FFFFFF;
-    }
-
-    .hg__right li {
-        /*min-height: 1em;*/
-        /*padding: 0.5em;*/
-    }
-
-    .hg__right li > * {
-        /*margin: 0.5em;*/
     }
 }
 

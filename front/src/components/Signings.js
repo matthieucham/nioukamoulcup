@@ -56,7 +56,7 @@ class PositionSignings extends Component {
 	render() {
 		const pos = this.props.position;
 		const signings = this.props.signings.filter( (s) => s.player.poste==pos).map( (s) => 
-			<Panel key={s.player.id+'_'+s.player.begin} header={ this.getSigningHeader(s) } className={ this.getClassName(s) }>
+			<Panel key={s.player.id+'_'+s.player.begin} header={ this.getSigningHeader(s) } className={ this.getClassName(s) } showArrow={false}>
 				<SigningPanel signing={s} />
 			</Panel>);
 		return (
