@@ -20,12 +20,13 @@ class ClubHdrSerializer(serializers.ModelSerializer):
         fields = ('id', 'nom')
 
 
-class PlayerHdrSerializer(serializers.ModelSerializer):
+class PlayerHdrSerializer(serializers.HyperlinkedModelSerializer):
     club = ClubHdrSerializer()
+    url = serializers.HyperlinkedIdentityField(view_name='stat_joueur-detail')
 
     class Meta:
         model = l1models.Joueur
-        fields = ('id', 'prenom', 'nom', 'surnom', 'poste', 'club')
+        fields = ('id', 'url', 'prenom', 'nom', 'surnom', 'poste', 'club')
 
 
 class TeamManagerSerializer(serializers.ModelSerializer):
