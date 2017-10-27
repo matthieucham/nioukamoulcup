@@ -85,3 +85,26 @@ export class TeamSignings extends Component {
 		);
 	}
 }
+
+export class AggregationPanel extends Component {
+	constructor(props) {
+		super(props);
+	}
+
+	render() {
+		const agg = this.props.agg;
+		return (
+			<section>
+				<h1>Statistiques</h1>
+				<dl className="inline-flex">
+					<dt>PA déposées</dt>
+					<dd>{ agg.total_pa }</dd>
+					<dt>Reventes</dt>
+					<dd>{ agg.total_releases }</dd>
+					<dt>Nombre total d'achats</dt>
+					<dd>{ agg.total_signings }</dd>
+				</dl>
+			</section>
+		);
+	}
+}

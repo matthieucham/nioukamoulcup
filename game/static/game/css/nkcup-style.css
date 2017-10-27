@@ -64,13 +64,13 @@ dl.inline-flex {
   overflow: visible;
 }
 dl.inline-flex dt {
-  flex: 0 0 30%;
+  flex: 0 0 50%;
   text-overflow: ellipsis;
   overflow: hidden;
   font-size: 0.8em;
 }
 dl.inline-flex dd {
-  flex:0 0 70%;
+  flex:0 0 50%;
   margin-left: auto;
   text-align: right;
   text-overflow: ellipsis;
@@ -79,7 +79,7 @@ dl.inline-flex dd {
 }
 
 dt, dd {
-  background-color: transparent;
+  background-color: #FFFFFF;
 }
 
 dt:nth-child(4n+1), dt:nth-child(4n+1) + dd {

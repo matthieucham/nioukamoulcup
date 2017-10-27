@@ -158,7 +158,7 @@ class CurrentSignings(serializers.Field):
 
 class SigningsAggregationSerializer(serializers.Serializer):
     total_pa = TotalPASaleField(source='*')
-    total_release = TotalReleaseField(source='*')
+    total_releases = TotalReleaseField(source='*')
     total_signings = TotalSignings(source='*')
     current_signings = CurrentSignings(source='*')
 

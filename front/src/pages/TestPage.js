@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import LeagueRankingWidget from '../components/LeagueRanking';
 import { CompoTabs } from '../components/Formation';
-import { TeamSignings } from '../components/Signings';
+import { TeamSignings, AggregationPanel } from '../components/Signings';
 
 var CURRENT_CLUBS = [
     {
@@ -781,30 +781,13 @@ var SIGNINGS = [
             }
         }
     ];
-var SIGNING = {
-            "player": {
-                "id": 259,
-                "url": "http://127.0.0.1:8000/game/home/stat/joueur/259/",
-                "prenom": "Gelson",
-                "nom": "Fernandes",
-                "surnom": "",
-                "poste": "M",
-                "club": {
-                    "id": 19,
-                    "nom": "Rennes"
-                }
-            },
-            "team": {
-                "id": 13,
-                "name": "The Dashing Otter"
-            },
-            "begin": "2017-02-14T23:00:00Z",
-            "end": "2017-03-09T11:00:00Z",
-            "attributes": {
-                "score_factor": 1.0,
-                "amount": 6.5
-            }
-        }
+var AGG = {
+        "total_pa": 18,
+        "total_releases": 2,
+        "total_signings": 11,
+        "current_signings": 11
+    };
+
 
 
 class App extends Component {
@@ -813,6 +796,7 @@ class App extends Component {
     	<div className="react-app-inner">
     		<CompoTabs clubs={ CURRENT_CLUBS } latestScores={ LATEST_SCORES } />
     		<aside className="hg__right">
+    			<AggregationPanel agg={ AGG } />
     			<TeamSignings signings={ SIGNINGS } />
     		</aside>
     	</div>

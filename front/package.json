@@ -5,8 +5,8 @@
   "main": "index.js",
   "dependencies": {
     "moment": "^2.19.1",
-    "muicss": "^0.9.27",
     "rc-collapse": "^1.7.6",
+    "rc-tabs": "^9.1.4",
     "react-svg": "^2.1.22"
   },
   "devDependencies": {
