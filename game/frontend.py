@@ -57,7 +57,7 @@ class StatJoueurView(DetailView):
         # ])
         # # Step 2: Create the Chart object
         # cht = Chart(datasource=scoredata,
-        #             series_options=[{'options': {'type': 'line', 'stacking': False},
+        # series_options=[{'options': {'type': 'line', 'stacking': False},
         #                              'terms': {
         #                                  'numero': [
         #                                      'points',
@@ -86,7 +86,8 @@ class LeagueWallView(PermissionRequiredMixin, CurrentLeagueInstanceMixin, Detail
         instance = self._get_current_league_instance(league)
         serializer = serializers.LeagueInstancePhaseDaySerializer(
             models.LeagueInstancePhaseDay.objects.get_latest_day_for_phases(
-                models.LeagueInstancePhase.objects.filter(league_instance=instance)), many=True)
+                models.LeagueInstancePhase.objects.filter(league_instance=instance)), many=True,
+            context={'request': self.request})
         context['props'] = {
             'ranking': json.loads(str(JSONRenderer().render(serializer.data), 'utf-8'))
         }

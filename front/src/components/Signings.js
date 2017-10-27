@@ -19,7 +19,7 @@ class SigningPanel extends Component{
 			<dl className="inline-flex">
 			<dt>Montant</dt>
 			<dd>{ signing.attributes.amount } Ka</dd>
-			{ bonus > 0 && <dt>Bonus</dt>}
+			{ bonus > 0 && <dt>Bonification</dt>}
 			{ bonus > 0 && <dd>+{ bonus }%</dd> }
 			<dt>Arrivée</dt>
 			<dd>{ Moment(signing.begin).format('DD/MM/YYYY HH:mm') }</dd>
@@ -45,7 +45,7 @@ class PositionSignings extends Component {
 		const club = signing.player.club ? signing.player.club.nom : 'Hors championnat';
 		const player = signing.player.surnom.length ? signing.player.surnom : signing.player.prenom+' '+signing.player.nom;
 		
-		return player+' ('+club+')';
+		return <span><span className='playerName'>{player}</span><span className='clubName'>{club}</span></span>;
 	}
 
 	getClassName(signing) {
@@ -58,7 +58,7 @@ class PositionSignings extends Component {
 	render() {
 		const pos = this.props.position;
 		const signings = this.props.signings.filter( (s) => s.player.poste==pos).map( (s) => 
-			<Panel key={s.player.id+'_'+s.player.begin} header={ this.getSigningHeader(s) } className={ this.getClassName(s) } showArrow>
+			<Panel header={ this.getSigningHeader(s) } headerClass={ this.getClassName(s) } showArrow>
 				<SigningPanel signing={s} />
 			</Panel>);
 		return (

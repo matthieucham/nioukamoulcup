@@ -7,6 +7,7 @@ from collections import defaultdict
 from . import scoring_models
 from ligue1 import models as l1models
 from utils.timer import Timer
+from django.utils import timezone
 
 
 class League(models.Model):
@@ -316,9 +317,25 @@ class TeamDayScore(models.Model):
         ordering = ['-day']
 
 
+class SigningManager(models.Manager):
+
+    def end(self, signing, reason, date=timezone.now(), amount=None):
+        if signing.end:
+            raise ValueError('Cannot end a signing which has a end date already')
+        if reason not in ('RE', 'MV', 'FR'):
+            raise ValueError('reason must be on of RE (release), MV (sold), FR (freed)')
+        signing.end = date
+        signing.attributes['end_reason'] = reason
+        if amount:
+            signing.attributes['end_amount'] = amount
+        self.update(signing)
+
+
 class Signing(models.Model):
     player = models.ForeignKey(l1models.Joueur, null=False)
     team = models.ForeignKey(Team, null=False)
     begin = models.DateTimeField(auto_now_add=True, db_index=True)
     end = models.DateTimeField(null=True, db_index=True)
     attributes = JSONField(default=dict({'score_factor': 1.0}))
+
+    objects = SigningManager()

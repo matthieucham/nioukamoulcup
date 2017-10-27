@@ -35,6 +35,9 @@ class TeamDetailView(generics.RetrieveAPIView):
     queryset = league_models.Team.objects.all()
     permission_classes = (DRYObjectPermissions, )
 
+    def get_serializer_context(self):
+        return {'request': self.request}
+
 
 class ClubListView(CurrentLeagueInstanceMixin, generics.ListAPIView):
     serializer_class = serializers.ClubSerializer

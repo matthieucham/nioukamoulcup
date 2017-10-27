@@ -67,6 +67,7 @@ dl.inline-flex dt {
   flex: 0 0 30%;
   text-overflow: ellipsis;
   overflow: hidden;
+  font-size: 0.8em;
 }
 dl.inline-flex dd {
   flex:0 0 70%;
@@ -74,6 +75,7 @@ dl.inline-flex dd {
   text-align: right;
   text-overflow: ellipsis;
   overflow: hidden;
+  font-size: 1em;
 }
 
 dt, dd {
@@ -119,19 +121,25 @@ dt:nth-child(4n+1), dt:nth-child(4n+1) + dd {
     border: none;
 }
 
-.hg__right .rc-collapse-header {
-    color: #5f5f5f;
+.hg__right .rc-collapse-header .playerName{
+    font-size: 1em;
+}
+
+.hg__right .rc-collapse-header .clubName{
+    font-size: 0.8em;
+}
+.hg__right .rc-collapse-header .clubName:before {
+    content: " (";
+}
+.hg__right .rc-collapse-header .clubName:after {
+    content: ")";
 }
 
 .hg__right .rc-collapse-content {
     color: inherit;
 }
 
-.hg__right .rc-collapse-item.bonus > .rc-collapse-header{
-    font-weight: bold;
-}
-
-.hg__right .rc-collapse-item.past > .rc-collapse-header{
+.hg__right .rc-collapse-header.past  .playerName{
     text-decoration: line-through;
 }
 

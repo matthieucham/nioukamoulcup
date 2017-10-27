@@ -13,7 +13,7 @@ urlpatterns = [
         name="stat_joueur-detail"),
 
     url(r'^league/wall/(?P<pk>[0-9]+)/$', frontend.LeagueWallView.as_view(),
-        name="league_wall"),
+        name="league_wall-detail"),
     url(r'^league/ekyp/(?P<pk>[0-9]+)/$', frontend.LeagueEkypView.as_view(),
-        name="league_ekyp"),
+        name="league_ekyp-detail"),
 ]
