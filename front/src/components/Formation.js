@@ -21,6 +21,22 @@ class Jersey extends Component {
 	}
 }
 
+
+class JerseyPlaceHolder extends Component {
+
+	render() {
+		const svgPath = '/static/svg/jersey-placeholder2.svg';
+		return (
+			<div className="jersey">
+			<ReactSVG
+			path={ svgPath }
+			style={{ width:64, height:64 }}
+			/>
+			</div>
+			);
+	}
+}
+
 class FieldPlayerDetails extends Component {
 	render() {
 		return (
@@ -59,10 +75,10 @@ class PlayersLine extends Component {
 		super(props);
 	}
 
-	getClub(id) {
+	getClub(club) {
 		var found = null;
-		if (id) {
-			found = this.props.clubsMap.get(+id);
+		if (club) {
+			found = this.props.clubsMap.get(+club.id);
 		} 
 		if (found) {
 			return found;
@@ -72,9 +88,15 @@ class PlayersLine extends Component {
 	}
 
 	render () {
-		const fieldPlayers = this.props.players.map( (pl) => <FieldPlayer key={pl.player.id} player={pl} club={ this.getClub(pl.club.id) } />);
+		const fieldPlayers = this.props.players.map( (pl) => <FieldPlayer key={pl.player.id} player={pl} club={ this.getClub(pl.club) } />);
+		const placeHolders = [];
+		if (fieldPlayers.length < this.props.expected) {
+			for(var i=0; i<(this.props.expected-fieldPlayers.length); i++) {
+				placeHolders.push(<JerseyPlaceHolder />)
+			}
+		}
 		return (
-			<div className={`compoLine ${ this.props.position }`}>{fieldPlayers}</div>
+			<div className={`compoLine ${ this.props.position }`}>{fieldPlayers}{placeHolders}</div>
 			);
 	}
 }
@@ -87,7 +109,7 @@ class Composition extends Component {
 
 	render() {
 		const positionOrder = ['G', 'D', 'M', 'A'];
-		const lines = positionOrder.map( (pos) => <PlayersLine key={pos} clubsMap={this.state.clubsMap} players={this.props.phaseResult['compo'][pos].slice(0, this.props.phaseResult['formation'][pos])} />);
+		const lines = positionOrder.map( (pos) => <PlayersLine key={pos} clubsMap={this.state.clubsMap} players={this.props.phaseResult['compo'][pos].slice(0, this.props.phaseResult['formation'][pos])} expected={ this.props.phaseResult['formation'][pos] }/>);
 		const formationLabel = this.props.phaseResult['formation']['D'] + ' - ' + this.props.phaseResult['formation']['M'] + ' - ' + this.props.phaseResult['formation']['A'];
 		return (<div className="composition">
 				<h1>{ formationLabel }</h1>

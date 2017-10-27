@@ -5,6 +5,11 @@ import { TeamSignings, AggregationPanel } from '../components/Signings';
 
 var CURRENT_CLUBS = [
     {
+        "id": 0,
+        "nom": "Hors L1",
+        "maillot_svg": "jersey-noclub2",
+    },
+    {
         "id": 1,
         "nom": "Toulouse",
         "maillot_svg": "jersey-plain2",
@@ -204,10 +209,7 @@ var LATEST_SCORES = [
                         }
                     },
                     {
-                        "club": {
-                            "name": "Lille",
-                            "id": 15
-                        },
+                        "club": null,
                         "score": "77.75",
                         "player": {
                             "name": "Y. Benzia",
@@ -227,17 +229,6 @@ var LATEST_SCORES = [
                     }
                 ],
                 "M": [
-                    {
-                        "club": {
-                            "name": "Bordeaux",
-                            "id": 14
-                        },
-                        "score": "93.27",
-                        "player": {
-                            "name": "J. Toulalan",
-                            "id": 187
-                        }
-                    },
                     {
                         "club": {
                             "name": "Marseille",
@@ -371,10 +362,7 @@ var LATEST_SCORES = [
                         }
                     },
                     {
-                        "club": {
-                            "name": "Lille",
-                            "id": 15
-                        },
+                        "club": null,
                         "score": "138.42",
                         "player": {
                             "name": "Y. Benzia",
