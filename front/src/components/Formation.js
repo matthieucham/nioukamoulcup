@@ -92,7 +92,7 @@ class PlayersLine extends Component {
 		const placeHolders = [];
 		if (fieldPlayers.length < this.props.expected) {
 			for(var i=0; i<(this.props.expected-fieldPlayers.length); i++) {
-				placeHolders.push(<JerseyPlaceHolder />)
+				placeHolders.push(<JerseyPlaceHolder key={'ph'+i} />)
 			}
 		}
 		return (

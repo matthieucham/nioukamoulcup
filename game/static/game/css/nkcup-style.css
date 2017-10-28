@@ -56,34 +56,47 @@ a.navlink::before {
     content: "\f101";
 }
 
-dl.inline-flex {
-  display: flex;
-  flex-flow: row;
-  flex-wrap: wrap;
-  width: 100%;      /* set the container width*/
-  overflow: visible;
-}
-dl.inline-flex dt {
-  flex: 0 0 50%;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  font-size: 0.8em;
-}
-dl.inline-flex dd {
-  flex:0 0 50%;
-  margin-left: auto;
-  text-align: right;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  font-size: 1em;
+dl.card {
+    top:0;
+    border: 1px solid #5f5f5f;
+    border-radius: 3px;
+    position: static;
+    height: 60px;
+    min-width: 60px;
+    max-width: 120px;
+    line-height: 60px;
+    text-align: center;
+    display: inline-block;
+    margin: 5px;
+    padding: 3px;
 }
 
-dt, dd {
-  background-color: #FFFFFF;
+dl.card > dt {
+    display: inline-block;
+    vertical-align: middle;
+    line-height: normal;
+    font-weight: bold;
 }
 
-dt:nth-child(4n+1), dt:nth-child(4n+1) + dd {
-  background-color: #f1f1f1;
+dl.card > dd {
+    display: block;
+    font-size: 0.8em;
+    line-height: normal;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transform: translateY(-100%);
+}
+
+
+dl.card:hover {
+    height: auto;
+}
+
+dl.card:hover > dd {
+    white-space: normal;
+    overflow: visible;
+    transform: none;
 }
 
 /* RiGHT COLUMN */

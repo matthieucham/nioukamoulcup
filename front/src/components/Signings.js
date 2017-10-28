@@ -16,16 +16,13 @@ class SigningPanel extends Component{
 		Moment.locale('fr');
 		return (
 			<div>
-			<dl className="inline-flex">
-			<dt>Montant</dt>
-			<dd>{ signing.attributes.amount } Ka</dd>
-			{ bonus > 0 && <dt>Bonification</dt>}
-			{ bonus > 0 && <dd>+{ bonus }%</dd> }
-			<dt>Arrivée</dt>
-			<dd>{ Moment(signing.begin).format('DD/MM/YYYY HH:mm') }</dd>
-			{ hasLeft && <dt>Départ</dt>}
-			{ hasLeft && <dd>{ Moment(signing.end).format('DD/MM/YYYY HH:mm') }</dd> }
+			<dl className="card">
+			<dt>{ signing.attributes.amount } Ka</dt>
+			<dd>Prix d'achat</dd>
 			</dl>
+			{ bonus > 0 && <dl className="card"><dt>+{ bonus }%</dt><dd>Bonification</dd></dl>}
+			<dl className="card"><dt>{ Moment(signing.begin).format('DD/MM/YYYY') }</dt><dd>Arrivée</dd></dl>
+			{ hasLeft && <dl className="card"><dt>{ Moment(signing.end).format('DD/MM/YYYY') }</dt><dd>Départ</dd></dl>}
 			<a className="navlink" href={ signing.player.url }>Fiche du joueur</a>
 			</div>
 		);
@@ -96,13 +93,17 @@ export class AggregationPanel extends Component {
 		return (
 			<section>
 				<h1>Statistiques</h1>
-				<dl className="inline-flex">
-					<dt>PA déposées</dt>
-					<dd>{ agg.total_pa }</dd>
-					<dt>Reventes</dt>
-					<dd>{ agg.total_releases }</dd>
-					<dt>Nombre total d'achats</dt>
-					<dd>{ agg.total_signings }</dd>
+				<dl className="card">
+				<dt>{ agg.total_pa }</dt>
+				<dd>PA déposées</dd>
+				</dl>
+				<dl className="card">
+				<dt>{ agg.total_releases }</dt>
+				<dd>Reventes</dd>
+				</dl>
+				<dl className="card">
+				<dt>{ agg.total_signings }</dt>
+				<dd>Nombre total d'achats</dd>
 				</dl>
 			</section>
 		);
