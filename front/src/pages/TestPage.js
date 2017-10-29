@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import LeagueRankingWidget from '../components/LeagueRanking';
 import { CompoTabs } from '../components/Formation';
 import { TeamSignings, AggregationPanel } from '../components/Signings';
+import { TeamCover } from '../components/TeamDesc';
 
 var CURRENT_CLUBS = [
     {
@@ -784,7 +785,7 @@ class App extends Component {
     	<div className="react-app-inner">
     		<CompoTabs clubs={ CURRENT_CLUBS } latestScores={ LATEST_SCORES } />
     		<aside className="hg__right">
-    			<AggregationPanel agg={ AGG } />
+                <TeamCover coverUrl={ 'http://www.senenews.com/wp-content/uploads/2011/02/ronaldo-gros.jpg' }/>
     			<TeamSignings signings={ SIGNINGS } />
     		</aside>
     	</div>

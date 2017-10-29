@@ -90,13 +90,11 @@ dl.card > dd {
 
 
 dl.card:hover {
-    height: auto;
+    max-width: none;
 }
 
 dl.card:hover > dd {
     white-space: normal;
-    overflow: visible;
-    transform: none;
 }
 
 /* RiGHT COLUMN */
@@ -169,7 +167,6 @@ dl.card:hover > dd {
         color: #FFFFFF;
     }
 }
-
 
 /* HEADER */
 .hg__header {
@@ -272,6 +269,15 @@ header nav a:hover, nav ul li ul li:hover {
     text-shadow: 2px 2px #000000;
 }
 
+.team-cover-box {
+    max-width: 300px;
+    height: 300px;
+    max-height: 300px;
+    background-repeat: no-repeat;
+    background-size:cover;
+    box-shadow: inset 0px 0px 10px rgba(0,0,0,0.9);
+}
+
 /* Turn off parallax scrolling for tablets and phones. Increase/decrease the pixels if needed */
 @media only screen and (max-device-width: 768px) {
     .cover {
@@ -320,14 +326,13 @@ header nav a:hover, nav ul li ul li:hover {
 .composition > h1 {
     text-align: center;
     background-color: rgba(255,255,255,0.2);
-    margin-bottom: 8px;
     padding: 3px;
 }
 
 .fieldPlayer {
     display: inline-block;
     text-align: center;
-    /*text-shadow: 2px 2px #ffffff;*/
+    margin: 8px;
 }
 .fieldPlayer svg {
     display: block;
