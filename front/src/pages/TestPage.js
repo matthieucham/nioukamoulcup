@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import LeagueRankingWidget from '../components/LeagueRanking';
 import { CompoTabs } from '../components/Formation';
 import { TeamSignings, AggregationPanel } from '../components/Signings';
-import { TeamCover } from '../components/TeamDesc';
+import { TeamCover, TeamHeader } from '../components/TeamDesc';
 
 var CURRENT_CLUBS = [
     {
@@ -777,16 +777,620 @@ var AGG = {
         "current_signings": 11
     };
 
+var FULL_PAGE = {
+    "name": "The Dashing Otter",
+    "managers": [
+        {
+            "user": "Latrell"
+        }
+    ],
+    "permissions": {
+        "read": true,
+        "write": false
+    },
+    "account_balance": 95.6,
+    "signings_aggregation": {
+        "total_pa": 0,
+        "total_releases": 0,
+        "total_signings": 11,
+        "current_signings": 11
+    },
+    "signings": [
+        {
+            "player": {
+                "id": 310,
+                "url": "http://127.0.0.1:8000/game/home/stat/joueur/310/",
+                "prenom": "Baptiste",
+                "nom": "Reynet",
+                "surnom": "",
+                "poste": "G",
+                "club": {
+                    "id": 2,
+                    "nom": "Dijon"
+                }
+            },
+            "team": {
+                "id": 13,
+                "url": "http://127.0.0.1:8000/game/league/ekyp/13/",
+                "name": "The Dashing Otter"
+            },
+            "begin": "2016-09-15T22:00:00Z",
+            "end": null,
+            "attributes": {
+                "score_factor": 1.05
+            }
+        },
+        {
+            "player": {
+                "id": 280,
+                "url": "http://127.0.0.1:8000/game/home/stat/joueur/280/",
+                "prenom": "Kamil",
+                "nom": "Glik",
+                "surnom": "",
+                "poste": "D",
+                "club": {
+                    "id": 20,
+                    "nom": "Monaco"
+                }
+            },
+            "team": {
+                "id": 13,
+                "url": "http://127.0.0.1:8000/game/league/ekyp/13/",
+                "name": "The Dashing Otter"
+            },
+            "begin": "2016-09-07T22:00:00Z",
+            "end": null,
+            "attributes": {
+                "score_factor": 1.05
+            }
+        },
+        {
+            "player": {
+                "id": 339,
+                "url": "http://127.0.0.1:8000/game/home/stat/joueur/339/",
+                "prenom": "Ivan",
+                "nom": "Santini",
+                "surnom": "",
+                "poste": "A",
+                "club": {
+                    "id": 18,
+                    "nom": "Caen"
+                }
+            },
+            "team": {
+                "id": 13,
+                "url": "http://127.0.0.1:8000/game/league/ekyp/13/",
+                "name": "The Dashing Otter"
+            },
+            "begin": "2016-09-13T22:00:00Z",
+            "end": null,
+            "attributes": {
+                "score_factor": 1.05
+            }
+        },
+        {
+            "player": {
+                "id": 146,
+                "url": "http://127.0.0.1:8000/game/home/stat/joueur/146/",
+                "prenom": "Cheikh",
+                "nom": "Ndoye",
+                "surnom": "",
+                "poste": "M",
+                "club": {
+                    "id": 11,
+                    "nom": "Angers"
+                }
+            },
+            "team": {
+                "id": 13,
+                "url": "http://127.0.0.1:8000/game/league/ekyp/13/",
+                "name": "The Dashing Otter"
+            },
+            "begin": "2016-09-21T22:00:00Z",
+            "end": null,
+            "attributes": {
+                "score_factor": 1.05
+            }
+        },
+        {
+            "player": {
+                "id": 371,
+                "url": "http://127.0.0.1:8000/game/home/stat/joueur/371/",
+                "prenom": "Kévin",
+                "nom": "Malcuit",
+                "surnom": "",
+                "poste": "D",
+                "club": {
+                    "id": 4,
+                    "nom": "Saint Etienne"
+                }
+            },
+            "team": {
+                "id": 13,
+                "url": "http://127.0.0.1:8000/game/league/ekyp/13/",
+                "name": "The Dashing Otter"
+            },
+            "begin": "2016-10-09T22:00:00Z",
+            "end": null,
+            "attributes": {
+                "score_factor": 1.0
+            }
+        },
+        {
+            "player": {
+                "id": 177,
+                "url": "http://127.0.0.1:8000/game/home/stat/joueur/177/",
+                "prenom": "Majeed ",
+                "nom": "Waris",
+                "surnom": "",
+                "poste": "A",
+                "club": {
+                    "id": 13,
+                    "nom": "Lorient"
+                }
+            },
+            "team": {
+                "id": 13,
+                "url": "http://127.0.0.1:8000/game/league/ekyp/13/",
+                "name": "The Dashing Otter"
+            },
+            "begin": "2017-02-07T23:00:00Z",
+            "end": null,
+            "attributes": {
+                "score_factor": 1.0
+            }
+        },
+        {
+            "player": {
+                "id": 170,
+                "url": "http://127.0.0.1:8000/game/home/stat/joueur/170/",
+                "prenom": "Zargo",
+                "nom": "Touré",
+                "surnom": "",
+                "poste": "D",
+                "club": {
+                    "id": 13,
+                    "nom": "Lorient"
+                }
+            },
+            "team": {
+                "id": 13,
+                "url": "http://127.0.0.1:8000/game/league/ekyp/13/",
+                "name": "The Dashing Otter"
+            },
+            "begin": "2017-02-14T23:00:00Z",
+            "end": null,
+            "attributes": {
+                "score_factor": 1.0
+            }
+        },
+        {
+            "player": {
+                "id": 309,
+                "url": "http://127.0.0.1:8000/game/home/stat/joueur/309/",
+                "prenom": "Grégory",
+                "nom": "Sertic",
+                "surnom": "",
+                "poste": "D",
+                "club": {
+                    "id": 9,
+                    "nom": "Marseille"
+                }
+            },
+            "team": {
+                "id": 13,
+                "url": "http://127.0.0.1:8000/game/league/ekyp/13/",
+                "name": "The Dashing Otter"
+            },
+            "begin": "2017-02-14T23:00:00Z",
+            "end": null,
+            "attributes": {
+                "score_factor": 1.0
+            }
+        },
+        {
+            "player": {
+                "id": 259,
+                "url": "http://127.0.0.1:8000/game/home/stat/joueur/259/",
+                "prenom": "Gelson",
+                "nom": "Fernandes",
+                "surnom": "",
+                "poste": "M",
+                "club": {
+                    "id": 19,
+                    "nom": "Rennes"
+                }
+            },
+            "team": {
+                "id": 13,
+                "url": "http://127.0.0.1:8000/game/league/ekyp/13/",
+                "name": "The Dashing Otter"
+            },
+            "begin": "2017-02-14T23:00:00Z",
+            "end": null,
+            "attributes": {
+                "score_factor": 1.0
+            }
+        },
+        {
+            "player": {
+                "id": 66,
+                "url": "http://127.0.0.1:8000/game/home/stat/joueur/66/",
+                "prenom": "Marcus",
+                "nom": "Coco",
+                "surnom": "",
+                "poste": "M",
+                "club": {
+                    "id": 5,
+                    "nom": "Guingamp"
+                }
+            },
+            "team": {
+                "id": 13,
+                "url": "http://127.0.0.1:8000/game/league/ekyp/13/",
+                "name": "The Dashing Otter"
+            },
+            "begin": "2017-02-19T23:00:00Z",
+            "end": null,
+            "attributes": {
+                "score_factor": 1.0
+            }
+        },
+        {
+            "player": {
+                "id": 7,
+                "url": "http://127.0.0.1:8000/game/home/stat/joueur/7/",
+                "prenom": "Wergiton",
+                "nom": "do Rosario Calmon",
+                "surnom": "Somalia",
+                "poste": "M",
+                "club": {
+                    "id": 1,
+                    "nom": "Toulouse"
+                }
+            },
+            "team": {
+                "id": 13,
+                "url": "http://127.0.0.1:8000/game/league/ekyp/13/",
+                "name": "The Dashing Otter"
+            },
+            "begin": "2017-02-23T23:00:00Z",
+            "end": null,
+            "attributes": {
+                "score_factor": 1.0
+            }
+        }
+    ],
+    "latest_scores": [
+        {
+            "team": {
+                "id": 13,
+                "url": "http://127.0.0.1:8000/game/league/ekyp/13/",
+                "name": "The Dashing Otter"
+            },
+            "score": "891.942",
+            "day": {
+                "id": 57,
+                "number": 38,
+                "journee": {
+                    "id": 1,
+                    "numero": 38,
+                    "debut": "2017-05-20T19:00:00Z",
+                    "fin": "2017-05-20T19:00:00Z"
+                },
+                "phase_id": 2,
+                "phase": "Clausura 2017"
+            },
+            "formation": {
+                "M": 4,
+                "A": 2,
+                "D": 4,
+                "G": 1
+            },
+            "compo": {
+                "M": [
+                    {
+                        "score": "110.06",
+                        "club": {
+                            "id": 11,
+                            "name": "Angers"
+                        },
+                        "player": {
+                            "id": 146,
+                            "name": "C. Ndoye"
+                        }
+                    },
+                    {
+                        "score": "74.93",
+                        "club": {
+                            "id": 5,
+                            "name": "Guingamp"
+                        },
+                        "player": {
+                            "id": 66,
+                            "name": "M. Coco"
+                        }
+                    },
+                    {
+                        "score": "54.60",
+                        "club": {
+                            "id": 1,
+                            "name": "Toulouse"
+                        },
+                        "player": {
+                            "id": 7,
+                            "name": "Somalia"
+                        }
+                    },
+                    {
+                        "score": "44.00",
+                        "club": {
+                            "id": 19,
+                            "name": "Rennes"
+                        },
+                        "player": {
+                            "id": 259,
+                            "name": "G. Fernandes"
+                        }
+                    }
+                ],
+                "A": [
+                    {
+                        "score": "99.17",
+                        "club": {
+                            "id": 13,
+                            "name": "Lorient"
+                        },
+                        "player": {
+                            "id": 177,
+                            "name": "M. Waris"
+                        }
+                    },
+                    {
+                        "score": "91.44",
+                        "club": {
+                            "id": 18,
+                            "name": "Caen"
+                        },
+                        "player": {
+                            "id": 339,
+                            "name": "I. Santini"
+                        }
+                    }
+                ],
+                "D": [
+                    {
+                        "score": "137.65",
+                        "club": {
+                            "id": 20,
+                            "name": "Monaco"
+                        },
+                        "player": {
+                            "id": 280,
+                            "name": "K. Glik"
+                        }
+                    },
+                    {
+                        "score": "83.73",
+                        "club": {
+                            "id": 4,
+                            "name": "Saint Etienne"
+                        },
+                        "player": {
+                            "id": 371,
+                            "name": "K. Malcuit"
+                        }
+                    },
+                    {
+                        "score": "62.93",
+                        "club": {
+                            "id": 9,
+                            "name": "Marseille"
+                        },
+                        "player": {
+                            "id": 309,
+                            "name": "G. Sertic"
+                        }
+                    },
+                    {
+                        "score": "32.03",
+                        "club": {
+                            "id": 13,
+                            "name": "Lorient"
+                        },
+                        "player": {
+                            "id": 170,
+                            "name": "Z. Touré"
+                        }
+                    }
+                ],
+                "G": [
+                    {
+                        "score": "101.39",
+                        "club": {
+                            "id": 2,
+                            "name": "Dijon"
+                        },
+                        "player": {
+                            "id": 310,
+                            "name": "B. Reynet"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "team": {
+                "id": 13,
+                "url": "http://127.0.0.1:8000/game/league/ekyp/13/",
+                "name": "The Dashing Otter"
+            },
+            "score": "1925.940",
+            "day": {
+                "id": 37,
+                "number": 38,
+                "journee": {
+                    "id": 1,
+                    "numero": 38,
+                    "debut": "2017-05-20T19:00:00Z",
+                    "fin": "2017-05-20T19:00:00Z"
+                },
+                "phase_id": 1,
+                "phase": "Saison 2016-17"
+            },
+            "formation": {
+                "M": 4,
+                "A": 2,
+                "D": 4,
+                "G": 1
+            },
+            "compo": {
+                "M": [
+                    {
+                        "score": "210.77",
+                        "club": {
+                            "id": 11,
+                            "name": "Angers"
+                        },
+                        "player": {
+                            "id": 146,
+                            "name": "C. Ndoye"
+                        }
+                    },
+                    {
+                        "score": "166.95",
+                        "club": {
+                            "id": 5,
+                            "name": "Guingamp"
+                        },
+                        "player": {
+                            "id": 66,
+                            "name": "M. Coco"
+                        }
+                    },
+                    {
+                        "score": "123.57",
+                        "club": {
+                            "id": 19,
+                            "name": "Rennes"
+                        },
+                        "player": {
+                            "id": 259,
+                            "name": "G. Fernandes"
+                        }
+                    },
+                    {
+                        "score": "118.91",
+                        "club": {
+                            "id": 1,
+                            "name": "Toulouse"
+                        },
+                        "player": {
+                            "id": 7,
+                            "name": "Somalia"
+                        }
+                    }
+                ],
+                "A": [
+                    {
+                        "score": "194.34",
+                        "club": {
+                            "id": 18,
+                            "name": "Caen"
+                        },
+                        "player": {
+                            "id": 339,
+                            "name": "I. Santini"
+                        }
+                    },
+                    {
+                        "score": "182.42",
+                        "club": {
+                            "id": 13,
+                            "name": "Lorient"
+                        },
+                        "player": {
+                            "id": 177,
+                            "name": "M. Waris"
+                        }
+                    }
+                ],
+                "D": [
+                    {
+                        "score": "260.17",
+                        "club": {
+                            "id": 20,
+                            "name": "Monaco"
+                        },
+                        "player": {
+                            "id": 280,
+                            "name": "K. Glik"
+                        }
+                    },
+                    {
+                        "score": "182.80",
+                        "club": {
+                            "id": 4,
+                            "name": "Saint Etienne"
+                        },
+                        "player": {
+                            "id": 371,
+                            "name": "K. Malcuit"
+                        }
+                    },
+                    {
+                        "score": "154.33",
+                        "club": {
+                            "id": 9,
+                            "name": "Marseille"
+                        },
+                        "player": {
+                            "id": 309,
+                            "name": "G. Sertic"
+                        }
+                    },
+                    {
+                        "score": "120.37",
+                        "club": {
+                            "id": 13,
+                            "name": "Lorient"
+                        },
+                        "player": {
+                            "id": 170,
+                            "name": "Z. Touré"
+                        }
+                    }
+                ],
+                "G": [
+                    {
+                        "score": "211.31",
+                        "club": {
+                            "id": 2,
+                            "name": "Dijon"
+                        },
+                        "player": {
+                            "id": 310,
+                            "name": "B. Reynet"
+                        }
+                    }
+                ]
+            }
+        }
+    ]
+}
 
 
 class App extends Component {
   render() {
     return (
     	<div className="react-app-inner">
-    		<CompoTabs clubs={ CURRENT_CLUBS } latestScores={ LATEST_SCORES } />
+    		<main>
+    		<TeamHeader team={ FULL_PAGE } />
+    		<CompoTabs clubs={ CURRENT_CLUBS } latestScores={ FULL_PAGE.latest_scores } />
+    		</main>
     		<aside className="hg__right">
-                <TeamCover coverUrl={ 'http://www.senenews.com/wp-content/uploads/2011/02/ronaldo-gros.jpg' }/>
-    			<TeamSignings signings={ SIGNINGS } />
+                <TeamCover name="El Brutal Principe " coverUrl={ 'http://2.bp.blogspot.com/_vtZDyEhVbnw/SSoFfKwR-gI/AAAAAAAACHs/4p_3iAYKikY/s400/Francescoli.php' }/>
+    			<TeamSignings signings={ FULL_PAGE.signings } />
     		</aside>
     	</div>
 

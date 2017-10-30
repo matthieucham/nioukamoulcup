@@ -96,7 +96,7 @@ class PlayersLine extends Component {
 			}
 		}
 		return (
-			<div className={`compoLine ${ this.props.position }`}>{fieldPlayers}{placeHolders}</div>
+			<div className={`compoLine`}>{fieldPlayers}{placeHolders}</div>
 			);
 	}
 }
@@ -112,7 +112,6 @@ class Composition extends Component {
 		const lines = positionOrder.map( (pos) => <PlayersLine key={pos} clubsMap={this.state.clubsMap} players={this.props.phaseResult['compo'][pos].slice(0, this.props.phaseResult['formation'][pos])} expected={ this.props.phaseResult['formation'][pos] }/>);
 		const formationLabel = this.props.phaseResult['formation']['D'] + ' - ' + this.props.phaseResult['formation']['M'] + ' - ' + this.props.phaseResult['formation']['A'];
 		return (<div className="composition">
-				<h1>{ formationLabel }</h1>
 				{ lines }
 				<h1>Total: { this.props.phaseResult['score'] }</h1>
 				</div>)

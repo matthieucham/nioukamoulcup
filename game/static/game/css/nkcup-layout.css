@@ -20,7 +20,7 @@ body {
     min-height: 100vh;
     height: 100%; /*1, 3*/
     margin: 0 auto;
-    /*max-width: 1150px;*/
+    max-width: 1150px;
 }
 
 .hg__body {
@@ -72,7 +72,7 @@ div.react-app-inner {
     flex: 1;
 }
 
-div.react-app-inner > div:first-child {
+div.react-app-inner > main {
     flex: 1;
 }
 
@@ -225,7 +225,6 @@ header nav ul ul li {
 }
 
 .hg__left nav h1, .cover h1 {
-    line-height: 1.5;
     display: inline-block;
     vertical-align: middle;
 }

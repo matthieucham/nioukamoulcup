@@ -170,6 +170,7 @@ class TeamDetailSerializer(serializers.ModelSerializer):
     # scores = TeamDayScoreSerializer(source='teamdayscore_set', many=True, read_only=True)
     latest_scores = serializers.SerializerMethodField()
     managers = TeamManagerSerializer(many=True, read_only=True)
+    account_balance = serializers.SlugRelatedField(source='bank_account', slug_field='balance', read_only=True)
 
     def get_latest_scores(self, obj):
         try:
@@ -184,5 +185,5 @@ class TeamDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = league_models.Team
-        fields = ('name', 'managers', 'permissions', 'signings_aggregation',
+        fields = ('name', 'managers', 'permissions', 'account_balance', 'signings_aggregation',
                   'signings', 'latest_scores', )
