@@ -782,6 +782,9 @@ var FULL_PAGE = {
     "managers": [
         {
             "user": "Latrell"
+        },
+        {
+            "user": "surlac"
         }
     ],
     "permissions": {

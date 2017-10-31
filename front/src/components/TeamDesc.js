@@ -50,9 +50,14 @@ export class TeamHeader extends Component {
 
 	render() {
 		const kv = this.state.keyValues.map(kv => <KeyValueBox value={kv[1]} key={kv[0]} desc={kv[0]} />);
+		const mgrs = this.props.team.managers.map(m => <li key={m.user} className="manager">{m.user}</li>);
 		return (
 			<div className={`team-header`}>
-				<h1 className="page-title">{ this.props.team.name }</h1>
+				<div className="team-title">
+					<h1 className="page-title">{ this.props.team.name }</h1>
+					<ul>{mgrs}</ul>
+				</div>
+				<TeamCover name="El Brutal Principe " coverUrl={ 'http://2.bp.blogspot.com/_vtZDyEhVbnw/SSoFfKwR-gI/AAAAAAAACHs/4p_3iAYKikY/s400/Francescoli.php' }/>
 				<div>{kv}</div>
 			</div>
 		);
