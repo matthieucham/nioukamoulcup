@@ -4,6 +4,7 @@ import 'rc-tabs/assets/index.css';
 import Tabs, { TabPane } from 'rc-tabs';
 import TabContent from 'rc-tabs/lib/TabContent';
 import InkTabBar from 'rc-tabs/lib/InkTabBar';
+import Griddle, { plugins, RowDefinition, ColumnDefinition } from 'griddle-react';
 
 
 class Jersey extends Component {
@@ -110,11 +111,41 @@ class Composition extends Component {
 	render() {
 		const positionOrder = ['G', 'D', 'M', 'A'];
 		const lines = positionOrder.map( (pos) => <PlayersLine key={pos} clubsMap={this.state.clubsMap} players={this.props.phaseResult['compo'][pos].slice(0, this.props.phaseResult['formation'][pos])} expected={ this.props.phaseResult['formation'][pos] }/>);
-		const formationLabel = this.props.phaseResult['formation']['D'] + ' - ' + this.props.phaseResult['formation']['M'] + ' - ' + this.props.phaseResult['formation']['A'];
 		return (<div className="composition">
 				{ lines }
 				<h1>Total: { this.props.phaseResult['score'] }</h1>
 				</div>)
+	}
+}
+
+class CompositionTable extends Component {
+
+	constructor(props) {
+		super(props);
+		const compo = this.props.phaseResult['compo'];
+		const positionOrder = ['G', 'D', 'M', 'A'];
+		positionOrder.map( (pos) => compo[pos].map((pl) => pl.position=pos));
+		
+		const arrs = [compo['G'], compo['D'], compo['M'], compo['A']];
+		this.state = {
+      		data: [].concat(...arrs)
+    	};
+	}
+
+	render() {
+		const playerHrefComponent = ({value}) => <a href={`/game/home/stat/joueur/${value.get('id')}`}>{value.get('name')}</a>;
+		const clubHrefComponent = ({value}) => <a href={`/game/home/stat/club/${value.get('id')}`}>{value.get('name')}</a>;
+		return (
+			<Griddle data={this.state.data} plugins={[plugins.LocalPlugin]}
+				components={{Layout: ({ Table }) => <Table />}} pageProperties={{ pageSize: 14 }}>
+				<RowDefinition>
+					<ColumnDefinition id="player" title="Joueur" customComponent={ playerHrefComponent }/>
+					<ColumnDefinition id="position" title="Poste" />
+					<ColumnDefinition id="club" title="Club" customComponent={ clubHrefComponent }/>
+					<ColumnDefinition id="score" title="Score" />
+				</RowDefinition>
+			</Griddle>
+		);
 	}
 }
 
@@ -126,6 +157,7 @@ export class CompoTabs extends Component {
 			const compositions = this.props.latestScores.map( (lsc) => 
 				<TabPane tab={ lsc['day']['phase'] } key={ lsc['day']['id'] }>
 					<Composition clubs={this.props.clubs} phaseResult={ lsc }/>
+					<CompositionTable phaseResult={ lsc }/>
 				</TabPane>);
 			return (
 				<Tabs

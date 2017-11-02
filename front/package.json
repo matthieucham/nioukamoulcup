@@ -4,10 +4,12 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
+    "griddle-react": "^1.9.0",
     "moment": "^2.19.1",
     "rc-collapse": "^1.7.6",
     "rc-tabs": "^9.1.4",
-    "react-svg": "^2.1.22"
+    "react-svg": "^2.1.22",
+    "recompose": "0.25.1"
   },
   "devDependencies": {
     "babel": "^6.23.0",
