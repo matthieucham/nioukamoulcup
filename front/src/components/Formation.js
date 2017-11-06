@@ -46,7 +46,7 @@ class FieldPlayerDetails extends Component {
 			<p>{ this.props.player.score }</p>
 			<p>{ this.props.club.nom }</p>
 			</div>
-		);
+			);
 	}
 }
 
@@ -66,7 +66,7 @@ class FieldPlayer extends Component {
 			<p>{ this.props.club.nom }</p>
 			</div>
 			</div>
-		);
+			);
 	}
 
 }
@@ -112,9 +112,9 @@ class Composition extends Component {
 		const positionOrder = ['G', 'D', 'M', 'A'];
 		const lines = positionOrder.map( (pos) => <PlayersLine key={pos} clubsMap={this.state.clubsMap} players={this.props.phaseResult['compo'][pos].slice(0, this.props.phaseResult['formation'][pos])} expected={ this.props.phaseResult['formation'][pos] }/>);
 		return (<div className="composition">
-				{ lines }
-				<h1>Total: { this.props.phaseResult['score'] }</h1>
-				</div>)
+			{ lines }
+			<h1>Total: { this.props.phaseResult['score'] }</h1>
+			</div>)
 	}
 }
 
@@ -125,27 +125,43 @@ class CompositionTable extends Component {
 		const compo = this.props.phaseResult['compo'];
 		const positionOrder = ['G', 'D', 'M', 'A'];
 		positionOrder.map( (pos) => compo[pos].map((pl) => pl.position=pos));
-		
-		const arrs = [compo['G'], compo['D'], compo['M'], compo['A']];
 		this.state = {
-      		data: [].concat(...arrs)
-    	};
+			data: compo['G'].concat(compo['D']).concat(compo['M']).concat(compo['A'])
+		};
 	}
 
 	render() {
 		const playerHrefComponent = ({value}) => <a href={`/game/home/stat/joueur/${value.get('id')}`}>{value.get('name')}</a>;
 		const clubHrefComponent = ({value}) => <a href={`/game/home/stat/club/${value.get('id')}`}>{value.get('name')}</a>;
+		const posMap = {'G': 'Gardien', 'D': 'Défenseur', 'M': 'Milieu', 'A': 'Attaquant'};
+		const positionTranslateComponent = ({value}) => <span>{ posMap[value] }</span>;
+		const styleConfig = {
+			icons: {
+				TableHeadingCell: {
+					sortDescendingIcon: <small></small>,
+					sortAscendingIcon: <small></small>,
+				},
+			},
+			classNames: {
+				Table: 'ktable-class',
+				Row: 'ktable-row-class',
+				Cell: 'ktable-cell-class',
+				TableHeading: 'ktable-heading-class',
+				TableHeadingCellAscending: 'ktable-heading-asc',
+				TableHeadingCellDescending: 'ktable-heading-desc',
+			},
+		};
 		return (
 			<Griddle data={this.state.data} plugins={[plugins.LocalPlugin]}
-				components={{Layout: ({ Table }) => <Table />}} pageProperties={{ pageSize: 14 }}>
-				<RowDefinition>
-					<ColumnDefinition id="player" title="Joueur" customComponent={ playerHrefComponent }/>
-					<ColumnDefinition id="position" title="Poste" />
-					<ColumnDefinition id="club" title="Club" customComponent={ clubHrefComponent }/>
-					<ColumnDefinition id="score" title="Score" />
-				</RowDefinition>
+			components={{Layout: ({ Table }) => <Table />}} pageProperties={{ pageSize: 14 }} styleConfig={styleConfig}>
+			<RowDefinition>
+			<ColumnDefinition id="player" title="Joueur" customComponent={ playerHrefComponent } sortable={ false }/>
+			<ColumnDefinition id="position" title="Poste" customComponent={ positionTranslateComponent }/>
+			<ColumnDefinition id="club" title="Club" customComponent={ clubHrefComponent }/>
+			<ColumnDefinition id="score" title="Score"/>
+			</RowDefinition>
 			</Griddle>
-		);
+			);
 	}
 }
 
@@ -156,16 +172,16 @@ export class CompoTabs extends Component {
 		} else {
 			const compositions = this.props.latestScores.map( (lsc) => 
 				<TabPane tab={ lsc['day']['phase'] } key={ lsc['day']['id'] }>
-					<Composition clubs={this.props.clubs} phaseResult={ lsc }/>
-					<CompositionTable phaseResult={ lsc }/>
+				<Composition clubs={this.props.clubs} phaseResult={ lsc }/>
+				<CompositionTable phaseResult={ lsc }/>
 				</TabPane>);
 			return (
 				<Tabs
-					renderTabBar={() => <InkTabBar/>}
-          			renderTabContent={() => <TabContent/>}>
+				renderTabBar={() => <InkTabBar/>}
+				renderTabContent={() => <TabContent/>}>
 				{compositions}
 				</Tabs>
-			);
+				);
 		}
 	}
 }

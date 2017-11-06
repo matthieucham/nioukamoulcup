@@ -277,7 +277,7 @@ class LeagueInstancePhaseDayManager(models.Manager):
             attrs['composition'][poste] = [
                 {'player': {'id': sig.player.pk, 'name': sig.player.display_name()},
                  'club': {'id': sig.player.club.pk, 'name': sig.player.club.nom} if sig.player.club else None,
-                 'score': "{0:.2f}".format(sco)} for
+                 'score': round(sco, 2)} for
                 sig, sco in composition[poste]]
         team_config = team.attributes
         if 'joker' in team_config:
