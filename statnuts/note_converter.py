@@ -10,7 +10,7 @@ def compute_note(statnuts_ratings):
         notes.append(
             CONVERSION_FUNCTIONS[r['source']](float(r['rating'])) if r['source'] in CONVERSION_FUNCTIONS else float(
                 r['rating']))
-    return float(sum(notes)) / max(len(notes), 1)
+    return round(float(sum(notes)) / max(len(notes), 1), 2)
 
 
 def _conv_kicker(raw):
