@@ -2,9 +2,11 @@ from rest_framework import serializers
 from dry_rest_permissions.generics import DRYPermissionsField
 from django.db import models
 from django.contrib.auth.models import User
+
+
 # import json
 
-from game.models import league_models, transfer_models
+from game.models import league_models, transfer_models, scoring_models
 from ligue1 import models as l1models
 
 
@@ -27,6 +29,55 @@ class PlayerHdrSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = l1models.Joueur
         fields = ('id', 'url', 'prenom', 'nom', 'surnom', 'poste', 'club')
+
+
+class JourneeScoringSerializer(serializers.ModelSerializer):
+    journee = serializers.SlugRelatedField('numero', read_only=True)
+
+    class Meta:
+        model = scoring_models.JourneeScoring
+        fields = ('journee', )
+
+
+class JJScoreSerializer(serializers.ModelSerializer):
+    journee_scoring = JourneeScoringSerializer(read_only=True)
+    note = serializers.FloatField()
+    bonus = serializers.FloatField()
+    compensation = serializers.FloatField()
+
+    class Meta:
+        model = scoring_models.JJScore
+        fields = ('journee_scoring', 'note', 'bonus', 'compensation', 'details')
+
+
+class NotesField(serializers.Field):
+    def to_representation(self, value):
+        perfs = scoring_models.JJScore.objects.filter(joueur=value,
+                                                      journee_scoring__saison_scoring__saison__est_courante__isnull=False)
+        perfs_notes = list(filter(lambda n: n is not None, map(lambda jjs: jjs.note, perfs)))
+        count = len(perfs_notes)
+        avg = round(float(sum(perfs_notes)) / max(count, 1), 3)
+        return avg
+
+
+class PlayerScoreSerializer(PlayerHdrSerializer):
+    # perfs = JJScoreSerializer(source='jjscore_set', many=True, read_only=True)
+    perfs_agg = serializers.SerializerMethodField(source='*')
+
+    def get_perfs_agg(self, value):
+        perfs = scoring_models.JJScore.objects.filter(joueur=value,
+                                                      journee_scoring__saison_scoring__saison__est_courante__isnull=False)
+        perfs_notes = list(filter(lambda n: n is not None, map(lambda jjs: jjs.note, perfs)))
+        count = len(perfs_notes)
+        avg = round(float(sum(perfs_notes)) / max(count, 1), 3)
+        buts = sum(list(map(lambda bo: bo['GOAL'] if 'GOAL' in bo else 0,
+                            map(lambda jjs: jjs.details['bonuses'] if 'bonuses' in jjs.details else [],
+                                perfs))))
+        return {'count': count, 'average': avg, 'goals': buts}
+
+    class Meta:
+        model = l1models.Joueur
+        fields = ('id', 'url', 'prenom', 'nom', 'surnom', 'poste', 'club', 'perfs_agg')
 
 
 class TeamManagerSerializer(serializers.ModelSerializer):
@@ -92,7 +143,7 @@ class LeagueInstancePhaseDaySerializer(serializers.ModelSerializer):
 
 
 class SigningSerializer(serializers.ModelSerializer):
-    player = PlayerHdrSerializer()
+    player = PlayerScoreSerializer()
     team = TeamHdrSerializer()
 
     class Meta:

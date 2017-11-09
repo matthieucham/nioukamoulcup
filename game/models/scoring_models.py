@@ -1,6 +1,7 @@
 __author__ = 'mgrandrie'
 from django.utils import timezone
 from django.db import models
+from django.contrib.postgres.fields import JSONField
 
 from ligue1 import models as l1models
 # from game import models as gamemodels
@@ -24,7 +25,8 @@ class SaisonScoring(models.Model):
                     js.delete()
             else:
                 journees_to_recompute.append(j)
-        return [JourneeScoring.objects.select_related('journee').create(journee=journee, saison_scoring=self) for journee in
+        return [JourneeScoring.objects.select_related('journee').create(journee=journee, saison_scoring=self) for
+                journee in
                 journees_to_recompute]
 
 
@@ -68,10 +70,10 @@ class JJScoreManager(models.Manager):
                     if bbp is None:
                         bbp = scoring.compute_best_by_position(all_perfs)
                     for perf in all_perfs:
-                        note, bonus, comp = scoring.compute_score_performance(perf, bbp)
+                        note, bonus, comp, earned_bonuses = scoring.compute_score_performance(perf, bbp)
                         jjscores.append(
                             JJScore(journee_scoring=journee_scoring, joueur=perf.joueur, note=note, bonus=bonus,
-                                    compensation=comp))
+                                    compensation=comp, details={'bonuses': earned_bonuses}))
                         # for cl in journee_scoring.journee.saison.participants:
                         # if not cl.pk in computed_club_pks:
                         # compenser scores matchs reportés ...
@@ -94,10 +96,12 @@ class JJScore(models.Model):
     note = models.DecimalField(max_digits=5, decimal_places=3, blank=True, null=True)
     bonus = models.DecimalField(max_digits=5, decimal_places=3, blank=False, null=False, default=0)
     compensation = models.DecimalField(max_digits=5, decimal_places=3, blank=True, null=True)
+    details = JSONField(default=dict())
+
     objects = JJScoreManager()
 
 
     # class TeamScore(models.Model):
     # team = models.OneToOneField(gamemodels.Team, primary_key=True)
-    #     kcup_score = models.FloatField(default=0.0)
+    # kcup_score = models.FloatField(default=0.0)
     #     computed_at = models.DateTimeField(auto_now_add=True)
