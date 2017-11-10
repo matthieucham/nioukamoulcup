@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from dry_rest_permissions.generics import DRYPermissionsField
 from django.db import models
+from game.services import scoring
 from django.contrib.auth.models import User
 
 
@@ -50,16 +51,6 @@ class JJScoreSerializer(serializers.ModelSerializer):
         fields = ('journee_scoring', 'note', 'bonus', 'compensation', 'details')
 
 
-class NotesField(serializers.Field):
-    def to_representation(self, value):
-        perfs = scoring_models.JJScore.objects.filter(joueur=value,
-                                                      journee_scoring__saison_scoring__saison__est_courante__isnull=False)
-        perfs_notes = list(filter(lambda n: n is not None, map(lambda jjs: jjs.note, perfs)))
-        count = len(perfs_notes)
-        avg = round(float(sum(perfs_notes)) / max(count, 1), 3)
-        return avg
-
-
 class PlayerScoreSerializer(PlayerHdrSerializer):
     # perfs = JJScoreSerializer(source='jjscore_set', many=True, read_only=True)
     perfs_agg = serializers.SerializerMethodField(source='*')
@@ -70,10 +61,17 @@ class PlayerScoreSerializer(PlayerHdrSerializer):
         perfs_notes = list(filter(lambda n: n is not None, map(lambda jjs: jjs.note, perfs)))
         count = len(perfs_notes)
         avg = round(float(sum(perfs_notes)) / max(count, 1), 3)
-        buts = sum(list(map(lambda bo: bo['GOAL'] if 'GOAL' in bo else 0,
-                            map(lambda jjs: jjs.details['bonuses'] if 'bonuses' in jjs.details else [],
-                                perfs))))
-        return {'count': count, 'average': avg, 'goals': buts}
+
+        output = {'NOTES_COUNT': count, 'NOTES_AVG': avg}
+        for metakey in scoring.BONUS:
+            for bonuskey in scoring.BONUS[metakey]:
+                bonusval = sum(map(lambda bo: bo[bonuskey], filter(lambda bo: bonuskey in bo,
+                                                                   map(lambda jjs: jjs.details['bonuses'], filter(
+                                                                       lambda j: j.details and 'bonuses' in j.details,
+                                                                       perfs)))))
+                output.update({bonuskey: bonusval})
+
+        return output
 
     class Meta:
         model = l1models.Joueur
