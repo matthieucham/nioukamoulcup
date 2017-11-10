@@ -46,9 +46,11 @@ export class PlayersTable extends Component {
 				sortDirection={sortDirection}>
 				<Column	label="Prénom"
 				dataKey="displayedFirstName"
+				cellRenderer={({rowData}) => <a href={rowData['url']}>{rowData['displayedFirstName']}</a> } 
 				width={100}  flexShrink={1}/>
 				<Column	label="Nom"
 				dataKey="displayedName"
+				cellRenderer={({rowData}) => <a href={rowData['url']}>{rowData['displayedName']}</a> } 
 				width={100} flexGrow={1}/>
 				<Column	label="Poste"
 				dataKey="poste"
