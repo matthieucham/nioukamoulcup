@@ -65,18 +65,14 @@ export class PlayersTable extends Component {
 
 				<Column	label="Buts"
 				dataKey="GOAL"
-				width={60}/>
-
-				<Column	label="Pén."
-				dataKey="PENALTY"
+				cellDataGetter={({rowData}) => rowData['GOAL']+ (rowData['PENALTY']/2.0)}
+				cellRenderer={({rowData}) => rowData['PENALTY'] ? rowData['GOAL']+' + '+rowData['PENALTY'] : rowData['GOAL']}
 				width={60}/>
 
 				<Column	label="Passes"
 				dataKey="PASS"
-				width={60}/>
-
-				<Column	label="Pén. Obt."
-				dataKey="HALFPASS"
+				cellDataGetter={({rowData}) => rowData['PASS']+ (rowData['HALFPASS']/2.0)}
+				cellRenderer={({rowData}) => rowData['HALFPASS'] ? rowData['PASS']+' + '+rowData['HALFPASS'] : rowData['PASS']}
 				width={60}/>
 
 				<Column	label="Rempart"
