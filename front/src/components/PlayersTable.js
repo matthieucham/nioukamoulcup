@@ -11,7 +11,10 @@ export class PlayersTable extends Component {
 		this.state={
 			sortBy: 'poste',
 			sortDirection: SortDirection.ASC,
-			players: props.players.map((p) => {p.displayedName= p.surnom ? p.surnom: p.nom; return p}).map((p) => {p.displayedFirstName= p.surnom ? "": p.prenom; return p}).sort(this._sortByPoste()),
+			players: props.players.map((p) => {p.displayedName= p.surnom ? p.surnom: p.nom; return p})
+				.map((p) => {p.displayedFirstName= p.surnom ? "": p.prenom; return p})
+				.map((p) => { Object.keys(p.perfs_agg).forEach(function(k) {p[k] = p.perfs_agg[k]}); return p })
+				.sort(this._sortByPoste()),
 			dico: {'G': 'Gardien', 'D': 'Défenseur', 'M': 'Milieu', 'A': 'Attaquant'},
 		};
 
@@ -40,22 +43,64 @@ export class PlayersTable extends Component {
 
 				sort={this._sort}
 				sortBy={sortBy}
-				sortDirection={sortDirection}
-				>
+				sortDirection={sortDirection}>
 				<Column	label="Prénom"
 				dataKey="displayedFirstName"
-				width={100}/>
+				width={100}  flexShrink={1}/>
 				<Column	label="Nom"
 				dataKey="displayedName"
 				width={100} flexGrow={1}/>
 				<Column	label="Poste"
 				dataKey="poste"
 				cellRenderer={({cellData}) => dico[cellData] } 
-				width={80}/>
-				<Column	label="Club"
-				dataKey="club" 
-				cellDataGetter={({rowData}) => rowData.club.nom}
-				width={100} flexGrow={1} />
+				width={80}  flexShrink={1}/>
+
+				<Column	label="Notes"
+				dataKey="NOTES_COUNT"
+				width={60}/>
+
+				<Column	label="Moy."
+				dataKey="NOTES_AVG"
+				width={60}/>
+
+				<Column	label="Buts"
+				dataKey="GOAL"
+				width={60}/>
+
+				<Column	label="Pén."
+				dataKey="PENALTY"
+				width={60}/>
+
+				<Column	label="Passes"
+				dataKey="PASS"
+				width={60}/>
+
+				<Column	label="Pén. Obt."
+				dataKey="HALFPASS"
+				width={60}/>
+
+				<Column	label="Rempart"
+				dataKey="3STOPS"
+				width={60}/>
+
+				<Column	label="Pén. Arr."
+				dataKey="PENALSTOP"
+				width={60}/>
+
+				<Column	label="Best"
+				dataKey="LEADER"
+				width={60}/>
+
+				<Column	label="Offensif"
+				dataKey="OFFENSIVE"
+				cellDataGetter={({rowData}) => rowData.OFFENSIVE+ (rowData.HALFOFFENSIVE/2.0)}
+				width={60}/>
+				
+				<Column	label="Clean sh."
+				dataKey="CLEANSHEET"
+				cellDataGetter={({rowData}) => rowData.CLEANSHEET+ (rowData.HALFCLEANSHEET/2.0)}
+				width={60}/>
+
 				</Table>
 				)}
 			</AutoSizer>
