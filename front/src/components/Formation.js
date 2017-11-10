@@ -4,9 +4,6 @@ import 'rc-tabs/assets/index.css';
 import Tabs, { TabPane } from 'rc-tabs';
 import TabContent from 'rc-tabs/lib/TabContent';
 import InkTabBar from 'rc-tabs/lib/InkTabBar';
-import Griddle, { plugins, RowDefinition, ColumnDefinition } from 'griddle-react';
-import { AutoSizer, Column, Table } from 'react-virtualized';
-import 'react-virtualized/styles.css'; // only needs to be imported once
 
 
 class Jersey extends Component {

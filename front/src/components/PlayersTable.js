@@ -57,49 +57,49 @@ export class PlayersTable extends Component {
 
 				<Column	label="Notes"
 				dataKey="NOTES_COUNT"
-				width={60}/>
+				width={40}/>
 
 				<Column	label="Moy."
 				dataKey="NOTES_AVG"
-				width={60}/>
+				width={40}/>
 
 				<Column	label="Buts"
 				dataKey="GOAL"
-				width={60}/>
+				width={40}/>
 
 				<Column	label="Pén."
 				dataKey="PENALTY"
-				width={60}/>
+				width={40}/>
 
 				<Column	label="Passes"
 				dataKey="PASS"
-				width={60}/>
+				width={40}/>
 
 				<Column	label="Pén. Obt."
 				dataKey="HALFPASS"
-				width={60}/>
+				width={40}/>
 
 				<Column	label="Rempart"
 				dataKey="3STOPS"
-				width={60}/>
+				width={40}/>
 
 				<Column	label="Pén. Arr."
 				dataKey="PENALSTOP"
-				width={60}/>
+				width={40}/>
 
 				<Column	label="Best"
 				dataKey="LEADER"
-				width={60}/>
+				width={40}/>
 
 				<Column	label="Offensif"
 				dataKey="OFFENSIVE"
 				cellDataGetter={({rowData}) => rowData.OFFENSIVE+ (rowData.HALFOFFENSIVE/2.0)}
-				width={60}/>
+				width={40}/>
 				
 				<Column	label="Clean sh."
 				dataKey="CLEANSHEET"
 				cellDataGetter={({rowData}) => rowData.CLEANSHEET+ (rowData.HALFCLEANSHEET/2.0)}
-				width={60}/>
+				width={40}/>
 
 				</Table>
 				)}
