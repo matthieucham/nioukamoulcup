@@ -44,13 +44,10 @@ export class PlayersTable extends Component {
 				sort={this._sort}
 				sortBy={sortBy}
 				sortDirection={sortDirection}>
-				<Column	label="Prénom"
-				dataKey="displayedFirstName"
-				cellRenderer={({rowData}) => <a href={rowData['url']}>{rowData['displayedFirstName']}</a> } 
-				width={100}  flexShrink={1}/>
+				
 				<Column	label="Nom"
 				dataKey="displayedName"
-				cellRenderer={({rowData}) => <a href={rowData['url']}>{rowData['displayedName']}</a> } 
+				cellRenderer={({rowData}) => <a href={rowData['url']}>{rowData['surnom']? rowData['displayedName'] : rowData['displayedFirstName']+' '+rowData['displayedName']}</a> } 
 				width={100} flexGrow={1}/>
 				<Column	label="Poste"
 				dataKey="poste"
