@@ -1,11 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { TestPage } from './pages/TestPage';
+import { EkypPage } from './pages/EkypPage';
 
 // ========================================
 
 const pages = {
-    'test': TestPage
+    'test': TestPage,
+    'ekyp': EkypPage,
 };
 
 ReactDOM.render(
