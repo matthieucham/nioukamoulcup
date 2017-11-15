@@ -329,6 +329,7 @@ header nav a:hover, nav ul li ul li:hover {
     .team-header .team-cover-box {
         display: block;
         flex-grow: 1;
+        min-width: 300px;
     }
 }
 

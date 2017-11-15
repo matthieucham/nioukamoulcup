@@ -4,16 +4,26 @@ import React, { Component } from 'react';
 export class TeamCover extends Component {
 	constructor(props) {
 		super(props);
+
+		this.state = {
+			'name': this.props.team.name,
+			'coverUrl': "perso" in this.props.team.attributes && "cover" in this.props.team.attributes.perso ? this.props.team.attributes.perso.cover : null,
+		}
 	}
 
 	render() {
+		const showName = this.props.showName;
 		return (
-			<div className={`team-cover-box`} style={ {backgroundImage: 'url('+this.props.coverUrl+')'} }>
-				<h1>{ this.props.name }</h1>
+			<div className={`team-cover-box`} style={ {backgroundImage: 'url('+this.state.coverUrl+')'} }>
+				{ showName && <h1>{ this.state.name }</h1> }
 			</div>
 		);
 	}
 }
+
+TeamCover.defaultProps = {
+  showName: true
+};
 
 class KeyValueBox extends Component {
 	render() {
@@ -57,7 +67,7 @@ export class TeamHeader extends Component {
 					<h1 className="page-title">{ this.props.team.name }</h1>
 					<ul>{mgrs}</ul>
 				</div>
-				<TeamCover name="El Brutal Principe " coverUrl={ 'http://2.bp.blogspot.com/_vtZDyEhVbnw/SSoFfKwR-gI/AAAAAAAACHs/4p_3iAYKikY/s400/Francescoli.php' }/>
+				<TeamCover team={ this.props.team } showName={ false }/>
 				<div>{kv}</div>
 			</div>
 		);

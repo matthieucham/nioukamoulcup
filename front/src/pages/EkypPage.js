@@ -6,6 +6,8 @@ import { PlayersTable } from '../components/PlayersTable';
 
 class Page extends Component {
 	render() {
+		const coverUrl= "perso" in this.props.team.attributes && "cover" in this.props.team.attributes.perso ? this.props.team.attributes.perso.cover : null;
+
 		return (
 			<div className="react-app-inner">
 			<main>
@@ -14,7 +16,7 @@ class Page extends Component {
 			<PlayersTable players={ this.props.team.signings.map((s) => s.player ) } height={ 500 }/>
 			</main>
 			<aside className="hg__right">
-			<TeamCover name={ this.props.team.name } coverUrl={ 'http://2.bp.blogspot.com/_vtZDyEhVbnw/SSoFfKwR-gI/AAAAAAAACHs/4p_3iAYKikY/s400/Francescoli.php' }/>
+			<TeamCover team={ this.props.team }/>
 			<TeamSignings signings={ this.props.team.signings } />
 			</aside>
 			</div>
