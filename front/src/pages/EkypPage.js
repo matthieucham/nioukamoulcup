@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { CompoTabs } from '../components/Formation';
 import { TeamSignings } from '../components/Signings';
 import { TeamCover, TeamHeader } from '../components/TeamDesc';
-import { PlayersTable } from '../components/PlayersTable';
+import TeamPlayersTable from '../containers/TeamPlayersTable';
 
 
 const mapStateToProps = state => {
@@ -31,7 +31,7 @@ const Page = ({ team, clubs}) => {
 			<main>
 			<TeamHeader team={ team } />
 			<CompoTabs clubs={ clubs } latestScores={ team.latest_scores } />
-			<PlayersTable players={ team.signings.map((s) => s.player ) } height={ 500 }/>
+			<TeamPlayersTable height={ 500 }/>
 			</main>
 			<aside className="hg__right">
 			<TeamCover team={ team }/>

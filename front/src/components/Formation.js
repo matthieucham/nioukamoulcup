@@ -88,7 +88,7 @@ export const CompoTabs = ({latestScores, clubs}) => {
 		return (
 			<Tabs
 			renderTabBar={() => <InkTabBar/>}
-			renderTabContent={() => <TabContent/>}>
+			renderTabContent={() => <TabContent animated={false}/>}>
 			{compositions}
 			</Tabs>
 			);
