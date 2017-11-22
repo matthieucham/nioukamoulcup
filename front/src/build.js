@@ -6,7 +6,7 @@ import { Provider } from 'react-redux'
 
 import nioukamoulcupApp from './reducers'
 import { TestPage } from './pages/TestPage'
-import { EkypPage } from './pages/EkypPage'
+import EkypPage from './pages/EkypPage'
 
 // ========================================
 
