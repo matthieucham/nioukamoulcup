@@ -52,7 +52,7 @@ class JJScoreSerializer(serializers.ModelSerializer):
 
 
 class PlayerScoreSerializer(PlayerHdrSerializer):
-    # perfs = JJScoreSerializer(source='jjscore_set', many=True, read_only=True)
+    perfs = JJScoreSerializer(source='jjscore_set', many=True, read_only=True)
     perfs_agg = serializers.SerializerMethodField(source='*')
 
     def get_perfs_agg(self, value):
@@ -75,7 +75,7 @@ class PlayerScoreSerializer(PlayerHdrSerializer):
 
     class Meta:
         model = l1models.Joueur
-        fields = ('id', 'url', 'prenom', 'nom', 'surnom', 'poste', 'club', 'perfs_agg')
+        fields = ('id', 'url', 'prenom', 'nom', 'surnom', 'poste', 'club', 'perfs_agg', 'perfs')
 
 
 class TeamManagerSerializer(serializers.ModelSerializer):
@@ -141,7 +141,7 @@ class LeagueInstancePhaseDaySerializer(serializers.ModelSerializer):
 
 
 class SigningSerializer(serializers.ModelSerializer):
-    player = PlayerScoreSerializer()
+    player = PlayerHdrSerializer()
     team = TeamHdrSerializer()
 
     class Meta:
