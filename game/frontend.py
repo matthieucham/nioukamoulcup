@@ -89,7 +89,7 @@ class LeagueWallView(PermissionRequiredMixin, CurrentLeagueInstanceMixin, Detail
             models.LeagueInstancePhaseDay.objects.get_latest_day_for_phases(
                 models.LeagueInstancePhase.objects.filter(league_instance=instance)), many=True,
             context={'request': self.request})
-        context['props'] = {
+        context['__PRELOADED_STATE__'] = {
             'ranking': json.loads(str(JSONRenderer().render(serializer.data), 'utf-8'))
         }
 
@@ -126,5 +126,5 @@ class LeagueEkypView(PermissionRequiredMixin, StateInitializerMixin, CurrentLeag
         #     l1models.Club.objects.filter(participations__est_courante__isnull=False), many=True,
         #     context={'request': self.request})
 
-        context['props'] = self.init_from_team(self.request, my_team)
+        context['__PRELOADED_STATE__'] = self.init_from_team(self.request, my_team)
         return context
