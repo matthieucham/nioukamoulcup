@@ -14,7 +14,9 @@ from ligue1 import models as l1models
 class ClubSerializer(serializers.ModelSerializer):
     class Meta:
         model = l1models.Club
-        fields = ('id', 'nom', 'maillot_svg', 'maillot_color_bg', 'maillot_color1', 'maillot_color2')
+        fields = ('id', 'nom',
+                  'maillot_svg', 'maillot_color_bg', 'maillot_color1'
+                  )
 
 
 class ClubHdrSerializer(serializers.ModelSerializer):
@@ -52,7 +54,7 @@ class JJScoreSerializer(serializers.ModelSerializer):
 
 
 class PlayerScoreSerializer(PlayerHdrSerializer):
-    perfs = JJScoreSerializer(source='jjscore_set', many=True, read_only=True)
+    # perfs = JJScoreSerializer(source='jjscore_set', many=True, read_only=True)
     perfs_agg = serializers.SerializerMethodField(source='*')
 
     def get_perfs_agg(self, value):
@@ -75,7 +77,16 @@ class PlayerScoreSerializer(PlayerHdrSerializer):
 
     class Meta:
         model = l1models.Joueur
-        fields = ('id', 'url', 'prenom', 'nom', 'surnom', 'poste', 'club', 'perfs_agg', 'perfs')
+        fields = ('id',
+                  'url',
+                  'prenom',
+                  'nom',
+                  'surnom',
+                  'poste',
+                  'club',
+                  'perfs_agg'
+                  # 'perfs',
+                  )
 
 
 class TeamManagerSerializer(serializers.ModelSerializer):

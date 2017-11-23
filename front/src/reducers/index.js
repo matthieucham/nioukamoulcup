@@ -5,7 +5,6 @@ import { combineReducers } from 'redux'
 
 function nioukamoulcupApp(state = initialState, action) {
 	/* TODO */
-	console.log(state)
 	return state;
 }
 

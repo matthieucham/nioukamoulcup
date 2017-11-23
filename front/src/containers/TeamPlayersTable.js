@@ -2,20 +2,12 @@ import { connect } from 'react-redux'
 import { PlayersTable } from '../components/PlayersTable'
 
 const getPlayersWithScore = (signings, fullPlayers) => {
-  // TODO : normalize state and direct access by id
-  return signings.map(s => {
-  		for (var fp of fullPlayers) {
-  			if (fp.id == s.player.id) {
-  				return fp;
-  			}
-  		}
-  		return null;
-     })
+  return signings.map(s => fullPlayers[s.player.id])
 }
 
 const mapStateToProps = state => {
   return {
-    players: getPlayersWithScore(state.team.signings, state.players)
+    players: getPlayersWithScore(state.result.team.signings, state.entities.players)
   }
 }
 

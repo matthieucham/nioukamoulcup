@@ -8,21 +8,12 @@ import TeamPlayersTable from '../containers/TeamPlayersTable';
 
 const mapStateToProps = state => {
 	return {
-		team: state.team,
-		clubs: state.clubs
+		team: state.result.team,
 	}
 }
 
-/* TODO */
-const mapDispatchToProps = dispatch => {
-  return {
-    onTodoClick: id => {
-      dispatch(toggleTodo(id))
-    }
-  }
-}
 
-const Page = ({ team, clubs}) => {
+const Page = ({ team }) => {
 	
 		const coverUrl= "perso" in team.attributes && "cover" in team.attributes.perso ? team.attributes.perso.cover : null;
 
@@ -30,7 +21,7 @@ const Page = ({ team, clubs}) => {
 			<div className="react-app-inner">
 			<main>
 			<TeamHeader team={ team } />
-			<CompoTabs clubs={ clubs } latestScores={ team.latest_scores } />
+			<CompoTabs latestScores={ team.latest_scores } />
 			<TeamPlayersTable height={ 500 }/>
 			</main>
 			<aside className="hg__right">
@@ -42,9 +33,6 @@ const Page = ({ team, clubs}) => {
 			);
 }
 
-const EkypPage = connect(
-	mapStateToProps,
-	mapDispatchToProps
-	)(Page)
+const EkypPage = connect(mapStateToProps)(Page)
 
 export default EkypPage

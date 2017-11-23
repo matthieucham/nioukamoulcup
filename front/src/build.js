@@ -3,8 +3,10 @@ import ReactDOM from 'react-dom';
 import { hydrate } from 'react-dom'
 import { createStore } from 'redux'
 import { Provider } from 'react-redux'
+import { normalize } from 'normalizr';
 
 import nioukamoulcupApp from './reducers'
+import { Schemas } from './middleware/api'
 import { TestPage } from './pages/TestPage'
 import EkypPage from './pages/EkypPage'
 
@@ -24,12 +26,15 @@ const pages = {
     'ekyp': EkypPage,
 };
 
+const preloadedStateSchema = { players: Schemas.PLAYER_ARRAY, clubs: Schemas.CLUB_ARRAY };
+const normalizedData = normalize(preloadedState, preloadedStateSchema);
+
 // Create Redux store with initial state
-const store = createStore(nioukamoulcupApp, preloadedState)
+const store = createStore(nioukamoulcupApp, normalizedData)
 
 hydrate(
 	<Provider store={store}>
-		{ React.createElement(pages[component], preloadedState) }
+		{ React.createElement(pages[component]) }
 	</Provider>,
 	 window.react_mount
 );
