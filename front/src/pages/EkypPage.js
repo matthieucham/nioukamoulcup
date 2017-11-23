@@ -1,28 +1,38 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux'
 import { CompoTabs } from '../components/Formation';
 import { TeamSignings } from '../components/Signings';
 import { TeamCover, TeamHeader } from '../components/TeamDesc';
-import { PlayersTable } from '../components/PlayersTable';
+import TeamPlayersTable from '../containers/TeamPlayersTable';
 
-class Page extends Component {
-	render() {
-		const coverUrl= "perso" in this.props.team.attributes && "cover" in this.props.team.attributes.perso ? this.props.team.attributes.perso.cover : null;
+
+const mapStateToProps = state => {
+	return {
+		team: state.result.team,
+	}
+}
+
+
+const Page = ({ team }) => {
+	
+		const coverUrl= "perso" in team.attributes && "cover" in team.attributes.perso ? team.attributes.perso.cover : null;
 
 		return (
 			<div className="react-app-inner">
 			<main>
-			<TeamHeader team={ this.props.team } />
-			<CompoTabs clubs={ this.props.clubs } latestScores={ this.props.team.latest_scores } />
-			<PlayersTable players={ this.props.team.signings.map((s) => s.player ) } height={ 500 }/>
+			<TeamHeader team={ team } />
+			<CompoTabs latestScores={ team.latest_scores } />
+			<TeamPlayersTable height={ 500 }/>
 			</main>
 			<aside className="hg__right">
-			<TeamCover team={ this.props.team }/>
-			<TeamSignings signings={ this.props.team.signings } />
+			<TeamCover team={ team }/>
+			<TeamSignings signings={ team.signings } />
 			</aside>
 			</div>
 
 			);
-	}
 }
 
-export const EkypPage = Page
+const EkypPage = connect(mapStateToProps)(Page)
+
+export default EkypPage
