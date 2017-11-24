@@ -1,5 +1,13 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux'
+
 import LeagueRankingWidget from '../components/LeagueRanking';
+
+const mapStateToProps = state => {
+	return {
+		ranking: state.result.ranking,
+	}
+}
 
 class App extends Component {
 	render() {
@@ -17,4 +25,5 @@ class App extends Component {
 	}
 }
 
-export const TestPage = App
+export const TestPage = connect(mapStateToProps)(App)
+

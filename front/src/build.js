@@ -4,6 +4,7 @@ import { hydrate } from 'react-dom'
 import { createStore } from 'redux'
 import { Provider } from 'react-redux'
 import { normalize } from 'normalizr';
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 
 import nioukamoulcupApp from './reducers'
 import { Schemas } from './middleware/api'
@@ -34,7 +35,9 @@ const store = createStore(nioukamoulcupApp, normalizedData)
 
 hydrate(
 	<Provider store={store}>
-		{ React.createElement(pages[component]) }
+		<MuiThemeProvider>
+			{ React.createElement(pages[component]) }
+		</MuiThemeProvider>
 	</Provider>,
 	 window.react_mount
 );

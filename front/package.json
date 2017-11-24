@@ -4,12 +4,13 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
+    "material-ui": "^0.19.4",
     "moment": "^2.19.1",
     "normalizr": "^3.2.4",
     "rc-collapse": "^1.7.6",
-    "rc-tabs": "^9.1.4",
     "react-redux": "^5.0.6",
     "react-svg": "^2.1.22",
+    "react-swipeable-views": "^0.12.10",
     "react-virtualized": "^9.12.0",
     "recompose": "0.25.1",
     "redux": "^3.7.2"
