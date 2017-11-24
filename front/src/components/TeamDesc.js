@@ -15,7 +15,7 @@ TeamCover.defaultProps = {
 	showName: true
 };
 
-const KeyValueBox = ({value, desc}) => <dl className="card"><dt>{value}</dt><dd>{desc}</dd></dl>
+const KeyValueBox = ({value, desc}) => <dl className="card"><dd>{desc}</dd><dt>{value}</dt></dl>
 
 
 function getKeyValues(team) {

@@ -50,6 +50,15 @@ h1.page-title {
     font-size: 1.8em;
 }
 
+a {
+    color: #2196F3;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
 a.navlink {
     color: #5f5f5f;
     display: block;
@@ -91,7 +100,7 @@ dl.card > dd {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    transform: translateY(-100%);
+    /*transform: translateY(-100%);*/
 }
 
 
@@ -147,33 +156,6 @@ table.ktable-class .ktable-heading-class {
 .hg__right .fixtures li > a:first-child {
     flex: 1;
     text-align: right;
-}
-
-.hg__right .rc-collapse {
-    background-color: inherit;
-    border: none;
-}
-
-.hg__right .rc-collapse-header .playerName{
-    font-size: 1em;
-}
-
-.hg__right .rc-collapse-header .clubName{
-    font-size: 0.8em;
-}
-.hg__right .rc-collapse-header .clubName:before {
-    content: " (";
-}
-.hg__right .rc-collapse-header .clubName:after {
-    content: ")";
-}
-
-.hg__right .rc-collapse-content {
-    color: inherit;
-}
-
-.hg__right .rc-collapse-header.past  .playerName{
-    text-decoration: line-through;
 }
 
 @media all and (max-width: 768px) {

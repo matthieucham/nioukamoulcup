@@ -7,7 +7,6 @@
     "material-ui": "^0.19.4",
     "moment": "^2.19.1",
     "normalizr": "^3.2.4",
-    "rc-collapse": "^1.7.6",
     "react-redux": "^5.0.6",
     "react-svg": "^2.1.22",
     "react-swipeable-views": "^0.12.10",
