@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-
+import KeyValueBox from './KeyValueBox';
 
 export const TeamCover = ({team, showName}) => {
 	const name = team.name;
@@ -15,9 +15,6 @@ TeamCover.defaultProps = {
 	showName: true
 };
 
-const KeyValueBox = ({value, desc}) => <dl className="card"><dd>{desc}</dd><dt>{value}</dt></dl>
-
-
 function getKeyValues(team) {
 	let keyValues = [];
 	keyValues.push(['Ka', team.account_balance]);
@@ -31,7 +28,7 @@ function getKeyValues(team) {
 }
 
 export const TeamHeader = ({team}) => {
-	const kv = getKeyValues(team).map(kv => <KeyValueBox value={kv[1]} key={kv[0]} desc={kv[0]} />);
+	const kv = getKeyValues(team).map(kv => <KeyValueBox value={kv[1]} key={kv[0]} label={kv[0]} onClick={ () => {alert('toto')} } />);
 	const mgrs = team.managers.map(m => <li key={m.user} className="manager">{m.user}</li>);
 	return (
 		<div className={`team-header`}>

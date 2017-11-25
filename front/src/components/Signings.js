@@ -5,21 +5,21 @@ import Subheader from 'material-ui/Subheader';
 import Avatar from 'material-ui/Avatar';
 import FlatButton from 'material-ui/FlatButton';
 
+import KeyValueBox from './KeyValueBox'
+
 
 const SigningPanel = ({ signing }) => {
 
 	const hasLeft = signing.hasOwnProperty('end') && signing.end;
-	const bonus = signing.attributes.score_factor && signing.attributes.score_factor > 1.0 ? ((signing.attributes.score_factor - 1.0) * 100).toFixed(0) : 0;
+	const bonus = signing.attributes.score_factor && signing.attributes.score_factor > 1.0 ? ((signing.attributes.score_factor - 1.0) * 100).toFixed(0)+'%': null;
+	const amount = signing.attributes.amount + ' Ka';
 	Moment.locale('fr');
 	return (
 		<div>
-		<dl className="card">
-		<dd>Prix d'achat</dd>
-		<dt>{ signing.attributes.amount } Ka</dt>
-		</dl>
-		{ bonus > 0 && <dl className="card"><dd>Bonification</dd><dt>+{ bonus }%</dt></dl>}
-		<dl className="card"><dd>Arrivée</dd><dt>{ Moment(signing.begin).format('DD/MM/YYYY') }</dt></dl>
-		{ hasLeft && <dl className="card"><dd>Départ</dd><dt>{ Moment(signing.end).format('DD/MM/YYYY') }</dt></dl>}
+		<KeyValueBox label="Prix d'achat" value={ amount } />
+		{ bonus && <KeyValueBox label="Bonification" value={ bonus }/>}
+		<KeyValueBox label="Arrivée" value={ Moment(signing.begin).format('DD/MM/YYYY') } />
+		{ hasLeft && <KeyValueBox label="Départ" value={ Moment(signing.end).format('DD/MM/YYYY') } />}
 		<CardActions>
       		<FlatButton label="Fiche" href={ signing.player.url } />
       		<FlatButton label="Revendre" href={ signing.player.url } primary={true} />

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import {Tabs, Tab} from 'material-ui/Tabs';
-import SwipeableViews from 'react-swipeable-views';
+/*import SwipeableViews from 'react-swipeable-views';*/
 
 import { JerseyPlaceHolder } from './FieldPlayer'
 import ClubFieldPlayer from '../containers/ClubFieldPlayer'
@@ -52,17 +52,22 @@ export class CompoTabs extends Component {
 			return (<Composition phaseResult={ latestScores[0] } />);
 		} else {
 			const tabs = latestScores.map( (lsc, index) => 
-				<Tab label={ lsc['day']['phase'] } key={ lsc['day']['id'] } value={ index }/>);
-			const sw = latestScores.map( (lsc) => 
+				<Tab label={ lsc['day']['phase'] } key={ lsc['day']['id'] } value={ index }>
+				<Composition phaseResult={ lsc } key={ lsc['day']['id'] } />
+				</Tab>
+				);
+			/*const sw = latestScores.map( (lsc) => 
 				<Composition phaseResult={ lsc } key={ lsc['day']['id'] } />);
+				Sous Tabs:
+				<SwipeableViews index={this.state.slideIndex} onChangeIndex={this.handleChange}>
+				{sw}
+				</SwipeableViews>*/
 			return (
 				<div>
 				<Tabs onChange={this.handleChange} value={this.state.slideIndex}>
 				{tabs}
 				</Tabs>
-				<SwipeableViews index={this.state.slideIndex} onChangeIndex={this.handleChange}>
-				{sw}
-				</SwipeableViews>
+				
 				</div>
 				);
 		}
