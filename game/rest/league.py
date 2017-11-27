@@ -46,3 +46,13 @@ class ClubListView(CurrentLeagueInstanceMixin, generics.ListAPIView):
         league_pk = self.kwargs['league_pk']
         instance = self._get_current_league_instance(league_pk)
         return l1models.Club.objects.filter(participations=instance.saison)
+
+
+class TeamSigningsListView(CurrentLeagueInstanceMixin, generics.ListAPIView):
+    permission_classes = (DRYObjectPermissions,)
+    serializer_class = serializers.SigningSerializer
+
+    def get_queryset(self):
+        team_pk = self.kwargs['team_pk']
+        return league_models.Signing.objects.filter(team=team_pk).order_by('begin')
+

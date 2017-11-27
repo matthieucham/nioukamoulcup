@@ -13,4 +13,7 @@ urlpatterns = format_suffix_patterns([
     url(r'^leagues/(?P<league_pk>[0-9]+)/clubs$',
         league.ClubListView.as_view(),
         name='team-detail'),
+    url(r'^teams/(?P<team_pk>[0-9]+)/signings$',
+        league.TeamSigningsListView.as_view(),
+        name='team-signings'),
 ])
