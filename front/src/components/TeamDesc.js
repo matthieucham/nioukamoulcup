@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import KeyValueBox from './KeyValueBox';
+import CollapsibleSection from './CollapsibleSection';
 
 export const TeamCover = ({team, showName}) => {
 	const name = team.name;
@@ -27,17 +28,37 @@ function getKeyValues(team) {
 	return keyValues;
 }
 
-export const TeamHeader = ({team}) => {
-	const kv = getKeyValues(team).map(kv => <KeyValueBox value={kv[1]} key={kv[0]} label={kv[0]} onClick={ () => {alert('toto')} } />);
-	const mgrs = team.managers.map(m => <li key={m.user} className="manager">{m.user}</li>);
-	return (
-		<div className={`team-header`}>
-		<div className="team-title">
-		<h1 className="page-title">{ team.name }</h1>
-		<ul>{mgrs}</ul>
-		</div>
-		<TeamCover team={ team } showName={ false }/>
-		<div>{kv}</div>
-		</div>
-		);
+export class TeamHeader extends Component {
+
+	constructor(props) {
+		super(props);
+		this.state = {expanded: false};
+
+		this.handleToggle = this.handleToggle.bind(this);
+	}
+	
+	handleToggle() {
+		this.setState({expanded: !this.state.expanded});
+	}
+	
+	render() {
+		const team = this.props.team;
+		const kv = getKeyValues(team).map(kv => <KeyValueBox value={kv[1]} key={kv[0]} label={kv[0]} onClick={ this.handleToggle } />);
+		const mgrs = team.managers.map(m => <li key={m.user} className="manager">{m.user}</li>);
+		return (
+			<div className={`team-header`}>
+			<div className="team-title">
+			<h1 className="page-title">{ team.name }</h1>
+			<ul>{mgrs}</ul>
+			</div>
+			<TeamCover team={ team } showName={ false }/>
+			<div>{kv}</div>
+
+			<CollapsibleSection expanded={this.state.expanded}>
+				<p>My loaded content here</p>
+			</CollapsibleSection>
+
+			</div>
+			);
+	}
 }

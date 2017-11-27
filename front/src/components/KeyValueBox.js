@@ -10,8 +10,9 @@ class KeyValueBox extends Component {
 
 	render() {
 		const clickable = this.props.onClick != null;
+		const clName = clickable ? "card clickable" : "card";
 		return(
-			<dl className="card" onClick={ this.props.onClick }>
+			<dl className={ clName } onClick={ this.props.onClick }>
 			<dd>{ this.props.label }</dd>
 			{ 
 				clickable &&

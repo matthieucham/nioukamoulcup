@@ -112,6 +112,15 @@ dl.card:hover dd {
     white-space: normal;
 }
 
+dl.card.clickable {
+    cursor: pointer;
+}
+
+dl.card.clickable:hover {
+    background-color: #f1f1f1;
+    transition-duration: 0.4s;
+}
+
 table.ktable-class .ktable-heading-class {
     background-color: #5f5f5f;
     color: #f1f1f1;
@@ -126,7 +135,17 @@ table.ktable-class .ktable-heading-class {
     background-color: #f1f1f1;
 }
 
+section.closed {
+    overflow: hidden;
+    height:0;
+    transition-duration: 0.4s;
+}
 
+section.expanded {
+    overflow: hidden;
+    height: 300px;
+    transition-duration: 0.4s;
+}
 
 /* RiGHT COLUMN */
 .hg__right > section {

@@ -45,7 +45,7 @@ const PositionSignings = ({signings, position}) => {
 						</div>
 				</CardHeader>
 
-			<CardText expandable={true} style={ {paddingTop: 0, paddingBottom: 0} } actAsExpander={true} >
+			<CardText expandable={true} style={ {paddingTop: 0, paddingBottom: 0} } actAsExpander={false} >
 			<SigningPanel signing={s} />
 			</CardText>
 			</Card>)});
