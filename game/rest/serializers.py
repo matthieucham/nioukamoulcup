@@ -157,7 +157,7 @@ class SigningSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = league_models.Signing
-        fields = ('player', 'team', 'begin', 'end', 'attributes')
+        fields = ('id', 'player', 'team', 'begin', 'end', 'attributes')
 
 
 class JourneeHdrSerializer(serializers.ModelSerializer):
