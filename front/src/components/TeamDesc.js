@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import KeyValueBox from './KeyValueBox';
 import { TeamDescCollapsibleSection } from '../containers/TeamDescCollapsibleSection';
-import { fetchSignings } from '../actions'
+import { SigningsKVB } from '../containers/SigningsKVB';
 
 export const TeamCover = ({team, showName}) => {
 	const name = team.name;
@@ -33,17 +33,11 @@ export class TeamHeader extends Component {
 
 	constructor(props) {
 		super(props);
-
-		this.handleClick = this.handleClick.bind(this);
 	}
-	
-	handleClick() {
-		fetchSignings(this.props.team.id)
-	}
-	
+		
 	render() {
 		const team = this.props.team;
-		const kv = getKeyValues(team).map(kv => <KeyValueBox value={kv[1]} key={kv[0]} label={kv[0]} onClick={ this.handleClick } />);
+		const kv = getKeyValues(team).map(kv => <KeyValueBox value={kv[1]} key={kv[0]} label={kv[0]} />);
 		const mgrs = team.managers.map(m => <li key={m.user} className="manager">{m.user}</li>);
 		return (
 			<div className={`team-header`}>
@@ -52,7 +46,7 @@ export class TeamHeader extends Component {
 			<ul>{mgrs}</ul>
 			</div>
 			<TeamCover team={ team } showName={ false }/>
-			<div>{kv}</div>
+			<div><SigningsKVB value="toto" label="titi" />{kv}</div>
 
 			<TeamDescCollapsibleSection>
 				<p>My loaded content here</p>
