@@ -6,7 +6,7 @@ import { Provider } from 'react-redux'
 import { normalize } from 'normalizr';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 
-import nioukamoulcupApp from './reducers'
+import configureStore from './store/configureStore'
 import { Schemas } from './middleware/api'
 import { TestPage } from './pages/TestPage'
 import EkypPage from './pages/EkypPage'
@@ -29,9 +29,32 @@ const pages = {
 
 const preloadedStateSchema = { players: Schemas.PLAYER_ARRAY, clubs: Schemas.CLUB_ARRAY };
 const normalizedData = normalize(preloadedState, preloadedStateSchema);
+const initialState = {
+	data: {
+		players: {
+			allIds: normalizedData.result.players,
+			byId: normalizedData.entities.players
+		},
+		clubs: {
+			allIds: normalizedData.result.clubs,
+			byId: normalizedData.entities.clubs
+		},
+		teams: {
+			visited: normalizedData.result.team
+		},
+		rankings: {
+			current: normalizedData.result.ranking
+		}
+	},
+	ui: {isFetching: false, expandTeamDesc: false},
+}
+
+console.log(initialState);
+
+export const API_ROOT = normalizedData.result.apiroot;
 
 // Create Redux store with initial state
-const store = createStore(nioukamoulcupApp, normalizedData)
+const store = configureStore(initialState)
 
 hydrate(
 	<Provider store={store}>

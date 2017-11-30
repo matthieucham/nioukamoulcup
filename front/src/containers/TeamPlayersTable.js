@@ -7,7 +7,7 @@ const getPlayersWithScore = (signings, fullPlayers) => {
 
 const mapStateToProps = state => {
   return {
-    players: getPlayersWithScore(state.result.team.signings, state.entities.players)
+    players: getPlayersWithScore(state.data.teams.visited.signings, state.data.players.byId)
   }
 }
 

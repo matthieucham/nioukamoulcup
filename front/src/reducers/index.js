@@ -5,34 +5,59 @@ import {
 } from '../actions'
 
 
-// Updates an entity cache in response to any action with response.entities.
-const entities = (state = { players: {}, clubs: {}, signings:{} }, action) => {
-  if (action.response && action.response.entities) {
-    return merge({}, state, action.response.entities)
-  }
-
-  return state
-}
-
-
-function signings( state={isFetching: false, signings: []}, action) {
+function signings( state={signings: []}, action) {
 	switch(action.type) {
 		case REQUEST_SIGNINGS:
-			return Object.assign({}, state, {isFetching: true})
+			console.log('req')
+			return Object.assign({}, state, {signings: []})
 		case RECEIVE_SIGNINGS:
-			return Object.assign({}, state, {isFetching: false, signings: action.signings})
+			console.log('resp '+action.signings)
+			return Object.assign({}, state, {signings: action.signings})
 		default:
 			return state
 	}
 }
 
-
-/*const nioukamoulcupApp = combineReducers({
-})*/
-
-function nioukamoulcupApp(state = initialState, action) {
-	/* TODO */
-	return state;
+const ui = (state={isFetching: false, expandTeamDesc: false}, action) => {
+	switch(action.type) {
+		case REQUEST_SIGNINGS:
+			return Object.assign({}, state, {isFetching: true, expandTeamDesc: true})
+		case RECEIVE_SIGNINGS:
+			return Object.assign({}, state, {isFetching: false})
+		default:
+			return state
+	}
 }
 
-export default nioukamoulcupApp
+const players = (state={}, action) => {
+	return state
+}
+
+const clubs = (state={}, action) => {
+	return state
+}
+
+const teams = (state={}, action) => {
+	return state
+}
+
+const rankings = (state={}, action) => {
+	return state
+}
+
+
+const data = combineReducers({
+	players,
+	clubs,
+	teams,
+	rankings,
+	signings,
+})
+
+
+const rootReducer = combineReducers({
+	data,
+	ui,
+})
+
+export default rootReducer

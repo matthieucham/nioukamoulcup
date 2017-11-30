@@ -245,5 +245,5 @@ class TeamDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = league_models.Team
-        fields = ('name', 'attributes', 'managers', 'permissions', 'account_balance', 'signings_aggregation',
+        fields = ('id', 'name', 'attributes', 'managers', 'permissions', 'account_balance', 'signings_aggregation',
                   'signings', 'latest_scores', )

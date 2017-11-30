@@ -5,7 +5,7 @@ import LeagueRankingWidget from '../components/LeagueRanking';
 
 const mapStateToProps = state => {
 	return {
-		ranking: state.result.ranking,
+		ranking: state.data.rankings.current,
 	}
 }
 

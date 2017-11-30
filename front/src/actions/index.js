@@ -2,6 +2,7 @@
 import fetch from 'cross-fetch'
 import { normalize } from 'normalizr';
 import { Schemas } from '../middleware/api'
+import { API_ROOT } from '../build'
 
 export const REQUEST_SIGNINGS='REQUEST_SIGNINGS'
 export const RECEIVE_SIGNINGS='RECEIVE_SIGNINGS'
@@ -17,24 +18,18 @@ export const receiveSignings = (team, json) => {
 	return {
 		type: RECEIVE_SIGNINGS,
 		team,
-		signings: normalize(json, Schemas.SIGNING_ARRAY)
+		signings: json
 	}
 }
 
-function getHostUrl() {
-	/*var protocol = window.location.protocol;
-	var slashes = protocol.concat("//");
-	var host = slashes.concat(window.location.hostname);
-	var withPort = host.concat(":").concat(window.location.port).concat("/")
-	return withPort;*/
-	return store.getState().apiroot;
-}
+export function fetchSignings(team) {
+	let url = API_ROOT.concat(`teams/${team}/signings?format=json`)
+	console.log("plouf "+url);
 
-function fetchSignings(team) {
   return dispatch => {
     dispatch(requestSignings(team))
-    return fetch(`https://www.reddit.com/r/${subreddit}.json`)
+    return fetch(url)
       .then(response => response.json())
-      .then(json => dispatch(receivePosts(subreddit, json)))
+      .then(json => dispatch(receiveSignings(team, json)))
   }
 }

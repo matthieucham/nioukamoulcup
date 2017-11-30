@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import KeyValueBox from './KeyValueBox';
-import CollapsibleSection from './CollapsibleSection';
+import { TeamDescCollapsibleSection } from '../containers/TeamDescCollapsibleSection';
+import { fetchSignings } from '../actions'
 
 export const TeamCover = ({team, showName}) => {
 	const name = team.name;
@@ -32,18 +33,17 @@ export class TeamHeader extends Component {
 
 	constructor(props) {
 		super(props);
-		this.state = {expanded: false};
 
-		this.handleToggle = this.handleToggle.bind(this);
+		this.handleClick = this.handleClick.bind(this);
 	}
 	
-	handleToggle() {
-		this.setState({expanded: !this.state.expanded});
+	handleClick() {
+		fetchSignings(this.props.team.id)
 	}
 	
 	render() {
 		const team = this.props.team;
-		const kv = getKeyValues(team).map(kv => <KeyValueBox value={kv[1]} key={kv[0]} label={kv[0]} onClick={ this.handleToggle } />);
+		const kv = getKeyValues(team).map(kv => <KeyValueBox value={kv[1]} key={kv[0]} label={kv[0]} onClick={ this.handleClick } />);
 		const mgrs = team.managers.map(m => <li key={m.user} className="manager">{m.user}</li>);
 		return (
 			<div className={`team-header`}>
@@ -54,9 +54,9 @@ export class TeamHeader extends Component {
 			<TeamCover team={ team } showName={ false }/>
 			<div>{kv}</div>
 
-			<CollapsibleSection expanded={this.state.expanded}>
+			<TeamDescCollapsibleSection>
 				<p>My loaded content here</p>
-			</CollapsibleSection>
+			</TeamDescCollapsibleSection>
 
 			</div>
 			);

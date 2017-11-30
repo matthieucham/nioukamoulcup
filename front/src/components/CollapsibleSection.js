@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-class CollapsibleSection extends Component {
+export class CollapsibleSection extends Component {
 	constructor(props) {
 		super(props)
 	}
@@ -15,5 +15,3 @@ class CollapsibleSection extends Component {
 			);
 	}
 }
-
-export default CollapsibleSection

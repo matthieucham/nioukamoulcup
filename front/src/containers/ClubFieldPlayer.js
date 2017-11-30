@@ -4,7 +4,7 @@ import { FieldPlayer } from '../components/FieldPlayer'
 const mapStateToProps = ( state, ownProps ) => {
 	const targetedPlayer = ownProps.player;
   	return {
-    	club: state.entities.clubs[targetedPlayer.club.id]
+    	club: state.data.clubs.byId[targetedPlayer.club.id]
   	}
 }
 
