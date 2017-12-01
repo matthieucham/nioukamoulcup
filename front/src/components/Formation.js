@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
-import {Tabs, Tab} from 'material-ui/Tabs';
-/*import SwipeableViews from 'react-swipeable-views';*/
+import 'rc-tabs/assets/index.css';
+import Tabs, { TabPane } from 'rc-tabs';
+import TabContent from 'rc-tabs/lib/TabContent';
+import InkTabBar from 'rc-tabs/lib/InkTabBar';
 
 import { JerseyPlaceHolder } from './FieldPlayer'
 import ClubFieldPlayer from '../containers/ClubFieldPlayer'
@@ -30,46 +32,25 @@ const Composition = ({ phaseResult }) => {
 		</div>)
 }
 
-export class CompoTabs extends Component { 
-	constructor(props) {
-		super(props);
-		this.state = {
-			slideIndex: 0
-		};
-
-		this.handleChange = this.handleChange.bind(this);
-	}
-
-	handleChange(value) {
-		this.setState({
-			slideIndex: value
-		});
-	};
-
-	render() {
-		const latestScores = this.props.latestScores;
-		if (latestScores.length == 1) {
-			return (<Composition phaseResult={ latestScores[0] } />);
-		} else {
-			const tabs = latestScores.map( (lsc, index) => 
-				<Tab label={ lsc['day']['phase'] } key={ lsc['day']['id'] } value={ index }>
-				<Composition phaseResult={ lsc } key={ lsc['day']['id'] } />
-				</Tab>
-				);
+export const CompoTabs = ({ latestScores }) => {
+	if (latestScores.length == 1) {
+		return (<Composition phaseResult={ latestScores[0] } />);
+	} else {
+		const compositions = latestScores.map( (lsc) => 
+			<TabPane tab={ lsc['day']['phase'] } key={ lsc['day']['id'] }>
+			<Composition phaseResult={ lsc }/>
+			</TabPane>);
 			/*const sw = latestScores.map( (lsc) => 
-				<Composition phaseResult={ lsc } key={ lsc['day']['id'] } />);
 				Sous Tabs:
 				<SwipeableViews index={this.state.slideIndex} onChangeIndex={this.handleChange}>
 				{sw}
 				</SwipeableViews>*/
-			return (
-				<div>
-				<Tabs onChange={this.handleChange} value={this.state.slideIndex}>
-				{tabs}
-				</Tabs>
-				
-				</div>
-				);
-		}
+		return (
+			<Tabs
+			renderTabBar={() => <InkTabBar/>}
+			renderTabContent={() => <TabContent animated={false}/>}>
+			{compositions}
+			</Tabs>
+			);
 	}
 }

@@ -59,7 +59,7 @@ const store = configureStore(initialState)
 hydrate(
 	<Provider store={store}>
 		<MuiThemeProvider>
-			{ React.createElement(pages[component]) }
+		{ React.createElement(pages[component]) }
 		</MuiThemeProvider>
 	</Provider>,
 	 window.react_mount

@@ -26,4 +26,3 @@ class App extends Component {
 }
 
 export const TestPage = connect(mapStateToProps)(App)
-
