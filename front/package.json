@@ -11,6 +11,7 @@
     "rc-tabs": "^9.1.4",
     "react-redux": "^5.0.6",
     "react-svg": "^2.1.22",
+    "react-tabs-redux": "^2.0.1",
     "react-virtualized": "^9.12.0",
     "recompose": "0.25.1",
     "redux": "^3.7.2",

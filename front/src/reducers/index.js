@@ -21,7 +21,7 @@ function signings( state={signings: []}, action) {
 const ui = (state={isFetching: false, expandTeamDesc: false}, action) => {
 	switch(action.type) {
 		case REQUEST_SIGNINGS:
-			return Object.assign({}, state, {isFetching: true, expandTeamDesc: true, teamDescTab:"0"})
+			return Object.assign({}, state, {isFetching: true, expandTeamDesc: true, teamDescTab:"signings"})
 		case RECEIVE_SIGNINGS:
 			return Object.assign({}, state, {isFetching: false})
 		default:

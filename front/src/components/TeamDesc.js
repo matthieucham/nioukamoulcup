@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
-import 'rc-tabs/assets/index.css';
+/*import 'rc-tabs/assets/index.css';
 import Tabs, { TabPane } from 'rc-tabs';
 import TabContent from 'rc-tabs/lib/TabContent';
-import InkTabBar from 'rc-tabs/lib/InkTabBar';
+import InkTabBar from 'rc-tabs/lib/InkTabBar';*/
+
+import { Tabs, TabLink, TabContent } from 'react-tabs-redux'
 
 import { connect } from 'react-redux'
 
@@ -44,19 +46,19 @@ class TeamDescCollapsibleSection extends Component {
 
 	render() {
 		const activeKey = this.props.activeKey;
-		console.log('activeKey= '+activeKey);
 		return (
 		<CollapsibleSection expanded={this.props.expanded}>
 			<Tabs
-			renderTabBar={() => <InkTabBar/>}
-			renderTabContent={() => <TabContent animated={false}/>}
-			activeKey={activeKey}>
-			<TabPane tab="signings" key="signings">
-				<p>Signings</p>
-			</TabPane>
-			<TabPane tab="test" key="test">
+			selectedTab={activeKey}>
+
+			<TabContent for="test" key="test">
 				<p>Test</p>
-			</TabPane>
+			</TabContent>
+
+			<TabContent for="signings" key="signings">
+				<p>Signings</p>
+			</TabContent>
+			
 			</Tabs>
 		</CollapsibleSection>
 		);
