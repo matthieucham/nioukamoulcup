@@ -1,6 +1,13 @@
 import React, { Component } from 'react';
+import 'rc-tabs/assets/index.css';
+import Tabs, { TabPane } from 'rc-tabs';
+import TabContent from 'rc-tabs/lib/TabContent';
+import InkTabBar from 'rc-tabs/lib/InkTabBar';
+
+import { connect } from 'react-redux'
+
 import KeyValueBox from './KeyValueBox';
-import { TeamDescCollapsibleSection } from '../containers/TeamDescCollapsibleSection';
+import { CollapsibleSection } from './CollapsibleSection';
 import { SigningsKVB } from '../containers/SigningsKVB';
 
 export const TeamCover = ({team, showName}) => {
@@ -29,6 +36,42 @@ function getKeyValues(team) {
 	return keyValues;
 }
 
+
+class TeamDescCollapsibleSection extends Component {
+	constructor(props) {
+		super(props);
+	}
+
+	render() {
+		const activeKey = this.props.activeKey;
+		console.log('activeKey= '+activeKey);
+		return (
+		<CollapsibleSection expanded={this.props.expanded}>
+			<Tabs
+			renderTabBar={() => <InkTabBar/>}
+			renderTabContent={() => <TabContent animated={false}/>}
+			activeKey={activeKey}>
+			<TabPane tab="signings" key="signings">
+				<p>Signings</p>
+			</TabPane>
+			<TabPane tab="test" key="test">
+				<p>Test</p>
+			</TabPane>
+			</Tabs>
+		</CollapsibleSection>
+		);
+	}
+}
+
+const mapStateToTeamDescCollapsibleSectionProps = ( state ) => {
+	return {
+    	expanded: state.ui.expandTeamDesc,
+    	activeKey: state.ui.teamDescTab
+  	}
+}
+
+const ConnectedTDS = connect(mapStateToTeamDescCollapsibleSectionProps)(TeamDescCollapsibleSection)
+
 export class TeamHeader extends Component {
 
 	constructor(props) {
@@ -48,9 +91,7 @@ export class TeamHeader extends Component {
 			<TeamCover team={ team } showName={ false }/>
 			<div><SigningsKVB value="toto" label="titi" />{kv}</div>
 
-			<TeamDescCollapsibleSection>
-				<p>My loaded content here</p>
-			</TeamDescCollapsibleSection>
+			<ConnectedTDS />
 
 			</div>
 			);

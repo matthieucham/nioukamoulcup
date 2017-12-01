@@ -46,10 +46,7 @@ const initialState = {
 			current: normalizedData.result.ranking
 		}
 	},
-	ui: {isFetching: false, expandTeamDesc: false},
 }
-
-console.log(initialState);
 
 export const API_ROOT = normalizedData.result.apiroot;
 
