@@ -1,13 +1,8 @@
 import React, { Component } from 'react';
-/*import 'rc-tabs/assets/index.css';
-import Tabs, { TabPane } from 'rc-tabs';
-import TabContent from 'rc-tabs/lib/TabContent';
-import InkTabBar from 'rc-tabs/lib/InkTabBar';*/
-
 import { Tabs, TabLink, TabContent } from 'react-tabs-redux'
-
 import { connect } from 'react-redux'
 
+import { closeTeamDesc } from '../actions'
 import KeyValueBox from './KeyValueBox';
 import { CollapsibleSection } from './CollapsibleSection';
 import { SigningsKVB } from '../containers/SigningsKVB';
@@ -46,8 +41,9 @@ class TeamDescCollapsibleSection extends Component {
 
 	render() {
 		const activeKey = this.props.activeKey;
+		const titles = { signings: 'Joueurs recrutés'}
 		return (
-		<CollapsibleSection expanded={this.props.expanded}>
+		<CollapsibleSection expanded={this.props.expanded} title={ titles[activeKey] } onClose={ () => this.props.onClose() }>
 			<Tabs
 			selectedTab={activeKey}>
 
@@ -72,7 +68,13 @@ const mapStateToTeamDescCollapsibleSectionProps = ( state ) => {
   	}
 }
 
-const ConnectedTDS = connect(mapStateToTeamDescCollapsibleSectionProps)(TeamDescCollapsibleSection)
+const mapDispatchToTeamDescCollapsibleSectionProps = dispatch => {
+  return {
+    onClose: () => dispatch( closeTeamDesc() )
+  }
+}
+
+const ConnectedTDS = connect(mapStateToTeamDescCollapsibleSectionProps, mapDispatchToTeamDescCollapsibleSectionProps)(TeamDescCollapsibleSection)
 
 export class TeamHeader extends Component {
 

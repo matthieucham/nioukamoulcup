@@ -1,7 +1,8 @@
 import { combineReducers } from 'redux'
 import {
 	REQUEST_SIGNINGS,
-	RECEIVE_SIGNINGS
+	RECEIVE_SIGNINGS,
+	CLOSE_TEAMDESC
 } from '../actions'
 
 
@@ -24,6 +25,9 @@ const ui = (state={isFetching: false, expandTeamDesc: false}, action) => {
 			return Object.assign({}, state, {isFetching: true, expandTeamDesc: true, teamDescTab:"signings"})
 		case RECEIVE_SIGNINGS:
 			return Object.assign({}, state, {isFetching: false})
+		case CLOSE_TEAMDESC:
+			console.log('close reçu');
+			return Object.assign({}, state, {expandTeamDesc: false})
 		default:
 			return state
 	}

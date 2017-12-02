@@ -134,6 +134,13 @@ table.ktable-class .ktable-heading-class {
     background-color: #f1f1f1;
 }
 
+.team-header section {
+    width: 100%;
+    padding: 0 10px;
+    margin: 3px;
+    border-bottom: solid #5f5f5f;
+}
+
 section.closed {
     overflow: hidden;
     height:0;
