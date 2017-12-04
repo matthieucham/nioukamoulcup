@@ -2,10 +2,10 @@ import React, { Component } from 'react';
 import { Tabs, TabLink, TabContent } from 'react-tabs-redux'
 import { connect } from 'react-redux'
 
-import { closeTeamDesc } from '../actions'
-import KeyValueBox from './KeyValueBox';
-import { CollapsibleSection } from './CollapsibleSection';
-import { SigningsKVB } from '../containers/SigningsKVB';
+import { closeTeamDesc, fetchSignings } from '../actions'
+import KeyValueBox from '../components/KeyValueBox';
+import { CollapsibleSection } from '../components/CollapsibleSection';
+
 
 export const TeamCover = ({team, showName}) => {
 	const name = team.name;
@@ -86,6 +86,8 @@ export class TeamHeader extends Component {
 		const team = this.props.team;
 		const kv = getKeyValues(team).map(kv => <KeyValueBox value={kv[1]} key={kv[0]} label={kv[0]} />);
 		const mgrs = team.managers.map(m => <li key={m.user} className="manager">{m.user}</li>);
+		const SigningsKVB = connect(state => { return {value: team.signings_aggregation.current_signings, label: "Joueurs"} }, 
+									dispatch => { return { onKVBClick: () => dispatch( fetchSignings(team.id) ) } } )(KeyValueBox);
 		return (
 			<div className={`team-header`}>
 			<div className="team-title">
@@ -93,7 +95,7 @@ export class TeamHeader extends Component {
 			<ul>{mgrs}</ul>
 			</div>
 			<TeamCover team={ team } showName={ false }/>
-			<div><SigningsKVB value="toto" label="titi" />{kv}</div>
+			<div><SigningsKVB /></div>
 
 			<ConnectedTDS />
 

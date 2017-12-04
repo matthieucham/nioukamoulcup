@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux'
 import { CompoTabs } from '../components/Formation';
 import { TeamSignings } from '../components/Signings';
-import { TeamCover, TeamHeader } from '../components/TeamDesc';
+import { TeamCover, TeamHeader } from '../containers/TeamDesc';
 import TeamPlayersTable from '../containers/TeamPlayersTable';
 
 
