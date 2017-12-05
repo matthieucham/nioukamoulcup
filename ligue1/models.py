@@ -148,7 +148,7 @@ class Joueur(Importe):
         if self.surnom:
             return self.surnom
         if self.prenom:
-            return '%s. %s' % (self.prenom[:1], self.nom)
+            return '%s %s' % (self.prenom, self.nom)
         return self.nom
 
     def __str__(self):

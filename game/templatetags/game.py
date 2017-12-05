@@ -1,6 +1,6 @@
 import bleach
 import html.parser
-import json as jsonlib
+import simplejson as jsonlib
 from django.utils.safestring import mark_safe
 from game import models
 # Inside custom tag - is_active.py

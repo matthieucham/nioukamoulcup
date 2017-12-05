@@ -24,7 +24,7 @@ export const receiveSignings = (team, json) => {
 }
 
 export function fetchSignings(team) {
-	let url = API_ROOT.concat(`teams/${team}/signings?format=json`)
+	let url = API_ROOT.concat(`teams/${team}/signings?format=json&ordering=-begin`)
 
   return dispatch => {
     dispatch(requestSignings(team))

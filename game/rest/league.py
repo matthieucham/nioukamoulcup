@@ -51,6 +51,8 @@ class ClubListView(CurrentLeagueInstanceMixin, generics.ListAPIView):
 class TeamSigningsListView(CurrentLeagueInstanceMixin, generics.ListAPIView):
     permission_classes = (DRYObjectPermissions,)
     serializer_class = serializers.SigningSerializer
+    ordering_fields = ('begin', )
+    ordering = ('begin', )
 
     def get_queryset(self):
         team_pk = self.kwargs['team_pk']

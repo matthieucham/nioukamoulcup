@@ -5,6 +5,7 @@ import { connect } from 'react-redux'
 import { closeTeamDesc, fetchSignings } from '../actions'
 import KeyValueBox from '../components/KeyValueBox';
 import { CollapsibleSection } from '../components/CollapsibleSection';
+import { SigningsTable } from '../components/SigningsTable';
 
 
 export const TeamCover = ({team, showName}) => {
@@ -42,6 +43,7 @@ class TeamDescCollapsibleSection extends Component {
 	render() {
 		const activeKey = this.props.activeKey;
 		const titles = { signings: 'Joueurs recrutés'}
+		const ConnectedSigningsTable = connect(state => { return {signings: state.data.signings.all, height: 300} } ) (SigningsTable);
 		return (
 		<CollapsibleSection expanded={this.props.expanded} title={ titles[activeKey] } onClose={ () => this.props.onClose() }>
 			<Tabs
@@ -52,7 +54,7 @@ class TeamDescCollapsibleSection extends Component {
 			</TabContent>
 
 			<TabContent for="signings" key="signings">
-				<p>Signings</p>
+				<ConnectedSigningsTable />
 			</TabContent>
 			
 			</Tabs>
@@ -64,7 +66,8 @@ class TeamDescCollapsibleSection extends Component {
 const mapStateToTeamDescCollapsibleSectionProps = ( state ) => {
 	return {
     	expanded: state.ui.expandTeamDesc,
-    	activeKey: state.ui.teamDescTab
+    	activeKey: state.ui.teamDescTab,
+    	/*signings: state.data.signings,*/
   	}
 }
 
@@ -86,7 +89,7 @@ export class TeamHeader extends Component {
 		const team = this.props.team;
 		const kv = getKeyValues(team).map(kv => <KeyValueBox value={kv[1]} key={kv[0]} label={kv[0]} />);
 		const mgrs = team.managers.map(m => <li key={m.user} className="manager">{m.user}</li>);
-		const SigningsKVB = connect(state => { return {value: team.signings_aggregation.current_signings, label: "Joueurs"} }, 
+		const SigningsKVB = connect(state => { return {value: team.signings_aggregation.current_signings, label: "Recrues"} }, 
 									dispatch => { return { onKVBClick: () => dispatch( fetchSignings(team.id) ) } } )(KeyValueBox);
 		return (
 			<div className={`team-header`}>

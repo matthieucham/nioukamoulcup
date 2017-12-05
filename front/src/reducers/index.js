@@ -9,11 +9,9 @@ import {
 function signings( state={signings: []}, action) {
 	switch(action.type) {
 		case REQUEST_SIGNINGS:
-			console.log('req')
-			return Object.assign({}, state, {signings: []})
+			return Object.assign({}, state, {all: []})
 		case RECEIVE_SIGNINGS:
-			console.log('resp '+action.signings)
-			return Object.assign({}, state, {signings: action.signings})
+			return Object.assign({}, state, {all: action.signings} )
 		default:
 			return state
 	}
@@ -26,7 +24,6 @@ const ui = (state={isFetching: false, expandTeamDesc: false}, action) => {
 		case RECEIVE_SIGNINGS:
 			return Object.assign({}, state, {isFetching: false})
 		case CLOSE_TEAMDESC:
-			console.log('close reçu');
 			return Object.assign({}, state, {expandTeamDesc: false})
 		default:
 			return state

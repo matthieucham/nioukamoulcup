@@ -11,9 +11,7 @@ export class PlayersTable extends Component {
 		this.state={
 			sortBy: 'poste',
 			sortDirection: SortDirection.ASC,
-			players: props.players.map((p) => {p.displayedName= p.surnom ? p.surnom: p.nom; return p})
-				.map((p) => {p.displayedFirstName= p.surnom ? "": p.prenom; return p})
-				.map((p) => { Object.keys(p.perfs_agg).forEach(function(k) {p[k] = p.perfs_agg[k]}); return p })
+			players: props.players.map((p) => { Object.keys(p.perfs_agg).forEach(function(k) {p[k] = p.perfs_agg[k]}); return p })
 				.sort(this._sortByPoste()),
 			dico: {'G': 'Gardien', 'D': 'Défenseur', 'M': 'Milieu', 'A': 'Attaquant'},
 		};
@@ -46,8 +44,8 @@ export class PlayersTable extends Component {
 				sortDirection={sortDirection}>
 				
 				<Column	label="Nom"
-				dataKey="displayedName"
-				cellRenderer={({rowData}) => <a href={rowData['url']}>{rowData['surnom']? rowData['displayedName'] : rowData['displayedFirstName']+' '+rowData['displayedName']}</a> } 
+				dataKey="display_name"
+				cellRenderer={({rowData}) => <a href={rowData['url']}>{rowData['display_name']}</a> } 
 				width={100} flexGrow={1}/>
 				<Column	label="Poste"
 				dataKey="poste"

@@ -31,7 +31,7 @@ class PlayerHdrSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = l1models.Joueur
-        fields = ('id', 'url', 'prenom', 'nom', 'surnom', 'poste', 'club')
+        fields = ('id', 'url', 'prenom', 'nom', 'surnom', 'display_name', 'poste', 'club')
 
 
 class JourneeScoringSerializer(serializers.ModelSerializer):
@@ -82,6 +82,7 @@ class PlayerScoreSerializer(PlayerHdrSerializer):
                   'prenom',
                   'nom',
                   'surnom',
+                  'display_name',
                   'poste',
                   'club',
                   'perfs_agg'
