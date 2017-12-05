@@ -22,19 +22,6 @@ TeamCover.defaultProps = {
 	showName: true
 };
 
-function getKeyValues(team) {
-	let keyValues = [];
-	keyValues.push(['Ka', team.account_balance]);
-	keyValues.push(['Joueurs', team.signings_aggregation.current_signings]);
-	keyValues.push(['PA', team.signings_aggregation.total_pa]);
-	keyValues.push(['Reventes', team.signings_aggregation.total_releases]);
-	let formation = team.latest_scores[0]['formation'];
-	keyValues.push(['Formation', formation['D']+'-'+formation['M']+'-'+formation['A']]);
-	team.latest_scores.forEach(ls => keyValues.push([ls.day.phase, ls.score+' Pts']));
-	return keyValues;
-}
-
-
 class TeamDescCollapsibleSection extends Component {
 	constructor(props) {
 		super(props);
@@ -66,8 +53,7 @@ class TeamDescCollapsibleSection extends Component {
 const mapStateToTeamDescCollapsibleSectionProps = ( state ) => {
 	return {
     	expanded: state.ui.expandTeamDesc,
-    	activeKey: state.ui.teamDescTab,
-    	/*signings: state.data.signings,*/
+    	activeKey: state.ui.teamDescTab
   	}
 }
 
@@ -87,10 +73,20 @@ export class TeamHeader extends Component {
 		
 	render() {
 		const team = this.props.team;
-		const kv = getKeyValues(team).map(kv => <KeyValueBox value={kv[1]} key={kv[0]} label={kv[0]} />);
 		const mgrs = team.managers.map(m => <li key={m.user} className="manager">{m.user}</li>);
+
+		const FinancesKVB = connect(state => { return {value: team.account_balance+' Ka', label: "Budget"} }, 
+									dispatch => { return { onKVBClick: () => dispatch( fetchSignings(team.id) ) } } )(KeyValueBox);
+
 		const SigningsKVB = connect(state => { return {value: team.signings_aggregation.current_signings, label: "Recrues"} }, 
 									dispatch => { return { onKVBClick: () => dispatch( fetchSignings(team.id) ) } } )(KeyValueBox);
+		const PAKVB = connect(state => { return {value: team.signings_aggregation.total_pa, label: "PA"} }, 
+									dispatch => { return { onKVBClick: () => dispatch( fetchSignings(team.id) ) } } )(KeyValueBox);
+		const REKVB = connect(state => { return {value: team.signings_aggregation.total_releases, label: "Reventes"} }, 
+									dispatch => { return { onKVBClick: () => dispatch( fetchSignings(team.id) ) } } )(KeyValueBox);
+		let formation = team.latest_scores[0]['formation'];
+		const FormationKVB = connect(state => { return {value: formation['D']+'-'+formation['M']+'-'+formation['A'], label: "Formation"} })(KeyValueBox);
+		const scores = team.latest_scores.map(ls => <KeyValueBox label={ls.day.phase} value={ls.score+' Pts'} key={ls.day.phase} />);
 		return (
 			<div className={`team-header`}>
 			<div className="team-title">
@@ -98,7 +94,14 @@ export class TeamHeader extends Component {
 			<ul>{mgrs}</ul>
 			</div>
 			<TeamCover team={ team } showName={ false }/>
-			<div><SigningsKVB /></div>
+			<div>
+			<FinancesKVB />
+			<SigningsKVB />
+			<PAKVB />
+			<REKVB />
+			<FormationKVB />
+			{ scores }
+			</div>
 
 			<ConnectedTDS />
 
