@@ -31,7 +31,7 @@ class PlayerHdrSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = l1models.Joueur
-        fields = ('id', 'url', 'prenom', 'nom', 'surnom', 'poste', 'club')
+        fields = ('id', 'url', 'prenom', 'nom', 'surnom', 'display_name', 'poste', 'club')
 
 
 class JourneeScoringSerializer(serializers.ModelSerializer):
@@ -82,6 +82,7 @@ class PlayerScoreSerializer(PlayerHdrSerializer):
                   'prenom',
                   'nom',
                   'surnom',
+                  'display_name',
                   'poste',
                   'club',
                   'perfs_agg'
@@ -157,7 +158,7 @@ class SigningSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = league_models.Signing
-        fields = ('player', 'team', 'begin', 'end', 'attributes')
+        fields = ('id', 'player', 'team', 'begin', 'end', 'attributes')
 
 
 class JourneeHdrSerializer(serializers.ModelSerializer):
@@ -245,5 +246,5 @@ class TeamDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = league_models.Team
-        fields = ('name', 'attributes', 'managers', 'permissions', 'account_balance', 'signings_aggregation',
+        fields = ('id', 'name', 'attributes', 'managers', 'permissions', 'account_balance', 'signings_aggregation',
                   'signings', 'latest_scores', )

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-class CollapsibleSection extends Component {
+export class CollapsibleSection extends Component {
 	constructor(props) {
 		super(props)
 	}
@@ -10,10 +10,10 @@ class CollapsibleSection extends Component {
 		const clName = this.props.expanded ? 'expanded' : 'closed';
 		return (
 			<section className={ clName }>
+				<a href="#" style={ {float: 'right'} } onClick={ () => this.props.onClose() }><i className="fa fa-chevron-up"></i></a>
+				<h1>{ this.props.title }</h1>
 				{ this.props.children }
 			</section>
 			);
 	}
 }
-
-export default CollapsibleSection

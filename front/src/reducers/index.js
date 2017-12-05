@@ -1,11 +1,64 @@
 import { combineReducers } from 'redux'
+import {
+	REQUEST_SIGNINGS,
+	RECEIVE_SIGNINGS,
+	CLOSE_TEAMDESC
+} from '../actions'
 
-/*const nioukamoulcupApp = combineReducers({
-})*/
 
-function nioukamoulcupApp(state = initialState, action) {
-	/* TODO */
-	return state;
+function signings( state={signings: []}, action) {
+	switch(action.type) {
+		case REQUEST_SIGNINGS:
+			return Object.assign({}, state, {all: []})
+		case RECEIVE_SIGNINGS:
+			return Object.assign({}, state, {all: action.signings} )
+		default:
+			return state
+	}
 }
 
-export default nioukamoulcupApp
+const ui = (state={isFetching: false, expandTeamDesc: false}, action) => {
+	switch(action.type) {
+		case REQUEST_SIGNINGS:
+			return Object.assign({}, state, {isFetching: true, expandTeamDesc: true, teamDescTab:"signings"})
+		case RECEIVE_SIGNINGS:
+			return Object.assign({}, state, {isFetching: false})
+		case CLOSE_TEAMDESC:
+			return Object.assign({}, state, {expandTeamDesc: false})
+		default:
+			return state
+	}
+}
+
+const players = (state={}, action) => {
+	return state
+}
+
+const clubs = (state={}, action) => {
+	return state
+}
+
+const teams = (state={}, action) => {
+	return state
+}
+
+const rankings = (state={}, action) => {
+	return state
+}
+
+
+const data = combineReducers({
+	players,
+	clubs,
+	teams,
+	rankings,
+	signings,
+})
+
+
+const rootReducer = combineReducers({
+	data,
+	ui,
+})
+
+export default rootReducer

@@ -1,17 +1,41 @@
 
-export const TEAM_NEXT_RESULT='TEAM_NEXT_RESULT'
-export const TEAM_PREVIOUS_RESULT='TEAM_PREVIOUS_RESULT'
+import fetch from 'cross-fetch'
+import { normalize } from 'normalizr';
+import { Schemas } from '../middleware/api'
+import { API_ROOT } from '../build'
 
-export const teamNextResult = dayNumber => {
+export const REQUEST_SIGNINGS='REQUEST_SIGNINGS'
+export const RECEIVE_SIGNINGS='RECEIVE_SIGNINGS'
+export const CLOSE_TEAMDESC='CLOSE_TEAMDESC'
+
+export const requestSignings = team => {
 	return {
-		type: TEAM_NEXT_RESULT,
-		dayNumber
+		type: REQUEST_SIGNINGS,
+		team
 	}
 }
 
-export const teamPreviousResult = dayNumber => {
+export const receiveSignings = (team, json) => {
 	return {
-		type: TEAM_PREVIOUS_RESULT,
-		dayNumber
+		type: RECEIVE_SIGNINGS,
+		team,
+		signings: json
+	}
+}
+
+export function fetchSignings(team) {
+	let url = API_ROOT.concat(`teams/${team}/signings?format=json&ordering=-begin`)
+
+  return dispatch => {
+    dispatch(requestSignings(team))
+    return fetch(url)
+      .then(response => response.json())
+      .then(json => dispatch(receiveSignings(team, json)))
+  }
+}
+
+export function closeTeamDesc() {
+	return {
+		type: CLOSE_TEAMDESC
 	}
 }

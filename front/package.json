@@ -4,15 +4,19 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
+    "cross-fetch": "^1.1.1",
     "material-ui": "^0.19.4",
     "moment": "^2.19.1",
     "normalizr": "^3.2.4",
+    "rc-tabs": "^9.1.4",
     "react-redux": "^5.0.6",
     "react-svg": "^2.1.22",
-    "react-swipeable-views": "^0.12.10",
+    "react-tabs-redux": "^2.0.1",
     "react-virtualized": "^9.12.0",
     "recompose": "0.25.1",
-    "redux": "^3.7.2"
+    "redux": "^3.7.2",
+    "redux-logger": "^3.0.6",
+    "redux-thunk": "^2.2.0"
   },
   "devDependencies": {
     "babel": "^6.23.0",

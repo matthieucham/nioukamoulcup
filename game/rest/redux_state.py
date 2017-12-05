@@ -1,5 +1,4 @@
-import json
-from rest_framework.renderers import JSONRenderer
+from rest_framework.reverse import reverse
 from . import serializers
 from ligue1 import models as l1models
 from utils.timer import Timer
@@ -20,6 +19,7 @@ class StateInitializerMixin:
                 'clubs': list(),
                 'players': list(),
                 'team': None,
+                'apiroot': reverse('api-root', request=request)
             }
             clubs_serializer = serializers.ClubSerializer(
                 l1models.Club.objects.filter(participations__est_courante__isnull=False), many=True,

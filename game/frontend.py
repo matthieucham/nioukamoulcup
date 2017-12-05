@@ -125,6 +125,5 @@ class LeagueEkypView(PermissionRequiredMixin, StateInitializerMixin, CurrentLeag
         # clubs_serializer = serializers.ClubSerializer(
         #     l1models.Club.objects.filter(participations__est_courante__isnull=False), many=True,
         #     context={'request': self.request})
-
         context['PRELOADED_STATE'] = self.init_from_team(self.request, my_team)
         return context
