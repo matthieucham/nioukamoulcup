@@ -78,6 +78,7 @@ INSTALLED_APPS = [
     'colorful',
     'svg',
 
+    'django_filters',
     'webpack_loader',
     'rest_framework',
     'dry_rest_permissions',

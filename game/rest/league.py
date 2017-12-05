@@ -6,7 +6,7 @@ from rest_framework.response import Response
 
 from dry_rest_permissions.generics import DRYObjectPermissions
 
-from game.models import league_models
+from game.models import league_models, transfer_models
 from ligue1 import models as l1models
 from game.rest import serializers
 
@@ -58,3 +58,24 @@ class TeamSigningsListView(CurrentLeagueInstanceMixin, generics.ListAPIView):
         team_pk = self.kwargs['team_pk']
         return league_models.Signing.objects.filter(team=team_pk).order_by('begin')
 
+
+class TeamBankAccountHistoryListView(CurrentLeagueInstanceMixin, generics.ListAPIView):
+    permission_classes = (DRYObjectPermissions,)
+    serializer_class = serializers.BankAccountHistorySerializer
+    ordering_fields = ('date',)
+    ordering = ('date',)
+
+    def get_queryset(self):
+        team_pk = self.kwargs['team_pk']
+        return league_models.BankAccountHistory.objects.filter(bank_account__team=team_pk)
+
+
+class TeamReleasesListView(CurrentLeagueInstanceMixin, generics.ListAPIView):
+    permission_classes = (DRYObjectPermissions,)
+    serializer_class = serializers.ReleaseSerializer
+    ordering_fields = ('signing__end',)
+    ordering = ('signing__end',)
+
+    def get_queryset(self):
+        team_pk = self.kwargs['team_pk']
+        return transfer_models.Release.objects.filter(signing__team=team_pk)

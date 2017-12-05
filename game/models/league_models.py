@@ -151,17 +151,17 @@ class BankAccountHistory(models.Model):
 
     @staticmethod
     def make_info_buy(player, seller=None):
-        return {'type': 'BUY', 'player_id': player.pk, 'player_name': player.__str__(),
+        return {'type': 'BUY', 'player_id': player.pk, 'player_name': player.display_name(),
                 'seller_name': seller.name if seller else None}
 
     @staticmethod
     def make_info_sell(player, buyer):
-        return {'type': 'SELL', 'player_id': player.pk, 'player_name': player.__str__(),
+        return {'type': 'SELL', 'player_id': player.pk, 'player_name': player.display_name(),
                 'buyer_name': buyer.name}
 
     @staticmethod
     def make_info_release(player):
-        return {'type': 'RELEASE', 'player_id': player.pk, 'player_name': player.__str__()}
+        return {'type': 'RELEASE', 'player_id': player.pk, 'player_name': player.display_name()}
 
 
 class LeagueInstance(models.Model):

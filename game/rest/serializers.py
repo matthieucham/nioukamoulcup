@@ -248,3 +248,19 @@ class TeamDetailSerializer(serializers.ModelSerializer):
         model = league_models.Team
         fields = ('id', 'name', 'attributes', 'managers', 'permissions', 'account_balance', 'signings_aggregation',
                   'signings', 'latest_scores', )
+
+
+class BankAccountHistorySerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = league_models.BankAccountHistory
+        fields = ('date', 'amount', 'new_balance', 'info')
+
+
+class ReleaseSerializer(serializers.ModelSerializer):
+
+    signing = SigningSerializer(read_only=True)
+
+    class Meta:
+        model = transfer_models.Release
+        fields = ('signing', 'amount', )
