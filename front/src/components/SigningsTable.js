@@ -18,8 +18,8 @@ export const SigningsTable = ({ signings, height }) => {
 
 				<Column	label="Date"
 				dataKey="begin"
-				cellDataGetter={({rowData}) => Moment(rowData.begin).format('DD/MM/YYYY HH:mm') } 
-				width={180}/>
+				cellDataGetter={({rowData}) => Moment(rowData.begin).format('DD/MM/YYYY') } 
+				width={120}/>
 
 				<Column	label="Joueur"
 				dataKey="player.display_name"
@@ -34,8 +34,8 @@ export const SigningsTable = ({ signings, height }) => {
 
 				<Column	label="Départ"
 				dataKey="end"
-				cellDataGetter={({rowData}) => rowData.attributes.end ? Moment(rowData.end).format('DD/MM/YYYY HH:mm') : '-'}
-				width={180}/>
+				cellDataGetter={({rowData}) => rowData.end ? Moment(rowData.end).format('DD/MM/YYYY') : '-'}
+				width={120}/>
 				</Table>
 				)}
 			</AutoSizer>);

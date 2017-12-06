@@ -1,4 +1,5 @@
 from django.http import Http404
+import datetime
 
 from rest_framework import generics
 from rest_framework.views import APIView
@@ -18,9 +19,14 @@ class CurrentLeagueInstanceMixin():
         except league_models.LeagueInstance.DoesNotExist:
             raise Http404
 
+    def _get_latest_merkato(self, league_pk):
+        return transfer_models.Merkato.objects.filter(league_instance__league=league_pk,
+                                                      league_instance__current=True).filter(
+            begin__lte=datetime.date.today()).order_by('-end').first()
+
 
 class LeagueInstanceRankingView(CurrentLeagueInstanceMixin, APIView):
-    permission_classes = (DRYObjectPermissions, )
+    permission_classes = (DRYObjectPermissions,)
 
     def get(self, request, league_pk, format=None):
         instance = self._get_current_league_instance(league_pk)
@@ -33,7 +39,7 @@ class LeagueInstanceRankingView(CurrentLeagueInstanceMixin, APIView):
 class TeamDetailView(generics.RetrieveAPIView):
     serializer_class = serializers.TeamDetailSerializer
     queryset = league_models.Team.objects.all()
-    permission_classes = (DRYObjectPermissions, )
+    permission_classes = (DRYObjectPermissions,)
 
     def get_serializer_context(self):
         return {'request': self.request}
@@ -51,8 +57,8 @@ class ClubListView(CurrentLeagueInstanceMixin, generics.ListAPIView):
 class TeamSigningsListView(CurrentLeagueInstanceMixin, generics.ListAPIView):
     permission_classes = (DRYObjectPermissions,)
     serializer_class = serializers.SigningSerializer
-    ordering_fields = ('begin', )
-    ordering = ('begin', )
+    ordering_fields = ('begin',)
+    ordering = ('begin',)
 
     def get_queryset(self):
         team_pk = self.kwargs['team_pk']
@@ -73,9 +79,11 @@ class TeamBankAccountHistoryListView(CurrentLeagueInstanceMixin, generics.ListAP
 class TeamReleasesListView(CurrentLeagueInstanceMixin, generics.ListAPIView):
     permission_classes = (DRYObjectPermissions,)
     serializer_class = serializers.ReleaseSerializer
-    ordering_fields = ('signing__end',)
-    ordering = ('signing__end',)
 
     def get_queryset(self):
         team_pk = self.kwargs['team_pk']
-        return transfer_models.Release.objects.filter(signing__team=team_pk)
+        merkato = self._get_latest_merkato(league_models.Team.objects.get(pk=team_pk).league.pk)
+        if merkato:
+            return transfer_models.Release.objects.filter(signing__team=team_pk, done=True,
+                                                          merkato_session__merkato=merkato).order_by('-signing__end')
+        return None
