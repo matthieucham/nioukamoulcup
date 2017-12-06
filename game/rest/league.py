@@ -82,8 +82,4 @@ class TeamReleasesListView(CurrentLeagueInstanceMixin, generics.ListAPIView):
 
     def get_queryset(self):
         team_pk = self.kwargs['team_pk']
-        merkato = self._get_latest_merkato(league_models.Team.objects.get(pk=team_pk).league.pk)
-        if merkato:
-            return transfer_models.Release.objects.filter(signing__team=team_pk, done=True,
-                                                          merkato_session__merkato=merkato).order_by('-signing__end')
-        return None
+        return transfer_models.Release.objects.get_for_team(team_pk)

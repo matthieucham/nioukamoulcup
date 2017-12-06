@@ -8,7 +8,7 @@ import TeamPlayersTable from '../containers/TeamPlayersTable';
 
 const mapStateToProps = state => {
 	return {
-		team: state.data.teams.visited,
+		team: state.data.team.initial,
 	}
 }
 

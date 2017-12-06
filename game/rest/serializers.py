@@ -202,9 +202,7 @@ class TotalPASaleField(serializers.Field):
 
 class TotalReleaseField(serializers.Field):
     def to_representation(self, value):
-        return transfer_models.Release.objects.filter(signing__team=value,
-                                                      merkato_session__merkato__league_instance__current=True,
-                                                      merkato_session__is_solved=True).count()
+        return transfer_models.Release.objects.get_for_team(value, just_count=True)
 
 
 class TotalSignings(serializers.Field):

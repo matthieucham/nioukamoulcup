@@ -102,7 +102,7 @@ class MerkatoSession(models.Model):
         return 'MerkatoSession #%d -> %s -> %s' % (self.number, self.closing, self.solving)
 
     class Meta:
-        ordering = ('closing', )
+        ordering = ('closing',)
 
 
 class Sale(models.Model):
@@ -157,7 +157,7 @@ class Sale(models.Model):
             ('merkato_session', 'rank'),
             ('merkato_session', 'player'),
         )
-        ordering = ('merkato_session', 'rank', )
+        ordering = ('merkato_session', 'rank',)
 
 
 class Auction(models.Model):
@@ -212,8 +212,21 @@ class Auction(models.Model):
         unique_together = ('sale', 'team')
 
 
+class ReleaseManager(models.Manager):
+    def get_for_team(self, team, just_count=False):
+        qs = self.filter(done=True, signing__team=team,
+                         merkato_session__merkato__league_instance__current=True,
+                         merkato_session__is_solved=True)
+        if just_count:
+            return qs.count()
+        else:
+            return qs.order_by('-signing__end')
+
+
 class Release(models.Model):
     signing = models.ForeignKey(league_models.Signing)
     merkato_session = models.ForeignKey(MerkatoSession)
     amount = models.DecimalField(max_digits=4, decimal_places=1)
     done = models.BooleanField(default=False)
+
+    objects = ReleaseManager()

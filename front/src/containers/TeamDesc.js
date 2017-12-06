@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Tabs, TabLink, TabContent } from 'react-tabs-redux'
 import { connect } from 'react-redux'
 
-import { closeTeamDesc, fetchSignings } from '../actions'
+import { closeTeamDesc, fetchSignings, fetchFinances } from '../actions'
 import KeyValueBox from '../components/KeyValueBox';
 import { CollapsibleSection } from '../components/CollapsibleSection';
 import { SigningsTable } from '../components/SigningsTable';
@@ -29,14 +29,14 @@ class TeamDescCollapsibleSection extends Component {
 
 	render() {
 		const activeKey = this.props.activeKey;
-		const titles = { signings: 'Joueurs recrutés'}
-		const ConnectedSigningsTable = connect(state => { return {signings: state.data.signings.all, height: 300} } ) (SigningsTable);
+		const titles = { signings: 'Joueurs recrutés', finances: 'Evolution du budget'}
+		const ConnectedSigningsTable = connect(state => { return {signings: state.data.team.signings.all, height: 300} } ) (SigningsTable);
 		return (
 		<CollapsibleSection expanded={this.props.expanded} title={ titles[activeKey] } onClose={ () => this.props.onClose() }>
 			<Tabs
 			selectedTab={activeKey}>
 
-			<TabContent for="test" key="test">
+			<TabContent for="finances" key="finances">
 				<p>Test</p>
 			</TabContent>
 
@@ -76,7 +76,7 @@ export class TeamHeader extends Component {
 		const mgrs = team.managers.map(m => <li key={m.user} className="manager">{m.user}</li>);
 
 		const FinancesKVB = connect(state => { return {value: team.account_balance+' Ka', label: "Budget"} }, 
-									dispatch => { return { onKVBClick: () => dispatch( fetchSignings(team.id) ) } } )(KeyValueBox);
+									dispatch => { return { onKVBClick: () => dispatch( fetchFinances(team.id) ) } } )(KeyValueBox);
 
 		const SigningsKVB = connect(state => { return {value: team.signings_aggregation.current_signings, label: "Recrues"} }, 
 									dispatch => { return { onKVBClick: () => dispatch( fetchSignings(team.id) ) } } )(KeyValueBox);

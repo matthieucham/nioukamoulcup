@@ -39,8 +39,8 @@ const initialState = {
 			allIds: normalizedData.result.clubs,
 			byId: normalizedData.entities.clubs
 		},
-		teams: {
-			visited: normalizedData.result.team
+		team: {
+			initial: normalizedData.result.team
 		},
 		rankings: {
 			current: normalizedData.result.ranking
