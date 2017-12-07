@@ -1,4 +1,4 @@
-import 'rc-collapse/assets/index.css';
+ï»¿import 'rc-collapse/assets/index.css';
 import React, { Component } from 'react';
 import Moment from 'moment';
 import Collapse, { Panel } from 'rc-collapse';
@@ -15,8 +15,8 @@ const SigningPanel = ({ signing }) => {
 		<div>
 		<KeyValueBox label="Prix d'achat" value={ amount } />
 		{ bonus && <KeyValueBox label="Bonification" value={ bonus }/>}
-		<KeyValueBox label="Arrivée" value={ Moment(signing.begin).format('DD/MM/YYYY') } />
-		{ hasLeft && <KeyValueBox label="Départ" value={ Moment(signing.end).format('DD/MM/YYYY') } />}
+		<KeyValueBox label="ArrivÃ©e" value={ Moment(signing.begin).format('DD/MM/YYYY') } />
+		{ hasLeft && <KeyValueBox label="DÃ©part" value={ Moment(signing.end).format('DD/MM/YYYY') } />}
 		<a className="navlink" href={ signing.player.url }>Fiche du joueur</a>
 		</div>
 		);

@@ -4,7 +4,6 @@ import { hydrate } from 'react-dom'
 import { createStore } from 'redux'
 import { Provider } from 'react-redux'
 import { normalize } from 'normalizr';
-import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 
 import configureStore from './store/configureStore'
 import { Schemas } from './middleware/api'
@@ -55,9 +54,7 @@ const store = configureStore(initialState)
 
 hydrate(
 	<Provider store={store}>
-		<MuiThemeProvider>
 		{ React.createElement(pages[component]) }
-		</MuiThemeProvider>
 	</Provider>,
 	 window.react_mount
 );
