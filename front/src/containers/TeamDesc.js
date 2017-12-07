@@ -6,6 +6,7 @@ import { closeTeamDesc, fetchSignings, fetchFinances } from '../actions'
 import KeyValueBox from '../components/KeyValueBox';
 import { CollapsibleSection } from '../components/CollapsibleSection';
 import { SigningsTable } from '../components/SigningsTable';
+import { FinancesTable } from '../components/FinancesTable';
 
 
 export const TeamCover = ({team, showName}) => {
@@ -30,6 +31,7 @@ class TeamDescCollapsibleSection extends Component {
 	render() {
 		const activeKey = this.props.activeKey;
 		const titles = { signings: 'Joueurs recrutés', finances: 'Evolution du budget'}
+		const ConnectedFinancesTable = connect(state => { return {history: state.data.team.finances.all, height: 300} } ) (FinancesTable);
 		const ConnectedSigningsTable = connect(state => { return {signings: state.data.team.signings.all, height: 300} } ) (SigningsTable);
 		return (
 		<CollapsibleSection expanded={this.props.expanded} title={ titles[activeKey] } onClose={ () => this.props.onClose() }>
@@ -37,7 +39,7 @@ class TeamDescCollapsibleSection extends Component {
 			selectedTab={activeKey}>
 
 			<TabContent for="finances" key="finances">
-				<p>Test</p>
+				<ConnectedFinancesTable />
 			</TabContent>
 
 			<TabContent for="signings" key="signings">
