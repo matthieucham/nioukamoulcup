@@ -183,6 +183,33 @@ section.expanded {
     text-align: right;
 }
 
+.hg__right .rc-collapse {
+    background-color: inherit;
+    border: none;
+}
+
+.hg__right .rc-collapse-header .playerName{
+    font-size: 1em;
+}
+
+.hg__right .rc-collapse-header .clubName{
+    font-size: 0.8em;
+}
+.hg__right .rc-collapse-header .clubName:before {
+    content: " (";
+}
+.hg__right .rc-collapse-header .clubName:after {
+    content: ")";
+}
+
+.hg__right .rc-collapse-content {
+    color: inherit;
+}
+
+.hg__right .rc-collapse-header.past  .playerName{
+    text-decoration: line-through;
+}
+
 @media all and (max-width: 768px) {
     .hg__right a {
         display: block;
