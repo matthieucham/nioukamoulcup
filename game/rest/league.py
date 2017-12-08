@@ -12,17 +12,12 @@ from ligue1 import models as l1models
 from game.rest import serializers
 
 
-class CurrentLeagueInstanceMixin():
+class CurrentLeagueInstanceMixin:
     def _get_current_league_instance(self, pk):
         try:
             return league_models.LeagueInstance.objects.get(league=pk, current=True)
         except league_models.LeagueInstance.DoesNotExist:
             raise Http404
-
-    def _get_latest_merkato(self, league_pk):
-        return transfer_models.Merkato.objects.filter(league_instance__league=league_pk,
-                                                      league_instance__current=True).filter(
-            begin__lte=datetime.date.today()).order_by('-end').first()
 
 
 class LeagueInstanceRankingView(CurrentLeagueInstanceMixin, APIView):
@@ -83,3 +78,28 @@ class TeamReleasesListView(CurrentLeagueInstanceMixin, generics.ListAPIView):
     def get_queryset(self):
         team_pk = self.kwargs['team_pk']
         return transfer_models.Release.objects.get_for_team(team_pk)
+
+
+class TeamSalesListView(CurrentLeagueInstanceMixin, generics.ListAPIView):
+    permission_classes = (DRYObjectPermissions,)
+    serializer_class = serializers.SaleSerializer
+
+    def get_queryset(self):
+        team_pk = self.kwargs['team_pk']
+        return transfer_models.Sale.objects.get_for_team(team_pk)
+
+
+class LeagueResultsByJourneeListView(CurrentLeagueInstanceMixin, generics.ListAPIView):
+    permission_classes = (DRYObjectPermissions,)
+    serializer_class = serializers.TeamDayScoreSerializer
+
+    def get_queryset(self):
+        team_pk = self.kwargs['team_pk']
+        league_pk = self.kwargs['league_pk']
+        journee_numero = self.kwargs['journee_numero']
+
+        days = league_models.LeagueInstancePhaseDay.objects.filter(
+            league_instance_phase__league_instance=self._get_current_league_instance(league_pk),
+            journee__numero=journee_numero
+        )
+        return league_models.TeamDayScore.objects.filter(day__in=days, team=team_pk)

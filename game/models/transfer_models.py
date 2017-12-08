@@ -105,6 +105,24 @@ class MerkatoSession(models.Model):
         ordering = ('closing',)
 
 
+class SaleManager(models.Manager):
+    def get_for_team(self, team, just_last_merkato=True, just_count=False, just_PA=True):
+        qs = self.filter(team=team,
+                         merkato_session__merkato__league_instance__current=True)
+        if just_last_merkato:
+            most_recent_merkato = Merkato.objects.filter(
+                league_instance__league=league_models.Team.objects.get(pk=team).league,
+                league_instance__current=True,
+                begin__lte=datetime.date.today()).order_by('-end').first()
+            qs = qs.filter(merkato_session__merkato=most_recent_merkato)
+        if just_PA:
+            qs = qs.filter(type='PA')
+        if just_count:
+            return qs.count()
+        else:
+            return qs
+
+
 class Sale(models.Model):
     TYPES = (('PA', 'Proposition d\'achat'), ('MV', 'Mise en vente'), ('AM', 'Achat masqué'))
 
@@ -115,6 +133,8 @@ class Sale(models.Model):
     type = models.CharField(max_length=2, blank=False, default='PA', choices=TYPES)
     winning_auction = models.ForeignKey('Auction', related_name='sale_won', null=True)
     rank = models.PositiveIntegerField(null=False, default=1)
+
+    objects = SaleManager()
 
     def save(self, *args, **kwargs):
         """
@@ -213,10 +233,17 @@ class Auction(models.Model):
 
 
 class ReleaseManager(models.Manager):
-    def get_for_team(self, team, just_count=False):
+    def get_for_team(self, team, just_last_merkato=True, just_count=False):
         qs = self.filter(done=True, signing__team=team,
                          merkato_session__merkato__league_instance__current=True,
                          merkato_session__is_solved=True)
+        if just_last_merkato:
+            most_recent_merkato = Merkato.objects.filter(
+                league_instance__league=(
+                    team if isinstance(team, league_models.Team) else league_models.Team.objects.get(pk=team)).league,
+                league_instance__current=True,
+                begin__lte=datetime.date.today()).order_by('-end').first()
+            qs = qs.filter(merkato_session__merkato=most_recent_merkato)
         if just_count:
             return qs.count()
         else:

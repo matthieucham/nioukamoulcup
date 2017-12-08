@@ -262,3 +262,12 @@ class ReleaseSerializer(serializers.ModelSerializer):
     class Meta:
         model = transfer_models.Release
         fields = ('signing', 'amount', )
+
+
+class SaleSerializer(serializers.ModelSerializer):
+    player = PlayerHdrSerializer(read_only=True)
+    team = TeamHdrSerializer(read_only=True)
+
+    class Meta:
+        model = transfer_models.Sale
+        fields = '__all__'
