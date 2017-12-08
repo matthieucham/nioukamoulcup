@@ -4,7 +4,6 @@ from django.db import models
 from game.services import scoring
 from django.contrib.auth.models import User
 
-
 # import json
 
 from game.models import league_models, transfer_models, scoring_models
@@ -39,7 +38,7 @@ class JourneeScoringSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = scoring_models.JourneeScoring
-        fields = ('journee', )
+        fields = ('journee',)
 
 
 class JJScoreSerializer(serializers.ModelSerializer):
@@ -95,7 +94,7 @@ class TeamManagerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = league_models.LeagueMembership
-        fields = ('user', )
+        fields = ('user',)
 
 
 class TeamHdrSerializer(serializers.HyperlinkedModelSerializer):
@@ -174,7 +173,7 @@ class DayHdrSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = league_models.LeagueInstancePhaseDay
-        fields = ('id', 'number', 'journee', 'phase_id', 'phase', )
+        fields = ('id', 'number', 'journee', 'phase_id', 'phase',)
 
 
 class TeamDayScoreSerializer(serializers.ModelSerializer):
@@ -233,9 +232,12 @@ class TeamDetailSerializer(serializers.ModelSerializer):
 
     def get_latest_scores(self, obj):
         try:
-            current_instance = league_models.LeagueInstance.objects.get(league=obj.league, current=True)
-            days = league_models.LeagueInstancePhaseDay.objects.get_latest_day_for_phases(
-                league_models.LeagueInstancePhase.objects.filter(league_instance=current_instance))
+            linstance = league_models.LeagueInstance.objects.get(league=obj.league, current=True)
+            days = league_models.LeagueInstancePhaseDay.objects.filter(
+                league_instance_phase__league_instance=linstance).filter(
+                journee__numero=league_models.LeagueInstancePhaseDay.objects.filter(
+                    league_instance_phase__league_instance=linstance).order_by('-journee__numero').values_list(
+                    'journee__numero', flat=True).first())
             return TeamDayScoreSerializer(many=True, read_only=True,
                                           context={'request': self.context['request']}).to_representation(
                 league_models.TeamDayScore.objects.filter(day__in=days, team=obj))
@@ -245,23 +247,21 @@ class TeamDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = league_models.Team
         fields = ('id', 'name', 'attributes', 'managers', 'permissions', 'account_balance', 'signings_aggregation',
-                  'signings', 'latest_scores', )
+                  'signings', 'latest_scores',)
 
 
 class BankAccountHistorySerializer(serializers.ModelSerializer):
-
     class Meta:
         model = league_models.BankAccountHistory
         fields = ('date', 'amount', 'new_balance', 'info')
 
 
 class ReleaseSerializer(serializers.ModelSerializer):
-
     signing = SigningSerializer(read_only=True)
 
     class Meta:
         model = transfer_models.Release
-        fields = ('signing', 'amount', )
+        fields = ('signing', 'amount',)
 
 
 class SaleSerializer(serializers.ModelSerializer):
