@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux'
-import { CompoTabs } from '../components/Formation';
+import { TeamDetails } from '../components/TeamDetails';
 import { TeamSignings } from '../components/Signings';
-import { TeamCover, TeamHeader } from '../containers/TeamDesc';
-import TeamPlayersTable from '../containers/TeamPlayersTable';
+import { TeamCover } from '../containers/TeamDesc';
 
 
 const mapStateToProps = state => {
@@ -14,15 +13,11 @@ const mapStateToProps = state => {
 
 
 const Page = ({ team }) => {
-	
-		const coverUrl= "perso" in team.attributes && "cover" in team.attributes.perso ? team.attributes.perso.cover : null;
 
 		return (
 			<div className="react-app-inner">
 			<main>
-			<TeamHeader team={ team } />
-			<CompoTabs latestScores={ team.latest_scores } />
-			<TeamPlayersTable height={ 500 }/>
+			<TeamDetails team={ team } />
 			</main>
 			<aside className="hg__right">
 			<TeamCover team={ team }/>
