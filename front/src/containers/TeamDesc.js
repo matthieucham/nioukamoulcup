@@ -2,11 +2,17 @@ import React, { Component } from 'react';
 import { Tabs, TabLink, TabContent } from 'react-tabs-redux'
 import { connect } from 'react-redux'
 
-import { closeTeamDesc, fetchSignings, fetchFinances } from '../actions'
+import { closeTeamDesc, fetchTeamSthg, 
+		REQUEST_SIGNINGS, RECEIVE_SIGNINGS, 
+		REQUEST_FINANCES, RECEIVE_FINANCES, 
+		REQUEST_RELEASES, RECEIVE_RELEASES, 
+		REQUEST_SALES, RECEIVE_SALES } from '../actions'
 import KeyValueBox from '../components/KeyValueBox';
 import { CollapsibleSection } from '../components/CollapsibleSection';
 import { SigningsTable } from '../components/SigningsTable';
 import { FinancesTable } from '../components/FinancesTable';
+import { ReleasesTable } from '../components/ReleasesTable';
+import { SalesTable } from '../components/SalesTable';
 
 
 export const TeamCover = ({team, showName}) => {
@@ -33,6 +39,8 @@ class TeamDescCollapsibleSection extends Component {
 		const titles = { signings: 'Joueurs recrutés', finances: 'Evolution du budget'}
 		const ConnectedFinancesTable = connect(state => { return {history: state.data.team.finances.all, height: 300} } ) (FinancesTable);
 		const ConnectedSigningsTable = connect(state => { return {signings: state.data.team.signings.all, height: 300} } ) (SigningsTable);
+		const ConnectedReleasesTable = connect(state => { return {releases: state.data.team.releases.all, height: 300} } ) (ReleasesTable);
+		const ConnectedSalesTable = connect(state => { return {sales: state.data.team.sales.all, height: 300} } ) (SalesTable);
 		return (
 		<CollapsibleSection expanded={this.props.expanded} title={ titles[activeKey] } onClose={ () => this.props.onClose() }>
 			<Tabs
@@ -44,6 +52,14 @@ class TeamDescCollapsibleSection extends Component {
 
 			<TabContent for="signings" key="signings">
 				<ConnectedSigningsTable />
+			</TabContent>
+
+			<TabContent for="releases" key="releases">
+				<ConnectedReleasesTable />
+			</TabContent>
+
+			<TabContent for="sales" key="sales">
+				<ConnectedSalesTable />
 			</TabContent>
 			
 			</Tabs>
@@ -78,14 +94,14 @@ export class TeamHeader extends Component {
 		const mgrs = team.managers.map(m => <li key={m.user} className="manager">{m.user}</li>);
 
 		const FinancesKVB = connect(state => { return {value: team.account_balance+' Ka', label: "Budget"} }, 
-									dispatch => { return { onKVBClick: () => dispatch( fetchFinances(team.id) ) } } )(KeyValueBox);
+									dispatch => { return { onKVBClick: () => dispatch( fetchTeamSthg(team.id, 'bankaccounthistory', REQUEST_FINANCES, RECEIVE_FINANCES, '-date') ) } } )(KeyValueBox);
 
 		const SigningsKVB = connect(state => { return {value: team.signings_aggregation.current_signings, label: "Recrues"} }, 
-									dispatch => { return { onKVBClick: () => dispatch( fetchSignings(team.id) ) } } )(KeyValueBox);
+									dispatch => { return { onKVBClick: () => dispatch( fetchTeamSthg(team.id, 'signings', REQUEST_SIGNINGS, RECEIVE_SIGNINGS, '-begin') ) } } )(KeyValueBox);
 		const PAKVB = connect(state => { return {value: team.signings_aggregation.total_pa, label: "PA"} }, 
-									dispatch => { return { onKVBClick: () => dispatch( fetchSignings(team.id) ) } } )(KeyValueBox);
+									dispatch => { return { onKVBClick: () => dispatch( fetchTeamSthg(team.id, 'sales', REQUEST_SALES, RECEIVE_SALES, 'merkato_session') ) } } )(KeyValueBox);
 		const REKVB = connect(state => { return {value: team.signings_aggregation.total_releases, label: "Reventes"} }, 
-									dispatch => { return { onKVBClick: () => dispatch( fetchSignings(team.id) ) } } )(KeyValueBox);
+									dispatch => { return { onKVBClick: () => dispatch( fetchTeamSthg(team.id, 'releases', REQUEST_RELEASES, RECEIVE_RELEASES, 'merkato_session') ) } } )(KeyValueBox);
 		let formation = team.latest_scores[0]['formation'];
 		const FormationKVB = connect(state => { return {value: formation['D']+'-'+formation['M']+'-'+formation['A'], label: "Formation"} })(KeyValueBox);
 		const scores = team.latest_scores.map(ls => <KeyValueBox label={ls.day.phase} value={ls.score+' Pts'} key={ls.day.phase} />);

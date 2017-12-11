@@ -264,9 +264,17 @@ class ReleaseSerializer(serializers.ModelSerializer):
         fields = ('signing', 'amount',)
 
 
+class MerkatoSessionSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = transfer_models.MerkatoSession
+        fields = '__all__'
+
+
 class SaleSerializer(serializers.ModelSerializer):
     player = PlayerHdrSerializer(read_only=True)
     team = TeamHdrSerializer(read_only=True)
+    merkato_session = MerkatoSessionSerializer(read_only=True)
 
     class Meta:
         model = transfer_models.Sale

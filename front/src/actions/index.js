@@ -9,8 +9,12 @@ export const RECEIVE_SIGNINGS='RECEIVE_SIGNINGS'
 export const CLOSE_TEAMDESC='CLOSE_TEAMDESC'
 export const REQUEST_FINANCES='REQUEST_FINANCES'
 export const RECEIVE_FINANCES='RECEIVE_FINANCES'
+export const REQUEST_RELEASES='REQUEST_RELEASES'
+export const RECEIVE_RELEASES='RECEIVE_RELEASES'
+export const REQUEST_SALES='REQUEST_SALES'
+export const RECEIVE_SALES='RECEIVE_SALES'
 
-export const requestSignings = team => {
+/*export const requestSignings = team => {
 	return {
 		type: REQUEST_SIGNINGS,
 		team
@@ -35,13 +39,43 @@ export function fetchSignings(team) {
       .then(json => dispatch(receiveSignings(team, json)))
   }
 }
+*/
+
+export const requestTeamSthg = (team, actionType) => {
+	return {
+		type: actionType,
+		team
+	}
+}
+
+export const receiveTeamSthg = (team, actionType, json) => {
+	return {
+		type: actionType,
+		team,
+		data: json
+	}
+}
+
+export function fetchTeamSthg(team, target, actionRequest, actionResponse, ordering) {
+	let url = API_ROOT.concat(`teams/${team}/${target}?format=json`)
+	if (ordering) {
+		url= url.concat(`&ordering=`).concat(ordering)
+	}
+
+  return dispatch => {
+    dispatch(requestTeamSthg(team, actionRequest))
+    return fetch(url)
+      .then(response => response.json())
+      .then(json => dispatch(receiveTeamSthg(team, actionResponse, json)))
+  }
+}
 
 export function closeTeamDesc() {
 	return {
 		type: CLOSE_TEAMDESC
 	}
 }
-
+/*
 export const requestFinances = team => {
 	return {
 		type: REQUEST_FINANCES,
@@ -66,4 +100,4 @@ export function fetchFinances(team) {
       .then(response => response.json())
       .then(json => dispatch(receiveFinances(team, json)))
   }
-}
+}*/

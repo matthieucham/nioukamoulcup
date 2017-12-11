@@ -4,7 +4,11 @@ import {
 	RECEIVE_SIGNINGS,
 	CLOSE_TEAMDESC,
 	REQUEST_FINANCES,
-	RECEIVE_FINANCES
+	RECEIVE_FINANCES,
+	REQUEST_RELEASES,
+	RECEIVE_RELEASES,
+	REQUEST_SALES,
+	RECEIVE_SALES
 } from '../actions'
 
 
@@ -13,7 +17,7 @@ function signings( state={signings: []}, action) {
 		case REQUEST_SIGNINGS:
 			return Object.assign({}, state, {all: []})
 		case RECEIVE_SIGNINGS:
-			return Object.assign({}, state, {all: action.signings} )
+			return Object.assign({}, state, {all: action.data} )
 		default:
 			return state
 	}
@@ -24,7 +28,29 @@ function finances( state={finances: []}, action) {
 		case REQUEST_FINANCES:
 			return Object.assign({}, state, {all: []})
 		case RECEIVE_FINANCES:
-			return Object.assign({}, state, {all: action.finances} )
+			return Object.assign({}, state, {all: action.data} )
+		default:
+			return state
+	}
+}
+
+function releases( state={releases: []}, action) {
+	switch(action.type) {
+		case REQUEST_RELEASES:
+			return Object.assign({}, state, {all: []})
+		case RECEIVE_RELEASES:
+			return Object.assign({}, state, {all: action.data} )
+		default:
+			return state
+	}
+}
+
+function sales( state={sales: []}, action) {
+	switch(action.type) {
+		case REQUEST_SALES:
+			return Object.assign({}, state, {all: []})
+		case RECEIVE_SALES:
+			return Object.assign({}, state, {all: action.data} )
 		default:
 			return state
 	}
@@ -39,6 +65,14 @@ const ui = (state={isFetching: false, expandTeamDesc: false}, action) => {
 		case REQUEST_FINANCES:
 			return Object.assign({}, state, {isFetching: true, expandTeamDesc: true, teamDescTab:"finances"})
 		case RECEIVE_FINANCES:
+			return Object.assign({}, state, {isFetching: false})
+		case REQUEST_RELEASES:
+			return Object.assign({}, state, {isFetching: true, expandTeamDesc: true, teamDescTab:"releases"})
+		case RECEIVE_RELEASES:
+			return Object.assign({}, state, {isFetching: false})
+		case REQUEST_SALES:
+			return Object.assign({}, state, {isFetching: true, expandTeamDesc: true, teamDescTab:"sales"})
+		case RECEIVE_SALES:
 			return Object.assign({}, state, {isFetching: false})
 		case CLOSE_TEAMDESC:
 			return Object.assign({}, state, {expandTeamDesc: false})
@@ -64,6 +98,8 @@ const team = combineReducers({
 	initial,
 	signings,
 	finances,
+	releases,
+	sales
 })
 
 const rankings = (state={}, action) => {
