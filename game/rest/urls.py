@@ -26,7 +26,7 @@ urlpatterns = format_suffix_patterns([
     url(r'^teams/(?P<team_pk>[0-9]+)/sales',
         league.TeamSalesListView.as_view(),
         name='team-sales'),
-    url(r'^leagues/(?P<league_pk>[0-9]+)/journee/(?P<journee_numero>[0-9]+)/teams/(?P<team_pk>[0-9]+)$',
+    url(r'^leagues/(?P<league_pk>[0-9]+)/journees/(?P<journee_numero>[0-9]+)/teams/(?P<team_pk>[0-9]+)$',
         league.LeagueResultsByJourneeListView.as_view(),
         name='league-journeeteam'),
 ])

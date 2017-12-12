@@ -13,33 +13,9 @@ export const REQUEST_RELEASES='REQUEST_RELEASES'
 export const RECEIVE_RELEASES='RECEIVE_RELEASES'
 export const REQUEST_SALES='REQUEST_SALES'
 export const RECEIVE_SALES='RECEIVE_SALES'
+export const REQUEST_COMPOSCORE='REQUEST_COMPOSCORE'
+export const RECEIVE_COMPOSCORE='RECEIVE_COMPOSCORE'
 
-/*export const requestSignings = team => {
-	return {
-		type: REQUEST_SIGNINGS,
-		team
-	}
-}
-
-export const receiveSignings = (team, json) => {
-	return {
-		type: RECEIVE_SIGNINGS,
-		team,
-		signings: json
-	}
-}
-
-export function fetchSignings(team) {
-	let url = API_ROOT.concat(`teams/${team}/signings?format=json&ordering=-begin`)
-
-  return dispatch => {
-    dispatch(requestSignings(team))
-    return fetch(url)
-      .then(response => response.json())
-      .then(json => dispatch(receiveSignings(team, json)))
-  }
-}
-*/
 
 export const requestTeamSthg = (team, actionType) => {
 	return {
@@ -75,29 +51,35 @@ export function closeTeamDesc() {
 		type: CLOSE_TEAMDESC
 	}
 }
-/*
-export const requestFinances = team => {
-	return {
-		type: REQUEST_FINANCES,
-		team
-	}
-}
 
-export const receiveFinances = (team, json) => {
+export const requestCompoScores = (team, journee) => {
 	return {
-		type: RECEIVE_FINANCES,
+		type: REQUEST_COMPOSCORE,
 		team,
-		finances: json
+		journee
 	}
 }
 
-export function fetchFinances(team) {
-	let url = API_ROOT.concat(`teams/${team}/bankaccounthistory?format=json&ordering=-date`)
+export const receiveCompoScores = (team, journee, json) => {
+	return {
+		type: RECEIVE_COMPOSCORE,
+		team,
+		journee: json.length>0 ? json[0].day.journee: null,
+		scores: json
+	}
+}
+
+/*
+export function fetchTeamScores(team, journee) {
+	let url = API_ROOT.concat(`leagues/1/journees/2/teams/13?format=json`)
+	if (ordering) {
+		url= url.concat(`&ordering=`).concat(ordering)
+	}
 
   return dispatch => {
-    dispatch(requestFinances(team))
+    dispatch(requestTeamSthg(team, actionRequest))
     return fetch(url)
       .then(response => response.json())
-      .then(json => dispatch(receiveFinances(team, json)))
+      .then(json => dispatch(receiveTeamSthg(team, actionResponse, json)))
   }
 }*/

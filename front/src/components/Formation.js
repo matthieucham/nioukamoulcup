@@ -40,11 +40,6 @@ export const CompoTabs = ({ latestScores }) => {
 			<TabPane tab={ lsc['day']['phase'] } key={ lsc['day']['id'] }>
 			<Composition phaseResult={ lsc }/>
 			</TabPane>);
-			/*const sw = latestScores.map( (lsc) => 
-				Sous Tabs:
-				<SwipeableViews index={this.state.slideIndex} onChangeIndex={this.handleChange}>
-				{sw}
-				</SwipeableViews>*/
 		return (
 			<Tabs
 			renderTabBar={() => <InkTabBar/>}

@@ -1,14 +1,13 @@
 import React, { Component } from 'react';
-import { CompoTabs } from '../components/Formation';
+import { TeamCompoScores } from '../containers/TeamCompoScores';
 import { TeamHeader } from '../containers/TeamDesc';
 import TeamPlayersTable from '../containers/TeamPlayersTable';
 
 
 export const TeamDetails = ( { team } ) => {
-		console.log(team);
 		return (<div>
 		<TeamHeader team={ team } />
-		<CompoTabs latestScores={ team.latest_scores } />
+		<TeamCompoScores />
 		<TeamPlayersTable height={ 500 }/>
 		</div>)
 	}

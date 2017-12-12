@@ -8,7 +8,8 @@ import {
 	REQUEST_RELEASES,
 	RECEIVE_RELEASES,
 	REQUEST_SALES,
-	RECEIVE_SALES
+	RECEIVE_SALES,
+	RECEIVE_COMPOSCORE
 } from '../actions'
 
 
@@ -56,6 +57,15 @@ function sales( state={sales: []}, action) {
 	}
 }
 
+function compoScores( state={compoScores: [], journee:{}}, action) {
+	switch(action.type) {
+		case RECEIVE_COMPOSCORE:
+			return Object.assign({}, state, {scores: action.scores, journee: action.journee} )
+		default:
+			return state
+	}
+}
+
 const ui = (state={isFetching: false, expandTeamDesc: false}, action) => {
 	switch(action.type) {
 		case REQUEST_SIGNINGS:
@@ -96,6 +106,7 @@ const initial = (state={}, action) => {
 
 const team = combineReducers({
 	initial,
+	compoScores,
 	signings,
 	finances,
 	releases,

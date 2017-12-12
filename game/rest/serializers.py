@@ -161,9 +161,18 @@ class SigningSerializer(serializers.ModelSerializer):
 
 
 class JourneeHdrSerializer(serializers.ModelSerializer):
+    is_last = serializers.SerializerMethodField()
+    is_first = serializers.SerializerMethodField()
+
+    def get_is_last(self, obj):
+        return l1models.Journee.objects.filter(saison=obj.saison, numero__gt=obj.numero).count() == 0
+
+    def get_is_first(self, obj):
+        return l1models.Journee.objects.filter(saison=obj.saison, numero__lt=obj.numero).count() == 0
+
     class Meta:
         model = l1models.Journee
-        fields = ('id', 'numero', 'debut', 'fin')
+        fields = ('id', 'numero', 'debut', 'fin', 'is_last', 'is_first')
 
 
 class DayHdrSerializer(serializers.ModelSerializer):
@@ -265,7 +274,6 @@ class ReleaseSerializer(serializers.ModelSerializer):
 
 
 class MerkatoSessionSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = transfer_models.MerkatoSession
         fields = '__all__'

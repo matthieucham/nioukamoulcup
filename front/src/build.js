@@ -39,13 +39,18 @@ const initialState = {
 			byId: normalizedData.entities.clubs
 		},
 		team: {
-			initial: normalizedData.result.team
+			initial: normalizedData.result.team,
+			compoScores: {
+				scores: normalizedData.result.team.latest_scores,
+				journee: normalizedData.result.team.latest_scores.length>0 ? normalizedData.result.team.latest_scores[0].day.journee: null,
+			}
 		},
 		rankings: {
 			current: normalizedData.result.ranking
 		}
 	},
-}
+};
+console.log(initialState);
 
 export const API_ROOT = normalizedData.result.apiroot;
 
