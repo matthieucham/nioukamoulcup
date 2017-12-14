@@ -249,7 +249,7 @@ class TeamDetailSerializer(serializers.ModelSerializer):
                     'journee__numero', flat=True).first())
             return TeamDayScoreSerializer(many=True, read_only=True,
                                           context={'request': self.context['request']}).to_representation(
-                league_models.TeamDayScore.objects.filter(day__in=days, team=obj))
+                league_models.TeamDayScore.objects.filter(day__in=days, team=obj).order_by('day__league_instance_phase'))
         except league_models.LeagueInstance.DoesNotExist:
             return None
 

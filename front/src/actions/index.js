@@ -2,7 +2,7 @@
 import fetch from 'cross-fetch'
 import { normalize } from 'normalizr';
 import { Schemas } from '../middleware/api'
-import { API_ROOT } from '../build'
+import { API_ROOT, LEAGUE_ID } from '../build'
 
 export const REQUEST_SIGNINGS='REQUEST_SIGNINGS'
 export const RECEIVE_SIGNINGS='RECEIVE_SIGNINGS'
@@ -60,7 +60,7 @@ export const requestCompoScores = (team, journee) => {
 	}
 }
 
-export const receiveCompoScores = (team, journee, json) => {
+export const receiveCompoScores = (team, json) => {
 	return {
 		type: RECEIVE_COMPOSCORE,
 		team,
@@ -69,17 +69,10 @@ export const receiveCompoScores = (team, journee, json) => {
 	}
 }
 
-/*
-export function fetchTeamScores(team, journee) {
-	let url = API_ROOT.concat(`leagues/1/journees/2/teams/13?format=json`)
-	if (ordering) {
-		url= url.concat(`&ordering=`).concat(ordering)
-	}
-
-  return dispatch => {
-    dispatch(requestTeamSthg(team, actionRequest))
-    return fetch(url)
-      .then(response => response.json())
-      .then(json => dispatch(receiveTeamSthg(team, actionResponse, json)))
+export function fetchTeamScores(team, numjournee) {
+	let url = API_ROOT.concat(`leagues/${LEAGUE_ID}/journees/${numjournee}/teams/${team}?format=json`)
+    return dispatch => {
+    	dispatch(requestCompoScores(team, numjournee))
+    	return fetch(url).then(response => response.json()).then(json => dispatch(receiveCompoScores(team, json)))
   }
-}*/
+}

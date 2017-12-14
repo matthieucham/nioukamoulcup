@@ -102,4 +102,5 @@ class LeagueResultsByJourneeListView(CurrentLeagueInstanceMixin, generics.ListAP
             league_instance_phase__league_instance=self._get_current_league_instance(league_pk),
             journee__numero=journee_numero
         )
-        return league_models.TeamDayScore.objects.filter(day__in=days, team=team_pk)
+        return league_models.TeamDayScore.objects.filter(day__in=days, team=team_pk).order_by(
+            'day__league_instance_phase')

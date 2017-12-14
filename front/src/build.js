@@ -41,8 +41,8 @@ const initialState = {
 		team: {
 			initial: normalizedData.result.team,
 			compoScores: {
-				scores: normalizedData.result.team.latest_scores,
-				journee: normalizedData.result.team.latest_scores.length>0 ? normalizedData.result.team.latest_scores[0].day.journee: null,
+				scores: normalizedData.result.team ? normalizedData.result.team.latest_scores : null,
+				journee: normalizedData.result.team && normalizedData.result.team.latest_scores.length>0 ? normalizedData.result.team.latest_scores[0].day.journee: null,
 			}
 		},
 		rankings: {
@@ -53,6 +53,7 @@ const initialState = {
 console.log(initialState);
 
 export const API_ROOT = normalizedData.result.apiroot;
+export const LEAGUE_ID = 1; /* TODO : pass from backend */
 
 // Create Redux store with initial state
 const store = configureStore(initialState)

@@ -1,30 +1,23 @@
 import React, { Component } from 'react';
 import { CompoTabs } from '../components/Formation'
-import { JourneeBrowser } from '../components/JourneeBrowser'
+import { JourneeBrowser } from './JourneeBrowser'
 import { connect } from 'react-redux'
-import {  }
 
 
 const mapStateToProps = (state) => {
 	return {
-		j: state.data.team.compoScores.journee,
-		sco : state.data.team.compoScores.scores,
+		journee: state.data.team.compoScores.journee,
+		scores : state.data.team.compoScores.scores,
+		team : state.data.team
 	}
 }
 
-/*
-const mapDispatchToProps = dispatch => { 
-	return { 
-		onPreviousClick: () => dispatch( fetchTeamSthg(team.id, 'bankaccounthistory', REQUEST_FINANCES, RECEIVE_FINANCES, '-date') ) 
-	} 
-}
-*/
 
-const JourneeCompoScore = ({j, sco}) => {
+const JourneeCompoScore = ({journee, scores, team}) => {
 	return (
 		<div>
-			<JourneeBrowser journee={j} />
-			<CompoTabs latestScores={sco} />
+			<JourneeBrowser journee={journee} team={team}/>
+			<CompoTabs latestScores={scores} />
 		</div>
 	);
 }
