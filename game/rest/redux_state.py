@@ -34,4 +34,5 @@ class StateInitializerMixin:
                 l1models.Joueur.objects.filter(signing__team=team), many=True, context={'request': request})
             self.initial_state['team'] = self._to_json(team_serializer)
             self.initial_state['players'] += self._to_json(players_serializer)
+            self.initial_state['league_id'] = team.league.id
             return self.initial_state

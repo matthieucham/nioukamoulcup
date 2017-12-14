@@ -53,7 +53,7 @@ const initialState = {
 console.log(initialState);
 
 export const API_ROOT = normalizedData.result.apiroot;
-export const LEAGUE_ID = 1; /* TODO : pass from backend */
+export const LEAGUE_ID = normalizedData.result.league_id;
 
 // Create Redux store with initial state
 const store = configureStore(initialState)
