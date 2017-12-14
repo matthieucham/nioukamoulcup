@@ -27,7 +27,9 @@ class LeagueInstanceRankingView(CurrentLeagueInstanceMixin, APIView):
         instance = self._get_current_league_instance(league_pk)
         serializer = serializers.LeagueInstancePhaseDaySerializer(
             league_models.LeagueInstancePhaseDay.objects.get_latest_day_for_phases(
-                league_models.LeagueInstancePhase.objects.filter(league_instance=instance)), many=True)
+                league_models.LeagueInstancePhase.objects.filter(league_instance=instance)),
+            many=True,
+            context={'request': request})
         return Response(serializer.data)
 
 
