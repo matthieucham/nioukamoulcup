@@ -175,6 +175,9 @@ class LeagueInstance(models.Model):
     configuration = JSONField(
         default=dict({'notes': {'HALFSEASON': 13, 'FULLSEASON': 26, 'TOURNAMENT': 3}}))
 
+    def has_object_read_permission(self, request):
+        return request.user in self.league.members.all()
+
 
 class LeagueInstancePhase(models.Model):
     TYPES = (('HALFSEASON', 'Half season'), ('FULLSEASON', 'Whole season'), ('TOURNAMENT', 'Tournament'))

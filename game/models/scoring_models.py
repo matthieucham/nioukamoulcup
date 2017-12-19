@@ -88,6 +88,15 @@ class JJScoreManager(models.Manager):
         return self.filter(joueur=joueur, journee_scoring__saison_scoring=saison_scoring).order_by(
             'journee_scoring__journee__numero')
 
+    def count_notes(self, saison, joueur_ids, journee_first=None, journee_last=None):
+        queryset = self.filter(joueur__in=joueur_ids, journee_scoring__saison_scoring__saison=saison, note__isnull=False)
+        if journee_first:
+            queryset = queryset.filter(journee_scoring__journee__numero__gte=journee_first)
+        if journee_last:
+            queryset = queryset.filter(journee_scoring__journee__numero__lte=journee_last)
+        print('%s' % queryset.query)
+        return queryset.count()
+
 
 class JJScore(models.Model):
     computed_at = models.DateTimeField(auto_now=True, null=False)

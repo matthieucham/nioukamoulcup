@@ -20,17 +20,21 @@ class CurrentLeagueInstanceMixin:
             raise Http404
 
 
-class LeagueInstanceRankingView(CurrentLeagueInstanceMixin, APIView):
+class LeagueInstanceRankingView(CurrentLeagueInstanceMixin, generics.RetrieveAPIView):
     permission_classes = (DRYObjectPermissions,)
+    serializer_class = serializers.LeagueInstanceRankingSerializer
 
-    def get(self, request, league_pk, format=None):
-        instance = self._get_current_league_instance(league_pk)
-        serializer = serializers.LeagueInstancePhaseDaySerializer(
-            league_models.LeagueInstancePhaseDay.objects.get_latest_day_for_phases(
-                league_models.LeagueInstancePhase.objects.filter(league_instance=instance)),
-            many=True,
-            context={'request': request})
-        return Response(serializer.data)
+    def get_queryset(self):
+        return league_models.LeagueInstance.objects.filter(current=True)
+
+    # def get(self, request, league_pk, format=None):
+    #     instance = self._get_current_league_instance(league_pk)
+        # serializer = serializers.LeagueInstancePhaseDaySerializer(
+        #     league_models.LeagueInstancePhaseDay.objects.get_latest_day_for_phases(
+        #         league_models.LeagueInstancePhase.objects.filter(league_instance=instance)),
+        #     many=True,
+        #     context={'request': request})
+        # return Response(serializer.data)
 
 
 class TeamDetailView(generics.RetrieveAPIView):

@@ -3,11 +3,13 @@ from dry_rest_permissions.generics import DRYPermissionsField
 from django.db import models
 from game.services import scoring
 from django.contrib.auth.models import User
+from . import expandable
 
 # import json
 
 from game.models import league_models, transfer_models, scoring_models
 from ligue1 import models as l1models
+from utils.timer import Timer
 
 
 class ClubSerializer(serializers.ModelSerializer):
@@ -124,6 +126,10 @@ class TeamDayScoreByDivisionSerializer(serializers.ListSerializer):
 class TeamDayScoreSerializer(serializers.ModelSerializer):
     team = TeamHdrSerializer(read_only=True)
     is_complete = serializers.SerializerMethodField()
+    rank = serializers.SerializerMethodField()
+    missing_notes = serializers.SerializerMethodField()
+
+    expand = ['missing_notes', ]
 
     def get_is_complete(self, obj):
         """
@@ -136,9 +142,45 @@ class TeamDayScoreSerializer(serializers.ModelSerializer):
                 return False
         return True
 
+    def get_missing_notes(self, obj):
+        """
+        Count missing notes in team
+        """
+        with Timer(id='get_missing_notes', verbose=True):
+            if not self.get_is_complete(obj):
+                return None
+            attrs = obj.attributes
+            phase_type = obj.day.league_instance_phase.type
+            jfirst = obj.day.league_instance_phase.journee_first
+            jlast = obj.day.league_instance_phase.journee_last
+            target_nb_per_player = obj.day.league_instance_phase.league_instance.configuration['notes'][phase_type]
+            # missing = 0
+            joueur_ids = []
+            for pos, req_nb in attrs['formation'].items():
+                for i in range(min(req_nb, len(attrs['composition'][pos]))):
+                    joueur_ids.append(attrs['composition'][pos][i]['player']['id'])
+                    # missing += max([(target_nb_per_player - scoring_models.JJScore.objects.count_notes(
+                    #     obj.day.league_instance_phase.league_instance.saison, player, journee_first=jfirst,
+                    #     journee_last=jlast)), 0])
+            return max([((target_nb_per_player * len(joueur_ids)) - scoring_models.JJScore.objects.count_notes(
+                obj.day.league_instance_phase.league_instance.saison, joueur_ids, journee_first=jfirst,
+                journee_last=jlast)), 0])
+
+    def get_rank(self, obj):
+        """
+        Compute the rank of this Team[DayScore] within its division
+        """
+        with Timer(id='get_rank', verbose=True):
+            if not self.get_is_complete(obj):
+                return None
+            ordered_ids = list(
+                league_models.TeamDayScore.objects.filter(day=obj.day, team__division=obj.team.division).order_by(
+                    '-score').values_list('id', flat=True))
+            return ordered_ids.index(obj.id) + 1
+
     class Meta:
         model = league_models.TeamDayScore
-        fields = ('team', 'score', 'is_complete')
+        fields = ('team', 'score', 'is_complete', 'rank', 'missing_notes',)
         list_serializer_class = TeamDayScoreByDivisionSerializer
 
 
@@ -149,6 +191,39 @@ class LeagueInstancePhaseDaySerializer(serializers.ModelSerializer):
     class Meta:
         model = league_models.LeagueInstancePhaseDay
         fields = ('league_instance_phase', 'phase_name', 'number', 'results')
+
+
+class PhaseDayRankingSerializer(serializers.ModelSerializer):
+    teamdayscore_set = TeamDayScoreSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = league_models.LeagueInstancePhaseDay
+        fields = ('id', 'number', 'league_instance_phase', 'journee', 'results',  # __all__
+                  'teamdayscore_set')
+
+
+class PhaseRankingSerializer(serializers.ModelSerializer):
+    # leagueinstancephaseday_set = PhaseDayRankingSerializer(many=True, read_only=True)
+    current_ranking = serializers.SerializerMethodField()
+
+    def get_current_ranking(self, obj):
+        latest_day = league_models.LeagueInstancePhaseDay.objects.filter(league_instance_phase=obj).order_by(
+            '-journee__numero').first()
+        return PhaseDayRankingSerializer(context={'request': self.context['request']}).to_representation(latest_day)
+
+    class Meta:
+        model = league_models.LeagueInstancePhase
+        fields = ('id', 'name', 'type', 'journee_first', 'journee_last', 'league_instance',  # __all__
+                  'current_ranking')
+
+
+class LeagueInstanceRankingSerializer(serializers.ModelSerializer):
+    leagueinstancephase_set = PhaseRankingSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = league_models.LeagueInstance
+        fields = ('id', 'name', 'slogan', 'league', 'current', 'begin', 'end', 'saison', 'configuration',  # __all__
+                  'leagueinstancephase_set',)
 
 
 class SigningSerializer(serializers.ModelSerializer):
@@ -234,7 +309,6 @@ class TeamDetailSerializer(serializers.ModelSerializer):
     permissions = DRYPermissionsField()
     signings_aggregation = SigningsAggregationSerializer(source='*', read_only=True)
     signings = SigningSerializer(source='signing_set', many=True, read_only=True)
-    # scores = TeamDayScoreSerializer(source='teamdayscore_set', many=True, read_only=True)
     latest_scores = serializers.SerializerMethodField()
     managers = TeamManagerSerializer(many=True, read_only=True)
     account_balance = serializers.SlugRelatedField(source='bank_account', slug_field='balance', read_only=True)
@@ -249,7 +323,8 @@ class TeamDetailSerializer(serializers.ModelSerializer):
                     'journee__numero', flat=True).first())
             return TeamDayScoreSerializer(many=True, read_only=True,
                                           context={'request': self.context['request']}).to_representation(
-                league_models.TeamDayScore.objects.filter(day__in=days, team=obj).order_by('day__league_instance_phase'))
+                league_models.TeamDayScore.objects.filter(day__in=days, team=obj).order_by(
+                    'day__league_instance_phase'))
         except league_models.LeagueInstance.DoesNotExist:
             return None
 
