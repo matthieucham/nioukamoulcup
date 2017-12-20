@@ -88,14 +88,16 @@ class JJScoreManager(models.Manager):
         return self.filter(joueur=joueur, journee_scoring__saison_scoring=saison_scoring).order_by(
             'journee_scoring__journee__numero')
 
-    def count_notes(self, saison, joueur_ids, journee_first=None, journee_last=None):
-        queryset = self.filter(joueur__in=joueur_ids, journee_scoring__saison_scoring__saison=saison, note__isnull=False)
+    def count_notes(self, saison, joueur_ids, max_by_joueur, journee_first=None, journee_last=None):
+        notes_notnull = models.Count('note')
+        queryset = self.filter(joueur__in=joueur_ids, journee_scoring__saison_scoring__saison=saison,
+                               note__isnull=False)
         if journee_first:
             queryset = queryset.filter(journee_scoring__journee__numero__gte=journee_first)
         if journee_last:
             queryset = queryset.filter(journee_scoring__journee__numero__lte=journee_last)
-        print('%s' % queryset.query)
-        return queryset.count()
+        queryset = queryset.values('joueur').annotate(notes_notnull=notes_notnull)
+        return sum([min(n, max_by_joueur) for n in queryset.values_list('notes_notnull', flat=True)])
 
 
 class JJScore(models.Model):
