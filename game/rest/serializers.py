@@ -127,18 +127,12 @@ class TeamDayScoreSerializer(serializers.ModelSerializer):
     team = TeamHdrSerializer(read_only=True)
     is_complete = serializers.SerializerMethodField()
     rank = serializers.SerializerMethodField()
+    previous_rank = serializers.SerializerMethodField()
     missing_notes = serializers.SerializerMethodField()
+    previous_score = serializers.SerializerMethodField()
 
     def get_is_complete(self, obj):
-        """
-        Check if team roster is complete
-        """
-        attrs = obj.attributes
-        # for each position in 'formation', check if there is enough players in 'composition'
-        for pos, req_nb in attrs['formation'].items():
-            if len(attrs['composition'][pos]) < req_nb:
-                return False
-        return True
+        return self._compute_is_complete(obj.attributes)
 
     def get_missing_notes(self, obj):
         """
@@ -165,21 +159,47 @@ class TeamDayScoreSerializer(serializers.ModelSerializer):
                 journee_first=jfirst,
                 journee_last=jlast)), 0])
 
-    def get_rank(self, obj):
+    @staticmethod
+    def _compute_is_complete(tds_attrs):
+        # for each position in 'formation', check if there is enough players in 'composition'
+        for pos, req_nb in tds_attrs['formation'].items():
+            if len(tds_attrs['composition'][pos]) < req_nb:
+                return False
+        return True
+
+    def _compute_rank(self, tds):
         """
         Compute the rank of this Team[DayScore] within its division
         """
-        with Timer(id='get_rank', verbose=False):
-            if not self.get_is_complete(obj):
+        with Timer(id='_compute_rank', verbose=False):
+            if not self.get_is_complete(tds):
                 return None
             ordered_ids = list(
-                league_models.TeamDayScore.objects.filter(day=obj.day, team__division=obj.team.division).order_by(
+                league_models.TeamDayScore.objects.filter(day=tds.day, team__division=tds.team.division).order_by(
                     '-score').values_list('id', flat=True))
-            return ordered_ids.index(obj.id) + 1
+            return ordered_ids.index(tds.id) + 1
+
+    def get_rank(self, obj):
+        return self._compute_rank(obj)
+
+    def get_previous_rank(self, obj):
+        return self._compute_rank(
+            league_models.TeamDayScore.objects.filter(day__journee__numero__lt=obj.day.journee.numero,
+                                                      day__league_instance_phase=obj.day.league_instance_phase,
+                                                      team=obj.team).first())
+
+    def get_previous_score(self, obj):
+        pd = league_models.TeamDayScore.objects.filter(day__journee__numero__lt=obj.day.journee.numero,
+                                                       day__league_instance_phase=obj.day.league_instance_phase,
+                                                       team=obj.team).first()
+        if pd:
+            return pd.score
+        else:
+            return None
 
     class Meta:
         model = league_models.TeamDayScore
-        fields = ('team', 'score', 'is_complete', 'rank', 'missing_notes',)
+        fields = ('team', 'score', 'previous_score', 'is_complete', 'rank', 'previous_rank', 'missing_notes',)
         list_serializer_class = TeamDayScoreByDivisionSerializer
 
 
@@ -203,7 +223,7 @@ class PhaseDayRankingSerializer(serializers.ModelSerializer):
 class PhaseRankingSerializer(serializers.ModelSerializer):
     # leagueinstancephaseday_set = PhaseDayRankingSerializer(many=True, read_only=True)
     current_ranking = serializers.SerializerMethodField()
-    previous_ranking = serializers.SerializerMethodField()
+    #previous_ranking = serializers.SerializerMethodField()
 
     @staticmethod
     def _get_latest_day(obj):
@@ -216,18 +236,18 @@ class PhaseRankingSerializer(serializers.ModelSerializer):
         return PhaseDayRankingSerializer(context={'request': self.context['request']}).to_representation(
             self._get_latest_day(obj))
 
-    def get_previous_ranking(self, obj):
-        latest = self._get_latest_day(obj)
-        if latest:
-            previous_day = league_models.LeagueInstancePhaseDay.objects.filter(league_instance_phase=obj,
-                                                                               journee__numero__lt=latest.journee.numero).order_by(
-                '-journee__numero').first()
-        return PhaseDayRankingSerializer(context={'request': self.context['request']}).to_representation(previous_day)
+    # def get_previous_ranking(self, obj):
+    #     latest = self._get_latest_day(obj)
+    #     if latest:
+    #         previous_day = league_models.LeagueInstancePhaseDay.objects.filter(league_instance_phase=obj,
+    #                                                                            journee__numero__lt=latest.journee.numero).order_by(
+    #             '-journee__numero').first()
+    #     return PhaseDayRankingSerializer(context={'request': self.context['request']}).to_representation(previous_day)
 
     class Meta:
         model = league_models.LeagueInstancePhase
         fields = ('id', 'name', 'type', 'journee_first', 'journee_last', 'league_instance',  # __all__
-                  'current_ranking', 'previous_ranking')
+                  'current_ranking',)
 
 
 class LeagueInstanceRankingSerializer(serializers.ModelSerializer):

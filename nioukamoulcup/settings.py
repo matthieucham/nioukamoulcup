@@ -110,7 +110,8 @@ REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': (
         'rest_framework.filters.DjangoFilterBackend',
         'rest_framework.filters.OrderingFilter',
-    )
+    ),
+    'COERCE_DECIMAL_TO_STRING': False,
 }
 
 ROOT_URLCONF = 'nioukamoulcup.urls'
