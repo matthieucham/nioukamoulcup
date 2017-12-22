@@ -26,6 +26,6 @@ def leagues_navbar_content(context):
 @register.filter
 def json(value):
     """safe jsonify filter, bleaches the json string using the bleach html tag remover"""
-    uncleaned = jsonlib.dumps(value)
+    uncleaned = jsonlib.dumps(value, iterable_as_array=True)
     clean = html.parser.unescape(bleach.clean(uncleaned))
     return mark_safe(clean)
