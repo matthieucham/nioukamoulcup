@@ -96,7 +96,7 @@ export class TeamHeader extends Component {
 		const FinancesKVB = connect(state => { return {value: team.account_balance+' Ka', label: "Budget"} }, 
 									dispatch => { return { onKVBClick: () => dispatch( fetchTeamSthg(team.id, 'bankaccounthistory', REQUEST_FINANCES, RECEIVE_FINANCES, '-date') ) } } )(KeyValueBox);
 
-		const SigningsKVB = connect(state => { return {value: team.signings_aggregation.current_signings, label: "Recrues"} }, 
+		const SigningsKVB = connect(state => { return {value: team.signings_aggregation.current_signings.total, label: "Recrues"} }, 
 									dispatch => { return { onKVBClick: () => dispatch( fetchTeamSthg(team.id, 'signings', REQUEST_SIGNINGS, RECEIVE_SIGNINGS, '-begin') ) } } )(KeyValueBox);
 		const PAKVB = connect(state => { return {value: team.signings_aggregation.total_pa, label: "PA"} }, 
 									dispatch => { return { onKVBClick: () => dispatch( fetchTeamSthg(team.id, 'sales', REQUEST_SALES, RECEIVE_SALES, 'merkato_session') ) } } )(KeyValueBox);

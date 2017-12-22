@@ -16,4 +16,6 @@ urlpatterns = [
         name="league_wall-detail"),
     url(r'^league/ekyp/(?P<pk>[0-9]+)/$', frontend.LeagueEkypView.as_view(),
         name="league_ekyp-detail"),
+    url(r'^league/ranking/(?P<pk>[0-9]+)/$', frontend.LeagueRankingView.as_view(),
+        name="league_ranking-detail"),
 ]

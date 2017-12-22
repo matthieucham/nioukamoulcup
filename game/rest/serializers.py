@@ -436,16 +436,17 @@ class SaleSerializer(serializers.ModelSerializer):
 
 class TeamInfoSerializer(TeamHdrSerializer):
     balance = serializers.SlugRelatedField('balance', source='bank_account', read_only=True)
-    total_pa = TotalPASaleField(source='*')
-    total_releases = TotalReleaseField(source='*')
+    # total_pa = TotalPASaleField(source='*')
+    # total_releases = TotalReleaseField(source='*')
     current_signings = CurrentSignings(source='*')
+    division = serializers.SlugRelatedField('name', read_only=True)
 
     @staticmethod
     def setup_eager_loading(queryset):
         """ Perform necessary eager loading of data. """
-        queryset = queryset.select_related('bank_account')
+        queryset = queryset.select_related('bank_account').select_related('division')
         return queryset
 
     class Meta:
         model = league_models.Team
-        fields = ('id', 'url', 'name', 'attributes', 'balance', 'total_pa', 'total_releases', 'current_signings',)
+        fields = ('id', 'url', 'name', 'attributes', 'division', 'balance', 'current_signings', )

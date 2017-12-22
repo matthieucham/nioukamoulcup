@@ -1,6 +1,7 @@
 from rest_framework.reverse import reverse
 from . import serializers
 from ligue1 import models as l1models
+from game import models
 from utils.timer import Timer
 
 
@@ -9,6 +10,7 @@ class StateInitializerMixin:
     Builds the initial states to pass to the front app to populate the redux store.
     Separate entities collected as is from associations between them
     """
+
     def _to_json(self, serializer):
         # return json.loads(str(JSONRenderer().render(serializer.data), 'utf-8'))
         return serializer.data
@@ -35,4 +37,18 @@ class StateInitializerMixin:
             self.initial_state['team'] = self._to_json(team_serializer)
             self.initial_state['players'] += self._to_json(players_serializer)
             self.initial_state['league_id'] = team.league.id
+            return self.initial_state
+
+    def init_from_league(self, request, league):
+        self._init_common(request)
+        with Timer(id='init_from_league', verbose=True):
+            ranking_serializer = serializers.LeagueInstanceRankingSerializer(
+                models.LeagueInstance.objects.get(league=league, current=True), context={'request': request})
+            teaminfo_serializer = serializers.TeamInfoSerializer(
+                models.Team.objects.select_related('bank_account').select_related('division').filter(league=league),
+                many=True,
+                context={'request': request})
+            self.initial_state.update({'ranking': self._to_json(ranking_serializer)})
+            self.initial_state.update({'teams': self._to_json(teaminfo_serializer)})
+            self.initial_state.update({'league_id': league.id})
             return self.initial_state

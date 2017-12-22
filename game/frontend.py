@@ -121,9 +121,25 @@ class LeagueEkypView(PermissionRequiredMixin, StateInitializerMixin, CurrentLeag
         context['component'] = 'ekyp'
         context['instance'] = self._get_current_league_instance(self.object)
 
-        # team_serializer = serializers.TeamDetailSerializer(my_team, context={'request': self.request})
-        # clubs_serializer = serializers.ClubSerializer(
-        #     l1models.Club.objects.filter(participations__est_courante__isnull=False), many=True,
-        #     context={'request': self.request})
         context['PRELOADED_STATE'] = self.init_from_team(self.request, my_team)
+        return context
+
+
+class LeagueRankingView(PermissionRequiredMixin, StateInitializerMixin, CurrentLeagueInstanceMixin, DetailView):
+    model = models.League
+    template_name = 'game/league/league_base.html'
+    permission_required = 'game.view_league'
+
+    def _get_my_team(self):
+        return models.LeagueMembership.objects.get(user=self.request.user, league=self.object).team
+
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get a context
+        context = super(LeagueRankingView, self).get_context_data(**kwargs)
+        my_team = self._get_my_team()
+        context['team'] = my_team
+        context['component'] = 'league'
+        context['instance'] = self._get_current_league_instance(self.object)
+
+        context['PRELOADED_STATE'] = self.init_from_league(self.request, self.object)
         return context

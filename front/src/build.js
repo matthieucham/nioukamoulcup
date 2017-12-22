@@ -9,6 +9,7 @@ import configureStore from './store/configureStore'
 import { Schemas } from './middleware/api'
 import { TestPage } from './pages/TestPage'
 import EkypPage from './pages/EkypPage'
+import { LeaguePage } from './pages/LeaguePage'
 
 // ========================================
 
@@ -24,6 +25,7 @@ const component = window.component
 const pages = {
     'test': TestPage,
     'ekyp': EkypPage,
+    'league': LeaguePage,
 };
 
 const preloadedStateSchema = { players: Schemas.PLAYER_ARRAY, clubs: Schemas.CLUB_ARRAY };
@@ -46,8 +48,9 @@ const initialState = {
 			}
 		},
 		rankings: {
-			current: normalizedData.result.ranking
-		}
+			current: normalizedData.result.ranking,
+			teams: normalizedData.result.teams,
+		},
 	},
 };
 console.log(initialState);
