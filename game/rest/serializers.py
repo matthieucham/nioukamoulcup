@@ -357,7 +357,14 @@ class TotalSignings(serializers.Field):
 
 class CurrentSignings(serializers.Field):
     def to_representation(self, value):
-        return league_models.Signing.objects.filter(team=value, end__isnull=True).count()
+        total = 0
+        output = dict()
+        for spcount in league_models.Signing.objects.filter(team=value, end__isnull=True).values(
+                'player__poste').annotate(models.Count('player')):
+            total += spcount['player__count']
+            output.update({spcount['player__poste']: spcount['player__count']})
+        output.update({'total': total})
+        return output
 
 
 class SigningsAggregationSerializer(serializers.Serializer):
@@ -441,4 +448,4 @@ class TeamInfoSerializer(TeamHdrSerializer):
 
     class Meta:
         model = league_models.Team
-        fields = ('id', 'url', 'name', 'attributes', 'balance', 'total_pa', 'total_releases', 'current_signings', )
+        fields = ('id', 'url', 'name', 'attributes', 'balance', 'total_pa', 'total_releases', 'current_signings',)
