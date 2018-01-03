@@ -101,7 +101,7 @@ export class TeamRankingTable extends Component {
 	}
 
 	_sortList({sortBy, sortDirection}) {
-		let sortedList = this.state.teams.sort(this._defaultSortBy(sortBy));
+		let sortedList = this.state.teams.sort(sortBy=='previous_score' ? this._sortByProg() : this._defaultSortBy(sortBy));
 		if (sortDirection === SortDirection.DESC)
 			return sortedList.reverse();
 		return sortedList;
@@ -109,11 +109,21 @@ export class TeamRankingTable extends Component {
 
    	_defaultSortBy(sortByKey) {
    		return function(a, b){
-				if (a[sortByKey] < b[sortByKey]) //sort string ascending
-					return -1 ;
-				if (a[sortByKey] > b[sortByKey])
-					return 1;
-				 return 0; //default return value (no sorting)
-				};
-			}
-		}
+			if (a[sortByKey] < b[sortByKey]) //sort string ascending
+				return -1 ;
+			if (a[sortByKey] > b[sortByKey])
+				return 1;
+			 return 0; //default return value (no sorting)
+		};
+	}
+
+	_sortByProg() {
+   		return function(a, b){
+			if (a['score']-a['previous_score'] < b['score']-b['previous_score']) //sort string ascending
+				return -1 ;
+			if (a['score']-a['previous_score'] > b['score']-b['previous_score'])
+				return 1;
+			 return 0; //default return value (no sorting)
+		};
+	}
+}
