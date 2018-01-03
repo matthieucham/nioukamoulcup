@@ -377,6 +377,24 @@ header nav a:hover, nav ul li ul li:hover {
     }
 }
 
+
+/* Tabs (redux-tabs) */
+.tab-content {
+    height: 100%;
+}
+
+.tab-link {
+    padding: 0 15px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    display: inline-block;
+    position: relative;
+}
+
+.tab-link-active {
+    border-bottom: 2px solid #2196F3;
+}
+
 /* LEFT CONTEXTUAL SUBMENU */
 
 .hg__left nav{
@@ -466,19 +484,20 @@ header nav a:hover, nav ul li ul li:hover {
     content: "\f007   ";
 }
 
-/* Tabs (redux-tabs) */
-.tab-content {
-    height: 100%;
+
+/* LEAGUE - Classements */
+
+.division-title::before {
+    font-family: FontAwesome;
+    content: "\f091   ";
 }
 
-.tab-link {
-    padding: 0 15px;
-    cursor: pointer;
-    border: 2px solid transparent;
-    display: inline-block;
-    position: relative;
+.prog-eq {
+    color: #b5b5b5;
 }
-
-.tab-link-active {
-    border-bottom: 2px solid #2196F3;
+.prog-up {
+    color: #228B22;
+}
+.prog-down {
+    color: #B22222;
 }

@@ -23,7 +23,6 @@ const JB = ({ team, journee, onPreviousClick, onNextClick }) => {
 
 
 const mapDispatchToProps = (dispatch, ownProps) => { 
-	console.log(ownProps);
 	const previousnum = ownProps.journee.is_first ? ownProps.journee.numero : ownProps.journee.numero-1
 	const nextnum = ownProps.journee.is_last ? ownProps.journee.numero : ownProps.journee.numero+1
 
