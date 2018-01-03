@@ -465,3 +465,20 @@ header nav a:hover, nav ul li ul li:hover {
     font-family: FontAwesome;
     content: "\f007   ";
 }
+
+/* Tabs (redux-tabs) */
+.tab-content {
+    height: 100%;
+}
+
+.tab-link {
+    padding: 0 15px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    display: inline-block;
+    position: relative;
+}
+
+.tab-link-active {
+    border-bottom: 2px solid #2196F3;
+}
