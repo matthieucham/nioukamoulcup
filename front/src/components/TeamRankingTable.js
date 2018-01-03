@@ -25,11 +25,11 @@ export class TeamRankingTable extends Component {
 		} = this.state;
 
 		return (
-			<AutoSizer>
-			{({width, height}) => (
+			<AutoSizer disableHeight>
+			{({width}) => (
 				<Table
 				ref="Table"
-				height={height}
+				height={ this.props.height }
 				width={width}
 				headerHeight={30}
 				rowHeight={30}
