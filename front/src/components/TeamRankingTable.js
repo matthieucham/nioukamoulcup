@@ -46,7 +46,19 @@ export class TeamRankingTable extends Component {
 
 				<Column	label=""
 				dataKey="previous_rank"
-				cellDataGetter={({rowData}) => rowData['previous_rank'] ? rowData['rank']-rowData['previous_rank'] : ' - '}
+				cellRenderer={({rowData}) => { 
+						if (rowData['previous_rank']) {
+							let prog = rowData['rank']-rowData['previous_rank']
+							if (prog == 0)
+								return <span className="prog-eq"><i className="fa fa-minus"></i></span>;
+							if (prog < 0) {
+								return <span className="prog-up"><i className="fa fa-arrow-up"></i> {Math.abs(prog)}</span>;
+							}
+							if (prog > 0)
+								return <span className="prog-down"><i className="fa fa-arrow-down"></i> {prog}</span>;
+						} else return '';
+					}
+				}
 				width={40}
 				disableSort/>
 
@@ -62,17 +74,18 @@ export class TeamRankingTable extends Component {
 				width={100} flexGrow={1}
 				disableSort/>
 
-				<Column	label="Notes manquantes"
+				<Column	label="Notes"
 				dataKey="missing_notes"
-				width={60}/>
+				cellDataGetter={({rowData}) => rowData['missing_notes'] == 0 ? '' : '-'+rowData['missing_notes']}
+				width={80}/>
 
 				<Column	label="Score"
 				dataKey="score"
 				width={80}/>
 
-				<Column	label=""
+				<Column	label="Prog."
 				dataKey="previous_score"
-				cellDataGetter={({rowData}) => rowData['score']-rowData['previous_score']}
+				cellDataGetter={({rowData}) => (rowData['score']-rowData['previous_score']).toFixed(1)}
 				width={80}/>
 
 				</Table>
