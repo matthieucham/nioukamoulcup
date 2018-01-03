@@ -1,8 +1,5 @@
 import React, { Component } from 'react';
-import 'rc-tabs/assets/index.css';
-import Tabs, { TabPane } from 'rc-tabs';
-import TabContent from 'rc-tabs/lib/TabContent';
-import InkTabBar from 'rc-tabs/lib/InkTabBar';
+import { Tabs, TabLink, TabContent } from 'react-tabs-redux'
 
 import { JerseyPlaceHolder } from './FieldPlayer'
 import ClubFieldPlayer from '../containers/ClubFieldPlayer'
@@ -33,19 +30,17 @@ const Composition = ({ phaseResult }) => {
 }
 
 export const CompoTabs = ({ latestScores }) => {
-	if (latestScores.length == 1) {
-		return (<Composition phaseResult={ latestScores[0] } />);
-	} else {
-		const compositions = latestScores.map( (lsc) => 
-			<TabPane tab={ lsc['day']['phase'] } key={ lsc['day']['id'] }>
-			<Composition phaseResult={ lsc }/>
-			</TabPane>);
-		return (
-			<Tabs
-			renderTabBar={() => <InkTabBar/>}
-			renderTabContent={() => <TabContent animated={false}/>}>
-			{compositions}
-			</Tabs>
-			);
-	}
+	const links = latestScores.map( (lsc) => 
+		<TabLink to={ 'ttab_'+lsc['day']['id'] } key={ 'tablink_'+lsc['day']['id'] }>{ lsc['day']['phase'] } </TabLink>);
+
+	const compositions = latestScores.map( (lsc) => 
+		<TabContent for={ 'ttab_'+lsc['day']['id'] } key={ lsc['day']['id'] }>
+		<Composition phaseResult={ lsc }/>
+		</TabContent>);
+	return (
+		<Tabs>
+		{links}
+		{compositions}
+		</Tabs>
+		);
 }
