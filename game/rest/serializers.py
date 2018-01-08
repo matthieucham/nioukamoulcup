@@ -213,7 +213,10 @@ class PlayerWithScoreSerializer(PlayerHdrSerializer):
     scores = serializers.SerializerMethodField()
 
     def get_scores(self, obj):
-        return self.context['score_by_id'][obj.id]['scores']
+        result = dict()
+        for scoph in self.context['score_by_id'][obj.id]['scores']:
+            result.update({scoph['phase']: scoph['score']})
+        return result
 
     class Meta:
         model = l1models.Joueur
@@ -448,8 +451,15 @@ class TeamInfoSerializer(TeamHdrSerializer):
         fields = ('id', 'url', 'name', 'attributes', 'division', 'balance', 'current_signings',)
 
 
+class LeagueInstancePhaseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = league_models.LeagueInstancePhase
+        fields = ('id', 'name', 'league_instance')
+
+
 class PlayersRankingSerializer(serializers.ModelSerializer):
     players_ranking = serializers.SerializerMethodField()
+    phases = LeagueInstancePhaseSerializer(source="leagueinstancephase_set", many=True, read_only=True)
 
     def get_players_ranking(self, obj):
         with Timer('get_ranking', verbose=False):
@@ -463,7 +473,7 @@ class PlayersRankingSerializer(serializers.ModelSerializer):
                         for psco in tds.attributes['composition'][poste]:
                             if not psco['player']['id'] in score_by_id:
                                 score_by_id.update({psco['player']['id']: dict({'scores': []})})
-                            score_by_id[psco['player']['id']]['scores'].append(dict({'phase': current_phase.name,
+                            score_by_id[psco['player']['id']]['scores'].append(dict({'phase': current_phase.id,
                                                                                      'score': psco['score']}))
             # fetch players
             players = l1models.Joueur.objects.select_related('club').filter(
@@ -474,4 +484,4 @@ class PlayersRankingSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = league_models.LeagueInstance
-        fields = ('players_ranking',)
+        fields = ('phases', 'players_ranking',)
