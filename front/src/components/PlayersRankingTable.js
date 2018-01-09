@@ -28,13 +28,14 @@ export class PlayersRankingTable extends Component {
 	constructor(props) {
 		super(props);
 
-
+		const orderedPlayers = props.players.sort(this._sortByScore('scores.'+props.phases[0]['id'])).reverse().map((el, index) => { el.index = index+1; return el })
 		this.state={
 			phases: props.phases,
-			filterPosition: props.filterPosition,
 			sortBy: 'scores.'+props.phases[0]['id'],
 			sortDirection: SortDirection.DESC,
-			players: props.players.sort(this._sortByScore('scores.'+props.phases[0]['id'])).reverse(),
+			players: orderedPlayers,
+			filterPosition: '',
+			visiblePlayers: orderedPlayers.filter(this._applyFilter('')),
 			dico: {'G': 'Gardien', 'D': 'Défenseur', 'M': 'Milieu', 'A': 'Attaquant'},
 		};
 
@@ -46,6 +47,8 @@ export class PlayersRankingTable extends Component {
 		const {
 			phases,
 			players,
+			visiblePlayers,
+			filterPosition,
 			sortBy,
 			sortDirection,
 			dico,
@@ -64,8 +67,8 @@ export class PlayersRankingTable extends Component {
 				width={width}
 				headerHeight={30}
 				rowHeight={30}
-				rowCount={players.length}
-				rowGetter={({ index }) => players[index]}
+				rowCount={visiblePlayers.length}
+				rowGetter={({ index }) => visiblePlayers[index]}
 
 				sort={this._sort}
 				sortBy={sortBy}
@@ -87,7 +90,9 @@ export class PlayersRankingTable extends Component {
 				cellDataGetter={({rowData}) => dico[rowData['poste']] }
 				width={140}
 				disableSort
-				headerRenderer={ ({ label }) => <PositionFilter label={label} handleChange={ ( event ) => {this.setState({ filterPosition: event.target.value }); this._filter()} }/> }
+				headerRenderer={ ({ label }) => <PositionFilter label={label} 
+																handleChange={ ( event ) => this._filter(event.target.value) }
+																/> }
 				/>
 
 				{ scoresCol }
@@ -98,14 +103,19 @@ export class PlayersRankingTable extends Component {
 			);
 	}
 
-	_filter() {
-		this.state.players.filter( pl => this.state.filterPosition.length>0 ? pl['poste'] == this.state.filterPosition : true )
+	_filter(position) {
+		this.setState({ visiblePlayers: this.state.players.filter(this._applyFilter(position)), filterPosition: position })
+	}
+
+	_applyFilter(pos) {
+		return (pl) => (pos.length == 0 || pl['poste'] == pos)
 	}
 
 	_sort({sortBy, sortDirection}) {
 		const players = this._sortList({sortBy, sortDirection});
 
 		this.setState({sortBy, sortDirection, players});
+		this._filter(this.state.filterPosition);
 	}
 
 	_sortList({sortBy, sortDirection}) {
