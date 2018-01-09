@@ -103,14 +103,9 @@ class LeagueResultsByJourneeListView(CurrentLeagueInstanceMixin, generics.ListAP
             'day__league_instance_phase')
 
 
-class LeaguePlayersRankingByJourneeListView(CurrentLeagueInstanceMixin, generics.RetrieveAPIView):
+class LeaguePlayersRankingView(CurrentLeagueInstanceMixin, generics.RetrieveAPIView):
     permission_classes = (DRYObjectPermissions,)
     serializer_class = serializers.PlayersRankingSerializer
-
-    def get_serializer_context(self):
-        context = super(LeaguePlayersRankingByJourneeListView, self).get_serializer_context()
-        context.update({'journee_numero': self.kwargs['journee_numero']})
-        return context
 
     def get_queryset(self):
         league_pk = self.kwargs['pk']

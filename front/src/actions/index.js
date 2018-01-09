@@ -15,6 +15,8 @@ export const REQUEST_SALES='REQUEST_SALES'
 export const RECEIVE_SALES='RECEIVE_SALES'
 export const REQUEST_COMPOSCORE='REQUEST_COMPOSCORE'
 export const RECEIVE_COMPOSCORE='RECEIVE_COMPOSCORE'
+export const REQUEST_PLAYERSRANKING='REQUEST_PLAYERSRANKING'
+export const RECEIVE_PLAYERSRANKING='RECEIVE_PLAYERSRANKING'
 
 
 export const requestTeamSthg = (team, actionType) => {
@@ -74,5 +76,26 @@ export function fetchTeamScores(team, numjournee) {
     return dispatch => {
     	dispatch(requestCompoScores(team, numjournee))
     	return fetch(url).then(response => response.json()).then(json => dispatch(receiveCompoScores(team, json)))
+  }
+}
+
+export const requestPlayersRanking = () => {
+	return {
+		type: REQUEST_PLAYERSRANKING,
+	}
+}
+
+export const receivePlayersRanking = (json) => {
+	return {
+		type: RECEIVE_PLAYERSRANKING,
+		ranking: json
+	}
+}
+
+export function fetchPlayersRanking() {
+	let url = API_ROOT.concat(`leagues/${LEAGUE_ID}/players?format=json`)
+    return dispatch => {
+    	dispatch(requestPlayersRanking())
+    	return fetch(url).then(response => response.json()).then(json => dispatch(receivePlayersRanking(json)))
   }
 }

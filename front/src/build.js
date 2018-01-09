@@ -48,7 +48,7 @@ const initialState = {
 			}
 		},
 		rankings: {
-			current: normalizedData.result.ranking,
+			phases_ranking: normalizedData.result.ranking,
 			teams: normalizedData.result.teams,
 		},
 	},

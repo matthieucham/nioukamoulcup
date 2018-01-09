@@ -43,6 +43,17 @@ export class PlayersRankingTable extends Component {
 		this._filter = this._filter.bind(this);
 	}
 
+
+
+	componentWillReceiveProps(nextProps) {
+		const orderedPlayers = nextProps.players.sort(this._sortByScore('scores.'+nextProps.phases[0]['id'])).reverse().map((el, index) => { el.index = index+1; return el })
+		this.setState(
+			{players: orderedPlayers,
+				visiblePlayers: orderedPlayers.filter(this._applyFilter(''))
+			}
+		)
+	}
+
 	render() {
 		const {
 			phases,

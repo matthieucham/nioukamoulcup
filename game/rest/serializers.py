@@ -461,11 +461,16 @@ class PlayersRankingSerializer(serializers.ModelSerializer):
     players_ranking = serializers.SerializerMethodField()
     phases = LeagueInstancePhaseSerializer(source="leagueinstancephase_set", many=True, read_only=True)
 
+    @staticmethod
+    def _get_latest_journee(obj):
+        return l1models.Journee.objects.filter(saison=obj.saison).order_by('-numero').first()
+
     def get_players_ranking(self, obj):
         with Timer('get_ranking', verbose=False):
+            j = PlayersRankingSerializer._get_latest_journee(obj)
             score_by_id = dict()
             for tds in league_models.TeamDayScore.objects.filter(day__league_instance_phase__league_instance=obj,
-                                                                 day__journee__numero=self.context['journee_numero']
+                                                                 day__journee=j
                                                                  ).select_related('day__league_instance_phase'):
                 current_phase = tds.day.league_instance_phase
                 if tds.attributes and 'composition' in tds.attributes:

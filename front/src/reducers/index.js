@@ -9,7 +9,8 @@ import {
 	RECEIVE_RELEASES,
 	REQUEST_SALES,
 	RECEIVE_SALES,
-	RECEIVE_COMPOSCORE
+	RECEIVE_COMPOSCORE,
+	RECEIVE_PLAYERSRANKING
 } from '../actions'
 
 
@@ -113,10 +114,29 @@ const team = combineReducers({
 	sales
 })
 
-const rankings = (state={}, action) => {
+const phases_ranking = (state={}, action) => {
 	return state
 }
 
+const teams = (state={}, action) => {
+	return state
+}
+
+function players_ranking( state={phases: [], ranking: []}, action) {
+	switch(action.type) {
+		case RECEIVE_PLAYERSRANKING:
+			return Object.assign({}, state, {phases: action.ranking.phases, ranking: action.ranking.players_ranking} )
+		default:
+			return state
+	}
+}
+
+
+const rankings = combineReducers({
+	phases_ranking,
+	players_ranking,
+	teams,
+})
 
 const data = combineReducers({
 	players,
