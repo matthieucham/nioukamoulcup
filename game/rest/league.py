@@ -116,6 +116,7 @@ class LeagueTeamInfoListView(generics.ListAPIView):
     permission_classes = (DRYObjectPermissions,)
     serializer_class = serializers.TeamInfoSerializer
 
+
     def get_queryset(self):
         league_pk = self.kwargs['pk']
         qs = league_models.Team.objects.filter(league=league_pk)

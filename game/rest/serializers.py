@@ -433,6 +433,22 @@ class SaleSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class TeamInfoByDivisionSerializer(serializers.ListSerializer):
+    def to_representation(self, instance):
+        """
+        List of instances (team) -> grouped by team.division
+        """
+        iterable = instance.all() if isinstance(instance, models.Manager) else instance
+        if not iterable:
+            return super().to_representation(instance)
+        one_team = iterable[0]
+        for div in league_models.LeagueDivision.objects.filter(
+                league=one_team.league).order_by('upper_division'):
+            div_teams = super().to_representation(
+                league_models.Team.objects.filter(division=div).order_by('name'))
+            yield {'id': div.id, 'name': div.name, 'teams': div_teams}
+
+
 class TeamInfoSerializer(TeamHdrSerializer):
     balance = serializers.SlugRelatedField('balance', source='bank_account', read_only=True)
     # total_pa = TotalPASaleField(source='*')
@@ -449,6 +465,7 @@ class TeamInfoSerializer(TeamHdrSerializer):
     class Meta:
         model = league_models.Team
         fields = ('id', 'url', 'name', 'attributes', 'division', 'balance', 'current_signings',)
+        list_serializer_class = TeamInfoByDivisionSerializer
 
 
 class LeagueInstancePhaseSerializer(serializers.ModelSerializer):
