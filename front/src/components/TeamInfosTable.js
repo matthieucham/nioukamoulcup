@@ -2,7 +2,20 @@ import React, { Component } from 'react';
 import { AutoSizer, Column, Table, SortDirection } from 'react-virtualized';
 import 'react-virtualized/styles.css'; // only needs to be imported once
 
-export class TeamInfosTable extends Component {
+
+export const TeamInfosByDivision = ({ divisions }) => {
+	const divs = divisions.map( (dv) =>
+		<div key={ 'teaminfosdiv_'+dv['id'] }>
+			<h2 className="division-title">{ dv['name'] }</h2>
+			<TeamInfosTable teams={ dv['teams'] } height={ 700 } />
+		</div>	
+	)  
+	return (
+			divs
+		);
+}
+
+class TeamInfosTable extends Component {
 
 	constructor(props) {
 		super(props);
