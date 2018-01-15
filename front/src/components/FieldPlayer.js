@@ -5,7 +5,7 @@ const Jersey = ({ club }) => {
 
 	const svgPath = '/static/svg/'+(club ? club.maillot_svg : 'jersey-noclub2')+'.svg';
 	const colFill = club ? club.maillot_color_bg : '#000';
-	const colStroke = club ? club.maillot_color1 : '#000';
+	const colStroke = club ? club.maillot_color_stroke : '#000';
 	return (
 		<div className="jersey">
 		<ReactSVG

@@ -231,7 +231,7 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 STATNUTS_CLIENT_ID = 'aLUoUeBI9Zuj7?JfC0t9U=P3mycANITG@0hvaQlZ'
 STATNUTS_SECRET = 'GsHk=.o2kTu9WkU!a:n1kqkQogZ4lXWitDGn2bZff=?YcdbI-;6h_Grusn@q56@;ttN9OMa9.dWcuBq4lJ8vu7;I9n_f:kJrZ5RUSNkAan088KLyv..7q_.Me94MB?Dy'
-STATNUTS_URL = 'https://statnuts-kcup.rhcloud.com'
+STATNUTS_URL = 'https://statnuts-app-statnuts.193b.starter-ca-central-1.openshiftapps.com'
 
 WEBPACK_LOADER = {
     'DEFAULT': {

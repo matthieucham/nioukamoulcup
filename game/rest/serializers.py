@@ -14,7 +14,7 @@ class ClubSerializer(serializers.ModelSerializer):
     class Meta:
         model = l1models.Club
         fields = ('id', 'nom',
-                  'maillot_svg', 'maillot_color_bg', 'maillot_color1'
+                  'maillot_svg', 'maillot_color_bg', 'maillot_color_stroke'
                   )
 
 
