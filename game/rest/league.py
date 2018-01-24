@@ -106,10 +106,11 @@ class LeagueResultsByJourneeListView(CurrentLeagueInstanceMixin, generics.ListAP
 class LeaguePlayersRankingView(CurrentLeagueInstanceMixin, generics.RetrieveAPIView):
     permission_classes = (DRYObjectPermissions,)
     serializer_class = serializers.PlayersRankingSerializer
+    lookup_field = 'league'
 
     def get_queryset(self):
-        league_pk = self.kwargs['pk']
-        return league_models.LeagueInstance.objects.filter(league=league_pk, current=True)
+        league = self.kwargs['league']
+        return league_models.LeagueInstance.objects.filter(league=league, current=True)
 
 
 class LeagueTeamInfoListView(generics.ListAPIView):

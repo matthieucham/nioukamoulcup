@@ -95,6 +95,7 @@ class MerkatoSession(models.Model):
     closing = models.DateTimeField(blank=False)
     solving = models.DateTimeField(blank=False)
     is_solved = models.BooleanField(null=False, default=False)
+    attributes = JSONField(null=True)
 
     objects = MerkatoSessionManager()
 

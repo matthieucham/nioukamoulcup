@@ -85,7 +85,7 @@ class PlayerScoreSerializer(PlayerHdrSerializer):
                   'poste',
                   'club',
                   'perfs_agg'
-                  # 'perfs',
+            # 'perfs',
                   )
 
 
@@ -115,7 +115,7 @@ class TeamDayScoreByDivisionSerializer(serializers.ListSerializer):
             return super().to_representation(instance)
         one_tds = iterable[0]
         for div in league_models.LeagueDivision.objects.filter(
-                league=one_tds.day.league_instance_phase.league_instance.league).order_by('upper_division'):
+                league=one_tds.day.league_instance_phase.league_instance.league).order_by('level'):
             div_ranking = super().to_representation(
                 league_models.TeamDayScore.objects.filter(day=one_tds.day, team__division=div).order_by('-score'))
             yield {'id': div.id, 'name': div.name, 'ranking': div_ranking}
@@ -130,6 +130,8 @@ class TeamDayScoreSerializer(serializers.ModelSerializer):
     previous_score = serializers.SerializerMethodField()
 
     def get_is_complete(self, obj):
+        if not obj:
+            return False
         return self._compute_is_complete(obj.attributes)
 
     def get_missing_notes(self, obj):
@@ -443,7 +445,7 @@ class TeamInfoByDivisionSerializer(serializers.ListSerializer):
             return super().to_representation(instance)
         one_team = iterable[0]
         for div in league_models.LeagueDivision.objects.filter(
-                league=one_team.league).order_by('upper_division'):
+                league=one_team.league).order_by('level'):
             div_teams = super().to_representation(
                 league_models.Team.objects.filter(division=div).order_by('name'))
             yield {'id': div.id, 'name': div.name, 'teams': div_teams}
@@ -478,25 +480,22 @@ class PlayersRankingSerializer(serializers.ModelSerializer):
     players_ranking = serializers.SerializerMethodField()
     phases = LeagueInstancePhaseSerializer(source="leagueinstancephase_set", many=True, read_only=True)
 
-    @staticmethod
-    def _get_latest_journee(obj):
-        return l1models.Journee.objects.filter(saison=obj.saison).order_by('-numero').first()
-
     def get_players_ranking(self, obj):
         with Timer('get_ranking', verbose=False):
-            j = PlayersRankingSerializer._get_latest_journee(obj)
+            latest_day_by_phase = league_models.LeagueInstancePhase.objects.filter(league_instance=obj).annotate(
+                latest_day=models.Max('leagueinstancephaseday__journee__numero'))
             score_by_id = dict()
-            for tds in league_models.TeamDayScore.objects.filter(day__league_instance_phase__league_instance=obj,
-                                                                 day__journee=j
-                                                                 ).select_related('day__league_instance_phase'):
-                current_phase = tds.day.league_instance_phase
-                if tds.attributes and 'composition' in tds.attributes:
-                    for poste in ['G', 'D', 'M', 'A']:
-                        for psco in tds.attributes['composition'][poste]:
-                            if not psco['player']['id'] in score_by_id:
-                                score_by_id.update({psco['player']['id']: dict({'scores': []})})
-                            score_by_id[psco['player']['id']]['scores'].append(dict({'phase': current_phase.id,
-                                                                                     'score': psco['score']}))
+            for phase in latest_day_by_phase:
+                for tds in league_models.TeamDayScore.objects.filter(day__league_instance_phase=phase,
+                                                                     day__journee__numero=phase.latest_day).select_related(
+                    'day__league_instance_phase'):
+                    if tds.attributes and 'composition' in tds.attributes:
+                        for poste in ['G', 'D', 'M', 'A']:
+                            for psco in tds.attributes['composition'][poste]:
+                                if not psco['player']['id'] in score_by_id:
+                                    score_by_id.update({psco['player']['id']: dict({'scores': []})})
+                                score_by_id[psco['player']['id']]['scores'].append(dict({'phase': phase.id,
+                                                                                         'score': psco['score']}))
             # fetch players
             players = l1models.Joueur.objects.select_related('club').filter(
                 pk__in=[key for key, _ in score_by_id.items()])

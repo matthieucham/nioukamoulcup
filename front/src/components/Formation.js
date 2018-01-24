@@ -30,11 +30,11 @@ const Composition = ({ phaseResult }) => {
 }
 
 export const CompoTabs = ({ latestScores }) => {
-	const links = latestScores.map( (lsc) => 
-		<TabLink to={ 'ttab_'+lsc['day']['id'] } key={ 'tablink_'+lsc['day']['id'] }>{ lsc['day']['phase'] } </TabLink>);
+	const links = latestScores.map( (lsc, index) => 
+		<TabLink to={ 'ttab_'+index } key={ 'tablink_'+lsc['day']['id'] }>{ lsc['day']['phase'] } </TabLink>);
 
-	const compositions = latestScores.map( (lsc) => 
-		<TabContent for={ 'ttab_'+lsc['day']['id'] } key={ lsc['day']['id'] }>
+	const compositions = latestScores.map( (lsc, index) => 
+		<TabContent for={ 'ttab_'+index } key={ lsc['day']['id'] }>
 		<Composition phaseResult={ lsc }/>
 		</TabContent>);
 	return (
