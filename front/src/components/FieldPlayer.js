@@ -30,7 +30,14 @@ export const JerseyPlaceHolder = () => {
 		);
 }
 
-const FieldPlayerDetails = ({player, club}) => <div className="playerDetails"><h1>{ player.player.name }</h1><p>{ player.score }</p><p>{ club ? club.nom : '-' }</p></div>;
+const FieldPlayerDetails = ({player, club}) => {
+	const bonus = (player.score_factor-1.0).toFixed(2)*100;
+	var bonusDisplay = '';
+	if (bonus > 0) {
+		bonusDisplay = <span className="bonus">{bonus+'%'}</span>;
+	}
+	return <div className="playerDetails"><h1>{ player.player.name }</h1><p>{ player.score }{ bonusDisplay }</p><p>{ club ? club.nom : '-' }</p></div>
+};
 
 
 export const FieldPlayer = ({ player, club }) => <div className="fieldPlayer"><Jersey club={club} /><FieldPlayerDetails player={ player } club={ club } /></div>;

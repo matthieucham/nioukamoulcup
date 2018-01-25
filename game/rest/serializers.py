@@ -494,8 +494,9 @@ class PlayersRankingSerializer(serializers.ModelSerializer):
                             for psco in tds.attributes['composition'][poste]:
                                 if not psco['player']['id'] in score_by_id:
                                     score_by_id.update({psco['player']['id']: dict({'scores': []})})
+                                scoval = float('%.2f' % round(psco['score'] / psco['score_factor'], 2))
                                 score_by_id[psco['player']['id']]['scores'].append(dict({'phase': phase.id,
-                                                                                         'score': psco['score']}))
+                                                                                         'score': scoval}))
             # fetch players
             players = l1models.Joueur.objects.select_related('club').filter(
                 pk__in=[key for key, _ in score_by_id.items()])

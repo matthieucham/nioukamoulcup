@@ -458,6 +458,15 @@ header nav a:hover, nav ul li ul li:hover {
     background-color: rgba(255,255,255,0.2);
     border-radius: 3px;
 }
+.fieldPlayer .playerDetails .bonus{
+    padding-left: 3px;
+    font-weight: bold;
+}
+.fieldPlayer .playerDetails .bonus::before{
+    font-family: "FontAwesome";
+    content: "\f005"
+}
+
 .compoLine {
     display: flex;
     justify-content: space-around;
