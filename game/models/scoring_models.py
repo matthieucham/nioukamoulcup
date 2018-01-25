@@ -60,12 +60,12 @@ class JJScoreManager(models.Manager):
     def create_jjscore_from_ligue1(self, journee_scoring):
         with Timer(id='create_jjscore_from_ligue1', verbose=False):
             computed_club_pks = []
-            bbp = None
             jjscores = []
             computed_joueurs = []
             for r in journee_scoring.journee.rencontres.all():
                 computed_club_pks.extend([r.club_domicile.pk, r.club_exterieur.pk])
                 all_perfs = r.performances.select_related('joueur').select_related('rencontre').all()
+                bbp = None
                 if all_perfs:  # perform queryset
                     if bbp is None:
                         bbp = scoring.compute_best_by_position(all_perfs)

@@ -41,7 +41,7 @@ def compute_best_by_position(all_perfs):
 
 
 def compute_score_performance(perf, best_note_by_position):
-    with Timer(id='compute_score_performance', verbose=True):
+    with Timer(id='compute_score_performance', verbose=False):
         if perf.joueur.poste is None:
             return None, 0, None, []
 
@@ -82,7 +82,8 @@ def _compute_bonus(perf, best_note_by_position):
     if perf.details['stats']['goals_saved'] > 3:
         earned.update({'3STOPS': 1})
         base += BONUS['PERSONAL']['3STOPS'][poste]
-    if 'note' in perf.details and perf.details['note'] >= best_note_by_position[perf.details['equipe']][poste]:
+    if 'note' in perf.details and perf.temps_de_jeu >= PLAYTIME['MAX_LONG'] and perf.details['note'] >= \
+            best_note_by_position[perf.details['equipe']][poste]:
         earned.update({'LEADER': 1})
         base += BONUS['PERSONAL']['LEADER'][poste]
     if perf.temps_de_jeu >= PLAYTIME['MIN_BONUS']:
@@ -90,13 +91,16 @@ def _compute_bonus(perf, best_note_by_position):
         if perf.rencontre.resultat[perf.details['equipe']]['buts_contre'] == 0:
             earned.update({'CLEANSHEET': 1})
             base += BONUS['COLLECTIVE']['CLEANSHEET'][poste]
-        if perf.rencontre.resultat[perf.details['equipe']]['buts_contre'] == 1 and perf.rencontre.resultat[perf.details['equipe']]['penos_contre'] == 1:
+        if perf.rencontre.resultat[perf.details['equipe']]['buts_contre'] == 1 and \
+                perf.rencontre.resultat[perf.details['equipe']]['penos_contre'] == 1:
             earned.update({'HALFCLEANSHEET': 1})
             base += BONUS['COLLECTIVE']['HALFCLEANSHEET'][poste]
-        if perf.rencontre.resultat[perf.details['equipe']]['buts_pour'] == 3 and perf.rencontre.resultat[perf.details['equipe']]['penos_pour'] == 1:
+        if perf.rencontre.resultat[perf.details['equipe']]['buts_pour'] == 3 and \
+                perf.rencontre.resultat[perf.details['equipe']]['penos_pour'] == 1:
             earned.update({'HALFOFFENSIVE': 1})
             base += BONUS['COLLECTIVE']['HALFOFFENSIVE'][poste]
-        if perf.rencontre.resultat[perf.details['equipe']]['buts_pour'] == 3 and perf.rencontre.resultat[perf.details['equipe']]['penos_pour'] == 0:
+        if perf.rencontre.resultat[perf.details['equipe']]['buts_pour'] == 3 and \
+                perf.rencontre.resultat[perf.details['equipe']]['penos_pour'] == 0:
             earned.update({'OFFENSIVE': 1})
             base += BONUS['COLLECTIVE']['OFFENSIVE'][poste]
         if perf.rencontre.resultat[perf.details['equipe']]['buts_pour'] > 3:
