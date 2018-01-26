@@ -14,8 +14,10 @@ urlpatterns = [
 
     url(r'^league/wall/(?P<pk>[0-9]+)/$', frontend.LeagueWallView.as_view(),
         name="league_wall-detail"),
-    url(r'^league/ekyp/(?P<pk>[0-9]+)/$', frontend.LeagueEkypView.as_view(),
+    url(r'^league/(?P<pk>[0-9]+)/ekyp/$', frontend.LeagueEkypView.as_view(),
         name="league_ekyp-detail"),
+    url(r'^league/(?P<pk>[0-9]+)/ekyp/(?P<team_pk>[0-9]+)$', frontend.LeagueEkypView.as_view(),
+        name="league_team-detail"),
     url(r'^league/ranking/(?P<pk>[0-9]+)/$', frontend.LeagueRankingView.as_view(),
         name="league_ranking-detail"),
 ]

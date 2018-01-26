@@ -1,5 +1,6 @@
 import operator
 from rest_framework import serializers
+from rest_framework.reverse import reverse
 from dry_rest_permissions.generics import DRYPermissionsField
 from django.db import models
 from game.services import scoring
@@ -97,8 +98,19 @@ class TeamManagerSerializer(serializers.ModelSerializer):
         fields = ('user',)
 
 
-class TeamHdrSerializer(serializers.HyperlinkedModelSerializer):
-    url = serializers.HyperlinkedIdentityField(view_name='league_ekyp-detail')
+class TeamHyperLink(serializers.HyperlinkedRelatedField):
+    view_name = 'league_team-detail'
+
+    def get_url(self, obj, view_name, request, format):
+        url_kwargs = {
+            'pk': obj.league.pk,
+            'team_pk': obj.pk
+        }
+        return reverse(view_name, kwargs=url_kwargs, request=request, format=format)
+
+
+class TeamHdrSerializer(serializers.ModelSerializer):
+    url = TeamHyperLink(source='*', read_only=True)
 
     class Meta:
         model = league_models.Team

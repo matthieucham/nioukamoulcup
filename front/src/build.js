@@ -10,6 +10,7 @@ import { Schemas } from './middleware/api'
 import { TestPage } from './pages/TestPage'
 import EkypPage from './pages/EkypPage'
 import { LeaguePage } from './pages/LeaguePage'
+import { TeamPage } from './pages/TeamPage'
 
 // ========================================
 
@@ -26,6 +27,7 @@ const pages = {
     'test': TestPage,
     'ekyp': EkypPage,
     'league': LeaguePage,
+    'team': TeamPage,
 };
 
 const preloadedStateSchema = { players: Schemas.PLAYER_ARRAY, clubs: Schemas.CLUB_ARRAY };

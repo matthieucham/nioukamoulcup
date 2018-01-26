@@ -118,10 +118,17 @@ class LeagueEkypView(PermissionRequiredMixin, StateInitializerMixin, CurrentLeag
         context = super(LeagueEkypView, self).get_context_data(**kwargs)
         my_team = self._get_my_team()
         context['team'] = my_team
-        context['component'] = 'ekyp'
         context['instance'] = self._get_current_league_instance(self.object)
 
-        context['PRELOADED_STATE'] = self.init_from_team(self.request, my_team)
+        if 'team_pk' in self.kwargs and self.kwargs['team_pk'] != my_team.pk:
+            context['component'] = 'team'
+            context['PRELOADED_STATE'] = self.init_from_team(self.request,
+                                                             models.Team.objects.filter(
+                                                                 managers__league=self.kwargs['pk']).get(
+                                                                 pk=self.kwargs['team_pk']))
+        else:
+            context['component'] = 'ekyp'
+            context['PRELOADED_STATE'] = self.init_from_team(self.request, my_team)
         return context
 
 
