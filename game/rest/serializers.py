@@ -398,11 +398,13 @@ class TeamDetailSerializer(serializers.ModelSerializer):
     def get_latest_scores(self, obj):
         try:
             linstance = league_models.LeagueInstance.objects.get(league=obj.league, current=True)
-            days = league_models.LeagueInstancePhaseDay.objects.filter(
-                league_instance_phase__league_instance=linstance).filter(
-                journee__numero=league_models.LeagueInstancePhaseDay.objects.filter(
-                    league_instance_phase__league_instance=linstance).order_by('-journee__numero').values_list(
-                    'journee__numero', flat=True).first())
+            latest_day_by_phase = league_models.LeagueInstancePhase.objects.filter(league_instance=linstance).annotate(
+                latest_day=models.Max('leagueinstancephaseday__journee__numero'))
+            days = []
+            for ph in latest_day_by_phase.all():
+                days += league_models.LeagueInstancePhaseDay.objects.filter(
+                    league_instance_phase__league_instance=linstance).filter(league_instance_phase=ph.pk,
+                                                                             journee__numero=ph.latest_day)
             return TeamDayScoreSerializer(many=True, read_only=True,
                                           context={'request': self.context['request']}).to_representation(
                 league_models.TeamDayScore.objects.filter(day__in=days, team=obj).select_related('team',
