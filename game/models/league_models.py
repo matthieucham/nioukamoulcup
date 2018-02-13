@@ -3,6 +3,7 @@ from django.contrib.postgres.fields import JSONField
 from django.contrib.auth.models import User
 # import json
 from collections import defaultdict
+import datetime
 
 from . import scoring_models
 from ligue1 import models as l1models
@@ -79,15 +80,15 @@ class Team(models.Model):
 
 class BankAccountManager(models.Manager):
     @transaction.atomic()
-    def init_account(self, team, init_balance):
+    def init_account(self, date, team, init_balance):
         account, created = self.get_or_create(team=team, defaults={'balance': init_balance, 'blocked': 0})
         if not created:
             account.balance = init_balance
             account.blocked = 0
             account.save()
-        account.bankaccounthistory_set.clear()
+        account.bankaccounthistory_set.all().delete()
         account.bankaccounthistory_set.add(
-            BankAccountHistory.objects.create(amount=init_balance, new_balance=init_balance,
+            BankAccountHistory.objects.create(date=date, amount=init_balance, new_balance=init_balance,
                                               info=BankAccountHistory.make_info_init()))
 
     @transaction.atomic()
@@ -140,7 +141,7 @@ class BankAccount(models.Model):
 
 class BankAccountHistory(models.Model):
     bank_account = models.ForeignKey(BankAccount, null=True)  # entries with null ref will be deleted by batch
-    date = models.DateTimeField(auto_now_add=True)
+    date = models.DateTimeField()
     amount = models.DecimalField(max_digits=4, decimal_places=1)
     new_balance = models.DecimalField(max_digits=4, decimal_places=1)
     info = JSONField()
@@ -293,7 +294,8 @@ class LeagueInstancePhaseDayManager(models.Manager):
         latest_days = []
         for ph in phases:
             latest_day = self.filter(league_instance_phase=ph,
-                                     results__isnull=False).prefetch_related('teamdayscore_set').order_by('-number').first()
+                                     results__isnull=False).prefetch_related('teamdayscore_set').order_by(
+                '-number').first()
             if latest_day:
                 latest_days.append(latest_day)
         return latest_days

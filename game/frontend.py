@@ -124,7 +124,7 @@ class LeagueEkypView(PermissionRequiredMixin, StateInitializerMixin, CurrentLeag
             context['component'] = 'team'
             context['PRELOADED_STATE'] = self.init_from_team(self.request,
                                                              models.Team.objects.filter(
-                                                                 managers__league=self.kwargs['pk']).get(
+                                                                 managers__league=self.kwargs['pk']).distinct().get(
                                                                  pk=self.kwargs['team_pk']))
         else:
             context['component'] = 'ekyp'

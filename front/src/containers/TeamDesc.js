@@ -37,10 +37,10 @@ class TeamDescCollapsibleSection extends Component {
 	render() {
 		const activeKey = this.props.activeKey;
 		const titles = { signings: 'Joueurs recrutés', finances: 'Evolution du budget', releases: 'Reventes à la banque', sales: 'PA déposées'}
-		const ConnectedFinancesTable = connect(state => { return {history: state.data.team.finances.all, height: 300} } ) (FinancesTable);
-		const ConnectedSigningsTable = connect(state => { return {signings: state.data.team.signings.all, height: 300} } ) (SigningsTable);
-		const ConnectedReleasesTable = connect(state => { return {releases: state.data.team.releases.all, height: 300} } ) (ReleasesTable);
-		const ConnectedSalesTable = connect(state => { return {sales: state.data.team.sales.all, height: 300} } ) (SalesTable);
+		const ConnectedFinancesTable = connect(state => { return {history: state.data.team.finances.all, height: 260} } ) (FinancesTable);
+		const ConnectedSigningsTable = connect(state => { return {signings: state.data.team.signings.all, height: 260} } ) (SigningsTable);
+		const ConnectedReleasesTable = connect(state => { return {releases: state.data.team.releases.all, height: 260} } ) (ReleasesTable);
+		const ConnectedSalesTable = connect(state => { return {sales: state.data.team.sales.all, height: 260} } ) (SalesTable);
 		return (
 		<CollapsibleSection expanded={this.props.expanded} title={ titles[activeKey] } onClose={ () => this.props.onClose() }>
 			<Tabs

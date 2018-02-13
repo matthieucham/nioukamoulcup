@@ -1,5 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
 from game import models as gamemodels
+import decimal
 
 
 class Command(BaseCommand):
@@ -28,9 +29,61 @@ class Command(BaseCommand):
             except gamemodels.LeagueInstance.MultipleObjectsReturned:
                 raise CommandError('League %s has multiple current instances !' % league_id)
 
+            # init account for all teams
             for team in gamemodels.Team.objects.filter(league=league):
-                # init history
-                history = list()
-                gamemodels.BankAccountHistory init = gamemodels.BankAccountHistory()
+                gamemodels.BankAccount.objects.init_account(instance.begin, team, int(options['start_amount']))
+            # get all budget-related events
+            events = list()
+            for sales_pa in gamemodels.Sale.objects.filter(type='PA',
+                                                           merkato_session__merkato__league_instance=instance).select_related(
+                'winning_auction').select_related('merkato_session'):
+                events.append({'date': sales_pa.merkato_session.solving,
+                               'team': sales_pa.winning_auction.team if sales_pa.winning_auction else sales_pa.team,
+                               'debit': - sales_pa.get_buying_price(),
+                               'sale': sales_pa})
+            for sales_mv in gamemodels.Sale.objects.filter(type='MV',
+                                                           merkato_session__merkato__league_instance=instance).select_related(
+                'winning_auction').select_related('merkato_session'):
+                if sales_mv.winning_auction:
+                    events.append({'date': sales_mv.merkato_session.solving,
+                                   'team': sales_mv.winning_auction.team,
+                                   'debit': - sales_mv.winning_auction.value,
+                                   'sale': sales_mv})
+                    events.append({'date': sales_mv.merkato_session.solving,
+                                   'team': sales_mv.team,
+                                   'credit': sales_mv.winning_auction.value * decimal.Decimal(
+                                       1.0 - sales_mv.merkato_session.merkato.configuration[
+                                           'mv_tax_rate']) if 'mv_tax_rate' in sales_mv.merkato_session.merkato.configuration else sales_mv.winning_auction.value,
+                                   'sale': sales_mv})
 
-        self.stdout.write('Done. %d league_instances processed' % licount)
+            for re in gamemodels.Release.objects.select_related('signing').select_related('merkato_session').filter(
+                    merkato_session__merkato__league_instance=instance, done=True):
+                events.append({'date': re.merkato_session.solving,
+                               'team': re.signing.team,
+                               'credit': re.amount,
+                               'release': re})
+            for ev in sorted(sorted(events, key=lambda e: 0 if 'release' in e else 1), key=lambda e: e['date']):
+                account = gamemodels.BankAccount.objects.get(team=ev['team'])
+                if 'debit' in ev:
+                    account.balance += ev['debit']
+                    account.bankaccounthistory_set.add(
+                        gamemodels.BankAccountHistory.objects.create(amount=ev['debit'], new_balance=account.balance,
+                                                                     date=ev['date'],
+                                                                     info=gamemodels.BankAccountHistory.make_info_buy(
+                                                                         ev['sale'].player,
+                                                                         seller=ev['sale'].team if ev[
+                                                                                                       'sale'].type == 'MV' else None)))
+                    account.save()
+                if 'credit' in ev:
+                    account.balance += ev['credit']
+                    if 'sale' in ev:
+                        info = gamemodels.BankAccountHistory.make_info_sell(ev['sale'].player,
+                                                                            buyer=ev['sale'].winning_auction.team)
+                    elif 'release' in ev:
+                        info = gamemodels.BankAccountHistory.make_info_release(ev['release'].signing.player)
+                    account.bankaccounthistory_set.add(
+                        gamemodels.BankAccountHistory.objects.create(date=ev['date'], amount=ev['credit'],
+                                                                     new_balance=account.balance,
+                                                                     info=info))
+                    account.save()
+            self.stdout.write('League instance %d done.' % league_id)

@@ -151,11 +151,9 @@ class Sale(models.Model):
         super(Sale, self).save(*args, **kwargs)
 
     def get_buying_price(self):
-        assert self.merkato_session.is_solved
         if self.winning_auction:
             return self.winning_auction.value
         else:
-            assert self.type == 'PA'
             return self.min_price
 
     def get_selling_price(self):
