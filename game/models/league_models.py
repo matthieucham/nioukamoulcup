@@ -86,7 +86,6 @@ class BankAccountManager(models.Manager):
             account.balance = init_balance
             account.blocked = 0
             account.save()
-        account.bankaccounthistory_set.all().delete()
         account.bankaccounthistory_set.add(
             BankAccountHistory.objects.create(date=date, amount=init_balance, new_balance=init_balance,
                                               info=BankAccountHistory.make_info_init()))

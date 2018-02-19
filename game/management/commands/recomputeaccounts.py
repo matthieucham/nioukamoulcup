@@ -9,14 +9,6 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('league_id', nargs='+', type=int)
 
-        parser.add_argument(
-            '--start_amount',
-            dest='start_amount',
-            default=100,
-            help='initial amount',
-            type=int,
-        )
-
     def handle(self, *args, **options):
         for league_id in options['league_id']:
             try:
@@ -29,11 +21,15 @@ class Command(BaseCommand):
             except gamemodels.LeagueInstance.MultipleObjectsReturned:
                 raise CommandError('League %s has multiple current instances !' % league_id)
 
-            # init account for all teams
-            for team in gamemodels.Team.objects.filter(league=league):
-                gamemodels.BankAccount.objects.init_account(instance.begin, team, int(options['start_amount']))
+            # clear previous history
+            gamemodels.BankAccountHistory.objects.filter(bank_account__team__league=league).delete()
             # get all budget-related events
             events = list()
+            for mkt in gamemodels.Merkato.objects.filter(league_instance=instance):
+                if 'init_balance' in mkt.configuration:
+                    for t in gamemodels.Team.objects.filter(league=league):
+                        events.append({'date': mkt.begin, 'balance': decimal.Decimal(mkt.configuration['init_balance']),
+                                       'team': t})
             for sales_pa in gamemodels.Sale.objects.filter(type='PA',
                                                            merkato_session__merkato__league_instance=instance).select_related(
                 'winning_auction').select_related('merkato_session'):
@@ -63,11 +59,19 @@ class Command(BaseCommand):
                                'credit': re.amount,
                                'release': re})
             for ev in sorted(sorted(events, key=lambda e: 0 if 'release' in e else 1), key=lambda e: e['date']):
-                account = gamemodels.BankAccount.objects.get(team=ev['team'])
+                account, _ = gamemodels.BankAccount.objects.get_or_create(team=ev['team'], defaults={'blocked': 0})
+                if 'balance' in ev:
+                    account.balance = ev['balance']
+                    account.bankaccounthistory_set.add(
+                        gamemodels.BankAccountHistory.objects.create(date=ev['date'], amount=ev['balance'],
+                                                                     new_balance=account.balance,
+                                                                     info=gamemodels.BankAccountHistory.make_info_init()))
+                    account.save()
                 if 'debit' in ev:
                     account.balance += ev['debit']
                     account.bankaccounthistory_set.add(
-                        gamemodels.BankAccountHistory.objects.create(amount=ev['debit'], new_balance=account.balance,
+                        gamemodels.BankAccountHistory.objects.create(amount=ev['debit'],
+                                                                     new_balance=account.balance,
                                                                      date=ev['date'],
                                                                      info=gamemodels.BankAccountHistory.make_info_buy(
                                                                          ev['sale'].player,

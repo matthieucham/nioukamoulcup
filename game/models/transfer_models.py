@@ -12,10 +12,10 @@ from ligue1 import models as l1models
 
 class MerkatoManager(models.Manager):
     def setup(self, league_instance, mode, begin, end, roster_size_max, closing_times=['12:00', '20:00'],
-              session_duration=48):
+              session_duration=48, initial_team_balance=None):
         assert mode in ['BID', 'DRFT']
         merkato = self.create(mode=mode, begin=begin, end=end, league_instance=league_instance,
-                              configuration=MerkatoManager._make_config(roster_size_max))
+                              configuration=MerkatoManager._make_config(roster_size_max, initial_team_balance=initial_team_balance))
         # create sessions
         ticks = [t for t in MerkatoManager._generate_ticks(begin, end, closing_times)]
         nb = 1
@@ -56,10 +56,13 @@ class MerkatoManager(models.Manager):
 
     @staticmethod
     def _make_config(roster_size_max, sales_per_session=-1, pa_number=1, mv_number=1, mv_tax_rate=0.1,
-                     re_tax_rate=0.5):
-        return {'roster_size_max': roster_size_max, 'sales_per_session': sales_per_session, 'pa_number': pa_number,
+                     re_tax_rate=0.5, initial_team_balance=None):
+        conf = {'roster_size_max': roster_size_max, 'sales_per_session': sales_per_session, 'pa_number': pa_number,
                 'mv_number': mv_number,
                 'mv_tax_rate': mv_tax_rate, 're_tax_rate': re_tax_rate}
+        if initial_team_balance:
+            conf['init_balance'] = initial_team_balance
+        return conf
 
 
 class Merkato(models.Model):
