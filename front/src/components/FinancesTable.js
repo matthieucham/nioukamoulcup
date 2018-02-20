@@ -11,6 +11,22 @@ function getNumber(theNumber)
     }
 }
 
+function getInfos(info)
+{
+    switch(info.type) {
+    	case 'INIT':
+    		return 'Distribution'
+    	case 'BUY':
+    		return 'Achat de '+info.player_name + (info.seller_name ? ' ('+info.seller_name+')': '')
+    	case 'RELEASE':
+    		return 'Revente de '+info.player_name
+    	case 'SELL':
+    		return 'Vente de '+info.player_name+' à '+info.buyer_name
+    	default:
+    		return 'info'
+    }
+}
+
 export const FinancesTable = ({ history, height }) => {
 		Moment.locale('fr');
 
@@ -32,8 +48,8 @@ export const FinancesTable = ({ history, height }) => {
 
 				<Column	label="Montant"
 				dataKey="amount"
-				cellDataGetter={({rowData}) => getNumber(rowData.amount) }
-				width={80} flexGrow={1}/>
+				cellDataGetter={({rowData}) => getNumber(rowData.amount) + ' Ka' }
+				width={80} />
 				
 				<Column	label="Total"
 				dataKey="new_balance"
@@ -42,6 +58,7 @@ export const FinancesTable = ({ history, height }) => {
 
 				<Column	label="Infos"
 				dataKey="info"
+				cellDataGetter={ ({rowData}) => getInfos(rowData.info) }
 				width={200} flexGrow={1}/>
 				</Table>
 				)}
