@@ -105,6 +105,9 @@ class MerkatoSession(models.Model):
     def __str__(self):
         return 'MerkatoSession #%d -> %s -> %s' % (self.number, self.closing, self.solving)
 
+    def has_object_read_permission(self, request):
+        return request.user in self.merkato.league_instance.league.members.all()
+
     class Meta:
         ordering = ('closing',)
 

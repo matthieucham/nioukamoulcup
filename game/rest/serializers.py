@@ -520,3 +520,91 @@ class PlayersRankingSerializer(serializers.ModelSerializer):
     class Meta:
         model = league_models.LeagueInstance
         fields = ('phases', 'players_ranking',)
+
+
+class AuctionSerializer(serializers.ModelSerializer):
+    is_mine = serializers.SerializerMethodField()
+
+    def get_is_mine(self, obj):
+        if 'request' in self.context:
+            mb = league_models.LeagueMembership.objects.filter(team=obj.team, user=self.context['request'].user).first()
+            return mb is not None
+        return None
+
+    class Meta:
+        model = transfer_models.Auction
+        fields = ('value', 'is_valid', 'is_mine')
+
+
+class SaleSummarySerializer(serializers.ModelSerializer):
+    author = TeamHdrSerializer(source='team', read_only=True)
+    player = PlayerHdrSerializer(read_only=True)
+
+    class Meta:
+        model = transfer_models.Sale
+        fields = ('id', 'rank', 'type', 'player', 'author', 'min_price')
+
+
+class SaleSerializer(SaleSummarySerializer):
+    winner = serializers.SerializerMethodField()
+    amount = serializers.SlugRelatedField(source='winning_auction', slug_field='value', read_only=True)
+    auctions = serializers.SerializerMethodField()
+
+    def get_auctions(self, obj):
+        return AuctionSerializer(transfer_models.Auction.objects.filter(sale=obj).order_by('value'), read_only=True,
+                                 many=True, context=self.context).data
+
+    def get_winner(self, obj):
+        if obj.winning_auction:
+            return TeamHdrSerializer(obj.winning_auction.team, read_only=True, context=self.context).data
+        return None
+
+    class Meta:
+        model = transfer_models.Sale
+        fields = ('id', 'rank', 'type', 'player', 'author', 'min_price', 'winner', 'amount', 'auctions')
+
+
+class MerkatoSessionSummarySerializer(serializers.HyperlinkedModelSerializer):
+    sales_count = serializers.SerializerMethodField()
+    releases_count = serializers.SerializerMethodField()
+
+    def get_sales_count(self, obj):
+        return transfer_models.Sale.objects.filter(merkato_session=obj).count()
+
+    def get_releases_count(self, obj):
+        return transfer_models.Release.objects.filter(merkato_session=obj, done=True).count()
+
+    class Meta:
+        model = transfer_models.MerkatoSession
+        fields = ('url', 'number', 'closing', 'solving', 'is_solved', 'attributes', 'sales_count', 'releases_count')
+
+
+class MerkatoSessionSerializer(MerkatoSessionSummarySerializer):
+    sales = serializers.SerializerMethodField()
+    releases = serializers.SerializerMethodField()
+
+    def get_sales(self, obj):
+        ordered_sales = transfer_models.Sale.objects.filter(merkato_session=obj).order_by('rank')
+        return SaleSerializer(ordered_sales, many=True, read_only=True, context=self.context).data
+
+    def get_releases(self, obj):
+        ordered_rel = transfer_models.Release.objects.filter(merkato_session=obj, done=True)
+        return ReleaseSerializer(ordered_rel, many=True, read_only=True, context=self.context).data
+
+    class Meta:
+        model = transfer_models.MerkatoSession
+        fields = (
+            'url', 'number', 'closing', 'solving', 'is_solved', 'attributes', 'sales_count', 'releases_count', 'sales',
+            'releases',)
+
+
+class MerkatoSerializer(serializers.ModelSerializer):
+    sessions = serializers.SerializerMethodField()
+
+    def get_sessions(self, obj):
+        ordered_sessions = transfer_models.MerkatoSession.objects.filter(merkato=obj, is_solved=True).order_by('number')
+        return MerkatoSessionSummarySerializer(ordered_sessions, many=True, read_only=True, context=self.context).data
+
+    class Meta:
+        model = transfer_models.Merkato
+        fields = ('begin', 'end', 'mode', 'configuration', 'league_instance', 'sessions',)

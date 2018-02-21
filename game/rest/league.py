@@ -117,9 +117,24 @@ class LeagueTeamInfoListView(generics.ListAPIView):
     permission_classes = (DRYObjectPermissions,)
     serializer_class = serializers.TeamInfoSerializer
 
-
     def get_queryset(self):
         league_pk = self.kwargs['pk']
         qs = league_models.Team.objects.filter(league=league_pk)
         qs = self.get_serializer_class().setup_eager_loading(qs)
         return qs
+
+
+class LeagueMerkatosListView(CurrentLeagueInstanceMixin, generics.ListAPIView):
+    permission_classes = (DRYObjectPermissions,)
+    serializer_class = serializers.MerkatoSerializer
+
+    def get_queryset(self):
+        return transfer_models.Merkato.objects.filter(
+            league_instance=self._get_current_league_instance(self.kwargs['league_pk'])).order_by('begin')
+
+
+class MerkatoSessionView(CurrentLeagueInstanceMixin, generics.RetrieveAPIView):
+    permission_classes = (DRYObjectPermissions,)
+    serializer_class = serializers.MerkatoSessionSerializer
+    queryset = transfer_models.MerkatoSession.objects.filter(is_solved=True)
+
