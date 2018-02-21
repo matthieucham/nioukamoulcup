@@ -354,8 +354,7 @@ class TeamDayScoreSerializer(serializers.ModelSerializer):
 
 class TotalPASaleField(serializers.Field):
     def to_representation(self, value):
-        return transfer_models.Sale.objects.filter(team=value, type='PA',
-                                                   merkato_session__merkato__league_instance__current=True).count()
+        return transfer_models.Sale.objects.get_for_team(value, just_count=True)
 
 
 class TotalReleaseField(serializers.Field):

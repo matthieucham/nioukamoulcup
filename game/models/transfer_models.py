@@ -115,7 +115,7 @@ class SaleManager(models.Manager):
                          merkato_session__merkato__league_instance__current=True)
         if just_last_merkato:
             most_recent_merkato = Merkato.objects.filter(
-                league_instance__league=league_models.Team.objects.get(pk=team).league,
+                league_instance__league=league_models.Team.objects.get(pk=team.pk).league,
                 league_instance__current=True,
                 begin__lte=datetime.date.today()).order_by('-end').first()
             qs = qs.filter(merkato_session__merkato=most_recent_merkato)

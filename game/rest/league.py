@@ -83,7 +83,7 @@ class TeamSalesListView(CurrentLeagueInstanceMixin, generics.ListAPIView):
 
     def get_queryset(self):
         team_pk = self.kwargs['team_pk']
-        return transfer_models.Sale.objects.get_for_team(team_pk)
+        return transfer_models.Sale.objects.get_for_team(league_models.Team.objects.get(pk=team_pk))
 
 
 class LeagueResultsByJourneeListView(CurrentLeagueInstanceMixin, generics.ListAPIView):
