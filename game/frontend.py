@@ -9,6 +9,7 @@ import json
 from . import models
 from ligue1 import models as l1models
 from .rest.league import CurrentLeagueInstanceMixin
+from .rest.redux_state import StateInitializerMixin
 from .rest import serializers
 
 
@@ -57,7 +58,7 @@ class StatJoueurView(DetailView):
         # ])
         # # Step 2: Create the Chart object
         # cht = Chart(datasource=scoredata,
-        #             series_options=[{'options': {'type': 'line', 'stacking': False},
+        # series_options=[{'options': {'type': 'line', 'stacking': False},
         #                              'terms': {
         #                                  'numero': [
         #                                      'points',
@@ -86,8 +87,9 @@ class LeagueWallView(PermissionRequiredMixin, CurrentLeagueInstanceMixin, Detail
         instance = self._get_current_league_instance(league)
         serializer = serializers.LeagueInstancePhaseDaySerializer(
             models.LeagueInstancePhaseDay.objects.get_latest_day_for_phases(
-                models.LeagueInstancePhase.objects.filter(league_instance=instance)), many=True)
-        context['props'] = {
+                models.LeagueInstancePhase.objects.filter(league_instance=instance)), many=True,
+            context={'request': self.request})
+        context['PRELOADED_STATE'] = {
             'ranking': json.loads(str(JSONRenderer().render(serializer.data), 'utf-8'))
         }
 
@@ -103,7 +105,7 @@ class LeagueWallView(PermissionRequiredMixin, CurrentLeagueInstanceMixin, Detail
         return context
 
 
-class LeagueEkypView(PermissionRequiredMixin, CurrentLeagueInstanceMixin, DetailView):
+class LeagueEkypView(PermissionRequiredMixin, StateInitializerMixin, CurrentLeagueInstanceMixin, DetailView):
     model = models.League
     template_name = 'game/league/ekyp.html'
     permission_required = 'game.view_league'
@@ -116,6 +118,35 @@ class LeagueEkypView(PermissionRequiredMixin, CurrentLeagueInstanceMixin, Detail
         context = super(LeagueEkypView, self).get_context_data(**kwargs)
         my_team = self._get_my_team()
         context['team'] = my_team
-        context['component'] = 'test'
         context['instance'] = self._get_current_league_instance(self.object)
+
+        if 'team_pk' in self.kwargs and self.kwargs['team_pk'] != my_team.pk:
+            context['component'] = 'team'
+            context['PRELOADED_STATE'] = self.init_from_team(self.request,
+                                                             models.Team.objects.filter(
+                                                                 managers__league=self.kwargs['pk']).distinct().get(
+                                                                 pk=self.kwargs['team_pk']))
+        else:
+            context['component'] = 'ekyp'
+            context['PRELOADED_STATE'] = self.init_from_team(self.request, my_team)
+        return context
+
+
+class LeagueRankingView(PermissionRequiredMixin, StateInitializerMixin, CurrentLeagueInstanceMixin, DetailView):
+    model = models.League
+    template_name = 'game/league/league_base.html'
+    permission_required = 'game.view_league'
+
+    def _get_my_team(self):
+        return models.LeagueMembership.objects.get(user=self.request.user, league=self.object).team
+
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get a context
+        context = super(LeagueRankingView, self).get_context_data(**kwargs)
+        my_team = self._get_my_team()
+        context['team'] = my_team
+        context['component'] = 'league'
+        context['instance'] = self._get_current_league_instance(self.object)
+
+        context['PRELOADED_STATE'] = self.init_from_league(self.request, self.object)
         return context

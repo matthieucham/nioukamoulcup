@@ -43,47 +43,68 @@ def compute_best_by_position(all_perfs):
 def compute_score_performance(perf, best_note_by_position):
     with Timer(id='compute_score_performance', verbose=False):
         if perf.joueur.poste is None:
-            return None, 0, None
-        if perf.temps_de_jeu < PLAYTIME['MAX_SHORT']:
-            return None, _compute_bonus(perf, False, best_note_by_position), COMPENSATION['SHORT']
-        elif perf.temps_de_jeu < PLAYTIME['MAX_LONG']:
-            return None, _compute_bonus(perf, False, best_note_by_position), COMPENSATION['LONG']
-        elif perf.temps_de_jeu < PLAYTIME['MIN_BONUS']:
-            return perf.details['note'] if 'note' in perf.details else None, _compute_bonus(perf, False,
-                                                                                            best_note_by_position), None if 'note' in perf.details else \
-                       COMPENSATION['LONG']
-        else:
-            return perf.details['note'] if 'note' in perf.details else None, _compute_bonus(perf, True,
-                                                                                            best_note_by_position), None if 'note' in perf.details else \
-                       COMPENSATION['LONG']
+            return None, 0, None, []
+
+        note = _compute_note(perf)
+        compensation = _compute_compensation(perf)
+        bonus, earned = _compute_bonus(perf, best_note_by_position)
+        return note, bonus, compensation, earned
 
 
-def _compute_bonus(perf, has_collective_bonus, best_note_by_position):
+def _compute_note(perf):
+    if perf.temps_de_jeu and perf.temps_de_jeu >= PLAYTIME['MAX_LONG']:
+        return perf.details['note'] if 'note' in perf.details else None
+    else:
+        return None
+
+
+def _compute_compensation(perf):
+    if perf.temps_de_jeu and perf.temps_de_jeu < PLAYTIME['MAX_SHORT']:
+        return COMPENSATION['SHORT']
+    elif perf.temps_de_jeu and perf.temps_de_jeu < PLAYTIME['MAX_LONG']:
+        return COMPENSATION['LONG']
+    else:
+        return None
+
+
+def _compute_bonus(perf, best_note_by_position):
     poste = perf.joueur.poste
     base = 0
+    earned = dict()
     # bonus individuel
     for (i, j) in [('PENALSTOP', 'penalties_saved'), ('GOAL', 'goals_scored'), ('PENALTY',
-                                                                              'penalties_scored'),
+                                                                                'penalties_scored'),
                    ('PASS', 'goals_assists'), ('HALFPASS', 'penalties_awarded')]:
-        base += (BONUS['PERSONAL'][i][poste] * perf.details['stats'][j])
+        val = perf.details['stats'][j]
+        if val:
+            earned.update({i: val})
+            base += (BONUS['PERSONAL'][i][poste] * val)
     if perf.details['stats']['goals_saved'] > 3:
+        earned.update({'3STOPS': 1})
         base += BONUS['PERSONAL']['3STOPS'][poste]
-    if 'note' in perf.details and perf.details['note'] >= best_note_by_position[perf.details['equipe']][poste]:
+    if 'note' in perf.details and perf.temps_de_jeu >= PLAYTIME['MAX_LONG'] and perf.details['note'] >= \
+            best_note_by_position[perf.details['equipe']][poste]:
+        earned.update({'LEADER': 1})
         base += BONUS['PERSONAL']['LEADER'][poste]
-    if has_collective_bonus:
+    if perf.temps_de_jeu >= PLAYTIME['MIN_BONUS']:
         # get from rencontre...
         if perf.rencontre.resultat[perf.details['equipe']]['buts_contre'] == 0:
+            earned.update({'CLEANSHEET': 1})
             base += BONUS['COLLECTIVE']['CLEANSHEET'][poste]
-        if perf.rencontre.resultat[perf.details['equipe']]['buts_contre'] == 1 and perf.rencontre.resultat[
-            perf.details['equipe']]['penos_contre'] == 1:
+        if perf.rencontre.resultat[perf.details['equipe']]['buts_contre'] == 1 and \
+                perf.rencontre.resultat[perf.details['equipe']]['penos_contre'] == 1:
+            earned.update({'HALFCLEANSHEET': 1})
             base += BONUS['COLLECTIVE']['HALFCLEANSHEET'][poste]
-        if perf.rencontre.resultat[perf.details['equipe']]['buts_pour'] == 3 and perf.rencontre.resultat[
-            perf.details['equipe']]['penos_pour'] == 1:
+        if perf.rencontre.resultat[perf.details['equipe']]['buts_pour'] == 3 and \
+                perf.rencontre.resultat[perf.details['equipe']]['penos_pour'] == 1:
+            earned.update({'HALFOFFENSIVE': 1})
             base += BONUS['COLLECTIVE']['HALFOFFENSIVE'][poste]
-        if perf.rencontre.resultat[perf.details['equipe']]['buts_pour'] == 3 and perf.rencontre.resultat[
-            perf.details['equipe']]['penos_pour'] == 0:
+        if perf.rencontre.resultat[perf.details['equipe']]['buts_pour'] == 3 and \
+                perf.rencontre.resultat[perf.details['equipe']]['penos_pour'] == 0:
+            earned.update({'OFFENSIVE': 1})
             base += BONUS['COLLECTIVE']['OFFENSIVE'][poste]
         if perf.rencontre.resultat[perf.details['equipe']]['buts_pour'] > 3:
+            earned.update({'OFFENSIVE': 1})
             base += BONUS['COLLECTIVE']['OFFENSIVE'][poste]
 
-    return base
+    return base, earned

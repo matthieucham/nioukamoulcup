@@ -12,10 +12,10 @@ from ligue1 import models as l1models
 
 class MerkatoManager(models.Manager):
     def setup(self, league_instance, mode, begin, end, roster_size_max, closing_times=['12:00', '20:00'],
-              session_duration=48):
+              session_duration=48, initial_team_balance=None):
         assert mode in ['BID', 'DRFT']
         merkato = self.create(mode=mode, begin=begin, end=end, league_instance=league_instance,
-                              configuration=MerkatoManager._make_config(roster_size_max))
+                              configuration=MerkatoManager._make_config(roster_size_max, initial_team_balance=initial_team_balance))
         # create sessions
         ticks = [t for t in MerkatoManager._generate_ticks(begin, end, closing_times)]
         nb = 1
@@ -56,10 +56,13 @@ class MerkatoManager(models.Manager):
 
     @staticmethod
     def _make_config(roster_size_max, sales_per_session=-1, pa_number=1, mv_number=1, mv_tax_rate=0.1,
-                     re_tax_rate=0.5):
-        return {'roster_size_max': roster_size_max, 'sales_per_session': sales_per_session, 'pa_number': pa_number,
+                     re_tax_rate=0.5, initial_team_balance=None):
+        conf = {'roster_size_max': roster_size_max, 'sales_per_session': sales_per_session, 'pa_number': pa_number,
                 'mv_number': mv_number,
                 'mv_tax_rate': mv_tax_rate, 're_tax_rate': re_tax_rate}
+        if initial_team_balance:
+            conf['init_balance'] = initial_team_balance
+        return conf
 
 
 class Merkato(models.Model):
@@ -95,14 +98,36 @@ class MerkatoSession(models.Model):
     closing = models.DateTimeField(blank=False)
     solving = models.DateTimeField(blank=False)
     is_solved = models.BooleanField(null=False, default=False)
+    attributes = JSONField(null=True)
 
     objects = MerkatoSessionManager()
 
     def __str__(self):
         return 'MerkatoSession #%d -> %s -> %s' % (self.number, self.closing, self.solving)
 
+    def has_object_read_permission(self, request):
+        return request.user in self.merkato.league_instance.league.members.all()
+
     class Meta:
-        ordering = ('closing', )
+        ordering = ('closing',)
+
+
+class SaleManager(models.Manager):
+    def get_for_team(self, team, just_last_merkato=True, just_count=False, just_PA=True):
+        qs = self.filter(team=team,
+                         merkato_session__merkato__league_instance__current=True)
+        if just_last_merkato:
+            most_recent_merkato = Merkato.objects.filter(
+                league_instance__league=league_models.Team.objects.get(pk=team.pk).league,
+                league_instance__current=True,
+                begin__lte=datetime.date.today()).order_by('-end').first()
+            qs = qs.filter(merkato_session__merkato=most_recent_merkato)
+        if just_PA:
+            qs = qs.filter(type='PA')
+        if just_count:
+            return qs.count()
+        else:
+            return qs
 
 
 class Sale(models.Model):
@@ -115,6 +140,8 @@ class Sale(models.Model):
     type = models.CharField(max_length=2, blank=False, default='PA', choices=TYPES)
     winning_auction = models.ForeignKey('Auction', related_name='sale_won', null=True)
     rank = models.PositiveIntegerField(null=False, default=1)
+
+    objects = SaleManager()
 
     def save(self, *args, **kwargs):
         """
@@ -130,11 +157,9 @@ class Sale(models.Model):
         super(Sale, self).save(*args, **kwargs)
 
     def get_buying_price(self):
-        assert self.merkato_session.is_solved
         if self.winning_auction:
             return self.winning_auction.value
         else:
-            assert self.type == 'PA'
             return self.min_price
 
     def get_selling_price(self):
@@ -157,7 +182,7 @@ class Sale(models.Model):
             ('merkato_session', 'rank'),
             ('merkato_session', 'player'),
         )
-        ordering = ('merkato_session', 'rank', )
+        ordering = ('merkato_session', 'rank',)
 
 
 class Auction(models.Model):
@@ -212,8 +237,28 @@ class Auction(models.Model):
         unique_together = ('sale', 'team')
 
 
+class ReleaseManager(models.Manager):
+    def get_for_team(self, team, just_last_merkato=True, just_count=False):
+        qs = self.filter(done=True, signing__team=team,
+                         merkato_session__merkato__league_instance__current=True,
+                         merkato_session__is_solved=True)
+        if just_last_merkato:
+            most_recent_merkato = Merkato.objects.filter(
+                league_instance__league=(
+                    team if isinstance(team, league_models.Team) else league_models.Team.objects.get(pk=team)).league,
+                league_instance__current=True,
+                begin__lte=datetime.date.today()).order_by('-end').first()
+            qs = qs.filter(merkato_session__merkato=most_recent_merkato)
+        if just_count:
+            return qs.count()
+        else:
+            return qs.order_by('-signing__end')
+
+
 class Release(models.Model):
     signing = models.ForeignKey(league_models.Signing)
     merkato_session = models.ForeignKey(MerkatoSession)
     amount = models.DecimalField(max_digits=4, decimal_places=1)
     done = models.BooleanField(default=False)
+
+    objects = ReleaseManager()

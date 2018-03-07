@@ -7,10 +7,13 @@ Utilitaire de conversion et d'agglomération des notes "brutes" importées
 def compute_note(statnuts_ratings):
     notes = []
     for r in statnuts_ratings:
-        notes.append(
-            CONVERSION_FUNCTIONS[r['source']](float(r['rating'])) if r['source'] in CONVERSION_FUNCTIONS else float(
-                r['rating']))
-    return float(sum(notes)) / max(len(notes), 1)
+        if r['source'] in ['f2750ce3-bef0-46a2-89aa-83f4042eb931', '0ecffaee-ba15-11e4-97c6-b1229586dec7', '04c19d53-ba15-11e4-97c6-b1229586dec7']:
+            notes.append(
+                CONVERSION_FUNCTIONS[r['source']](float(r['rating'])) if r['source'] in CONVERSION_FUNCTIONS else float(
+                    r['rating']))
+        else:
+            print('ignored rating from %s' % r['source'])
+    return round(float(sum(notes)) / max(len(notes), 1), 2)
 
 
 def _conv_kicker(raw):

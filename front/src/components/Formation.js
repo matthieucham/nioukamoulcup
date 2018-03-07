@@ -1,53 +1,46 @@
-import React, { Component } from 'react'
-import ReactSVG from 'react-svg'
+import React, { Component } from 'react';
+import { Tabs, TabLink, TabContent } from 'react-tabs-redux'
+
+import { JerseyPlaceHolder } from './FieldPlayer'
+import ClubFieldPlayer from '../containers/ClubFieldPlayer'
 
 
-class Jersey extends Component {
+const PlayersLine = ({ expected, players }) => {
 
-	render() {
-		const svgPath = '/static/svg/'+this.props.club.maillot_svg+'.svg';
-		return (
-			<div className="jersey">
-			<ReactSVG
-			path={ svgPath }
-			style={{ width:64, height:64, fill:this.props.club.maillot_color_bg, stroke:this.props.club.maillot_color1 }}
-			/>
-			</div>
-			);
+	const fieldPlayers = players.map( (pl) => <ClubFieldPlayer key={pl.player.id} player={pl} />);
+	const placeHolders = [];
+	if (fieldPlayers.length < expected) {
+		for(var i=0; i<(expected-fieldPlayers.length); i++) {
+			placeHolders.push(<JerseyPlaceHolder key={'ph'+i} />)
+		}
 	}
-}
-
-class FieldPlayerDetails extends Component {
-	render() {
-		return (
-			<div className="details">
-			<h1>{ this.props.player.player.name }</h1>
-			<p>{ this.props.player.score }</p>
-			<p>{ this.props.club.nom }</p>
-			</div>
+	return (
+		<div className={`compoLine`}>{fieldPlayers}{placeHolders}</div>
 		);
-	}
 }
 
-export class FieldPlayer extends Component {
+const Composition = ({ phaseResult }) => {
 
-	constructor(props) {
-		super(props);
-	}
+	const positionOrder = ['G', 'D', 'M', 'A'];
+	const lines = positionOrder.map( (pos) => <PlayersLine key={pos} players={phaseResult['compo'][pos].slice(0, phaseResult['formation'][pos])} expected={ phaseResult['formation'][pos] }/>);
+	return (<div className="composition">
+		{ lines }
+		<h1>Total: { phaseResult['score'] }</h1>
+		</div>)
+}
 
-	render() {
-		return (
-			<div className="fieldPlayer">
-			<Jersey club={this.props.club} />
-			<h1>{ this.props.player.player.name }</h1>
-			<p>{ this.props.player.score }</p>
-			<p>{ this.props.club.nom }</p>
-			</div>
+export const CompoTabs = ({ latestScores }) => {
+	const links = latestScores.map( (lsc, index) => 
+		<TabLink to={ 'ttab_'+index } key={ 'tablink_'+lsc['day']['id'] }>{ lsc['day']['phase'] } </TabLink>);
+
+	const compositions = latestScores.map( (lsc, index) => 
+		<TabContent for={ 'ttab_'+index } key={ lsc['day']['id'] }>
+		<Composition phaseResult={ lsc }/>
+		</TabContent>);
+	return (
+		<Tabs>
+		{links}
+		{compositions}
+		</Tabs>
 		);
-	}
-
 }
-
-
-
-/* https://stackoverflow.com/questions/29913387/show-hide-components-in-reactjs */

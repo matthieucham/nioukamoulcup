@@ -1,20 +1,15 @@
 {% load l1results %}
 {% load i18n %}
 
-<div class="panel-group">
     {% for journee in journees %}
-        <div class="panel panel-default">
-            <div class="panel-heading smallbox-title">Journée {{ journee.numero }}<br/>
-                <small>{{ journee|journee_dates:'d M Y' }}</small>
-            </div>
-            <div class="list-group">
+        <section class="fixtures">
+            <h1>Journée {{ journee.numero }}</h1>
+            <h2>{{ journee|journee_dates:'d M Y' }}</h2>
+            <ul>
                 {% for r in journee.rencontres.all %}
-                    {% rencontre_score r %}
+                    <li>{% rencontre_score r %}</li>
                 {% endfor %}
-            </div>
-            <div class="panel-footer">
-                <a href="#">Tous les résultats</a>
-            </div>
-        </div>
+            </ul>
+            <a href="#" class="navlink">Tous les résultats</a>
+        </section>
     {% endfor %}
-</div>

@@ -3,10 +3,12 @@ from django.contrib.postgres.fields import JSONField
 from django.contrib.auth.models import User
 # import json
 from collections import defaultdict
+import datetime
 
 from . import scoring_models
 from ligue1 import models as l1models
 from utils.timer import Timer
+from django.utils import timezone
 
 
 class League(models.Model):
@@ -78,15 +80,14 @@ class Team(models.Model):
 
 class BankAccountManager(models.Manager):
     @transaction.atomic()
-    def init_account(self, team, init_balance):
+    def init_account(self, date, team, init_balance):
         account, created = self.get_or_create(team=team, defaults={'balance': init_balance, 'blocked': 0})
         if not created:
             account.balance = init_balance
             account.blocked = 0
             account.save()
-        account.bankaccounthistory_set.clear()
         account.bankaccounthistory_set.add(
-            BankAccountHistory.objects.create(amount=init_balance, new_balance=init_balance,
+            BankAccountHistory.objects.create(date=date, amount=init_balance, new_balance=init_balance,
                                               info=BankAccountHistory.make_info_init()))
 
     @transaction.atomic()
@@ -139,7 +140,7 @@ class BankAccount(models.Model):
 
 class BankAccountHistory(models.Model):
     bank_account = models.ForeignKey(BankAccount, null=True)  # entries with null ref will be deleted by batch
-    date = models.DateTimeField(auto_now_add=True)
+    date = models.DateTimeField()
     amount = models.DecimalField(max_digits=4, decimal_places=1)
     new_balance = models.DecimalField(max_digits=4, decimal_places=1)
     info = JSONField()
@@ -150,17 +151,17 @@ class BankAccountHistory(models.Model):
 
     @staticmethod
     def make_info_buy(player, seller=None):
-        return {'type': 'BUY', 'player_id': player.pk, 'player_name': player.__str__(),
+        return {'type': 'BUY', 'player_id': player.pk, 'player_name': player.display_name(),
                 'seller_name': seller.name if seller else None}
 
     @staticmethod
     def make_info_sell(player, buyer):
-        return {'type': 'SELL', 'player_id': player.pk, 'player_name': player.__str__(),
+        return {'type': 'SELL', 'player_id': player.pk, 'player_name': player.display_name(),
                 'buyer_name': buyer.name}
 
     @staticmethod
     def make_info_release(player):
-        return {'type': 'RELEASE', 'player_id': player.pk, 'player_name': player.__str__()}
+        return {'type': 'RELEASE', 'player_id': player.pk, 'player_name': player.display_name()}
 
 
 class LeagueInstance(models.Model):
@@ -173,6 +174,9 @@ class LeagueInstance(models.Model):
     saison = models.ForeignKey(l1models.Saison)
     configuration = JSONField(
         default=dict({'notes': {'HALFSEASON': 13, 'FULLSEASON': 26, 'TOURNAMENT': 3}}))
+
+    def has_object_read_permission(self, request):
+        return request.user in self.league.members.all()
 
 
 class LeagueInstancePhase(models.Model):
@@ -232,12 +236,10 @@ class LeagueInstancePhaseDayManager(models.Manager):
             composition = defaultdict(list)
             for poste in formation:
                 scores_at_poste = sorted(dscores[poste], key=lambda x: x[1], reverse=True)
-                for i in range(0, formation[poste]):
-                    if i < len(scores_at_poste):
+                for i in range(0, len(scores_at_poste)):
+                    if i < formation[poste]:
                         teamscore += scores_at_poste[i][1]
-                        composition[poste].append(scores_at_poste[i])
-                    else:
-                        break  # break poste loop, go to next poste list.
+                    composition[poste].append(scores_at_poste[i])
             return self._make_teamdayscore(team, lipd, teamscore, composition)
         else:
             # TODO
@@ -278,7 +280,8 @@ class LeagueInstancePhaseDayManager(models.Manager):
             attrs['composition'][poste] = [
                 {'player': {'id': sig.player.pk, 'name': sig.player.display_name()},
                  'club': {'id': sig.player.club.pk, 'name': sig.player.club.nom} if sig.player.club else None,
-                 'score': sco} for
+                 'score': round(sco, 2),
+                 'score_factor': sig.attributes['score_factor'] if 'score_factor' in sig.attributes else 1.0} for
                 sig, sco in composition[poste]]
         team_config = team.attributes
         if 'joker' in team_config:
@@ -290,7 +293,8 @@ class LeagueInstancePhaseDayManager(models.Manager):
         latest_days = []
         for ph in phases:
             latest_day = self.filter(league_instance_phase=ph,
-                                     results__isnull=False).prefetch_related('teamdayscore_set').order_by('-number').first()
+                                     results__isnull=False).prefetch_related('teamdayscore_set').order_by(
+                '-number').first()
             if latest_day:
                 latest_days.append(latest_day)
         return latest_days
@@ -318,9 +322,25 @@ class TeamDayScore(models.Model):
         ordering = ['-day']
 
 
+class SigningManager(models.Manager):
+
+    def end(self, signing, reason, date=timezone.now(), amount=None):
+        if signing.end:
+            raise ValueError('Cannot end a signing which has a end date already')
+        if reason not in ('RE', 'MV', 'FR'):
+            raise ValueError('reason must be on of RE (release), MV (sold), FR (freed)')
+        signing.end = date
+        signing.attributes['end_reason'] = reason
+        if amount:
+            signing.attributes['end_amount'] = amount
+        self.update(signing)
+
+
 class Signing(models.Model):
     player = models.ForeignKey(l1models.Joueur, null=False)
     team = models.ForeignKey(Team, null=False)
     begin = models.DateTimeField(auto_now_add=True, db_index=True)
     end = models.DateTimeField(null=True, db_index=True)
     attributes = JSONField(default=dict({'score_factor': 1.0}))
+
+    objects = SigningManager()

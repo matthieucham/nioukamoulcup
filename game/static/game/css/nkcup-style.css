@@ -1,6 +1,6 @@
 @import url(https://fonts.googleapis.com/css?family=PT+Sans);
 @import url(https://fonts.googleapis.com/css?family=Russo+One);
-
+@import url(//cdn.muicss.com/mui-0.9.27/css/mui.min.css);
 /* RESET */
 
 /* http://meyerweb.com/eric/tools/css/reset/
@@ -24,6 +24,7 @@ time, mark, audio, video {
     margin: 0;
     padding: 0;
     border: 0;
+    list-style: none;
     font-size: 100%;
     font: inherit;
     vertical-align: baseline;
@@ -44,6 +45,195 @@ h1 {
     font-size: 1.5em;
 }
 
+h1.page-title {
+    font-size: 1.8em;
+}
+
+a {
+    color: #2196F3;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+a.navlink {
+    color: #5f5f5f;
+    display: block;
+    text-align: right;
+    margin-top: 5px;
+}
+a.navlink::before {
+    font-family: FontAwesome;
+    content: "\f101   ";
+}
+
+a.navbutton {
+    padding: 0 8px;
+}
+
+a.navbutton.disabled {
+   pointer-events: none;
+   visibility: hidden;
+}
+
+dl.card {
+    top:0;
+    border: 1px solid #5f5f5f;
+    border-radius: 3px;
+    position: static;
+    height: 60px;
+    min-width: 60px;
+    max-width: 120px;
+    line-height: 60px;
+    text-align: center;
+    display: inline-block;
+    margin: 5px;
+    padding: 3px;
+}
+
+dl.card dt {
+    display: inline-block;
+    vertical-align: middle;
+    line-height: normal;
+    font-weight: bold;
+}
+
+dl.card dd {
+    color: #5f5f5f;
+    display: block;
+    font-size: 0.8em;
+    line-height: normal;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    /*transform: translateY(-100%);*/
+}
+
+
+dl.card:hover {
+    max-width: none;
+}
+
+dl.card:hover dd {
+    white-space: normal;
+}
+
+dl.card.clickable {
+    cursor: pointer;
+}
+
+dl.card.clickable:hover {
+    background-color: #f1f1f1;
+    transition-duration: 0.4s;
+}
+
+table.ktable-class .ktable-heading-class {
+    background-color: #5f5f5f;
+    color: #f1f1f1;
+    font-weight: bold;
+}
+
+.ReactVirtualized__Table__row {
+    background-color: #FFFFFF;
+}
+
+.ReactVirtualized__Table__row:nth-child(odd) {
+    background-color: #f1f1f1;
+}
+
+.team-header section {
+    width: 100%;
+    padding: 0 10px;
+    margin: 3px;
+    border-bottom: 1px solid #5f5f5f;
+}
+
+section.closed {
+    overflow: hidden;
+    height:0;
+    transition-duration: 0.4s;
+}
+
+section.expanded {
+    overflow: hidden;
+    height: 300px;
+    transition-duration: 0.4s;
+}
+
+/* RiGHT COLUMN */
+.hg__right > section {
+    border-bottom: 1px solid #5f5f5f;
+    padding: 5px;
+    margin: 3px;
+}
+
+.hg__right > section h1, .hg__right > section h2 {
+    text-align: center;
+}
+
+.hg__right .fixtures ul {
+    margin: 1em 0;
+}
+
+.hg__right .fixtures li {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.hg__right .fixtures li > a:last-child {
+    flex: 1;
+    text-align: left;
+}
+.hg__right .fixtures li > a:first-child {
+    flex: 1;
+    text-align: right;
+}
+
+.hg__right .rc-collapse {
+    background-color: inherit;
+    border: none;
+}
+
+.hg__right .rc-collapse-header .playerName{
+    font-size: 1em;
+}
+
+.hg__right .rc-collapse-header .clubName{
+    font-size: 0.8em;
+}
+.hg__right .rc-collapse-header .clubName:before {
+    content: " (";
+}
+.hg__right .rc-collapse-header .clubName:after {
+    content: ")";
+}
+
+.hg__right .rc-collapse-content {
+    color: inherit;
+}
+
+.hg__right .rc-collapse-header.past  .playerName{
+    text-decoration: line-through;
+}
+
+@media all and (max-width: 768px) {
+    .hg__right a {
+        display: block;
+        margin: 0.3em;
+        padding: 0.5em;
+        text-align: center;
+    }
+
+    .hg__right .navlink {
+        background-color: #5f5f5f;
+        color: #FFFFFF;
+    }
+}
+
+/* HEADER */
 .hg__header {
     background-color: #5f5f5f;
     color: #f1f1f1;
@@ -65,7 +255,7 @@ h1 {
 }
 
 .hg__right {
-    background-color: #FFFFFF;
+    background-color: #f1f1f1;
 }
 
 header nav ul {
@@ -132,32 +322,86 @@ header nav a:hover, nav ul li ul li:hover {
 }
 
 .cover {
-    position: relative;
     background-color: #b5b5b5;
     background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(../images/logo_fullres_notitle.png);
     /* Create the parallax scrolling effect */
     background-attachment: fixed;
     background-repeat: no-repeat;
     background-size: cover;
+}
+
+.team-cover-box {
+    max-width: 300px;
+    height: 300px;
+    max-height: 300px;
+    background-repeat: no-repeat;
+    background-size:cover;
+    box-shadow: inset 0px 0px 10px rgba(0,0,0,0.9);
+}
+
+.team-header .team-cover-box {
+        display: none;
+    }
+
+.cover, .team-cover-box {
     color: #f1f1f1;
     text-align: center;
     text-shadow: 2px 2px #000000;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.team-cover-box h1 {
+    background-color: rgba(0,0,0,0.5);
+    padding: 10px 0;
 }
 
 /* Turn off parallax scrolling for tablets and phones. Increase/decrease the pixels if needed */
-@media only screen and (max-device-width: 768px) {
+@media all and (max-width : 768px) {
     .cover {
         background-attachment: scroll;
     }
+    .team-cover-box {
+        display: none;
+    }
+
+    .team-header {
+        justify-content: space-between;
+    }
+
+    .team-header .team-cover-box {
+        display: block;
+        flex-grow: 1;
+        min-width: 300px;
+    }
+}
+
+
+/* Tabs (redux-tabs) */
+.tab-content {
+    height: 100%;
+}
+
+.tab-link {
+    padding: 0 15px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    display: inline-block;
+    position: relative;
+}
+
+.tab-link-active {
+    border-bottom: 2px solid #2196F3;
 }
 
 /* LEFT CONTEXTUAL SUBMENU */
 
-nav.hg__left {
+.hg__left nav{
     padding: 3px;
 }
 
-nav.hg__left .button {
+.hg__left nav .button {
     background-color: #FFFFFF;
     border: 2px solid #f9bee5;
     border-radius: 4px;
@@ -171,30 +415,98 @@ nav.hg__left .button {
 
 @media all and (max-width : 768px) {
 
-    nav.hg__left .button {
+    .hg__left nav .button {
         display: inline-block;
         padding: 5px 8px;
     }
 }
 
-nav.hg__left .button:hover,  nav.hg__left .button.active{
+.hg__left nav .button:hover,  .hg__left nav .button.active{
     background-color: #f9bee5;
 }
 
 
 /*  LEAGUE - ekyp  */
+.composition {
+    background: radial-gradient(circle, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.4)), url(../images/pitch.jpg);
+    /*background-attachment: fixed;*/
+    background-repeat: no-repeat;
+    max-width: 1200px;
+    padding: 8px;
+}
+
+.composition > h1 {
+    text-align: center;
+    background-color: rgba(255,255,255,0.2);
+    padding: 3px;
+}
+
 .fieldPlayer {
     display: inline-block;
-    padding: 5px;
     text-align: center;
-    text-shadow: 2px 2px #ffffff;
+    margin: 8px;
 }
 .fieldPlayer svg {
     display: block;
     margin-left: auto;
     margin-right: auto;
 }
-.fieldPlayer h1, .fieldPlayer p {
+.fieldPlayer .playerDetails {
     position:relative;
     top: -15px;
+    padding: 5px;
+    background-color: rgba(255,255,255,0.2);
+    border-radius: 3px;
+}
+.fieldPlayer .playerDetails .bonus{
+    padding-left: 3px;
+    font-weight: bold;
+}
+.fieldPlayer .playerDetails .bonus::before{
+    font-family: "FontAwesome";
+    content: "\f005"
+}
+
+.compoLine {
+    display: flex;
+    justify-content: space-around;
+    min-height: 166px;
+}
+
+.team-header {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.team-title {
+    padding: 10px 20px;
+}
+
+.team-title li.manager {
+    display: inline-block;
+    color: #5f5f5f;
+    margin-right: 10px;
+}
+
+.team-title li.manager::before {
+    font-family: FontAwesome;
+    content: "\f007   ";
+}
+
+
+/* LEAGUE - Classements */
+
+.division-title::before {
+    font-family: FontAwesome;
+    content: "\f091   ";
+}
+
+.prog-eq {
+    color: #b5b5b5;
+}
+.prog-up {
+    color: #228B22;
+}
+.prog-down {
+    color: #B22222;
 }

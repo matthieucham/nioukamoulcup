@@ -92,20 +92,21 @@ class Journee(Importe):
 
 
 class Club(Importe):
-    SVG_TEMPLATES = (('jersey-plain', 'vierge'), ('jersey-stripe-center', 'bande centrale'),
-                     ('jersey-stripe-center-double', 'bande centrale bicolore'),
-                     ('jersey-stripes-v', 'rayures verticales'), ('jersey-diag-half', 'moitié diagonale'),
-                     ('jersey-stripe-h', 'bande horizontale'), ('jersey-stripe-diag', 'bande en diagonale'),
-                     ('jersey-sleeves', 'manches colorées'), ('jersey-scap', 'scapulaire'), ('jersey-plain-decorated',
-                                                                                             'coutures colorées'),)
+    SVG_TEMPLATES = (('jersey-plain2', 'uni'),
+                     ('jersey-stripes-v2', 'rayures verticales'),
+                     ('jersey-diag-half-white2.svg', 'moitié diagonale blanche'),
+                     ('jersey-scap2', 'scapulaire'), ('jersey-shoulders2', 'épaules'),
+                     ('jersey-halfdark2', 'moitié assombrie'), ('jersey-stripe-center2', 'bande centrale'),
+                     ('jersey-stripe-h-bicolor2', 'bande horizontale bicolore'),
+                     ('jersey-stripe-h2', 'bande horizontale unie'),
+                     )
 
     nom = models.CharField(max_length=100)
     sn_team_uuid = models.UUIDField(null=False)
     participations = models.ManyToManyField(Saison, related_name='participants')
-    maillot_svg = models.CharField(max_length=50, choices=SVG_TEMPLATES, blank=False, default='jersey-plain')
+    maillot_svg = models.CharField(max_length=50, choices=SVG_TEMPLATES, blank=False, default='jersey-plain2')
     maillot_color_bg = RGBColorField(blank=False, default='#FFFFFF')
-    maillot_color1 = RGBColorField(blank=True)
-    maillot_color2 = RGBColorField(blank=True)
+    maillot_color_stroke = RGBColorField(blank=True)
 
     def __str__(self):
         return self.nom
@@ -148,7 +149,7 @@ class Joueur(Importe):
         if self.surnom:
             return self.surnom
         if self.prenom:
-            return '%s. %s' % (self.prenom[:1], self.nom)
+            return '%s %s' % (self.prenom, self.nom)
         return self.nom
 
     def __str__(self):
