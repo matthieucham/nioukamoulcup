@@ -1,0 +1,22 @@
+{% load l1results %}
+<div class="row">
+    <div class="col-xs-5 text-right">
+        <h3>{{ header.dom }}</h3>
+    </div>
+    <div class="col-xs-2 text-center"><strong><h3>{{ header.score_dom }}&nbsp;:&nbsp;{{ header.score_ext }}</h3></strong></div>
+    <div class="col-xs-5 text-left">
+        <h3>{{ header.ext }}</h3>
+    </div>
+</div>
+{% if 'goals_scored' in summary %}
+    {% include 'game/tags/l1results_rencontre_summary_row.html' with prop=summary.goals_scored title="Buts" %}
+{% endif %}
+{% if 'penalties_scored' in summary %}
+    {% include 'game/tags/l1results_rencontre_summary_row.html' with prop=summary.penalties_scored title="Pénaltys" %}
+{% endif %}
+{% if 'goals_assists' in summary %}
+    {% include 'game/tags/l1results_rencontre_summary_row.html' with prop=summary.goals_assists title="Passes décisives" %}
+{% endif %}
+{% if 'penalties_awarded' in summary %}
+    {% include 'game/tags/l1results_rencontre_summary_row.html' with prop=summary.penalties_awarded title="Pénaltys obtenus" %}
+{% endif %}

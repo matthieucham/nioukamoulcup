@@ -1,0 +1,32 @@
+{% load i18n %}
+{% load static %}
+<!doctype html>
+<html lang="{{ LANGUAGE_CODE }}">
+<head>
+    <meta charset="utf-8">
+    <title>{% block title %}{% endblock title %}{% block title-page %}{% endblock title-page %} - Kamoulcup</title>
+    <meta name="robots" content="follow, all"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="description" content="{% block meta-description %}{% trans "Le jeu de fantasy football basé sur la Ligue 1 qui va vous faire apprécier les 0-0" %}{% endblock meta-description %}{% block meta-description-page %}{% endblock meta-description-page %}" />
+    <meta name="keywords"
+          content="{% block meta-keywords %}Fantasy, football, ligue 1, game, roto, rotisserie, Jean-Jacques Gosso{% endblock meta-keywords %}"/>
+    {% block meta %}{% endblock meta %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link rel="home" href="{% url 'zinnia:entry_archive_index' %}"/>
+    <link rel="stylesheet" href="{% static 'game/css/nkcup-layout.css' %}">
+    <link rel="stylesheet" href="{% static 'game/css/nkcup-style.css' %}">
+    {% block link %}{% endblock link %}
+    {% block script %}{% endblock script %}
+</head>
+
+<body class="hg">
+  <header class="hg__header">
+    {% block navbar %}{% include './navbar.html' %}{% endblock navbar %}
+  </header>
+  <div class="hg__body">
+      {% block gamecontent %}{% endblock gamecontent%}
+  </div>
+  <footer class="hg__footer">Footer</footer>
+</body>
+
+</html>

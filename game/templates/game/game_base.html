@@ -1,0 +1,8 @@
+{% extends "game/skeleton.html" %}
+{% load static %}
+
+{% block gamecontent %}
+    {% block col-center %}<main class="hg__main">{% block content-center %}{% endblock content-center %}</main>{% endblock col-center %}
+{% block col-left %}<div class="hg__left"><nav>{% block left-menu %}{% endblock left-menu %}</nav></div>{% endblock col-left %}
+    {% block col-right %}{% endblock col-right %}
+{% endblock gamecontent %}

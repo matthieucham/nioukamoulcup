@@ -1,0 +1,25 @@
+{% extends "game/game_base.html" %}
+{% load static %}
+{% load game %}
+{% load render_bundle from webpack_loader %}
+
+{% block left-menu %}
+    {% include 'game/league/menu.html' %}
+{% endblock left-menu %}
+
+{% block content-center %}
+
+    <div class="cover">
+        <h1>{{ instance.slogan }}</h1>
+    </div>
+
+    <div id="react-app"></div>
+
+    <script>
+        window.component = '{{ component }}';
+        window.__PRELOADED_STATE__ = {{PRELOADED_STATE|json}};  // make sure to escape your props to prevent XSS!
+        window.react_mount = document.getElementById('react-app');
+    </script>
+    {% render_bundle 'main' %}
+
+{% endblock content-center %}

@@ -1,0 +1,8 @@
+{% extends "game/game_base.html" %}
+{% load static %}
+
+{% block left-menu %}
+    {% include 'game/home/menu.html' %}
+{% endblock left-menu %}
+
+{% block col-right %}<aside class="hg__right">{% block content-right %}{% endblock content-right %}</aside>{% endblock col-right %}

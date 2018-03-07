@@ -1,0 +1,21 @@
+{% extends "game/home/home_base.html" %}
+{% load static %}
+{% load l1results %}
+
+{% block content-right %}
+    {% last_journees 3 %}
+{% endblock content-right %}
+
+{% block content-center %}
+    <small>{{ rencontre.date }}</small>
+    {% rencontre_summary rencontre %}
+
+    <div class="col-md-6">
+        {% rencontre_team rencontre 'dom' %}
+    </div>
+
+    <div class="col-md-6">
+        {% rencontre_team rencontre 'ext' %}
+    </div>
+
+{% endblock content-center %}

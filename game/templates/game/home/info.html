@@ -1,0 +1,24 @@
+{% extends "game/home/home_base.html" %}
+{% load static %}
+{% load l1results %}
+
+{% block content-center %}
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
+        labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
+        laboris nisi ut aliquip ex ea commodo consequat. Excepteur sint occaecat cupidatat non
+        proident, sunt in culpa qui officia deserunt mollit anim id est laborum consectetur
+        adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
+        ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+        consequat.</p>
+    <hr>
+    <h3>Test</h3>
+
+    <p>{% lorem %}</p>
+{% endblock content-center %}
+
+{% block content-right %}
+ {% comment %}
+    {% get_recent_entries 3 'game/home/zinnia_recent_articles_list.html' %}
+ {% endcomment %}
+ {% last_journees %}
+{% endblock content-right %}

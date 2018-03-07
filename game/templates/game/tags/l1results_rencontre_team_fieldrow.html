@@ -1,0 +1,11 @@
+{% load l1results %}
+
+<tr>
+    <td><a href="{% url 'stat_joueur-detail' stat.joueur.pk %}">{{ stat.joueur }}</a></td>
+    <td>{{ stat.time }}</td>
+    {% if stat.rating > 0 %}
+        <td>{% if stat.best %} <strong>{{ stat.rating }}</strong> {% else %} {{ stat.rating }} {% endif %}</td>
+    {% else %}
+        <td>-</td>
+    {% endif %}
+</tr>

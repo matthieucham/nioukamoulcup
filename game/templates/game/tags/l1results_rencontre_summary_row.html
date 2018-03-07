@@ -1,0 +1,19 @@
+{% load l1results %}
+
+<div class="row">
+    <div class="col-xs-5 text-right">
+        <ul>
+            {% for j in prop.dom %}
+                <li><a href="{% url 'stat_joueur-detail' j.pk %}">{{ j|format_scorer:prop.dom }}</a></li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="col-xs-2 text-center">{{ title }}</div>
+    <div class="col-xs-5 text-left">
+        <ul>
+            {% for j in prop.ext %}
+                <li><a href="{% url 'stat_joueur-detail' j.pk %}">{{ j|format_scorer:prop.ext }}</a></li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
