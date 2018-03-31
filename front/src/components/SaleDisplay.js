@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import TextLoop from './TextLoop';
+import ReactRevealText from 'react-reveal-text'
 
 
 export class AnimatedOffersValue extends Component {
@@ -7,7 +8,9 @@ export class AnimatedOffersValue extends Component {
 	constructor(props) {
 		super(props);
 
-
+		this.state = {
+			showWinner: false
+		}
 	}
 
 	render() {
@@ -19,8 +22,11 @@ export class AnimatedOffersValue extends Component {
 					speed={ 1000 }
 					stopLoop={ true }
 					children={ vals }
-					onLoopCompleted={ () => console.log('Terminé')}>
+					onLoopCompleted={ () => this.setState({'showWinner': true}) }>
 				</TextLoop> Ka
+				<ReactRevealText show={ this.state.showWinner }>
+				The Gipsy Queens
+				</ReactRevealText>
 			</div>
 		);
 	}

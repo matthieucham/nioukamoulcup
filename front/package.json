@@ -12,6 +12,7 @@
     "rc-collapse": "^1.7.6",
     "react-motion": "^0.5.0",
     "react-redux": "^5.0.6",
+    "react-reveal-text": "^0.1.1",
     "react-svg": "^2.1.22",
     "react-tabs-redux": "^2.0.1",
     "react-virtualized": "^9.12.0",
