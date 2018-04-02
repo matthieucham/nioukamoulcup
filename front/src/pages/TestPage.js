@@ -15,17 +15,52 @@ class App extends Component {
 	render() {
 		const offers = [
                 {
-                    "value": 3.5,
+                    "value": 1.1,
                     "is_valid": true,
                     "is_mine": false
                 },
                 {
-                    "value": 5.0,
-                    "is_valid": false,
+                    "value": 4.7,
+                    "is_valid": true,
                     "is_mine": false
                 },
                 {
-                    "value": 5.2,
+                    "value": 4.8,
+                    "is_valid": true,
+                    "is_mine": true
+                },
+                {
+                    "value": 6.8,
+                    "is_valid": true,
+                    "is_mine": false
+                },
+                {
+                    "value": 6.9,
+                    "is_valid": true,
+                    "is_mine": false
+                },
+                {
+                    "value": 7.0,
+                    "is_valid": true,
+                    "is_mine": false
+                },
+                {
+                    "value": 7.6,
+                    "is_valid": true,
+                    "is_mine": false
+                },
+                {
+                    "value": 7.7,
+                    "is_valid": true,
+                    "is_mine": false
+                },
+                {
+                    "value": 10.8,
+                    "is_valid": true,
+                    "is_mine": false
+                },
+                {
+                    "value": 16.8,
                     "is_valid": true,
                     "is_mine": false
                 }
