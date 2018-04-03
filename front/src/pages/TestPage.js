@@ -4,38 +4,66 @@ import { connect } from 'react-redux'
 import LeagueRankingWidget from '../components/LeagueRanking';
 import { AnimatedOffersValue } from '../components/SaleDisplay'
 
-const mapStateToProps = state => {
-	return {
-		ranking: state.data.rankings.current,
-	}
-}
-
 class App extends Component {
 
 	render() {
-		const offers = [
+		const sale = {
+            "id": 173,
+            "rank": 1,
+            "type": "PA",
+            "player": {
+                "id": 202,
+                "url": "http://127.0.0.1:8000/game/home/stat/joueur/202/",
+                "prenom": "Marcos Paulo Mesquita",
+                "nom": "Lopes",
+                "surnom": "Rony Lopes",
+                "display_name": "Rony Lopes",
+                "poste": "M",
+                "club": {
+                    "id": 20,
+                    "nom": "Monaco"
+                }
+            },
+            "author": {
+                "id": 17,
+                "url": "http://127.0.0.1:8000/game/league/1/ekyp/17",
+                "name": "Hippoceros & Rhinoppotame"
+            },
+            "min_price": 0.1,
+            "winner": {
+                "id": 7,
+                "url": "http://127.0.0.1:8000/game/league/1/ekyp/7",
+                "name": "Damn ! United"
+            },
+            "amount": 30.0,
+            "auctions": [
                 {
-                    "value": 1.1,
-                    "is_valid": true,
-                    "is_mine": false
-                },
-                {
-                    "value": 4.7,
+                    "value": 0.2,
                     "is_valid": true,
                     "is_mine": false
                 },
                 {
                     "value": 4.8,
                     "is_valid": true,
-                    "is_mine": true
+                    "is_mine": false
                 },
                 {
-                    "value": 6.8,
+                    "value": 5.1,
                     "is_valid": true,
                     "is_mine": false
                 },
                 {
-                    "value": 6.9,
+                    "value": 6.5,
+                    "is_valid": true,
+                    "is_mine": false
+                },
+                {
+                    "value": 6.6,
+                    "is_valid": true,
+                    "is_mine": false
+                },
+                {
+                    "value": 6.7,
                     "is_valid": true,
                     "is_mine": false
                 },
@@ -45,30 +73,36 @@ class App extends Component {
                     "is_mine": false
                 },
                 {
-                    "value": 7.6,
+                    "value": 7.2,
                     "is_valid": true,
                     "is_mine": false
                 },
                 {
-                    "value": 7.7,
+                    "value": 8.1,
                     "is_valid": true,
                     "is_mine": false
                 },
                 {
-                    "value": 10.8,
+                    "value": 21.2,
+                    "is_valid": true,
+                    "is_mine": true
+                },
+                {
+                    "value": 22.0,
                     "is_valid": true,
                     "is_mine": false
                 },
                 {
-                    "value": 16.8,
+                    "value": 30.0,
                     "is_valid": true,
                     "is_mine": false
                 }
-            ];
+            ]
+        };
 		return (
 			<div className="react-app-inner">
 			<main>
-			<AnimatedOffersValue offers={ offers } />
+			<AnimatedOffersValue offers={ sale.auctions } winner={ sale.winner.name } bestOffer={ sale.amount } difference={ 8.0 } />
 			</main>
 			<aside className="hg__right">
 			
@@ -79,4 +113,4 @@ class App extends Component {
 	}
 }
 
-export const TestPage = connect(mapStateToProps)(App)
+export const TestPage = App
