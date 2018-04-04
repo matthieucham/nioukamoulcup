@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux'
 
 import LeagueRankingWidget from '../components/LeagueRanking';
-import { AnimatedOffersValue } from '../components/SaleDisplay'
+import { SaleDisplay } from '../components/SaleDisplay'
 
 class App extends Component {
 
@@ -102,7 +102,7 @@ class App extends Component {
 		return (
 			<div className="react-app-inner">
 			<main>
-			<AnimatedOffersValue offers={ sale.auctions } winner={ sale.winner.name } bestOffer={ sale.amount } difference={ 8.0 } />
+			<SaleDisplay sale={ sale } />
 			</main>
 			<aside className="hg__right">
 			

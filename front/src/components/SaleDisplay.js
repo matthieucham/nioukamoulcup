@@ -11,8 +11,6 @@ export class AnimatedOffersValue extends Component {
 		let offers = this._cleanOffers(props.offers)
 		let best = props.bestOffer.toFixed(1)+' Ka'
 		let difference = 'écart ' + props.difference.toFixed(1)+' Ka'
-		console.log(best)
-		console.log(difference)
 		this.state = {
 			showWinner: false,
 			auctions: offers,
@@ -51,5 +49,21 @@ export class AnimatedOffersValue extends Component {
 				
 			</div>
 		);
+	}
+}
+
+
+export class SaleDisplay extends Component {
+
+	constructor(props) {
+		super(props)
+	}
+
+	render() {
+		return (
+			<div className="saleDisplay">
+				<AnimatedOffersValue offers={ this.props.sale.auctions } winner={ this.props.sale.winner.name } bestOffer={ this.props.sale.amount } difference={ 8.0 } />
+			</div>
+			)
 	}
 }

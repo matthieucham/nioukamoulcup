@@ -510,3 +510,20 @@ header nav a:hover, nav ul li ul li:hover {
 .prog-down {
     color: #B22222;
 }
+
+.saleDisplay {
+    background: url(../images/envelopes2.png);
+    background-position: center;
+    background-repeat: no-repeat;
+    padding: 8px;
+    min-width: 180px;
+    max-width: 260px;
+    height: 180px;
+    display: table;
+    text-align: center;
+}
+
+.saleDisplay > div {
+    display: table-cell;
+    vertical-align: middle;
+}
