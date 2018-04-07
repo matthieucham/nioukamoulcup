@@ -21,7 +21,10 @@ class App extends Component {
                 "poste": "M",
                 "club": {
                     "id": 20,
-                    "nom": "Monaco"
+                    "nom": "Monaco",
+                    "maillot_svg": "jersey-shoulders2",
+                    "maillot_color_bg": "#ffffff",
+                    "maillot_color_stroke": "#ff0000"
                 }
             },
             "author": {

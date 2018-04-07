@@ -515,7 +515,10 @@ header nav a:hover, nav ul li ul li:hover {
     background: url(../images/envelopes2.png);
     background-position: center;
     background-repeat: no-repeat;
+    border: 2px solid #f9bee5;
+    border-radius: 3px;
     padding: 8px;
+    margin: 3px;
     min-width: 180px;
     max-width: 260px;
     height: 180px;

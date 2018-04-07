@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import ReactSVG from 'react-svg';
 
-const Jersey = ({ club }) => {
+export const Jersey = ({ club }) => {
 
 	const svgPath = '/static/svg/'+(club ? club.maillot_svg : 'jersey-noclub2')+'.svg';
 	const colFill = club ? club.maillot_color_bg : '#000';
