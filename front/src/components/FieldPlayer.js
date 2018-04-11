@@ -12,11 +12,17 @@ export const Jersey = ({ club }) => {
 		path={ svgPath }
 		style={{ width:64, height:64, fill:colFill, stroke:colStroke }}
 		/>
-		<span className="clubName">{ club ? club.nom : '-' }</span>
+			<div className="clubName-container">
+			<span className="clubName">{ club ? club.nom : '-' }</span>
+			</div>
 		</div>
 		);
 }
 
+export const Position = ({ poste }) => {
+	const dico = {'G': 'Gardien', 'D': 'Défenseur', 'M': 'Milieu', 'A': 'Attaquant'}
+	return (<p>{dico[poste]}</p>);
+}
 
 export const JerseyPlaceHolder = () => {
 
