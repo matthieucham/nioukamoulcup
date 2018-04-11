@@ -12,6 +12,7 @@ export const Jersey = ({ club }) => {
 		path={ svgPath }
 		style={{ width:64, height:64, fill:colFill, stroke:colStroke }}
 		/>
+		<span className="clubName">{ club ? club.nom : '-' }</span>
 		</div>
 		);
 }
@@ -36,7 +37,7 @@ const FieldPlayerDetails = ({player, club}) => {
 	if (bonus > 0) {
 		bonusDisplay = <span className="bonus">{bonus+'%'}</span>;
 	}
-	return <div className="playerDetails"><h1>{ player.player.name }</h1><p>{ player.score }{ bonusDisplay }</p><p>{ club ? club.nom : '-' }</p></div>
+	return <div className="playerDetails"><h1>{ player.player.name }</h1><p>{ player.score }{ bonusDisplay }</p></div>
 };
 
 

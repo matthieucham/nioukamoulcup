@@ -441,6 +441,17 @@ header nav a:hover, nav ul li ul li:hover {
     padding: 3px;
 }
 
+.jersey .clubName {
+    position:relative;
+    top: -20px;
+    padding: 2px;
+    color: #f1f1f1;
+    font-size: 0.8em;
+    font-weight: bold;
+    background-color: rgba(0,0,0,0.6);
+    border-radius: 2px;
+}
+
 .fieldPlayer {
     display: inline-block;
     text-align: center;
