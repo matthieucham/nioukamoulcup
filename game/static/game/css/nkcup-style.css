@@ -542,11 +542,9 @@ header nav a:hover, nav ul li ul li:hover {
     min-width: 120px;
     max-width: 260px;
     height: 120px;
-    display: table;
-    text-align: center;
 }
 
-.saleDisplay > div {
+.saleDisplay .salePresentation {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
