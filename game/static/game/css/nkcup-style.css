@@ -510,3 +510,51 @@ header nav a:hover, nav ul li ul li:hover {
 .prog-down {
     color: #B22222;
 }
+
+
+/*************************************/
+dl.kvgroup {
+    padding: 0 3px;
+}
+.kvgroup>dt, .kvgroup>dd {
+    display: inline-block;
+}
+.kvgroup>dt::after {
+    font-family: FontAwesome;
+    content: "   \f0da";
+}
+.kvgroup>dt {
+    color: rgba(0,0,0,0.5);
+    font-size: 0.8em;
+}
+
+#home-main {
+    padding: 10px 0;
+}
+
+#home-main h2{
+    background-color: rgba(0,0,0,0.5);
+    color: #f1f1f1;
+    font-weight: bold;
+    font-size: 0.8em;
+    text-transform: uppercase;
+    padding-left: 8px;
+}
+
+#player-title {
+    display: flex;
+    flex: 1;
+    align-items: center;
+}
+
+#player-title > * {
+    margin-left: 20px;
+}
+
+#player-profile > div {
+    display: flex;
+    flex: 1;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+

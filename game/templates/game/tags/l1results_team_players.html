@@ -5,9 +5,7 @@
 
 <div>
     <div>
-        <div style="width: 64px; float:left; fill: {{ team.maillot_color_bg }}; stroke: {{ team.maillot_color_stroke }};">
-            {% svg team.maillot_svg %}
-        </div>
+        {% club_logo team  %}
         <h1>{{ team }}</h1>
     </div>
     <ul>

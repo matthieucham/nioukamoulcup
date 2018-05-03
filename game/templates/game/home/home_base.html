@@ -5,4 +5,10 @@
     {% include 'game/home/menu.html' %}
 {% endblock left-menu %}
 
+{% block content-center %}
+    <article id="home-main">
+        {% block content-center-home %}{% endblock content-center-home %}
+    </article>
+{% endblock content-center %}
+
 {% block col-right %}<aside class="hg__right">{% block content-right %}{% endblock content-right %}</aside>{% endblock col-right %}

@@ -245,3 +245,7 @@ if not DEBUG:
         'BUNDLE_DIR_NAME': 'dist/',
         'STATS_FILE': os.path.join(BASE_DIR, 'front', 'webpack-stats-prod.json'),
     })
+
+LOCALE_PATHS = (
+    os.path.join(BASE_DIR, 'locale'),
+)

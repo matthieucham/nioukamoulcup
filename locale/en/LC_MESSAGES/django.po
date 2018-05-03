@@ -1,0 +1,44 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2018-05-03 17:04+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: .\accounts\models.py:12
+msgid "user"
+msgstr ""
+
+#: .\game\templates\game\home\stat_joueur.html:29
+msgid "G"
+msgstr "Goalkeeper"
+
+#: .\game\templates\game\home\stat_joueur.html:30
+msgid "D"
+msgstr "Defender"
+
+#: .\game\templates\game\home\stat_joueur.html:31
+msgid "M"
+msgstr "Midfielder"
+
+#: .\game\templates\game\home\stat_joueur.html:32
+msgid "A"
+msgstr "Forward"
+
+#: .\game\templates\game\skeleton.html:10
+msgid ""
+"Le jeu de fantasy football basé sur la Ligue 1 qui va vous faire apprécier "
+"les 0-0"
+msgstr ""

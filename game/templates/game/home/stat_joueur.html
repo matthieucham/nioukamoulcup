@@ -1,6 +1,7 @@
 {% extends "game/home/home_base.html" %}
 {% load static %}
 {% load l1results %}
+{% load i18n %}
 
 {% block script %}
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
@@ -10,10 +11,30 @@
 {% endblock script %}
 
 {% block content-right %}
-{% joueurs_club joueur.club %}
+    {% joueurs_club joueur.club %}
 {% endblock content-right %}
 
-{% block content-center %}
-{{ joueur }}
-<div id='chtcontainer'>{{ chart.as_html }}</div>
-{% endblock content-center %}
+{% block content-center-home %}
+    <section id="player-title">
+        {% club_logo joueur.club 'big' %}
+        <h1>{{ joueur.display_name }}</h1>
+    </section>
+    <section id="player-profile">
+        <h2>Profil</h2>
+        <div>
+            {% keyvalue 'Nom' joueur.nom %}
+            {% keyvalue 'Prénom' joueur.prenom %}
+            {% if joueur.surnom %}
+                {% keyvalue 'Surnom' joueur.surnom %}
+            {% endif %}
+            {% keyvalue 'Club' joueur.club.nom %}
+            {% trans joueur.poste as poste %}
+            {% keyvalue 'Poste' poste %}
+        </div>
+    </section>
+    <section id="player-stats">
+    </section>
+    <section id="player-performances">
+    </section>
+    <div id='chtcontainer'>{{ chart.as_html }}</div>
+{% endblock content-center-home %}

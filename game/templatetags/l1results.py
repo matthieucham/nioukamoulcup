@@ -6,7 +6,6 @@ from django.template import defaultfilters
 from ligue1 import models as l1models
 from game import services
 
-
 register = template.Library()
 
 
@@ -37,6 +36,13 @@ def last_journees(nb=1):
 def sort_position_function(joueur):
     sort_order = {'G': 0, 'D': 1, 'M': 2, 'A': 3, None: 10}
     return sort_order[joueur.poste]
+
+
+@register.inclusion_tag('game/tags/l1results_club_logo.html')
+def club_logo(club, size='medium'):
+    mapping = {'small': 32, 'medium': 48, 'big': 64, 'biggest': 128}
+    return {'svg': club.maillot_svg, 'stroke': club.maillot_color_stroke, 'fill': club.maillot_color_bg,
+            'size': mapping.get(size, mapping.get('medium'))}
 
 
 @register.inclusion_tag('game/tags/l1results_team_players.html')
@@ -112,3 +118,8 @@ def format_scorer(joueur, stat):
         return joueur.__str__()
     else:
         return joueur.__str__() + ' x%d' % stat[joueur]
+
+
+@register.inclusion_tag('game/tags/l1results_keyvalue.html')
+def keyvalue(key, val):
+    return {'key': key, 'value': val}
