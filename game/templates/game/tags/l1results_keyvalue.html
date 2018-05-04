@@ -1,4 +1,8 @@
 <dl class="kvgroup">
-    <dt>{{ key }}</dt>
+    <dt>
+        {% if falogo %}
+            <i class="fa {{ falogo }}"></i>
+        {% endif %}
+        {{ key }}</dt>
     <dd>{{ value }}</dd>
 </dl>

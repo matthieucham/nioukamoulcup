@@ -1,4 +1,5 @@
 from django.views.generic import TemplateView, DetailView
+from django.db.models import Sum, Avg
 # from chartit import DataPool, Chart
 from graphos.sources.model import SimpleDataSource
 from graphos.renderers.morris import AreaChart
@@ -11,6 +12,7 @@ from ligue1 import models as l1models
 from .rest.league import CurrentLeagueInstanceMixin
 from .rest.redux_state import StateInitializerMixin
 from .rest import serializers
+from .services.scoring import BONUS
 
 
 class HomePage(TemplateView):
@@ -26,12 +28,25 @@ class StatJoueurView(DetailView):
     model = l1models.Joueur
     template_name = 'game/home/stat_joueur.html'
 
+    def _compute_stats_agg(self, jjscores):
+        agg = dict()
+        for bk in set(BONUS['COLLECTIVE'].keys()).union(set(BONUS['PERSONAL'].keys())):
+            agg[bk] = 0
+        for jjs in jjscores:
+            for bk in set(BONUS['COLLECTIVE'].keys()).union(set(BONUS['PERSONAL'].keys())):
+                if 'bonuses' in jjs.details and bk in jjs.details['bonuses']:
+                    agg[bk] += jjs.details['bonuses'][bk]
+        agg['AVGNOTE'] = round(jjscores.filter(note__isnull=False).aggregate(Avg('note'))['note__avg'] or 0, 2)
+        agg['NBNOTE'] = jjscores.filter(note__isnull=False).count()
+        return agg
+
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get a context
         context = super(StatJoueurView, self).get_context_data(**kwargs)
         # Step 1: Create a DataPool with the data we want to retrieve.
-        saisonscoring = models.SaisonScoring.objects.filter(saison__est_courante__isnull=False)[0]
+        saisonscoring = models.SaisonScoring.objects.filter(saison__est_courante__isnull=False).first()
         jjscores = models.JJScore.objects.list_scores_for_joueur(joueur=self.object, saison_scoring=saisonscoring)
+        context['stats'] = self._compute_stats_agg(jjscores)
         data_source_array = [['J', 'Pts']]
         for jjs in jjscores:
             data_source_array.append([jjs.journee_scoring.journee.numero,

@@ -16,7 +16,7 @@
 
 {% block content-center-home %}
     <section id="player-title">
-        {% club_logo joueur.club 'big' %}
+        {% club_logo joueur.club 'medium' %}
         <h1>{{ joueur.display_name }}</h1>
     </section>
     <section id="player-profile">
@@ -33,8 +33,25 @@
         </div>
     </section>
     <section id="player-stats">
+        <h2>Statistiques</h2>
+        <div>
+            {% keyvalue 'Nombre de notes' stats.NBNOTE %}
+            {% keyvalue 'Note moyenne' stats.AVGNOTE %}
+            {% keyvalue 'Buts marqués (hors pénaltys)' stats.GOAL 'fa-trophy' %}
+            {% keyvalue 'Passes décisives' stats.PASS 'fa-gift' %}
+            {% keyvalue 'Pénaltys marqués' stats.PENALTY 'fa-trophy fa-rotate-90' %}
+            {% keyvalue 'Pénaltys obtenus' stats.HALFPASS 'fa-ambulance' %}
+            {% keyvalue 'Meilleur de son équipe à son poste' stats.LEADER 'fa-plus-circle' %}
+            {% keyvalue 'Plus de 3 arrêts' stats.3STOPS 'fa-lock' %}
+            {% keyvalue 'Pénaltys arrêtés' stats.PENALSTOP 'fa-ban' %}
+            {% keyvalue 'Matchs sans but encaissé' stats.CLEANSHEET 'fa-shield' %}
+            {% keyvalue 'Matchs avec un seul but encaissé sur pénalty' stats.HALFCLEANSHEET 'fa-shield fa-rotate-90' %}
+            {% keyvalue 'Matchs avec 3 buts marqués (dans le jeu) ou plus' stats.OFFENSIVE 'fa-thermometer-full' %}
+            {% keyvalue 'Matchs avec exactement 3 buts marqués dont un pénalty' stats.HALFOFFENSIVE 'fa-thermometer-half' %}
+        </div>
     </section>
     <section id="player-performances">
+        <h2>Performances</h2>
     </section>
     <div id='chtcontainer'>{{ chart.as_html }}</div>
 {% endblock content-center-home %}
