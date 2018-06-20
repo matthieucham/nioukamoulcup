@@ -121,5 +121,5 @@ def format_scorer(joueur, stat):
 
 
 @register.inclusion_tag('game/tags/l1results_keyvalue.html')
-def keyvalue(key, val, falogo=None):
-    return {'key': key, 'value': val, 'falogo': falogo}
+def keyvalue(key, val, falogo=None, classname='kvgroup'):
+    return {'key': key, 'value': val, 'falogo': falogo, 'classname': classname}

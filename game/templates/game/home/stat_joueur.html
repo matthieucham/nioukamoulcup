@@ -32,11 +32,16 @@
             {% keyvalue 'Poste' poste %}
         </div>
     </section>
+    <section id="player-bilan">
+        <h2>Bilan</h2>
+        <div>
+            {% keyvalue 'Matchs notés' stats.NBNOTE None 'card' %}
+            {% keyvalue 'Note moyenne' stats.AVGNOTE None 'card' %}
+            {% keyvalue 'Bonus' stats.BONUS None 'card' %}
+        </div>
     <section id="player-stats">
         <h2>Statistiques</h2>
         <div>
-            {% keyvalue 'Nombre de notes' stats.NBNOTE %}
-            {% keyvalue 'Note moyenne' stats.AVGNOTE %}
             {% keyvalue 'Buts marqués (hors pénaltys)' stats.GOAL 'fa-trophy' %}
             {% keyvalue 'Passes décisives' stats.PASS 'fa-gift' %}
             {% keyvalue 'Pénaltys marqués' stats.PENALTY 'fa-trophy fa-rotate-90' %}

@@ -38,6 +38,7 @@ class StatJoueurView(DetailView):
                     agg[bk] += jjs.details['bonuses'][bk]
         agg['AVGNOTE'] = round(jjscores.filter(note__isnull=False).aggregate(Avg('note'))['note__avg'] or 0, 2)
         agg['NBNOTE'] = jjscores.filter(note__isnull=False).count()
+        agg['BONUS'] = jjscores.aggregate(Sum('bonus'))['bonus__sum'] or 0
         return agg
 
     def get_context_data(self, **kwargs):

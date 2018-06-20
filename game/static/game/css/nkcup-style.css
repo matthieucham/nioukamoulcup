@@ -519,11 +519,11 @@ dl.kvgroup {
 .kvgroup>dt, .kvgroup>dd {
     display: inline-block;
 }
-.kvgroup>dt::after {
+.kvgroup>dd::after {
     font-family: FontAwesome;
     content: "   \f0da";
 }
-.kvgroup>dt {
+.kvgroup>dd {
     color: rgba(0,0,0,0.5);
     font-size: 0.8em;
 }
@@ -555,6 +555,13 @@ dl.kvgroup {
     display: flex;
     flex: 1;
     justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+#player-bilan > div {
+    display: flex;
+    flex: 1;
+    justify-content: space-around;
     flex-wrap: wrap;
 }
 
