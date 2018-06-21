@@ -64,6 +64,7 @@ a.navlink {
     text-align: right;
     margin-top: 5px;
 }
+
 a.navlink::before {
     font-family: FontAwesome;
     content: "\f101   ";
@@ -74,12 +75,16 @@ a.navbutton {
 }
 
 a.navbutton.disabled {
-   pointer-events: none;
-   visibility: hidden;
+    pointer-events: none;
+    visibility: hidden;
+}
+
+.center {
+    text-align: center;
 }
 
 dl.card {
-    top:0;
+    top: 0;
     border: 1px solid #5f5f5f;
     border-radius: 3px;
     position: static;
@@ -110,7 +115,6 @@ dl.card dd {
     text-overflow: ellipsis;
     /*transform: translateY(-100%);*/
 }
-
 
 dl.card:hover {
     max-width: none;
@@ -152,7 +156,7 @@ table.ktable-class .ktable-heading-class {
 
 section.closed {
     overflow: hidden;
-    height:0;
+    height: 0;
     transition-duration: 0.4s;
 }
 
@@ -187,6 +191,7 @@ section.expanded {
     flex: 1;
     text-align: left;
 }
+
 .hg__right .fixtures li > a:first-child {
     flex: 1;
     text-align: right;
@@ -197,16 +202,18 @@ section.expanded {
     border: none;
 }
 
-.hg__right .rc-collapse-header .playerName{
+.hg__right .rc-collapse-header .playerName {
     font-size: 1em;
 }
 
-.hg__right .rc-collapse-header .clubName{
+.hg__right .rc-collapse-header .clubName {
     font-size: 0.8em;
 }
+
 .hg__right .rc-collapse-header .clubName:before {
     content: " (";
 }
+
 .hg__right .rc-collapse-header .clubName:after {
     content: ")";
 }
@@ -215,7 +222,7 @@ section.expanded {
     color: inherit;
 }
 
-.hg__right .rc-collapse-header.past  .playerName{
+.hg__right .rc-collapse-header.past .playerName {
     text-decoration: line-through;
 }
 
@@ -335,13 +342,13 @@ header nav a:hover, nav ul li ul li:hover {
     height: 300px;
     max-height: 300px;
     background-repeat: no-repeat;
-    background-size:cover;
-    box-shadow: inset 0px 0px 10px rgba(0,0,0,0.9);
+    background-size: cover;
+    box-shadow: inset 0px 0px 10px rgba(0, 0, 0, 0.9);
 }
 
 .team-header .team-cover-box {
-        display: none;
-    }
+    display: none;
+}
 
 .cover, .team-cover-box {
     color: #f1f1f1;
@@ -353,15 +360,16 @@ header nav a:hover, nav ul li ul li:hover {
 }
 
 .team-cover-box h1 {
-    background-color: rgba(0,0,0,0.5);
+    background-color: rgba(0, 0, 0, 0.5);
     padding: 10px 0;
 }
 
 /* Turn off parallax scrolling for tablets and phones. Increase/decrease the pixels if needed */
-@media all and (max-width : 768px) {
+@media all and (max-width: 768px) {
     .cover {
         background-attachment: scroll;
     }
+
     .team-cover-box {
         display: none;
     }
@@ -376,7 +384,6 @@ header nav a:hover, nav ul li ul li:hover {
         min-width: 300px;
     }
 }
-
 
 /* Tabs (redux-tabs) */
 .tab-content {
@@ -397,7 +404,7 @@ header nav a:hover, nav ul li ul li:hover {
 
 /* LEFT CONTEXTUAL SUBMENU */
 
-.hg__left nav{
+.hg__left nav {
     padding: 3px;
 }
 
@@ -413,7 +420,7 @@ header nav a:hover, nav ul li ul li:hover {
     margin: 4px;
 }
 
-@media all and (max-width : 768px) {
+@media all and (max-width: 768px) {
 
     .hg__left nav .button {
         display: inline-block;
@@ -421,10 +428,9 @@ header nav a:hover, nav ul li ul li:hover {
     }
 }
 
-.hg__left nav .button:hover,  .hg__left nav .button.active{
+.hg__left nav .button:hover, .hg__left nav .button.active {
     background-color: #f9bee5;
 }
-
 
 /*  LEAGUE - ekyp  */
 .composition {
@@ -437,7 +443,7 @@ header nav a:hover, nav ul li ul li:hover {
 
 .composition > h1 {
     text-align: center;
-    background-color: rgba(255,255,255,0.2);
+    background-color: rgba(255, 255, 255, 0.2);
     padding: 3px;
 }
 
@@ -446,23 +452,27 @@ header nav a:hover, nav ul li ul li:hover {
     text-align: center;
     margin: 8px;
 }
+
 .fieldPlayer svg {
     display: block;
     margin-left: auto;
     margin-right: auto;
 }
+
 .fieldPlayer .playerDetails {
-    position:relative;
+    position: relative;
     top: -15px;
     padding: 5px;
-    background-color: rgba(255,255,255,0.2);
+    background-color: rgba(255, 255, 255, 0.2);
     border-radius: 3px;
 }
-.fieldPlayer .playerDetails .bonus{
+
+.fieldPlayer .playerDetails .bonus {
     padding-left: 3px;
     font-weight: bold;
 }
-.fieldPlayer .playerDetails .bonus::before{
+
+.fieldPlayer .playerDetails .bonus::before {
     font-family: "FontAwesome";
     content: "\f005"
 }
@@ -493,7 +503,6 @@ header nav a:hover, nav ul li ul li:hover {
     content: "\f007   ";
 }
 
-
 /* LEAGUE - Classements */
 
 .division-title::before {
@@ -504,27 +513,32 @@ header nav a:hover, nav ul li ul li:hover {
 .prog-eq {
     color: #b5b5b5;
 }
+
 .prog-up {
     color: #228B22;
 }
+
 .prog-down {
     color: #B22222;
 }
 
-
 /*************************************/
 dl.kvgroup {
+    display: inline-block;
     padding: 0 3px;
 }
-.kvgroup>dt, .kvgroup>dd {
+
+.kvgroup > dt, .kvgroup > dd {
     display: inline-block;
 }
-.kvgroup>dd::after {
+
+.kvgroup > dd::after {
     font-family: FontAwesome;
     content: "   \f0da";
 }
-.kvgroup>dd {
-    color: rgba(0,0,0,0.5);
+
+.kvgroup > dd {
+    color: rgba(0, 0, 0, 0.5);
     font-size: 0.8em;
 }
 
@@ -532,8 +546,8 @@ dl.kvgroup {
     padding: 10px 0;
 }
 
-#home-main h2{
-    background-color: rgba(0,0,0,0.5);
+#home-main h2 {
+    background-color: rgba(0, 0, 0, 0.5);
     color: #f1f1f1;
     font-weight: bold;
     font-size: 0.8em;
@@ -565,10 +579,58 @@ dl.kvgroup {
     flex-wrap: wrap;
 }
 
-/*#player-stats > div {*/
-    /*display: flex;*/
-    /*flex: 1;*/
-    /*justify-content: space-between;*/
-    /*flex-wrap: wrap;*/
-/*}*/
+#player-stats > ul {
+    padding: 0 3px;
+}
 
+#player-performances > div {
+    display: table;
+    table-layout: fixed;
+    width: 100%;
+}
+
+#player-performances .header_matches {
+    display: table-header-group;
+    background: #b5b5b5;
+    font-weight: bold;
+}
+
+#player-performances .line_match {
+    display: table-row;
+}
+
+.line_match:nth-child(odd) {
+    background: #f1f1f1;
+}
+
+#player-performances .cell_match {
+    display: table-cell;
+    padding: 0 3px;
+}
+
+.cell_match__compensation {
+    color: rgba(0, 0, 0, 0.5);
+    font-size: 0.8em;
+}
+
+.rencontre_score {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+.rencontre_score > .dom {
+    text-align: right;
+    flex: 1;
+}
+
+.rencontre_score > .score {
+    text-align: center;
+    padding: 0 5px;
+    font-weight: bold;
+}
+
+.rencontre_score > .ext {
+    text-align: left;
+    flex: 1;
+}

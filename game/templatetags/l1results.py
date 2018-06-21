@@ -17,9 +17,15 @@ def rencontre_score(rencontre):
     else:
         score_dom = rencontre.resultat['dom']['buts_pour']
         score_ext = rencontre.resultat['ext']['buts_pour']
-    return {'rid': rencontre.pk, 'club_dom': rencontre.club_domicile.nom, 'club_ext': rencontre.club_exterieur.nom,
-            'score_dom':
-                score_dom, 'score_ext': score_ext}
+    return {
+        'rid': rencontre.pk,
+        'club_dom': rencontre.club_domicile.nom,
+        'cdid': rencontre.club_domicile.pk,
+        'club_ext': rencontre.club_exterieur.nom,
+        'ceid': rencontre.club_exterieur.pk,
+        'score_dom': score_dom,
+        'score_ext': score_ext
+    }
 
 
 @register.inclusion_tag('game/tags/l1results_last_journees.html')
@@ -121,5 +127,32 @@ def format_scorer(joueur, stat):
 
 
 @register.inclusion_tag('game/tags/l1results_keyvalue.html')
-def keyvalue(key, val, falogo=None, classname='kvgroup'):
-    return {'key': key, 'value': val, 'falogo': falogo, 'classname': classname}
+def keyvalue(key, val, classname='kvgroup'):
+    return {'key': key, 'value': val, 'classname': classname}
+
+
+@register.inclusion_tag('game/tags/l1results_performance_joueur.html')
+def perf_joueur(jjs):
+    # TODO order
+    # TODO bonus agg
+    return {'jjs': jjs}
+
+
+@register.inclusion_tag('game/tags/l1results_bonus.html')
+def bonus(bonuskey, bonusval=1):
+    icon_dict = {
+        'GOAL': ('fa-trophy', 'Tomato'),
+        'PENALTY': ('fa-trophy fa-rotate-90', 'Orange'),
+        'PASS': ('fa-gift', 'DodgerBlue'),
+        'HALFPASS': ('fa-ambulance', 'Sienna'),
+        'LEADER': ('fa-plus-circle', 'MediumSeaGreen'),
+        '3STOPS': ('fa-lock', 'LimeGreen'),
+        'PENALSTOP': ('fa-ban', 'SlateBlue'),
+        'CLEANSHEET': ('fa-shield', 'Gray'),
+        'HALFCLEANSHEET': ('fa-shield fa-rotate-90', 'LightGray'),
+        'OFFENSIVE': ('fa-thermometer-full', 'GoldenRod'),
+        'HALFOFFENSIVE': ('fa-thermometer-half', 'Gold')
+    }
+    ico, color = icon_dict[bonuskey]
+    return {'icon': ico, 'color': color, 'nb': bonusval}
+

@@ -1,0 +1,34 @@
+{% load humanize %}
+{% load l1results %}
+
+<div class="line_match">
+    <div class="cell_match center">
+        {{ jjs.journee_scoring.journee.numero }}
+    </div>
+    <div class="cell_match">
+        {% if jjs.rencontre is not None %}
+            {{ jjs.rencontre.date|date:"SHORT_DATE_FORMAT" }}
+        {% endif %}
+    </div>
+    <div class="cell_match center">
+        {% if jjs.rencontre is not None %}
+            {% rencontre_score jjs.rencontre %}
+        {% else %}
+            -
+        {% endif %}
+    </div>
+    <div class="cell_match center">
+        {% if jjs.note is not None %}
+            <span class="cell_match__note">{{ jjs.note|stringformat:'0.2f' }}</span>
+        {% elif jjs.compensation > 0 %}
+            <span class="cell_match__compensation">{{ jjs.compensation|stringformat:'0.0f' }}</span>
+        {% else %}
+            -
+        {% endif %}
+    </div>
+    <div class="cell_match">
+        {% for bk, bv in jjs.details.bonuses.items %}
+            {% bonus bk bv %}
+        {% endfor %}
+    </div>
+</div>
