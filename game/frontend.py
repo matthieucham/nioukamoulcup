@@ -1,7 +1,8 @@
 from django.views.generic import TemplateView, DetailView
-from django.db.models import Sum, Avg
+from django.db.models import Sum, Avg, Count, Q
 from graphos.sources.model import SimpleDataSource
 from graphos.renderers.morris import AreaChart
+# from graphos.renderers.gchart import AreaChart
 from rules.contrib.views import PermissionRequiredMixin
 from rest_framework.renderers import JSONRenderer
 import json
@@ -25,7 +26,19 @@ class ResultRencontreView(DetailView):
 
 class ClubView(DetailView):
     model = l1models.Club
-    template_name = 'game/home/result_rencontre.html'
+    template_name = 'game/home/club_detail.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(ClubView, self).get_context_data(**kwargs)
+        saisonscoring = models.SaisonScoring.objects.filter(saison__est_courante__isnull=False).first()
+        context['players'] = []
+        for j in self.object.joueurs.prefetch_related('jjscore_set').annotate(
+                nb_notes=Count('jjscore', filter=Q(journee_scoring__saison_scoring=saisonscoring,
+                                                   note__isnull=False))):
+            context['players'].append(j)
+        # for pos in ['G', 'D', 'M', 'A']:
+        #     context[pos] = self.object.joueurs.filter(poste=pos).order_by('nom')
+        return context
 
 
 class StatJoueurView(DetailView):
@@ -56,17 +69,36 @@ class StatJoueurView(DetailView):
             .select_related('rencontre__club_exterieur').select_related('journee_scoring__journee')
         context['stats'] = self._compute_stats_agg(jjscores)
         context['jjscores'] = jjscores
-        data_source_array = [['J', 'Pts']]
+        data_source_array = [['J', 'Note', 'Bonus']]
         for jjs in jjscores:
             data_source_array.append([jjs.journee_scoring.journee.numero,
-                                      round(float(jjs.note or 0) + float(jjs.compensation or 0) + float(jjs.bonus or 0),
-                                            3)])
+                                      round(float(jjs.note or 0) + float(jjs.compensation or 0), 3),
+                                      float(jjs.bonus or 0)])
         data_source = SimpleDataSource(data_source_array)
         context['chart'] = AreaChart(data_source,
                                      # width=580,
-                                     options={'resize': True, 'hideHover': 'auto', 'parseTime': False,
-                                              'fillOpacity': 0.6, 'ymax': 'auto 15', 'grid': False,
-                                              'goals': [0.0, 5.0, 10.0, 15.0]})
+                                     options={'resize': True,
+                                              'hideHover': 'auto',
+                                              'parseTime': False,
+                                              'fillOpacity': 0.6,
+                                              'ymin': 0,
+                                              'ymax': 'auto 15',
+                                              'grid': False,
+                                              'behaveLikeLine': False,
+                                              'goals': [0.0, 5.0, 10.0, 15.0, 20.0, 25.0]}
+                                     # options={
+                                     #     'title': self.object.display_name(),
+                                     #     'isStacked': True,
+                                     #     'legend': {'position': 'top', 'maxLines': 3},
+                                     #     'hAxis': {'title': 'Journée'},
+                                     #     'vAxis': {'title': 'Points', 'minValue': 0, 'ticks': [5, 10, 15, 20]},
+                                     #     'chartArea': {'left': 'auto', 'top': 'auto', 'width': '80%', 'height': '80%'},
+                                     #     'crosshair': {'trigger': 'both'},
+                                     #     'curveType': 'function',
+                                     #     'focusTarget': 'category',
+                                     #     'pointSize': 5,
+                                     # }
+                                     )
         return context
 
 

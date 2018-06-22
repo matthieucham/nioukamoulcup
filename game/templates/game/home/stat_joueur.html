@@ -8,6 +8,12 @@
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.css">
     <script src="//cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.min.js"></script>
+{#    <script type="text/javascript" src="https://www.google.com/jsapi"></script>#}
+{#    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>#}
+{#    <script type="text/javascript">#}
+{#        google.charts.load('visualization', '1', {packages: ['corechart']});#}
+{#       // google.charts.setOnLoadCallback(drawChart);#}
+{#    </script>#}
 {% endblock script %}
 
 {% block content-right %}
@@ -15,7 +21,7 @@
 {% endblock content-right %}
 
 {% block content-center-home %}
-    <section id="player-title">
+    <section id="section-title">
         {% club_logo joueur.club 'medium' %}
         <h1>{{ joueur.display_name }}</h1>
     </section>
@@ -39,36 +45,39 @@
             {% keyvalue 'Note moyenne' stats.AVGNOTE 'card' %}
             {% keyvalue 'Bonus' stats.BONUS 'card' %}
         </div>
-    <section id="player-stats">
-        <h2>Statistiques</h2>
-        <ul>
-            <li>{% bonus 'GOAL' %}{% keyvalue 'Buts marqués (hors pénaltys)' stats.GOAL %}</li>
-            <li>{% bonus 'PASS' %}{% keyvalue 'Passes décisives' stats.PASS %}</li>
-            <li>{% bonus 'PENALTY' %}{% keyvalue 'Pénaltys marqués' stats.PENALTY %}</li>
-            <li>{% bonus 'HALFPASS' %}{% keyvalue 'Pénaltys obtenus' stats.HALFPASS %}</li>
-            <li>{% bonus 'LEADER' %}{% keyvalue 'Meilleur de son équipe à son poste' stats.LEADER %}</li>
-            <li>{% bonus '3STOPS' %}{% keyvalue 'Plus de 3 arrêts' stats.3STOPS %}</li>
-            <li>{% bonus 'PENALSTOP' %}{% keyvalue 'Pénaltys arrêtés' stats.PENALSTOP %}</li>
-            <li>{% bonus 'CLEANSHEET' %}{% keyvalue 'Matchs sans but encaissé' stats.CLEANSHEET %}</li>
-            <li>{% bonus 'HALFCLEANSHEET' %}{% keyvalue 'Matchs avec un seul but encaissé sur pénalty' stats.HALFCLEANSHEET %}</li>
-            <li>{% bonus 'OFFENSIVE' %}{% keyvalue 'Matchs avec 3 buts marqués (dans le jeu) ou plus' stats.OFFENSIVE %}</li>
-            <li>{% bonus 'HALFOFFENSIVE' %}{% keyvalue 'Matchs avec exactement 3 buts marqués dont un pénalty' stats.HALFOFFENSIVE %}</li>
-        </ul>
-    </section>
-    <section id="player-performances">
-        <h2>Performances</h2>
-        <div>
-        <div class="header_matches">
-            <div class="cell_match center" style="width:5%;">J.</div>
-            <div class="cell_match" style="width:15%;">Date</div>
-            <div class="cell_match center">Match</div>
-            <div class="cell_match center" style="width:10%;">Note</div>
-            <div class="cell_match">Bonus</div>
-        </div>
-        {% for jjs in jjscores %}
-            {% perf_joueur jjs %}
-        {% endfor %}
-        </div>
-    </section>
-    <div id='chtcontainer'>{{ chart.as_html }}</div>
+        <section id="player-stats">
+            <h2>Statistiques</h2>
+            <ul>
+                <li>{% bonus 'GOAL' %}{% keyvalue 'Buts marqués (hors pénaltys)' stats.GOAL %}</li>
+                <li>{% bonus 'PASS' %}{% keyvalue 'Passes décisives' stats.PASS %}</li>
+                <li>{% bonus 'PENALTY' %}{% keyvalue 'Pénaltys marqués' stats.PENALTY %}</li>
+                <li>{% bonus 'HALFPASS' %}{% keyvalue 'Pénaltys obtenus' stats.HALFPASS %}</li>
+                <li>{% bonus 'LEADER' %}{% keyvalue 'Meilleur de son équipe à son poste' stats.LEADER %}</li>
+                <li>{% bonus '3STOPS' %}{% keyvalue 'Plus de 3 arrêts' stats.3STOPS %}</li>
+                <li>{% bonus 'PENALSTOP' %}{% keyvalue 'Pénaltys arrêtés' stats.PENALSTOP %}</li>
+                <li>{% bonus 'CLEANSHEET' %}{% keyvalue 'Matchs sans but encaissé' stats.CLEANSHEET %}</li>
+                <li>
+                    {% bonus 'HALFCLEANSHEET' %}{% keyvalue 'Matchs avec un seul but encaissé sur pénalty' stats.HALFCLEANSHEET %}</li>
+                <li>
+                    {% bonus 'OFFENSIVE' %}{% keyvalue 'Matchs avec 3 buts marqués (dans le jeu) ou plus' stats.OFFENSIVE %}</li>
+                <li>
+                    {% bonus 'HALFOFFENSIVE' %}{% keyvalue 'Matchs avec exactement 3 buts marqués dont un pénalty' stats.HALFOFFENSIVE %}</li>
+            </ul>
+        </section>
+        <section id="player-performances">
+            <h2>Performances</h2>
+            <div>
+                <div class="header_matches">
+                    <div class="cell_match center" style="width:5%;">J.</div>
+                    <div class="cell_match" style="width:15%;">Date</div>
+                    <div class="cell_match center">Match</div>
+                    <div class="cell_match center" style="width:10%;">Note</div>
+                    <div class="cell_match">Bonus</div>
+                </div>
+                {% for jjs in jjscores %}
+                    {% perf_joueur jjs %}
+                {% endfor %}
+            </div>
+        </section>
+        <div id='chtcontainer'>{{ chart.as_html }}</div>
 {% endblock content-center-home %}

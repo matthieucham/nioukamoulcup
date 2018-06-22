@@ -555,13 +555,13 @@ dl.kvgroup {
     padding-left: 8px;
 }
 
-#player-title {
+#section-title {
     display: flex;
     flex: 1;
     align-items: center;
 }
 
-#player-title > * {
+#section-title > * {
     margin-left: 20px;
 }
 
@@ -633,4 +633,9 @@ dl.kvgroup {
 .rencontre_score > .ext {
     text-align: left;
     flex: 1;
+}
+
+#chtcontainer {
+    height:400px;
+    width: 100%;
 }
