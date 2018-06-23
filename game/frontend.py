@@ -33,8 +33,8 @@ class ClubView(DetailView):
         saisonscoring = models.SaisonScoring.objects.filter(saison__est_courante__isnull=False).first()
         context['players'] = []
         for j in self.object.joueurs.prefetch_related('jjscore_set').annotate(
-                nb_notes=Count('jjscore', filter=Q(journee_scoring__saison_scoring=saisonscoring,
-                                                   note__isnull=False))):
+                nb_notes=Count('jjscore', filter=Q(jjscore__journee_scoring__saison_scoring=saisonscoring,
+                                                   jjscore__note__isnull=False))):
             context['players'].append(j)
         # for pos in ['G', 'D', 'M', 'A']:
         #     context[pos] = self.object.joueurs.filter(poste=pos).order_by('nom')

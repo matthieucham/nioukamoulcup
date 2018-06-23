@@ -10,7 +10,7 @@ from utils.timer import Timer
 
 
 class SaisonScoring(models.Model):
-    saison = models.ForeignKey(l1models.Saison, null=False)
+    saison = models.ForeignKey(l1models.Saison, on_delete=models.CASCADE, null=False)
     computed_at = models.DateTimeField(auto_now=True)
 
     def compute(self):
@@ -34,8 +34,8 @@ class JourneeScoring(models.Model):
     STATUS_CHOICES = (('OPEN', 'Open'), ('LOCKED', 'locked'),)
 
     status = models.CharField(max_length=10, blank=False, default='OPEN', choices=STATUS_CHOICES)
-    journee = models.ForeignKey(l1models.Journee, null=False)
-    saison_scoring = models.ForeignKey(SaisonScoring, null=False)
+    journee = models.ForeignKey(l1models.Journee, on_delete=models.CASCADE, null=False)
+    saison_scoring = models.ForeignKey(SaisonScoring, on_delete=models.CASCADE, null=False)
     computed_at = models.DateTimeField(null=True)
     locked_at = models.DateTimeField(null=True)
 
@@ -72,7 +72,8 @@ class JJScoreManager(models.Manager):
                     for perf in all_perfs:
                         note, bonus, comp, earned_bonuses = scoring.compute_score_performance(perf, bbp)
                         jjscores.append(
-                            JJScore(journee_scoring=journee_scoring, joueur=perf.joueur, rencontre=r, note=note, bonus=bonus,
+                            JJScore(journee_scoring=journee_scoring, joueur=perf.joueur, rencontre=r, note=note,
+                                    bonus=bonus,
                                     compensation=comp, details={'bonuses': earned_bonuses}))
                         # for cl in journee_scoring.journee.saison.participants:
                         # if not cl.pk in computed_club_pks:
@@ -102,9 +103,9 @@ class JJScoreManager(models.Manager):
 
 class JJScore(models.Model):
     computed_at = models.DateTimeField(auto_now=True, null=False)
-    journee_scoring = models.ForeignKey(JourneeScoring, null=False)
-    joueur = models.ForeignKey(l1models.Joueur, null=False)
-    rencontre = models.ForeignKey(l1models.Rencontre, null=True)
+    journee_scoring = models.ForeignKey(JourneeScoring, on_delete=models.CASCADE, null=False)
+    joueur = models.ForeignKey(l1models.Joueur, on_delete=models.CASCADE, null=False)
+    rencontre = models.ForeignKey(l1models.Rencontre, on_delete=models.CASCADE, null=True)
     note = models.DecimalField(max_digits=5, decimal_places=3, blank=True, null=True)
     bonus = models.DecimalField(max_digits=5, decimal_places=3, blank=False, null=False, default=0)
     compensation = models.DecimalField(max_digits=5, decimal_places=3, blank=True, null=True)

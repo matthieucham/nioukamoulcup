@@ -16,29 +16,6 @@
                 <p>{{ j.nom }} {{ j.nb_notes }}</p>
             {% endfor %}
         </div>
-        <h2>Gardiens</h2>
-        <div>
-            {% for j in context.G %}
-                <p>{{ j.nom }}</p>
-            {% endfor %}
-        </div>
-        <h2>Défenseurs</h2>
-        <div>
-            {% for j in context.D %}
-                <p>{{ j.nom }}</p>
-            {% endfor %}
-        </div>
-        <h2>Milieux</h2>
-        <div>
-            {% for j in context.M %}
-                <p>{{ j.nom }}</p>
-            {% endfor %}
-        </div>
-        <h2>Attaquants</h2>
-        <div>
-            {% for j in context.A %}
-                <p>{{ j.nom }}</p>
-            {% endfor %}
-        </div>
+
     </section>
 {% endblock %}

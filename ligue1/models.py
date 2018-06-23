@@ -40,7 +40,7 @@ class Saison(Importe):
 
 
 class SaisonCourante(models.Model):
-    saison = models.ForeignKey(Saison, related_name='est_courante')
+    saison = models.ForeignKey(Saison, on_delete=models.CASCADE, related_name='est_courante')
 
     def __str__(self):
         return self.saison.__str__()
@@ -69,7 +69,7 @@ class Journee(Importe):
     sn_step_uuid = models.UUIDField(null=False)
     debut = models.DateTimeField(null=True)
     fin = models.DateTimeField(null=True)
-    saison = models.ForeignKey(Saison, related_name='journees')
+    saison = models.ForeignKey(Saison, on_delete=models.CASCADE, related_name='journees')
     objects = JourneeManager()
 
     class Meta:
@@ -140,7 +140,7 @@ class Joueur(Importe):
     nom = models.CharField(max_length=50)
     surnom = models.CharField(max_length=50, blank=True)
     sn_person_uuid = models.UUIDField(null=False)
-    club = models.ForeignKey(Club, related_name='joueurs', null=True, blank=True)
+    club = models.ForeignKey(Club, on_delete=models.SET_NULL, related_name='joueurs', null=True, blank=True)
     poste = models.CharField(max_length=1, choices=POSTES, null=True)
 
     objects = JoueurManager()
@@ -208,11 +208,11 @@ class RencontreManager(models.Manager):
 
 class Rencontre(Importe):
     sn_meeting_uuid = models.UUIDField(null=False)
-    club_domicile = models.ForeignKey(Club, null=False, related_name='recoit')
-    club_exterieur = models.ForeignKey(Club, null=False, related_name='visite')
+    club_domicile = models.ForeignKey(Club, on_delete=models.PROTECT, null=False, related_name='recoit')
+    club_exterieur = models.ForeignKey(Club,  on_delete=models.PROTECT, null=False, related_name='visite')
     date = models.DateTimeField()
     resultat = JSONField(null=True)
-    journee = models.ForeignKey(Journee, null=False, related_name='rencontres')
+    journee = models.ForeignKey(Journee, on_delete=models.CASCADE, null=False, related_name='rencontres')
     objects = RencontreManager()
 
     def __str__(self):
@@ -234,9 +234,9 @@ class Rencontre(Importe):
 
 
 class Performance(models.Model):
-    rencontre = models.ForeignKey(Rencontre, null=False, related_name='performances')
-    joueur = models.ForeignKey(Joueur, null=False, related_name='performances')
-    club = models.ForeignKey(Club, null=False)
+    rencontre = models.ForeignKey(Rencontre, on_delete=models.CASCADE, null=False, related_name='performances')
+    joueur = models.ForeignKey(Joueur, on_delete=models.CASCADE, null=False, related_name='performances')
+    club = models.ForeignKey(Club, on_delete=models.PROTECT, null=False)
     temps_de_jeu = models.PositiveSmallIntegerField()
     details = JSONField()
 

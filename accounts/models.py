@@ -8,6 +8,7 @@ from userena.models import UserenaBaseProfile
 
 class KcupUserProfile(UserenaBaseProfile):
     user = models.OneToOneField(User,
+                                on_delete=models.CASCADE,
                                 unique=True,
                                 verbose_name=_('user'),
                                 related_name='gamer_profile')
