@@ -32,12 +32,12 @@ class ClubView(DetailView):
         context = super(ClubView, self).get_context_data(**kwargs)
         saisonscoring = models.SaisonScoring.objects.filter(saison__est_courante__isnull=False).first()
         context['players'] = []
-        for j in self.object.joueurs.prefetch_related('jjscore_set').annotate(
-                nb_notes=Count('jjscore', filter=Q(jjscore__journee_scoring__saison_scoring=saisonscoring,
-                                                   jjscore__note__isnull=False))):
-            context['players'].append(j)
-        # for pos in ['G', 'D', 'M', 'A']:
-        #     context[pos] = self.object.joueurs.filter(poste=pos).order_by('nom')
+        deco_joueurs = self.object.joueurs.prefetch_related('jjscore_set').annotate(
+            nb_notes=Count('jjscore', filter=Q(jjscore__journee_scoring__saison_scoring=saisonscoring,
+                                               jjscore__note__isnull=False))).annotate(
+            avg_note=Avg('jjscore__note', filter=Q(jjscore__journee_scoring__saison_scoring=saisonscoring,
+                                                   jjscore__note__isnull=False))).order_by('nom')
+        context['players'] = l1models.Joueur.objects.order_queryset_by_poste(deco_joueurs)
         return context
 
 

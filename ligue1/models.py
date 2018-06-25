@@ -133,6 +133,10 @@ class JoueurManager(models.Manager):
         joueur.derniere_maj = maj
         joueur.save()
 
+    def order_queryset_by_poste(self, qs):
+        listed = qs.all()
+        return sorted(listed, key=lambda j: self.POSTE_SORT_ORDER[j.poste] if j.poste else 0)
+
 
 class Joueur(Importe):
     POSTES = (('G', 'Gardien'), ('D', 'Défenseur'), ('M', 'Milieu'), ('A', 'Attaquant'))
@@ -209,7 +213,7 @@ class RencontreManager(models.Manager):
 class Rencontre(Importe):
     sn_meeting_uuid = models.UUIDField(null=False)
     club_domicile = models.ForeignKey(Club, on_delete=models.PROTECT, null=False, related_name='recoit')
-    club_exterieur = models.ForeignKey(Club,  on_delete=models.PROTECT, null=False, related_name='visite')
+    club_exterieur = models.ForeignKey(Club, on_delete=models.PROTECT, null=False, related_name='visite')
     date = models.DateTimeField()
     resultat = JSONField(null=True)
     journee = models.ForeignKey(Journee, on_delete=models.CASCADE, null=False, related_name='rencontres')
