@@ -11,11 +11,11 @@
     </section>
 
     <section id="club-staff">
-    <div>
-            {% for j in context.players %}
-                <p>{{ j.nom }} {{ j.nb_notes }}</p>
+        <h2>Effectif</h2>
+        <div>
+            {% for j in players %}
+                <p>{{ j.nom }}</p>
             {% endfor %}
         </div>
-
     </section>
 {% endblock %}
