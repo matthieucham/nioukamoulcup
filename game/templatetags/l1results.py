@@ -90,8 +90,8 @@ def rencontre_summary(rencontre):
         {
             'summary': agglo,
             'header': {
-                'dom': rencontre.club_domicile.nom,
-                'ext': rencontre.club_exterieur.nom,
+                'dom': rencontre.club_domicile,
+                'ext': rencontre.club_exterieur,
                 'score_dom': rencontre.resultat['dom']['buts_pour'],
                 'score_ext': rencontre.resultat['ext']['buts_pour']}
         }

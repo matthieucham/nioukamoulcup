@@ -583,6 +583,10 @@ dl.kvgroup {
     padding: 0 3px;
 }
 
+#club-players > ul {
+    padding: 0 3px;
+}
+
 #player-performances > div {
     display: table;
     table-layout: fixed;

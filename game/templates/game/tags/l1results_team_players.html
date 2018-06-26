@@ -3,7 +3,7 @@
 {% load i18n %}
 
 
-<div>
+<section id="club-players">
     <div>
         {% club_logo team  %}
         <h1>{{ team }}</h1>
@@ -11,8 +11,8 @@
     <ul>
         {% for j in players %}
             <li>
-            <a href="{% url 'stat_joueur-detail' j.pk %}">{{ j }} {{ j.poste }}</a>
+            <a href="{% url 'stat_joueur-detail' j.pk %}">{{ j.display_name }}</a>
             </li>
         {% endfor %}
     </ul>
-</div>
+</section>
