@@ -17,6 +17,10 @@ def rencontre_score(rencontre):
     else:
         score_dom = rencontre.resultat['dom']['buts_pour']
         score_ext = rencontre.resultat['ext']['buts_pour']
+    if hasattr(rencontre, 'diff'):
+        diff = rencontre.diff
+    else:
+        diff = 0
     return {
         'rid': rencontre.pk,
         'club_dom': rencontre.club_domicile.nom,
@@ -24,7 +28,8 @@ def rencontre_score(rencontre):
         'club_ext': rencontre.club_exterieur.nom,
         'ceid': rencontre.club_exterieur.pk,
         'score_dom': score_dom,
-        'score_ext': score_ext
+        'score_ext': score_ext,
+        'diff': diff
     }
 
 
@@ -155,4 +160,3 @@ def bonus(bonuskey, bonusval=1):
     }
     ico, color = icon_dict[bonuskey]
     return {'icon': ico, 'color': color, 'nb': bonusval}
-

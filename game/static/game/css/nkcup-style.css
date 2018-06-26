@@ -514,11 +514,11 @@ header nav a:hover, nav ul li ul li:hover {
     color: #b5b5b5;
 }
 
-.prog-up {
+.prog-up,.won {
     color: #228B22;
 }
 
-.prog-down {
+.prog-down,.lost {
     color: #B22222;
 }
 
