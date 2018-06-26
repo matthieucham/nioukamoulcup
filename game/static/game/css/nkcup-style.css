@@ -589,26 +589,38 @@ dl.kvgroup {
     width: 100%;
 }
 
-#player-performances .header_matches {
+#club-staff > div {
+    display: table;
+    table-layout: fixed;
+    width: 100%;
+}
+
+#club-results > div {
+    display: table;
+    table-layout: fixed;
+    width: 100%;
+}
+
+.header_table {
     display: table-header-group;
     background: #b5b5b5;
     font-weight: bold;
 }
 
-#player-performances .line_match {
+.line_table {
     display: table-row;
 }
 
-.line_match:nth-child(odd) {
+.line_table:nth-child(odd) {
     background: #f1f1f1;
 }
 
-#player-performances .cell_match {
+.cell_table {
     display: table-cell;
     padding: 0 3px;
 }
 
-.cell_match__compensation {
+#player-performances .compensation {
     color: rgba(0, 0, 0, 0.5);
     font-size: 0.8em;
 }

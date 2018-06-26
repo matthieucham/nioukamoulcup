@@ -1,0 +1,23 @@
+{% load humanize %}
+{% load l1results %}
+{% load i18n %}
+
+<div class="line_table">
+    <div class="cell_table">
+        <a href="{% url 'stat_joueur-detail' joueur.pk %}">{{ joueur.display_name }}</a>
+    </div>
+    <div class="cell_table center">
+        {% trans joueur.poste as poste %}
+        {{ poste }}
+    </div>
+    <div class="cell_table center">
+        {% if joueur.avg_note > 0 %}
+            <span class="note">{{ joueur.avg_note|stringformat:'0.2f' }}</span>
+        {% else %}
+            -
+        {% endif %}
+    </div>
+    <div class="cell_table center">
+        {{ joueur.nb_notes }}
+    </div>
+</div>

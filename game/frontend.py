@@ -1,5 +1,5 @@
 from django.views.generic import TemplateView, DetailView
-from django.db.models import Sum, Avg, Count, Q
+from django.db.models import Sum, Avg, Count, Q, F
 from graphos.sources.model import SimpleDataSource
 from graphos.renderers.morris import AreaChart
 # from graphos.renderers.gchart import AreaChart
@@ -38,6 +38,17 @@ class ClubView(DetailView):
             avg_note=Avg('jjscore__note', filter=Q(jjscore__journee_scoring__saison_scoring=saisonscoring,
                                                    jjscore__note__isnull=False))).order_by('nom')
         context['players'] = l1models.Joueur.objects.order_queryset_by_poste(deco_joueurs)
+        rencontres = l1models.Rencontre.objects.select_related('club_domicile').select_related(
+            'club_exterieur').select_related(
+            'journee').filter(journee__saison__saisonscoring=saisonscoring).filter(
+            Q(club_domicile=self.object) | Q(club_exterieur=self.object)).order_by('date')
+        renc = list(rencontres.all())
+        for r in renc:
+            if r.club_domicile.pk == self.object.pk:
+                setattr(r, 'diff', r.resultat['dom']['buts_pour'] - r.resultat['ext']['buts_pour'])
+            else:
+                setattr(r, 'diff', r.resultat['ext']['buts_pour'] - r.resultat['dom']['buts_pour'])
+        context['rencontres'] = renc
         return context
 
 
