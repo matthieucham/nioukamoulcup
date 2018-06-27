@@ -90,6 +90,7 @@ def rencontre_summary(rencontre):
         {
             'summary': agglo,
             'header': {
+                'date': rencontre.date,
                 'dom': rencontre.club_domicile,
                 'ext': rencontre.club_exterieur,
                 'score_dom': rencontre.resultat['dom']['buts_pour'],

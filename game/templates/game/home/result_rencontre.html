@@ -7,15 +7,16 @@
 {% endblock content-right %}
 
 {% block content-center %}
-    <small>{{ rencontre.date }}</small>
+    <article id="home-main">
     {% rencontre_summary rencontre %}
 
-    <div class="col-md-6">
+    <div>
         {% rencontre_team rencontre 'dom' %}
     </div>
 
-    <div class="col-md-6">
+    <div>
         {% rencontre_team rencontre 'ext' %}
     </div>
+    </article>
 
 {% endblock content-center %}

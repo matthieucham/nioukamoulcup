@@ -562,7 +562,11 @@ dl.kvgroup {
 }
 
 #section-title > * {
-    margin-left: 20px;
+    margin: 0 20px;
+}
+
+#section-title > h1 {
+    flex-grow: 1;
 }
 
 #player-profile > div {
@@ -605,6 +609,12 @@ dl.kvgroup {
     width: 100%;
 }
 
+#rencontre-summary > div {
+    display: table;
+    table-layout: fixed;
+    width: 100%;
+}
+
 .header_table {
     display: table-header-group;
     background: #b5b5b5;
@@ -612,6 +622,7 @@ dl.kvgroup {
 }
 
 .line_table {
+    width: 100%;
     display: table-row;
 }
 
