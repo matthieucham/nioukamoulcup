@@ -25,9 +25,9 @@ class SaisonScoring(models.Model):
                     js.delete()
             else:
                 journees_to_recompute.append(j)
-        return [JourneeScoring.objects.select_related('journee').create(journee=journee, saison_scoring=self) for
-                journee in
-                journees_to_recompute]
+        for journee in journees_to_recompute:
+            JourneeScoring.objects.select_related('journee').create(journee=journee, saison_scoring=self)
+        SJScore.objects.create_sjscore_from_ligue1(self)
 
 
 class JourneeScoring(models.Model):
@@ -113,6 +113,56 @@ class JJScore(models.Model):
 
     objects = JJScoreManager()
 
+
+class SJScoreManager(models.Manager):
+
+    def create_sjscore_from_ligue1(self, saison_scoring):
+        with Timer(id='create_sjscore_from_ligue1', verbose=True):
+            sjscores = []
+            jjscores_by_joueur = dict()
+            for jjs in JJScore.objects.select_related('joueur').filter(journee_scoring__saison_scoring=saison_scoring):
+                jjscores_by_joueur.setdefault(jjs.joueur, []).append(jjs)
+            for jpk, scores in jjscores_by_joueur.items():
+                agglo = self._compute_stats_agg(scores)
+                sjscores.append(SJScore(saison_scoring=saison_scoring,
+                                        joueur=jpk,
+                                        avg_note=agglo.pop('AVGNOTE'),
+                                        nb_notes=agglo.pop('NBNOTE'),
+                                        total_bonuses=agglo.pop('BONUS'),
+                                        sum_compensations=agglo.pop('SUMCOMP'),
+                                        details=agglo))
+            self.filter(saison_scoring=saison_scoring).delete()
+            self.bulk_create(sjscores)
+
+    def _compute_stats_agg(self, jjscores):
+        agg = dict()
+        for bk in set(scoring.BONUS['COLLECTIVE'].keys()).union(set(scoring.BONUS['PERSONAL'].keys())):
+            agg[bk] = 0
+        for jjs in jjscores:
+            for bk in set(scoring.BONUS['COLLECTIVE'].keys()).union(set(scoring.BONUS['PERSONAL'].keys())):
+                if 'bonuses' in jjs.details and bk in jjs.details['bonuses']:
+                    agg[bk] += jjs.details['bonuses'][bk]
+        notes = [jjs.note for jjs in jjscores if jjs.note is not None]
+        bonus = [jjs.bonus for jjs in jjscores if jjs.bonus is not None]
+        compensations = [jjs.compensation for jjs in jjscores if jjs.compensation is not None]
+        agg['AVGNOTE'] = round(sum(notes) / len(notes), 2) if len(notes) > 0 else None
+        agg['NBNOTE'] = len(notes)
+        agg['BONUS'] = sum(bonus)
+        agg['SUMCOMP'] = sum(compensations)
+        return agg
+
+
+class SJScore(models.Model):
+    computed_at = models.DateTimeField(auto_now=True, null=False)
+    saison_scoring = models.ForeignKey(SaisonScoring, on_delete=models.CASCADE, null=False)
+    joueur = models.ForeignKey(l1models.Joueur, on_delete=models.CASCADE, null=False)
+    avg_note = models.DecimalField(max_digits=5, decimal_places=3, blank=True, null=True)
+    nb_notes = models.PositiveIntegerField(null=False, default=0)
+    total_bonuses = models.DecimalField(max_digits=6, decimal_places=3, blank=False, null=False, default=0)
+    sum_compensations = models.DecimalField(max_digits=6, decimal_places=3, blank=True, null=True)
+    details = JSONField(default=dict())
+
+    objects = SJScoreManager()
 
     # class TeamScore(models.Model):
     # team = models.OneToOneField(gamemodels.Team, primary_key=True)

@@ -134,7 +134,7 @@ def format_scorer(joueur, stat):
 
 @register.inclusion_tag('game/tags/l1results_keyvalue.html')
 def keyvalue(key, val, classname='kvgroup'):
-    return {'key': key, 'value': val, 'classname': classname}
+    return {'key': key, 'value': val if val is not None else '-', 'classname': classname}
 
 
 @register.inclusion_tag('game/tags/l1results_performance_joueur.html')

@@ -32,11 +32,11 @@ class ClubView(DetailView):
         context = super(ClubView, self).get_context_data(**kwargs)
         saisonscoring = models.SaisonScoring.objects.filter(saison__est_courante__isnull=False).first()
         context['players'] = []
-        deco_joueurs = self.object.joueurs.prefetch_related('jjscore_set').annotate(
-            nb_notes=Count('jjscore', filter=Q(jjscore__journee_scoring__saison_scoring=saisonscoring,
-                                               jjscore__note__isnull=False))).annotate(
-            avg_note=Avg('jjscore__note', filter=Q(jjscore__journee_scoring__saison_scoring=saisonscoring,
-                                                   jjscore__note__isnull=False))).order_by('nom')
+        # sjscores = models.SJScore.objects.select_related('joueur').filter(saison_scoring=saisonscoring,
+        #                                                                   joueur__club=self.object)
+        deco_joueurs = self.object.joueurs.prefetch_related('sjscore_set').annotate(
+            nb_notes=F('sjscore__nb_notes', filter=Q(sjscore__saison_scoring=saisonscoring))).annotate(
+            avg_note=F('sjscore__avg_note', filter=Q(sjscore__saison_scoring=saisonscoring))).order_by('nom')
         context['players'] = l1models.Joueur.objects.order_queryset_by_poste(deco_joueurs)
         rencontres = l1models.Rencontre.objects.select_related('club_domicile').select_related(
             'club_exterieur').select_related(
@@ -44,10 +44,11 @@ class ClubView(DetailView):
             Q(club_domicile=self.object) | Q(club_exterieur=self.object)).order_by('date')
         renc = list(rencontres.all())
         for r in renc:
-            if r.club_domicile.pk == self.object.pk:
-                setattr(r, 'diff', r.resultat['dom']['buts_pour'] - r.resultat['ext']['buts_pour'])
-            else:
-                setattr(r, 'diff', r.resultat['ext']['buts_pour'] - r.resultat['dom']['buts_pour'])
+            if
+        r.club_domicile.pk == self.object.pk:
+        setattr(r, 'diff', r.resultat['dom']['buts_pour'] - r.resultat['ext']['buts_pour'])
+        else:
+        setattr(r, 'diff', r.resultat['ext']['buts_pour'] - r.resultat['dom']['buts_pour'])
         context['rencontres'] = renc
         return context
 
@@ -55,19 +56,6 @@ class ClubView(DetailView):
 class StatJoueurView(DetailView):
     model = l1models.Joueur
     template_name = 'game/home/stat_joueur.html'
-
-    def _compute_stats_agg(self, jjscores):
-        agg = dict()
-        for bk in set(BONUS['COLLECTIVE'].keys()).union(set(BONUS['PERSONAL'].keys())):
-            agg[bk] = 0
-        for jjs in jjscores:
-            for bk in set(BONUS['COLLECTIVE'].keys()).union(set(BONUS['PERSONAL'].keys())):
-                if 'bonuses' in jjs.details and bk in jjs.details['bonuses']:
-                    agg[bk] += jjs.details['bonuses'][bk]
-        agg['AVGNOTE'] = round(jjscores.filter(note__isnull=False).aggregate(Avg('note'))['note__avg'] or 0, 2)
-        agg['NBNOTE'] = jjscores.filter(note__isnull=False).count()
-        agg['BONUS'] = jjscores.aggregate(Sum('bonus'))['bonus__sum'] or 0
-        return agg
 
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get a context
@@ -78,7 +66,7 @@ class StatJoueurView(DetailView):
                                                                  saison_scoring=saisonscoring) \
             .select_related('rencontre__club_domicile') \
             .select_related('rencontre__club_exterieur').select_related('journee_scoring__journee')
-        context['stats'] = self._compute_stats_agg(jjscores)
+        context['stats'] = models.SJScore.objects.get(saison_scoring=saisonscoring, joueur=self.object)
         context['jjscores'] = jjscores
         data_source_array = [['J', 'Note', 'Bonus']]
         for jjs in jjscores:
