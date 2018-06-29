@@ -8,15 +8,14 @@
 
 {% block content-center %}
     <article id="home-main">
-    {% rencontre_summary rencontre %}
+        {% rencontre_summary rencontre %}
 
-    <div>
-        {% rencontre_team rencontre 'dom' %}
-    </div>
-
-    <div>
-        {% rencontre_team rencontre 'ext' %}
-    </div>
+        <section id="rencontre-performances">
+            <h2>Performances</h2>
+            <div>
+                {% rencontre_team rencontre 'dom' %}
+                {% rencontre_team rencontre 'ext' %}
+            </div>
+        </section>
     </article>
-
 {% endblock content-center %}

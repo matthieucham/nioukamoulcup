@@ -666,3 +666,17 @@ dl.kvgroup {
     height:400px;
     width: 100%;
 }
+
+#rencontre-performances > div {
+    display: flex;
+    flex: 1;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+#rencontre-performances .result-rencontre-performances-team {
+    flex: 50%;
+    width: 50%;
+    display: table;
+    table-layout: fixed;
+}

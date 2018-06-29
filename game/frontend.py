@@ -22,23 +22,6 @@ class HomePage(TemplateView):
 class ResultRencontreView(DetailView):
     model = l1models.Rencontre
     template_name = 'game/home/result_rencontre.html'
-    summarykeys = ('GOAL', 'PENALTY', 'PASS', 'HALFPASS', 'PENALSTOP')
-
-    # def _init_summary(self):
-    #     summ = dict()
-    #     for k in self.summarykeys:
-    #         summ[k] = list()
-    #     return summ
-    #
-    # def get_context_data(self, **kwargs):
-    #     context = super(ResultRencontreView, self).get_context_data(**kwargs)
-    #     summary = {
-    #         'dom': self._init_summary(),
-    #         'ext': self._init_summary(),
-    #     }
-    #     for jjs in models.JJScore.objects.filter(rencontre=self.object):
-    #         for sk in self.summarykeys:
-    #             if sk in jjs.details['bonuses']:
 
 
 class ClubView(DetailView):
@@ -49,7 +32,6 @@ class ClubView(DetailView):
         context = super(ClubView, self).get_context_data(**kwargs)
         saisonscoring = models.SaisonScoring.objects.filter(saison__est_courante__isnull=False).first()
         context['players'] = []
-        models.SJScore.objects.select_related('joueur').filter(saison_scoring=saisonscoring, joueur__club=self.object)
         deco_joueurs = self.object.joueurs.filter(sjscore__saison_scoring=saisonscoring).annotate(
             nb_notes=F('sjscore__nb_notes')).annotate(avg_note=F('sjscore__avg_note')).annotate(
             bonuses=F('sjscore__details')).order_by('nom')

@@ -109,19 +109,7 @@ def rencontre_team(rencontre, equipe):
                       else None,
                       'joueur': perf.joueur}
         position = perf.joueur.poste
-        if position is not None:
-            if position == 'G':
-                base_stats['against'] = perf.details['stats']['goals_conceded']
-                base_stats['saves'] = perf.details['stats']['goals_saved']
-            out[position].append(base_stats)
-    # meilleur de chaque poste
-    for pos in ['D', 'M']:
-        best = 0
-        for rt in (st['rating'] for st in out[pos]):
-            if rt is not None:
-                best = max(best, rt)
-        for p in out[pos]:
-            p['best'] = p['rating'] == best
+        out[position].append(base_stats)
     return out
 
 
