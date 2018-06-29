@@ -249,3 +249,5 @@ if not DEBUG:
 LOCALE_PATHS = (
     os.path.join(BASE_DIR, 'locale'),
 )
+
+TEMPLATE_STRING_IF_INVALID = ''

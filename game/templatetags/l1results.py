@@ -81,7 +81,8 @@ def journee_dates(journee, pattern=None):
 def rencontre_summary(rencontre):
     agglo = {}
     for perf in rencontre.performances.all():
-        for key in ['goals_scored', 'goals_assists', 'penalties_scored', 'penalties_awarded']:
+        for key in ['goals_scored', 'goals_assists', 'penalties_scored', 'penalties_awarded', 'penalties_saved',
+                    'own_goals']:
             if perf.details['stats'][key] > 0:
                 if key not in agglo:
                     agglo[key] = {'dom': {}, 'ext': {}}
@@ -127,9 +128,9 @@ def rencontre_team(rencontre, equipe):
 @register.filter()
 def format_scorer(joueur, stat):
     if stat[joueur] == 1:
-        return joueur.__str__()
+        return joueur.display_name()
     else:
-        return joueur.__str__() + ' x%d' % stat[joueur]
+        return joueur.display_name() + ' x%d' % stat[joueur]
 
 
 @register.inclusion_tag('game/tags/l1results_keyvalue.html')
@@ -157,7 +158,8 @@ def bonus(bonuskey, bonusval=1):
         'CLEANSHEET': ('fa-shield', 'Gray'),
         'HALFCLEANSHEET': ('fa-shield fa-rotate-90', 'LightGray'),
         'OFFENSIVE': ('fa-thermometer-full', 'GoldenRod'),
-        'HALFOFFENSIVE': ('fa-thermometer-half', 'Gold')
+        'HALFOFFENSIVE': ('fa-thermometer-half', 'Gold'),
+        'CSC': ('fa-thumbs-down', 'DarkSlateGrey'),
     }
     ico, color = icon_dict[bonuskey]
     return {'icon': ico, 'color': color, 'nb': bonusval}

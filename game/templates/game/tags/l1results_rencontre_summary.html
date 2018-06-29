@@ -22,5 +22,11 @@
         {% if 'penalties_awarded' in summary %}
             {% include 'game/tags/l1results_rencontre_summary_row.html' with prop=summary.penalties_awarded title="Pénaltys obtenus" bonuskey="HALFPASS" %}
         {% endif %}
+        {% if 'penalties_saved' in summary %}
+            {% include 'game/tags/l1results_rencontre_summary_row.html' with prop=summary.penalties_saved title="Pénaltys arrêtés" bonuskey="PENALSTOP" %}
+        {% endif %}
+        {% if 'own_goals' in summary %}
+            {% include 'game/tags/l1results_rencontre_summary_row.html' with prop=summary.own_goals title="Contre son camp" bonuskey="CSC" %}
+        {% endif %}
     </div>
 </section>
