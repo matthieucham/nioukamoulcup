@@ -1,6 +1,11 @@
+{% load l1results %}
+
 <div class="rencontre_score">
     <div class="dom">
-        <a href="{% url 'club-detail' cdid %}">{{ club_dom }}</a>
+        {% if logos %}
+            {% club_logo cdom 'small' %}
+        {% endif %}
+        <a href="{% url 'club-detail' cdom.pk %}">{{ cdom.nom }}</a>
     </div>
     <div class="score">
         <a href="{% url 'result_rencontre-detail' rid %}"><strong>
@@ -15,6 +20,9 @@
         </strong></a>
     </div>
     <div class="ext">
-        <a href="{% url 'club-detail' ceid %}">{{ club_ext }}</a>
+        <a href="{% url 'club-detail' cext.pk %}">{{ cext.nom }}</a>
+        {% if logos %}
+            {% club_logo cext 'small' %}
+        {% endif %}
     </div>
 </div>

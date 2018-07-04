@@ -69,6 +69,7 @@ class Journee(Importe):
     sn_step_uuid = models.UUIDField(null=False)
     debut = models.DateTimeField(null=True)
     fin = models.DateTimeField(null=True)
+    name = models.CharField(max_length=100, null=True, blank=True)
     saison = models.ForeignKey(Saison, on_delete=models.CASCADE, related_name='journees')
     objects = JourneeManager()
 
@@ -76,7 +77,10 @@ class Journee(Importe):
         ordering = ['saison', 'numero']
 
     def __str__(self):
-        return '%d @ %s' % (self.numero, self.saison)
+        if self.name:
+            return self.name
+        else:
+            return 'Journée %d' % self.numero
 
     def save(self, *args, **kwargs):
         if self.pk is not None:

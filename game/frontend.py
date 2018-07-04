@@ -98,6 +98,19 @@ class StatJoueurView(DetailView):
         return context
 
 
+class ResultJourneeView(DetailView):
+    model = l1models.Journee
+    template_name = 'game/home/result_journee.html'
+
+    def get_object(self, queryset=None):
+        pk = self.kwargs.get(self.pk_url_kwarg)
+        if pk is None:
+            # retrieve latest journee
+            return l1models.Journee.objects.order_by('-fin').first()
+        else:
+            return super(ResultJourneeView, self).get_object(queryset)
+
+
 class LeagueWallView(PermissionRequiredMixin, CurrentLeagueInstanceMixin, DetailView):
     model = models.League
     template_name = 'game/league/wall.html'

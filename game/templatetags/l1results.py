@@ -10,7 +10,7 @@ register = template.Library()
 
 
 @register.inclusion_tag('game/tags/l1results_rencontre_score.html')
-def rencontre_score(rencontre):
+def rencontre_score(rencontre, with_logos=False):
     if rencontre.resultat is None:
         score_dom = '?'
         score_ext = '?'
@@ -23,13 +23,12 @@ def rencontre_score(rencontre):
         diff = 0
     return {
         'rid': rencontre.pk,
-        'club_dom': rencontre.club_domicile.nom,
-        'cdid': rencontre.club_domicile.pk,
-        'club_ext': rencontre.club_exterieur.nom,
-        'ceid': rencontre.club_exterieur.pk,
+        'cdom': rencontre.club_domicile,
+        'cext': rencontre.club_exterieur,
         'score_dom': score_dom,
         'score_ext': score_ext,
-        'diff': diff
+        'diff': diff,
+        'logos': with_logos
     }
 
 

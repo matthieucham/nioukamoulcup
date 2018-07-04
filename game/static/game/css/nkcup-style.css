@@ -680,3 +680,8 @@ dl.kvgroup {
     display: table;
     table-layout: fixed;
 }
+
+#journee_result {
+    display:table;
+    width: 100%;
+}

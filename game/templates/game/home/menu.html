@@ -1,6 +1,6 @@
 {% load game %}
 {% block left-menu %}
         <a href="{% url 'home_info' %}" class="button {% is_navbar_active request 'info' %}">Infos</a>
-        <a href="#" class="button {% is_navbar_active request 'result' %}">Résultats</a>
+        <a href="{% url 'result_journee-latest' %}" class="button {% is_navbar_active request 'result' %}">Résultats</a>
         <a href="#" class="button {% is_navbar_active request 'stat' %}">Statistiques</a>
 {% endblock left-menu %}
