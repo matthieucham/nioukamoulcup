@@ -8,12 +8,12 @@
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.css">
     <script src="//cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.min.js"></script>
-{#    <script type="text/javascript" src="https://www.google.com/jsapi"></script>#}
-{#    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>#}
-{#    <script type="text/javascript">#}
-{#        google.charts.load('visualization', '1', {packages: ['corechart']});#}
-{#       // google.charts.setOnLoadCallback(drawChart);#}
-{#    </script>#}
+    {#    <script type="text/javascript" src="https://www.google.com/jsapi"></script>#}
+    {#    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>#}
+    {#    <script type="text/javascript">#}
+    {#        google.charts.load('visualization', '1', {packages: ['corechart']});#}
+    {#       // google.charts.setOnLoadCallback(drawChart);#}
+    {#    </script>#}
 {% endblock script %}
 
 {% block content-right %}
@@ -33,7 +33,10 @@
             {% if joueur.surnom %}
                 {% keyvalue 'Surnom' joueur.surnom %}
             {% endif %}
-            {% keyvalue 'Club' joueur.club.nom %}
+            <dl class='kvgroup'>
+                <dd>Club</dd>
+                <dt><a href="{% url 'club-detail' joueur.club.pk  %}">{{ joueur.club.nom }}</a></dt>
+            </dl>
             {% trans joueur.poste as poste %}
             {% keyvalue 'Poste' poste %}
         </div>
