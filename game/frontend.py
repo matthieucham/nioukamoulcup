@@ -98,7 +98,7 @@ class StatJoueurView(DetailView):
         return context
 
 
-def compute_team(selection, best=True):
+def compute_team(selection, best=True, criteria='note'):
     # test 5-3-2, 4-4-2, 3-5-2, 4-3-3
     formations = {
         '532': (1, 5, 3, 2),
@@ -108,8 +108,10 @@ def compute_team(selection, best=True):
     }
     scores = dict()
     for name, (ng, nd, nm, na) in formations.items():
-        scores[sum([jjs.note for jjs in selection['G'][:ng]]) + sum([jjs.note for jjs in selection['D'][:nd]]) + sum(
-            [jjs.note for jjs in selection['M'][:nm]]) + sum([jjs.note for jjs in selection['A'][:na]])] = name
+        scores[sum([getattr(jjs, criteria) for jjs in selection['G'][:ng]]) + sum(
+            [getattr(jjs, criteria) for jjs in selection['D'][:nd]]) + sum(
+            [getattr(jjs, criteria) for jjs in selection['M'][:nm]]) + sum(
+            [getattr(jjs, criteria) for jjs in selection['A'][:na]])] = name
     if best:
         formation = scores[max(scores)]
     else:
@@ -153,11 +155,60 @@ class ResultJourneeView(DetailView):
             }
         }
         for p, nb in [('G', 1), ('D', 5), ('M', 5), ('A', 3)]:
-            selection['best'][p].extend(models.JJScore.objects.get_n_best_or_worst(self.object, nb, p))
-            selection['worst'][p].extend(models.JJScore.objects.get_n_best_or_worst(self.object, nb, p, False))
+            selection['best'][p].extend(models.JJScore.objects.get_n_best_or_worst(nb, journee=self.object, poste=p))
+            selection['worst'][p].extend(
+                models.JJScore.objects.get_n_best_or_worst(nb, journee=self.object, poste=p, best=False))
 
         context['best'] = compute_team(selection['best'])
         context['worst'] = compute_team(selection['worst'], False)
+        return context
+
+
+class StatView(DetailView):
+    model = l1models.Saison
+    template_name = 'game/home/stat_saison.html'
+
+    def get_object(self, queryset=None):
+        scourante = l1models.SaisonCourante.objects.first()
+        if scourante is not None:
+            return scourante.saison
+        return None
+
+    def get_context_data(self, **kwargs):
+        context = super(StatView, self).get_context_data(**kwargs)
+        # Best of / worst of saison
+        selection = {
+            'best': {
+                'G': [],
+                'D': [],
+                'M': [],
+                'A': [],
+            },
+            'all': {
+                'G': [],
+                'D': [],
+                'M': [],
+                'A': [],
+            },
+            'worst': {
+                'G': [],
+                'D': [],
+                'M': [],
+                'A': [],
+            }
+        }
+        for p, nb in [('G', 1), ('D', 5), ('M', 5), ('A', 3)]:
+            selection['best'][p].extend(models.SJScore.objects.get_n_best_or_worst(self.object, nb, p))
+            selection['all'][p].extend(
+                models.SJScore.objects.get_n_best_or_worst(self.object, nb, p, criteria='nb_notes'))
+            selection['worst'][p].extend(models.SJScore.objects.get_n_best_or_worst(self.object, nb, p, False))
+
+        bestofall = models.JJScore.objects.get_n_best_or_worst(3)
+        worstofall = models.JJScore.objects.get_n_best_or_worst(3, best=False)
+
+        context['best'] = compute_team(selection['best'], criteria='avg_note')
+        context['worst'] = compute_team(selection['worst'], False, criteria='avg_note')
+        context['all'] = compute_team(selection['all'], False, criteria='nb_notes')
         return context
 
 

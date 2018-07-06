@@ -100,8 +100,10 @@ class JJScoreManager(models.Manager):
         queryset = queryset.values('joueur').annotate(notes_notnull=notes_notnull)
         return sum([min(n, max_by_joueur) for n in queryset.values_list('notes_notnull', flat=True)])
 
-    def get_n_best_or_worst(self, journee, numberof, poste=None, best=True):
-        ofjournee = self.filter(journee_scoring__journee=journee, note__isnull=False)
+    def get_n_best_or_worst(self, numberof, journee=None, poste=None, best=True):
+        ofjournee = self.filter(note__isnull=False)
+        if journee is not None:
+            ofjournee = self.filter(journee_scoring__journee=journee)
         if poste is not None:
             ofjournee = ofjournee.filter(joueur__poste=poste)
         if best:
@@ -160,6 +162,16 @@ class SJScoreManager(models.Manager):
         agg['BONUS'] = sum(bonus)
         agg['SUMCOMP'] = sum(compensations)
         return agg
+
+    def get_n_best_or_worst(self, saison, numberof, poste=None, best=True, criteria='avg_note'):
+        ofsaison = self.filter(saison_scoring__saison=saison, avg_note__gt=0)
+        if poste is not None:
+            ofsaison = ofsaison.filter(joueur__poste=poste)
+        if best:
+            ordering = '-%s' % criteria
+        else:
+            ordering = '%s' % criteria
+        return ofsaison.order_by(ordering)[:numberof]
 
 
 class SJScore(models.Model):

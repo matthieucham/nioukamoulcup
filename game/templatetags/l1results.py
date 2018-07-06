@@ -155,4 +155,9 @@ def bonus(bonuskey, bonusval=1):
 @register.inclusion_tag('game/tags/l1results_compo_player.html')
 def compo_player(jjs):
     # TODO if no club
-    return {'club': jjs.joueur.club, 'joueur': jjs.joueur, 'note': jjs.note, 'bonus': jjs.details['bonuses']}
+    return {
+        'club': jjs.joueur.club,
+        'joueur': jjs.joueur,
+        'note': jjs.note if hasattr(jjs, 'note') else '%s [%dn]' % (jjs.avg_note, jjs.nb_notes),
+        'bonus': jjs.details['bonuses'] if 'bonuses' in jjs.details else None
+    }

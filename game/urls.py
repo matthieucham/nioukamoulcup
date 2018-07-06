@@ -10,6 +10,8 @@ urlpatterns = [
         name="result_rencontre-detail"),
     url(r'^home/result/club/(?P<pk>[0-9]+)/$', frontend.ClubView.as_view(),
         name="club-detail"),
+    url(r'^home/stat/$', frontend.StatView.as_view(),
+        name="stat-detail"),
     url(r'^home/stat/joueur/(?P<pk>[0-9]+)/$', frontend.StatJoueurView.as_view(),
         name="stat_joueur-detail"),
     url(r'^home/result/journee/latest/$', frontend.ResultJourneeView.as_view(),

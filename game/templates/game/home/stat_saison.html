@@ -1,0 +1,41 @@
+{% extends "game/home/home_base.html" %}
+{% load static %}
+{% load l1results %}
+{% load humanize %}
+
+{% block content-right %}
+    <section>
+        <h1>Tops / Flop</h1>
+
+    </section>
+    <section>
+        <h1>Journées</h1>
+        <ul>
+            {% for j in object.journees.all %}
+                <li><a href="{% url 'result_journee-detail' j.pk %}">{{ j }}</a></li>
+            {% endfor %}
+        </ul>
+    </section>
+{% endblock content-right %}
+
+{% block content-center %}
+    <article id="home-main">
+        <section id="section-title">
+            <h1 class="center">Statistiques {{ object }}</h1>
+        </section>
+        <section id="saison_stat">
+            <div>
+                <h2>Equipe de la saison</h2>
+                {% include 'game/home/composition.html' with selection=best %}
+            </div>
+            <div>
+                <h2>Pitres de la saison</h2>
+                {% include 'game/home/composition.html' with selection=worst %}
+            </div>
+            <div>
+                <h2>Indéboulonnables de la saison</h2>
+                {% include 'game/home/composition.html' with selection=all %}
+            </div>
+        </section>
+    </article>
+{% endblock content-center %}
