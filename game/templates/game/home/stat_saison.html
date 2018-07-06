@@ -6,7 +6,13 @@
 {% block content-right %}
     <section>
         <h1>Tops / Flop</h1>
+        <p>{{ bestofall.joueur.display_name }}
+            {{ bestofall.note }}
+            {{ bestofall.rencontre.journee.numero }}</p>
 
+        <p>{{ worstofall.joueur.display_name }}
+            {{ worstofall.note }}
+            {{ worstofall.rencontre.journee.numero }}</p>
     </section>
     <section>
         <h1>Journées</h1>

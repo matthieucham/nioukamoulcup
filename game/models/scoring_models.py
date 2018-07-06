@@ -100,8 +100,8 @@ class JJScoreManager(models.Manager):
         queryset = queryset.values('joueur').annotate(notes_notnull=notes_notnull)
         return sum([min(n, max_by_joueur) for n in queryset.values_list('notes_notnull', flat=True)])
 
-    def get_n_best_or_worst(self, numberof, journee=None, poste=None, best=True):
-        ofjournee = self.filter(note__isnull=False)
+    def get_n_best_or_worst(self, numberof, saison, journee=None, poste=None, best=True):
+        ofjournee = self.filter(journee_scoring__saison_scoring__saison=saison, note__isnull=False).filter(note__gt=0)
         if journee is not None:
             ofjournee = self.filter(journee_scoring__journee=journee)
         if poste is not None:

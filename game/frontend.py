@@ -155,9 +155,11 @@ class ResultJourneeView(DetailView):
             }
         }
         for p, nb in [('G', 1), ('D', 5), ('M', 5), ('A', 3)]:
-            selection['best'][p].extend(models.JJScore.objects.get_n_best_or_worst(nb, journee=self.object, poste=p))
+            selection['best'][p].extend(
+                models.JJScore.objects.get_n_best_or_worst(nb, self.object.saison, journee=self.object, poste=p))
             selection['worst'][p].extend(
-                models.JJScore.objects.get_n_best_or_worst(nb, journee=self.object, poste=p, best=False))
+                models.JJScore.objects.get_n_best_or_worst(nb, self.object.saison, journee=self.object, poste=p,
+                                                           best=False))
 
         context['best'] = compute_team(selection['best'])
         context['worst'] = compute_team(selection['worst'], False)
@@ -203,8 +205,8 @@ class StatView(DetailView):
                 models.SJScore.objects.get_n_best_or_worst(self.object, nb, p, criteria='nb_notes'))
             selection['worst'][p].extend(models.SJScore.objects.get_n_best_or_worst(self.object, nb, p, False))
 
-        bestofall = models.JJScore.objects.get_n_best_or_worst(3)
-        worstofall = models.JJScore.objects.get_n_best_or_worst(3, best=False)
+        context['bestofall'] = models.JJScore.objects.get_n_best_or_worst(1, self.object)
+        context['worstofall'] = models.JJScore.objects.get_n_best_or_worst(1, self.object, best=False)
 
         context['best'] = compute_team(selection['best'], criteria='avg_note')
         context['worst'] = compute_team(selection['worst'], False, criteria='avg_note')
