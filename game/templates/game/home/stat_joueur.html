@@ -35,7 +35,7 @@
             {% endif %}
             <dl class='kvgroup'>
                 <dd>Club</dd>
-                <dt><a href="{% url 'club-detail' joueur.club.pk  %}">{{ joueur.club.nom }}</a></dt>
+                <dt><a href="{% url 'club-detail' joueur.club.pk %}">{{ joueur.club.nom }}</a></dt>
             </dl>
             {% trans joueur.poste as poste %}
             {% keyvalue 'Poste' poste %}
@@ -46,7 +46,7 @@
         <div>
             {% keyvalue 'Matchs notés' stats.nb_notes 'card' %}
             {% keyvalue 'Note moyenne' stats.avg_note 'card' %}
-            {% keyvalue 'Bonus' stats.total_bonuses 'card' %}
+            {#            {% keyvalue 'Bonus' stats.total_bonuses 'card' %}#}
         </div>
         <section id="player-stats">
             <h2>Statistiques</h2>

@@ -150,3 +150,9 @@ def bonus(bonuskey, bonusval=1):
     }
     ico, color = icon_dict[bonuskey]
     return {'icon': ico, 'color': color, 'nb': bonusval}
+
+
+@register.inclusion_tag('game/tags/l1results_compo_player.html')
+def compo_player(jjs):
+    # TODO if no club
+    return {'club': jjs.joueur.club, 'joueur': jjs.joueur, 'note': jjs.note, 'bonus': jjs.details['bonuses']}

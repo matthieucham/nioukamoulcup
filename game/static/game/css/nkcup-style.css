@@ -459,6 +459,12 @@ header nav a:hover, nav ul li ul li:hover {
     margin-right: auto;
 }
 
+.fieldPlayer .jersey > div {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
 .fieldPlayer .playerDetails {
     position: relative;
     top: -15px;
@@ -684,4 +690,10 @@ dl.kvgroup {
 #journee_result {
     display:table;
     width: 100%;
+}
+
+.bonus-list {
+    background-color: #212121;
+    color: #f1f1f1;
+    padding: 3px;
 }

@@ -98,6 +98,31 @@ class StatJoueurView(DetailView):
         return context
 
 
+def compute_team(selection, best=True):
+    # test 5-3-2, 4-4-2, 3-5-2, 4-3-3
+    formations = {
+        '532': (1, 5, 3, 2),
+        '442': (1, 4, 4, 2),
+        '352': (1, 3, 5, 2),
+        '433': (1, 4, 3, 3)
+    }
+    scores = dict()
+    for name, (ng, nd, nm, na) in formations.items():
+        scores[sum([jjs.note for jjs in selection['G'][:ng]]) + sum([jjs.note for jjs in selection['D'][:nd]]) + sum(
+            [jjs.note for jjs in selection['M'][:nm]]) + sum([jjs.note for jjs in selection['A'][:na]])] = name
+    if best:
+        formation = scores[max(scores)]
+    else:
+        # worst
+        formation = scores[min(scores)]
+    team = list()
+    team.append(selection['G'][:formations[formation][0]])
+    team.append(selection['D'][:formations[formation][1]])
+    team.append(selection['M'][:formations[formation][2]])
+    team.append(selection['A'][:formations[formation][3]])
+    return team
+
+
 class ResultJourneeView(DetailView):
     model = l1models.Journee
     template_name = 'game/home/result_journee.html'
@@ -109,6 +134,31 @@ class ResultJourneeView(DetailView):
             return l1models.Journee.objects.order_by('-fin').first()
         else:
             return super(ResultJourneeView, self).get_object(queryset)
+
+    def get_context_data(self, **kwargs):
+        context = super(ResultJourneeView, self).get_context_data(**kwargs)
+        # Best of / worst of journee
+        selection = {
+            'best': {
+                'G': [],
+                'D': [],
+                'M': [],
+                'A': [],
+            },
+            'worst': {
+                'G': [],
+                'D': [],
+                'M': [],
+                'A': [],
+            }
+        }
+        for p, nb in [('G', 1), ('D', 5), ('M', 5), ('A', 3)]:
+            selection['best'][p].extend(models.JJScore.objects.get_n_best_or_worst(self.object, nb, p))
+            selection['worst'][p].extend(models.JJScore.objects.get_n_best_or_worst(self.object, nb, p, False))
+
+        context['best'] = compute_team(selection['best'])
+        context['worst'] = compute_team(selection['worst'], False)
+        return context
 
 
 class LeagueWallView(PermissionRequiredMixin, CurrentLeagueInstanceMixin, DetailView):

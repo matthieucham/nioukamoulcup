@@ -29,5 +29,31 @@
                 </div>
             {% endfor %}
         </section>
+        <section id="journee_stat">
+            <div>
+                <h2>Equipe de la journée</h2>
+                <div class="composition">
+                    {% for line in best %}
+                        <div class="compoLine">
+                            {% for jjs in line %}
+                                {% compo_player jjs %}
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div>
+                <h2>Pitres de la journée</h2>
+                <div class="composition">
+                    {% for line in worst %}
+                        <div class="compoLine">
+                            {% for jjs in line %}
+                                {% compo_player jjs %}
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
     </article>
 {% endblock content-center %}
