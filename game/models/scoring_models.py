@@ -103,7 +103,7 @@ class JJScoreManager(models.Manager):
     def get_n_best_or_worst(self, numberof, saison, journee=None, poste=None, best=True):
         ofjournee = self.filter(journee_scoring__saison_scoring__saison=saison, note__isnull=False).filter(note__gt=0)
         if journee is not None:
-            ofjournee = self.filter(journee_scoring__journee=journee)
+            ofjournee = ofjournee.filter(journee_scoring__journee=journee)
         if poste is not None:
             ofjournee = ofjournee.filter(joueur__poste=poste)
         if best:
