@@ -205,8 +205,8 @@ class StatView(DetailView):
                 models.SJScore.objects.get_n_best_or_worst(self.object, nb, p, criteria='nb_notes'))
             selection['worst'][p].extend(models.SJScore.objects.get_n_best_or_worst(self.object, nb, p, False))
 
-        context['bestofall'] = models.JJScore.objects.get_n_best_or_worst(1, self.object)
-        context['worstofall'] = models.JJScore.objects.get_n_best_or_worst(1, self.object, best=False)
+        context['bestofall'] = models.JJScore.objects.get_n_best_or_worst(3, self.object)
+        context['worstofall'] = models.JJScore.objects.get_n_best_or_worst(3, self.object, best=False)
 
         context['best'] = compute_team(selection['best'], criteria='avg_note')
         context['worst'] = compute_team(selection['worst'], False, criteria='avg_note')
