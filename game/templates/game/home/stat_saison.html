@@ -11,7 +11,7 @@
         <li>
             <p>{{jjs.rencontre.date}}</p>
             <p>{{ jjs.joueur.display_name }} {{ jjs.note }}
-            {% for bk, bv in jjs.details.bonuses.items %}
+                {% for bk, bv in jjs.details.bonuses.items %}
                 {% bonus bk bv %}
                 {% endfor %}</p>
             <p>{% rencontre_score jjs.rencontre %}</p>
@@ -25,7 +25,7 @@
         <li>
             <p>{{jjs.rencontre.date}}</p>
             <p>{{ jjs.joueur.display_name }} {{ jjs.note }}
-            {% for bk, bv in jjs.details.bonuses.items %}
+                {% for bk, bv in jjs.details.bonuses.items %}
                 {% bonus bk bv %}
                 {% endfor %}</p>
             <p>{% rencontre_score jjs.rencontre %}</p>
@@ -49,6 +49,11 @@
         <h1 class="center">Statistiques {{ object }}</h1>
     </section>
     <section id="saison_stat">
+        <form action="{% url 'stat-detail' %}" method="get">
+            {% csrf_token %}
+            {{ stats_form }}
+            <input type="submit" value="Rires"/>
+        </form>
         <div>
             <h2>Equipe de la saison</h2>
             {% include 'game/home/composition.html' with selection=best %}

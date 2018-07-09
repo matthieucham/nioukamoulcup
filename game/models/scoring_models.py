@@ -163,8 +163,8 @@ class SJScoreManager(models.Manager):
         agg['SUMCOMP'] = sum(compensations)
         return agg
 
-    def get_n_best_or_worst(self, saison, numberof, poste=None, best=True, criteria='avg_note'):
-        ofsaison = self.filter(saison_scoring__saison=saison, avg_note__gt=0)
+    def get_n_best_or_worst(self, saison, numberof, poste=None, best=True, criteria='avg_note', nb_notes_min=1):
+        ofsaison = self.filter(saison_scoring__saison=saison, avg_note__gt=0).filter(nb_notes__gte=nb_notes_min)
         if poste is not None:
             ofsaison = ofsaison.filter(joueur__poste=poste)
         if best:

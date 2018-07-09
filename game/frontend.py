@@ -12,7 +12,7 @@ from ligue1 import models as l1models
 from .rest.league import CurrentLeagueInstanceMixin
 from .rest.redux_state import StateInitializerMixin
 from .rest import serializers
-from .services.scoring import BONUS
+from .forms import StatsForm
 
 
 class HomePage(TemplateView):
@@ -199,15 +199,18 @@ class StatView(DetailView):
                 'A': [],
             }
         }
+        nb_notes_min = self.request.GET.get('nb_notes') or 1
         for p, nb in [('G', 1), ('D', 5), ('M', 5), ('A', 3)]:
-            selection['best'][p].extend(models.SJScore.objects.get_n_best_or_worst(self.object, nb, p))
+            selection['best'][p].extend(
+                models.SJScore.objects.get_n_best_or_worst(self.object, nb, p, nb_notes_min=nb_notes_min))
             selection['all'][p].extend(
                 models.SJScore.objects.get_n_best_or_worst(self.object, nb, p, criteria='nb_notes'))
-            selection['worst'][p].extend(models.SJScore.objects.get_n_best_or_worst(self.object, nb, p, False))
+            selection['worst'][p].extend(
+                models.SJScore.objects.get_n_best_or_worst(self.object, nb, p, False, nb_notes_min=nb_notes_min))
 
+        context['stats_form'] = StatsForm(self.request.GET) if self.request.GET.get('nb_notes') else StatsForm()
         context['bestofall'] = models.JJScore.objects.get_n_best_or_worst(3, self.object)
         context['worstofall'] = models.JJScore.objects.get_n_best_or_worst(3, self.object, best=False)
-
         context['best'] = compute_team(selection['best'], criteria='avg_note')
         context['worst'] = compute_team(selection['worst'], False, criteria='avg_note')
         context['all'] = compute_team(selection['all'], False, criteria='nb_notes')
