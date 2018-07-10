@@ -122,7 +122,6 @@ dl.card dd {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    /*transform: translateY(-100%);*/
 }
 
 dl.card:hover {
@@ -596,6 +595,17 @@ dl.kvgroup {
     flex: 1;
     justify-content: space-around;
     flex-wrap: wrap;
+}
+
+#player-bonuses {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    width: 50%;
+}
+
+#player-bonuses .kvgroup {
+    margin: 0 1em;
 }
 
 #player-stats > ul {

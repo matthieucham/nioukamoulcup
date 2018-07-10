@@ -125,6 +125,11 @@ def keyvalue(key, val, classname='kvgroup'):
     return {'key': key, 'value': val if val is not None else '-', 'classname': classname}
 
 
+@register.inclusion_tag('game/tags/l1results_bonusvalue.html')
+def bonusvalue(bonuskey, label, val):
+    return {'bonuskey': bonuskey, 'label': label, 'value': val if val is not None else '-'}
+
+
 @register.inclusion_tag('game/tags/l1results_performance_joueur.html')
 def perf_joueur(jjs):
     # TODO order

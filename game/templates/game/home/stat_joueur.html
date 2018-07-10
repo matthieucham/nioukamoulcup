@@ -47,26 +47,20 @@
             {% keyvalue 'Matchs notés' stats.nb_notes 'card' %}
             {% keyvalue 'Note moyenne' stats.avg_note 'card' %}
             {#            {% keyvalue 'Bonus' stats.total_bonuses 'card' %}#}
+            <div id="player-bonuses">
+                {% bonusvalue 'GOAL' 'Buts h.p.' stats.details.GOAL %}
+                {% bonusvalue 'PASS' 'Passes' stats.details.PASS %}
+                {% bonusvalue 'PENALTY' 'Pénos' stats.details.PENALTY %}
+                {% bonusvalue 'HALFPASS' 'Pén obt' stats.details.HALFPASS %}
+                {% bonusvalue 'LEADER' '++' stats.details.LEADER %}
+                {% bonusvalue '3STOPS' '3 arr' stats.details.3STOPS %}
+                {% bonusvalue 'PENALSTOP' 'Pén arr' stats.details.PENALSTOP %}
+                {% bonusvalue 'CLEANSHEET' 'CS' stats.details.CLEANSHEET %}
+                {% bonusvalue 'HALFCLEANSHEET' 'demie CS' stats.details.HALFCLEANSHEET %}
+                {% bonusvalue 'OFFENSIVE' 'Off.' stats.details.OFFENSIVE %}
+                {% bonusvalue 'HALFOFFENSIVE' 'Demi off' stats.details.HALFOFFENSIVE %}
+            </div>
         </div>
-        <section id="player-stats">
-            <h2>Statistiques</h2>
-            <ul>
-                <li>{% bonus 'GOAL' %}{% keyvalue 'Buts marqués (hors pénaltys)' stats.details.GOAL %}</li>
-                <li>{% bonus 'PASS' %}{% keyvalue 'Passes décisives' stats.details.PASS %}</li>
-                <li>{% bonus 'PENALTY' %}{% keyvalue 'Pénaltys marqués' stats.details.PENALTY %}</li>
-                <li>{% bonus 'HALFPASS' %}{% keyvalue 'Pénaltys obtenus' stats.details.HALFPASS %}</li>
-                <li>{% bonus 'LEADER' %}{% keyvalue 'Meilleur de son équipe à son poste' stats.details.LEADER %}</li>
-                <li>{% bonus '3STOPS' %}{% keyvalue 'Plus de 3 arrêts' stats.details.3STOPS %}</li>
-                <li>{% bonus 'PENALSTOP' %}{% keyvalue 'Pénaltys arrêtés' stats.details.PENALSTOP %}</li>
-                <li>{% bonus 'CLEANSHEET' %}{% keyvalue 'Matchs sans but encaissé' stats.details.CLEANSHEET %}</li>
-                <li>
-                    {% bonus 'HALFCLEANSHEET' %}{% keyvalue 'Matchs avec un seul but encaissé sur pénalty' stats.details.HALFCLEANSHEET %}</li>
-                <li>
-                    {% bonus 'OFFENSIVE' %}{% keyvalue 'Matchs avec 3 buts marqués (dans le jeu) ou plus' stats.details.OFFENSIVE %}</li>
-                <li>
-                    {% bonus 'HALFOFFENSIVE' %}{% keyvalue 'Matchs avec exactement 3 buts marqués dont un pénalty' stats.details.HALFOFFENSIVE %}</li>
-            </ul>
-        </section>
         <section id="player-performances">
             <h2>Performances</h2>
             <div>
