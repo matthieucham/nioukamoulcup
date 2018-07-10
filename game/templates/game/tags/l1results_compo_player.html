@@ -1,0 +1,21 @@
+{% load l1results %}
+
+<div class="fieldPlayer">
+    <div class="jersey">
+        {% club_logo club 'big' %}
+        <div class="clubName-container">
+            <span class="clubName">{{ club.nom }}</span>
+        </div>
+    </div>
+    <div class="playerDetails">
+        <h1>{{ joueur.display_name }}</h1>
+        <p><span class="bonus-list">
+        {{ note }}
+            {% for bk, bv in bonus.items %}
+                {% bonus bk bv %}
+            {% endfor %}
+        </span>
+        </p>
+        <a class="navlink" href="{% url 'stat_joueur-detail' joueur.pk %}">fiche</a>
+    </div>
+</div>

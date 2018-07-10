@@ -6,21 +6,30 @@ from django.template import defaultfilters
 from ligue1 import models as l1models
 from game import services
 
-
 register = template.Library()
 
 
 @register.inclusion_tag('game/tags/l1results_rencontre_score.html')
-def rencontre_score(rencontre):
+def rencontre_score(rencontre, with_logos=False):
     if rencontre.resultat is None:
         score_dom = '?'
         score_ext = '?'
     else:
         score_dom = rencontre.resultat['dom']['buts_pour']
         score_ext = rencontre.resultat['ext']['buts_pour']
-    return {'rid': rencontre.pk, 'club_dom': rencontre.club_domicile.nom, 'club_ext': rencontre.club_exterieur.nom,
-            'score_dom':
-                score_dom, 'score_ext': score_ext}
+    if hasattr(rencontre, 'diff'):
+        diff = rencontre.diff
+    else:
+        diff = 0
+    return {
+        'rid': rencontre.pk,
+        'cdom': rencontre.club_domicile,
+        'cext': rencontre.club_exterieur,
+        'score_dom': score_dom,
+        'score_ext': score_ext,
+        'diff': diff,
+        'logos': with_logos
+    }
 
 
 @register.inclusion_tag('game/tags/l1results_last_journees.html')
@@ -37,6 +46,13 @@ def last_journees(nb=1):
 def sort_position_function(joueur):
     sort_order = {'G': 0, 'D': 1, 'M': 2, 'A': 3, None: 10}
     return sort_order[joueur.poste]
+
+
+@register.inclusion_tag('game/tags/l1results_club_logo.html')
+def club_logo(club, size='medium'):
+    mapping = {'small': 32, 'medium': 48, 'big': 64, 'biggest': 128}
+    return {'svg': club.maillot_svg, 'stroke': club.maillot_color_stroke, 'fill': club.maillot_color_bg,
+            'size': mapping.get(size, mapping.get('medium'))}
 
 
 @register.inclusion_tag('game/tags/l1results_team_players.html')
@@ -64,7 +80,8 @@ def journee_dates(journee, pattern=None):
 def rencontre_summary(rencontre):
     agglo = {}
     for perf in rencontre.performances.all():
-        for key in ['goals_scored', 'goals_assists', 'penalties_scored', 'penalties_awarded']:
+        for key in ['goals_scored', 'goals_assists', 'penalties_scored', 'penalties_awarded', 'penalties_saved',
+                    'own_goals']:
             if perf.details['stats'][key] > 0:
                 if key not in agglo:
                     agglo[key] = {'dom': {}, 'ext': {}}
@@ -73,8 +90,9 @@ def rencontre_summary(rencontre):
         {
             'summary': agglo,
             'header': {
-                'dom': rencontre.club_domicile.nom,
-                'ext': rencontre.club_exterieur.nom,
+                'date': rencontre.date,
+                'dom': rencontre.club_domicile,
+                'ext': rencontre.club_exterieur,
                 'score_dom': rencontre.resultat['dom']['buts_pour'],
                 'score_ext': rencontre.resultat['ext']['buts_pour']}
         }
@@ -90,25 +108,61 @@ def rencontre_team(rencontre, equipe):
                       else None,
                       'joueur': perf.joueur}
         position = perf.joueur.poste
-        if position is not None:
-            if position == 'G':
-                base_stats['against'] = perf.details['stats']['goals_conceded']
-                base_stats['saves'] = perf.details['stats']['goals_saved']
-            out[position].append(base_stats)
-    # meilleur de chaque poste
-    for pos in ['D', 'M']:
-        best = 0
-        for rt in (st['rating'] for st in out[pos]):
-            if rt is not None:
-                best = max(best, rt)
-        for p in out[pos]:
-            p['best'] = p['rating'] == best
+        out[position].append(base_stats)
     return out
 
 
 @register.filter()
 def format_scorer(joueur, stat):
     if stat[joueur] == 1:
-        return joueur.__str__()
+        return joueur.display_name()
     else:
-        return joueur.__str__() + ' x%d' % stat[joueur]
+        return joueur.display_name() + ' x%d' % stat[joueur]
+
+
+@register.inclusion_tag('game/tags/l1results_keyvalue.html')
+def keyvalue(key, val, classname='kvgroup'):
+    return {'key': key, 'value': val if val is not None else '-', 'classname': classname}
+
+
+@register.inclusion_tag('game/tags/l1results_bonusvalue.html')
+def bonusvalue(bonuskey, label, val):
+    return {'bonuskey': bonuskey, 'label': label, 'value': val if val is not None else '-'}
+
+
+@register.inclusion_tag('game/tags/l1results_performance_joueur.html')
+def perf_joueur(jjs):
+    # TODO order
+    # TODO bonus agg
+    return {'jjs': jjs}
+
+
+@register.inclusion_tag('game/tags/l1results_bonus.html')
+def bonus(bonuskey, bonusval=1):
+    icon_dict = {
+        'GOAL': ('fa-trophy', 'Tomato'),
+        'PENALTY': ('fa-trophy fa-rotate-90', 'Orange'),
+        'PASS': ('fa-gift', 'DodgerBlue'),
+        'HALFPASS': ('fa-ambulance', 'Sienna'),
+        'LEADER': ('fa-plus-circle', 'MediumSeaGreen'),
+        '3STOPS': ('fa-lock', 'LimeGreen'),
+        'PENALSTOP': ('fa-ban', 'SlateBlue'),
+        'CLEANSHEET': ('fa-shield', 'Gray'),
+        'HALFCLEANSHEET': ('fa-shield fa-rotate-90', 'LightGray'),
+        'OFFENSIVE': ('fa-thermometer-full', 'GoldenRod'),
+        'HALFOFFENSIVE': ('fa-thermometer-half', 'Gold'),
+        'CSC': ('fa-thumbs-down', 'DarkSlateGrey'),
+    }
+    ico, color = icon_dict[bonuskey]
+    return {'icon': ico, 'color': color, 'nb': bonusval}
+
+
+@register.inclusion_tag('game/tags/l1results_compo_player.html')
+def compo_player(jjs):
+    # TODO if no club
+    return {
+        'club': jjs.joueur.club,
+        'joueur': jjs.joueur,
+        'note': jjs.note if hasattr(jjs, 'note') else '%s [%dn]' % (jjs.avg_note, jjs.nb_notes),
+        'bonus': jjs.details['bonuses'] if 'bonuses' in jjs.details else None
+    }

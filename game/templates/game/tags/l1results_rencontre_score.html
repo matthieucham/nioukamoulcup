@@ -1,5 +1,28 @@
-<a href="{% url 'result_rencontre-detail' rid %}">{{ club_dom }}</a>
-&nbsp;
-<a href="{% url 'result_rencontre-detail' rid %}"><strong>{{ score_dom }}-{{ score_ext }}</strong></a>
-&nbsp;
-<a href="{% url 'result_rencontre-detail' rid %}">{{ club_ext }}</a>
+{% load l1results %}
+
+<div class="rencontre_score">
+    <div class="dom">
+        {% if logos %}
+            {% club_logo cdom 'small' %}
+        {% endif %}
+        <a href="{% url 'club-detail' cdom.pk %}">{{ cdom.nom }}</a>
+    </div>
+    <div class="score">
+        <a href="{% url 'result_rencontre-detail' rid %}"><strong>
+            {% if diff < 0 %}
+                <span class="lost">
+            {% elif diff > 0 %}
+                <span class="won">
+            {% else %}
+                <span>
+            {% endif %}
+            {{ score_dom }}-{{ score_ext }}</span>
+        </strong></a>
+    </div>
+    <div class="ext">
+        <a href="{% url 'club-detail' cext.pk %}">{{ cext.nom }}</a>
+        {% if logos %}
+            {% club_logo cext 'small' %}
+        {% endif %}
+    </div>
+</div>

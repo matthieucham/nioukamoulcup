@@ -1,0 +1,45 @@
+{% extends "game/home/home_base.html" %}
+{% load static %}
+{% load i18n %}
+{% load humanize %}
+
+{% load l1results %}
+
+{% block content-right %}
+    <section class="fixtures">
+        <h1>Résultats</h1>
+        <ul>
+            {% for r in rencontres %}
+                <li>{% rencontre_score r %}</li>
+            {% endfor %}
+        </ul>
+    </section>
+{% endblock content-right %}
+
+{% block content-center-home %}
+    <section id="section-title">
+        {% club_logo object 'medium' %}
+        <h1>{{ object.nom }}</h1>
+    </section>
+
+    <section id="club-staff">
+        <h2>Effectif</h2>
+        <div>
+            <div class="header_table">
+                <div class="cell_table">Joueur</div>
+                <div class="cell_table center" style="width:15%;">Position</div>
+                <div class="cell_table center" style="width:15%;">Note moyenne</div>
+                <div class="cell_table center" style="width:15%;">Nombre de notes</div>
+                <div class="cell_table center" style="width:5%;">{% bonus 'LEADER' %}</div>
+                <div class="cell_table center" style="width:5%;">{% bonus 'GOAL' %}</div>
+                <div class="cell_table center" style="width:5%;">{% bonus 'PENALTY' %}</div>
+                <div class="cell_table center" style="width:5%;">{% bonus 'PASS' %}</div>
+                <div class="cell_table center" style="width:5%;">{% bonus 'HALFPASS' %}</div>
+                <div class="cell_table center" style="width:5%;">{% bonus 'PENALSTOP' %}</div>
+            </div>
+            {% for pl in players %}
+                {% include './club_joueur.html' with joueur=pl %}
+            {% endfor %}
+        </div>
+    </section>
+{% endblock %}

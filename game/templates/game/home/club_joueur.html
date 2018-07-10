@@ -1,0 +1,51 @@
+{% load humanize %}
+{% load l1results %}
+{% load i18n %}
+{% load getattribute %}
+
+<div class="line_table">
+    <div class="cell_table">
+        <a href="{% url 'stat_joueur-detail' joueur.pk %}">{{ joueur.display_name }}</a>
+    </div>
+    <div class="cell_table center">
+        {% trans joueur.poste as poste %}
+        {{ poste }}
+    </div>
+    <div class="cell_table center">
+        {% if joueur.avg_note > 0 %}
+            <span class="note">{{ joueur.avg_note|stringformat:'0.2f' }}</span>
+        {% else %}
+            -
+        {% endif %}
+    </div>
+    <div class="cell_table center">
+        {{ joueur.nb_notes }}
+    </div>
+    {#    <div class="cell_table center">#}
+    {#        {% with keys='GOAL PENALTY PASS HALFPASS LEADER 3STOPS PENALSTOP' %}#}
+    {#            {% for bkey in keys.split %}#}
+    {#                {% if joueur.bonuses|getattribute:bkey|add:"0" > 0 %}#}
+    {#                    {% bonus bkey joueur.bonuses|getattribute:bkey %}#}
+    {#                {% endif %}#}
+    {#            {% endfor %}#}
+    {#        {% endwith %}#}
+    {#    </div>#}
+    <div class="cell_table center">
+        {{ joueur.bonuses.LEADER }}
+    </div>
+    <div class="cell_table center">
+        {{ joueur.bonuses.GOAL }}
+    </div>
+    <div class="cell_table center">
+        {{ joueur.bonuses.PENALTY }}
+    </div>
+    <div class="cell_table center">
+        {{ joueur.bonuses.PASS }}
+    </div>
+    <div class="cell_table center">
+        {{ joueur.bonuses.HALFPASS }}
+    </div>
+    <div class="cell_table center">
+        {{ joueur.bonuses.PENALSTOP }}
+    </div>
+</div>

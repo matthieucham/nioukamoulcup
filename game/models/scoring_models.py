@@ -10,7 +10,7 @@ from utils.timer import Timer
 
 
 class SaisonScoring(models.Model):
-    saison = models.ForeignKey(l1models.Saison, null=False)
+    saison = models.ForeignKey(l1models.Saison, on_delete=models.CASCADE, null=False)
     computed_at = models.DateTimeField(auto_now=True)
 
     def compute(self):
@@ -25,17 +25,17 @@ class SaisonScoring(models.Model):
                     js.delete()
             else:
                 journees_to_recompute.append(j)
-        return [JourneeScoring.objects.select_related('journee').create(journee=journee, saison_scoring=self) for
-                journee in
-                journees_to_recompute]
+        for journee in journees_to_recompute:
+            JourneeScoring.objects.select_related('journee').create(journee=journee, saison_scoring=self)
+        SJScore.objects.create_sjscore_from_ligue1(self)
 
 
 class JourneeScoring(models.Model):
     STATUS_CHOICES = (('OPEN', 'Open'), ('LOCKED', 'locked'),)
 
     status = models.CharField(max_length=10, blank=False, default='OPEN', choices=STATUS_CHOICES)
-    journee = models.ForeignKey(l1models.Journee, null=False)
-    saison_scoring = models.ForeignKey(SaisonScoring, null=False)
+    journee = models.ForeignKey(l1models.Journee, on_delete=models.CASCADE, null=False)
+    saison_scoring = models.ForeignKey(SaisonScoring, on_delete=models.CASCADE, null=False)
     computed_at = models.DateTimeField(null=True)
     locked_at = models.DateTimeField(null=True)
 
@@ -72,7 +72,8 @@ class JJScoreManager(models.Manager):
                     for perf in all_perfs:
                         note, bonus, comp, earned_bonuses = scoring.compute_score_performance(perf, bbp)
                         jjscores.append(
-                            JJScore(journee_scoring=journee_scoring, joueur=perf.joueur, note=note, bonus=bonus,
+                            JJScore(journee_scoring=journee_scoring, joueur=perf.joueur, rencontre=r, note=note,
+                                    bonus=bonus,
                                     compensation=comp, details={'bonuses': earned_bonuses}))
                         # for cl in journee_scoring.journee.saison.participants:
                         # if not cl.pk in computed_club_pks:
@@ -99,11 +100,24 @@ class JJScoreManager(models.Manager):
         queryset = queryset.values('joueur').annotate(notes_notnull=notes_notnull)
         return sum([min(n, max_by_joueur) for n in queryset.values_list('notes_notnull', flat=True)])
 
+    def get_n_best_or_worst(self, numberof, saison, journee=None, poste=None, best=True):
+        ofjournee = self.filter(journee_scoring__saison_scoring__saison=saison, note__isnull=False).filter(note__gt=0)
+        if journee is not None:
+            ofjournee = ofjournee.filter(journee_scoring__journee=journee)
+        if poste is not None:
+            ofjournee = ofjournee.filter(joueur__poste=poste)
+        if best:
+            ordering = '-note'
+        else:
+            ordering = 'note'
+        return ofjournee.order_by(ordering)[:numberof]
+
 
 class JJScore(models.Model):
     computed_at = models.DateTimeField(auto_now=True, null=False)
-    journee_scoring = models.ForeignKey(JourneeScoring, null=False)
-    joueur = models.ForeignKey(l1models.Joueur, null=False)
+    journee_scoring = models.ForeignKey(JourneeScoring, on_delete=models.CASCADE, null=False)
+    joueur = models.ForeignKey(l1models.Joueur, on_delete=models.CASCADE, null=False)
+    rencontre = models.ForeignKey(l1models.Rencontre, on_delete=models.CASCADE, null=True)
     note = models.DecimalField(max_digits=5, decimal_places=3, blank=True, null=True)
     bonus = models.DecimalField(max_digits=5, decimal_places=3, blank=False, null=False, default=0)
     compensation = models.DecimalField(max_digits=5, decimal_places=3, blank=True, null=True)
@@ -111,6 +125,66 @@ class JJScore(models.Model):
 
     objects = JJScoreManager()
 
+
+class SJScoreManager(models.Manager):
+
+    def create_sjscore_from_ligue1(self, saison_scoring):
+        with Timer(id='create_sjscore_from_ligue1', verbose=True):
+            sjscores = []
+            jjscores_by_joueur = dict()
+            for jjs in JJScore.objects.select_related('joueur').filter(journee_scoring__saison_scoring=saison_scoring):
+                jjscores_by_joueur.setdefault(jjs.joueur, []).append(jjs)
+            for jpk, scores in jjscores_by_joueur.items():
+                agglo = self._compute_stats_agg(scores)
+                sjscores.append(SJScore(saison_scoring=saison_scoring,
+                                        joueur=jpk,
+                                        avg_note=agglo.pop('AVGNOTE'),
+                                        nb_notes=agglo.pop('NBNOTE'),
+                                        total_bonuses=agglo.pop('BONUS'),
+                                        sum_compensations=agglo.pop('SUMCOMP'),
+                                        details=agglo))
+            self.filter(saison_scoring=saison_scoring).delete()
+            self.bulk_create(sjscores)
+
+    def _compute_stats_agg(self, jjscores):
+        agg = dict()
+        for bk in set(scoring.BONUS['COLLECTIVE'].keys()).union(set(scoring.BONUS['PERSONAL'].keys())):
+            agg[bk] = 0
+        for jjs in jjscores:
+            for bk in set(scoring.BONUS['COLLECTIVE'].keys()).union(set(scoring.BONUS['PERSONAL'].keys())):
+                if 'bonuses' in jjs.details and bk in jjs.details['bonuses']:
+                    agg[bk] += jjs.details['bonuses'][bk]
+        notes = [jjs.note for jjs in jjscores if jjs.note is not None]
+        bonus = [jjs.bonus for jjs in jjscores if jjs.bonus is not None]
+        compensations = [jjs.compensation for jjs in jjscores if jjs.compensation is not None]
+        agg['AVGNOTE'] = round(sum(notes) / len(notes), 2) if len(notes) > 0 else None
+        agg['NBNOTE'] = len(notes)
+        agg['BONUS'] = sum(bonus)
+        agg['SUMCOMP'] = sum(compensations)
+        return agg
+
+    def get_n_best_or_worst(self, saison, numberof, poste=None, best=True, criteria='avg_note', nb_notes_min=1):
+        ofsaison = self.filter(saison_scoring__saison=saison, avg_note__gt=0).filter(nb_notes__gte=nb_notes_min)
+        if poste is not None:
+            ofsaison = ofsaison.filter(joueur__poste=poste)
+        if best:
+            ordering = '-%s' % criteria
+        else:
+            ordering = '%s' % criteria
+        return ofsaison.order_by(ordering)[:numberof]
+
+
+class SJScore(models.Model):
+    computed_at = models.DateTimeField(auto_now=True, null=False)
+    saison_scoring = models.ForeignKey(SaisonScoring, on_delete=models.CASCADE, null=False)
+    joueur = models.ForeignKey(l1models.Joueur, on_delete=models.CASCADE, null=False)
+    avg_note = models.DecimalField(max_digits=5, decimal_places=3, blank=True, null=True)
+    nb_notes = models.PositiveIntegerField(null=False, default=0)
+    total_bonuses = models.DecimalField(max_digits=6, decimal_places=3, blank=False, null=False, default=0)
+    sum_compensations = models.DecimalField(max_digits=6, decimal_places=3, blank=True, null=True)
+    details = JSONField(default=dict())
+
+    objects = SJScoreManager()
 
     # class TeamScore(models.Model):
     # team = models.OneToOneField(gamemodels.Team, primary_key=True)

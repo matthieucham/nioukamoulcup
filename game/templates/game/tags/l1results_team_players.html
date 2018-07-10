@@ -3,30 +3,13 @@
 {% load i18n %}
 
 
-<div class="panel panel-default">
-    <div class="panel-heading">
-        <div style="width: 48px; float:left;">
-            <style type="text/css" scoped>
-                path.bg {
-                    fill: {{ team.maillot_color_bg }};
-                }
-                path.color1 {
-                    fill: {{ team.maillot_color1 }};
-                }
-                path.color2 {
-                    fill: {{ team.maillot_color2 }};
-                }
-            </style>
-            {% svg team.maillot_svg %}
-        </div>
-        <h4>{{ team }}</h4>
-
-        <div style="clear: both;"></div>
-    </div>
-    <div class="list-group">
+<section id="club-players">
+    <h1>{{ team }}</h1>
+    <ul>
         {% for j in players %}
-            <a href="{% url 'stat_joueur-detail' j.pk %}" class="list-group-item">{{ j }}<span
-                    class="badge">{{ j.poste }}</span></a>
+            <li>
+                <a href="{% url 'stat_joueur-detail' j.pk %}">{{ j.display_name }}</a>
+            </li>
         {% endfor %}
-    </div>
-</div>
+    </ul>
+</section>

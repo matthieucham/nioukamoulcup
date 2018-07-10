@@ -15,7 +15,8 @@ class MerkatoManager(models.Manager):
               session_duration=48, initial_team_balance=None):
         assert mode in ['BID', 'DRFT']
         merkato = self.create(mode=mode, begin=begin, end=end, league_instance=league_instance,
-                              configuration=MerkatoManager._make_config(roster_size_max, initial_team_balance=initial_team_balance))
+                              configuration=MerkatoManager._make_config(roster_size_max,
+                                                                        initial_team_balance=initial_team_balance))
         # create sessions
         ticks = [t for t in MerkatoManager._generate_ticks(begin, end, closing_times)]
         nb = 1
@@ -72,7 +73,7 @@ class Merkato(models.Model):
     end = models.DateTimeField(blank=False)
     mode = models.CharField(max_length=4, blank=False, choices=MODES)
     configuration = JSONField()
-    league_instance = models.ForeignKey(league_models.LeagueInstance, null=False)
+    league_instance = models.ForeignKey(league_models.LeagueInstance, on_delete=models.CASCADE, null=False)
 
     objects = MerkatoManager()
 
@@ -93,7 +94,7 @@ class MerkatoSessionManager(models.Manager):
 
 
 class MerkatoSession(models.Model):
-    merkato = models.ForeignKey(Merkato, null=False)
+    merkato = models.ForeignKey(Merkato, on_delete=models.CASCADE, null=False)
     number = models.PositiveIntegerField(blank=False)
     closing = models.DateTimeField(blank=False)
     solving = models.DateTimeField(blank=False)
@@ -133,12 +134,12 @@ class SaleManager(models.Manager):
 class Sale(models.Model):
     TYPES = (('PA', 'Proposition d\'achat'), ('MV', 'Mise en vente'), ('AM', 'Achat masqué'))
 
-    player = models.ForeignKey(l1models.Joueur, null=False)
-    team = models.ForeignKey(league_models.Team, null=False)
-    merkato_session = models.ForeignKey(MerkatoSession, null=False)
+    player = models.ForeignKey(l1models.Joueur, on_delete=models.CASCADE, null=False)
+    team = models.ForeignKey(league_models.Team, on_delete=models.CASCADE, null=False)
+    merkato_session = models.ForeignKey(MerkatoSession, on_delete=models.CASCADE, null=False)
     min_price = models.DecimalField(max_digits=4, decimal_places=1)
     type = models.CharField(max_length=2, blank=False, default='PA', choices=TYPES)
-    winning_auction = models.ForeignKey('Auction', related_name='sale_won', null=True)
+    winning_auction = models.ForeignKey('Auction', on_delete=models.SET_NULL, related_name='sale_won', null=True)
     rank = models.PositiveIntegerField(null=False, default=1)
 
     objects = SaleManager()
@@ -189,8 +190,8 @@ class Auction(models.Model):
     REJECT_MOTIVES = (
         ('MONEY', 'Solde insuffisant'), ('MIN_PRICE', 'Enchère trop basse'), ('FULL', 'Plus de place dans l\'effectif'))
 
-    sale = models.ForeignKey(Sale, null=False, related_name='auctions')
-    team = models.ForeignKey(league_models.Team, null=False)
+    sale = models.ForeignKey(Sale, on_delete=models.CASCADE, null=False, related_name='auctions')
+    team = models.ForeignKey(league_models.Team, on_delete=models.CASCADE, null=False)
     value = models.DecimalField(max_digits=4, decimal_places=1)
     is_valid = models.NullBooleanField(null=True)
     reject_cause = models.CharField(max_length=10, null=True)
@@ -256,8 +257,8 @@ class ReleaseManager(models.Manager):
 
 
 class Release(models.Model):
-    signing = models.ForeignKey(league_models.Signing)
-    merkato_session = models.ForeignKey(MerkatoSession)
+    signing = models.ForeignKey(league_models.Signing, on_delete=models.CASCADE)
+    merkato_session = models.ForeignKey(MerkatoSession, on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=4, decimal_places=1)
     done = models.BooleanField(default=False)
 

@@ -1,19 +1,80 @@
 {% extends "game/home/home_base.html" %}
 {% load static %}
 {% load l1results %}
+{% load i18n %}
 
 {% block script %}
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.css">
     <script src="//cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.min.js"></script>
+    {#    <script type="text/javascript" src="https://www.google.com/jsapi"></script>#}
+    {#    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>#}
+    {#    <script type="text/javascript">#}
+    {#        google.charts.load('visualization', '1', {packages: ['corechart']});#}
+    {#       // google.charts.setOnLoadCallback(drawChart);#}
+    {#    </script>#}
 {% endblock script %}
 
 {% block content-right %}
-{% joueurs_club joueur.club %}
+    {% joueurs_club joueur.club %}
 {% endblock content-right %}
 
-{% block content-center %}
-{{ joueur }}
-<div id='chtcontainer'>{{ chart.as_html }}</div>
-{% endblock content-center %}
+{% block content-center-home %}
+    <section id="section-title">
+        {% club_logo joueur.club 'medium' %}
+        <h1>{{ joueur.display_name }}</h1>
+    </section>
+    <section id="player-profile">
+        <h2>Profil</h2>
+        <div>
+            {% keyvalue 'Nom' joueur.nom %}
+            {% keyvalue 'Prénom' joueur.prenom %}
+            {% if joueur.surnom %}
+                {% keyvalue 'Surnom' joueur.surnom %}
+            {% endif %}
+            <dl class='kvgroup'>
+                <dd>Club</dd>
+                <dt><a href="{% url 'club-detail' joueur.club.pk %}">{{ joueur.club.nom }}</a></dt>
+            </dl>
+            {% trans joueur.poste as poste %}
+            {% keyvalue 'Poste' poste %}
+        </div>
+    </section>
+    <section id="player-bilan">
+        <h2>Bilan</h2>
+        <div>
+            {% keyvalue 'Matchs notés' stats.nb_notes 'card' %}
+            {% keyvalue 'Note moyenne' stats.avg_note 'card' %}
+            {#            {% keyvalue 'Bonus' stats.total_bonuses 'card' %}#}
+            <div id="player-bonuses">
+                {% bonusvalue 'GOAL' 'Buts h.p.' stats.details.GOAL %}
+                {% bonusvalue 'PASS' 'Passes' stats.details.PASS %}
+                {% bonusvalue 'PENALTY' 'Pénos' stats.details.PENALTY %}
+                {% bonusvalue 'HALFPASS' 'Pén obt' stats.details.HALFPASS %}
+                {% bonusvalue 'LEADER' '++' stats.details.LEADER %}
+                {% bonusvalue '3STOPS' '3 arr' stats.details.3STOPS %}
+                {% bonusvalue 'PENALSTOP' 'Pén arr' stats.details.PENALSTOP %}
+                {% bonusvalue 'CLEANSHEET' 'CS' stats.details.CLEANSHEET %}
+                {% bonusvalue 'HALFCLEANSHEET' 'demie CS' stats.details.HALFCLEANSHEET %}
+                {% bonusvalue 'OFFENSIVE' 'Off.' stats.details.OFFENSIVE %}
+                {% bonusvalue 'HALFOFFENSIVE' 'Demi off' stats.details.HALFOFFENSIVE %}
+            </div>
+        </div>
+        <section id="player-performances">
+            <h2>Performances</h2>
+            <div>
+                <div class="header_table">
+                    <div class="cell_table center" style="width:5%;">J.</div>
+                    <div class="cell_table" style="width:15%;">Date</div>
+                    <div class="cell_table center">Match</div>
+                    <div class="cell_table center" style="width:10%;">Note</div>
+                    <div class="cell_table">Bonus</div>
+                </div>
+                {% for jjs in jjscores %}
+                    {% perf_joueur jjs %}
+                {% endfor %}
+            </div>
+        </section>
+        <div id='chtcontainer'>{{ chart.as_html }}</div>
+{% endblock content-center-home %}

@@ -23,20 +23,20 @@ class League(models.Model):
 
 
 class LeagueMembership(models.Model):
-    user = models.ForeignKey(User)
-    league = models.ForeignKey(League)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    league = models.ForeignKey(League, on_delete=models.CASCADE)
     is_baboon = models.BooleanField(default=False)
     date_joined = models.DateField()
-    team = models.ForeignKey('Team', related_name='managers', null=True)
+    team = models.ForeignKey('Team', on_delete=models.CASCADE, related_name='managers', null=True)
 
 
 class LeagueDivision(models.Model):
-    league = models.ForeignKey(League, null=False)
+    league = models.ForeignKey(League, on_delete=models.CASCADE, null=False)
     level = models.PositiveSmallIntegerField(null=False)
     name = models.CharField(max_length=100, blank=False)
     capacity = models.PositiveSmallIntegerField()
-    upper_division = models.ForeignKey("self", related_name='lower', null=True)
-    lower_division = models.ForeignKey("self", related_name='upper', null=True)
+    upper_division = models.ForeignKey("self", on_delete=models.SET_NULL, related_name='lower', null=True)
+    lower_division = models.ForeignKey("self", on_delete=models.SET_NULL, related_name='upper', null=True)
 
     def __str__(self):
         return self.name
@@ -62,8 +62,8 @@ class TeamManager(models.Manager):
 
 class Team(models.Model):
     name = models.CharField(max_length=100, blank=False)
-    league = models.ForeignKey(League, null=False)
-    division = models.ForeignKey(LeagueDivision)
+    league = models.ForeignKey(League, on_delete=models.CASCADE, null=False)
+    division = models.ForeignKey(LeagueDivision, on_delete=models.CASCADE)
     attributes = JSONField()
 
     objects = TeamManager()
@@ -132,14 +132,14 @@ class BankAccountManager(models.Manager):
 
 
 class BankAccount(models.Model):
-    team = models.OneToOneField(Team, primary_key=True, related_name='bank_account')
+    team = models.OneToOneField(Team, on_delete=models.CASCADE, primary_key=True, related_name='bank_account')
     balance = models.DecimalField(max_digits=4, decimal_places=1)
     blocked = models.DecimalField(max_digits=4, decimal_places=1)
     objects = BankAccountManager()
 
 
 class BankAccountHistory(models.Model):
-    bank_account = models.ForeignKey(BankAccount, null=True)  # entries with null ref will be deleted by batch
+    bank_account = models.ForeignKey(BankAccount, on_delete=models.CASCADE, null=True)  # entries with null ref will be deleted by batch
     date = models.DateTimeField()
     amount = models.DecimalField(max_digits=4, decimal_places=1)
     new_balance = models.DecimalField(max_digits=4, decimal_places=1)
@@ -167,11 +167,11 @@ class BankAccountHistory(models.Model):
 class LeagueInstance(models.Model):
     name = models.CharField(max_length=100, blank=False)
     slogan = models.CharField(max_length=255)
-    league = models.ForeignKey(League, null=False)
+    league = models.ForeignKey(League, on_delete=models.CASCADE, null=False)
     current = models.BooleanField(default=False)
     begin = models.DateTimeField(blank=False)
     end = models.DateTimeField(blank=False)
-    saison = models.ForeignKey(l1models.Saison)
+    saison = models.ForeignKey(l1models.Saison, on_delete=models.CASCADE)
     configuration = JSONField(
         default=dict({'notes': {'HALFSEASON': 13, 'FULLSEASON': 26, 'TOURNAMENT': 3}}))
 
@@ -182,7 +182,7 @@ class LeagueInstance(models.Model):
 class LeagueInstancePhase(models.Model):
     TYPES = (('HALFSEASON', 'Half season'), ('FULLSEASON', 'Whole season'), ('TOURNAMENT', 'Tournament'))
 
-    league_instance = models.ForeignKey(LeagueInstance, null=False)
+    league_instance = models.ForeignKey(LeagueInstance, on_delete=models.CASCADE, null=False)
     name = models.CharField(max_length=100)
     type = models.CharField(choices=TYPES, max_length=10)
     journee_first = models.PositiveIntegerField(blank=False, db_index=True)
@@ -301,9 +301,9 @@ class LeagueInstancePhaseDayManager(models.Manager):
 
 
 class LeagueInstancePhaseDay(models.Model):
-    league_instance_phase = models.ForeignKey(LeagueInstancePhase, null=False)
+    league_instance_phase = models.ForeignKey(LeagueInstancePhase, on_delete=models.CASCADE, null=False)
     number = models.PositiveIntegerField(blank=False)
-    journee = models.ForeignKey(l1models.Journee, null=False)
+    journee = models.ForeignKey(l1models.Journee, on_delete=models.CASCADE, null=False)
     results = models.ManyToManyField(Team, through='TeamDayScore')
 
     objects = LeagueInstancePhaseDayManager()
@@ -313,8 +313,8 @@ class LeagueInstancePhaseDay(models.Model):
 
 
 class TeamDayScore(models.Model):
-    day = models.ForeignKey(LeagueInstancePhaseDay, null=False)
-    team = models.ForeignKey(Team)
+    day = models.ForeignKey(LeagueInstancePhaseDay, on_delete=models.CASCADE, null=False)
+    team = models.ForeignKey(Team, on_delete=models.CASCADE)
     score = models.DecimalField(decimal_places=3, max_digits=7)
     attributes = JSONField()
 
@@ -323,7 +323,6 @@ class TeamDayScore(models.Model):
 
 
 class SigningManager(models.Manager):
-
     def end(self, signing, reason, date=timezone.now(), amount=None):
         if signing.end:
             raise ValueError('Cannot end a signing which has a end date already')
@@ -337,8 +336,8 @@ class SigningManager(models.Manager):
 
 
 class Signing(models.Model):
-    player = models.ForeignKey(l1models.Joueur, null=False)
-    team = models.ForeignKey(Team, null=False)
+    player = models.ForeignKey(l1models.Joueur, on_delete=models.CASCADE, null=False)
+    team = models.ForeignKey(Team, on_delete=models.CASCADE, null=False)
     begin = models.DateTimeField(auto_now_add=True, db_index=True)
     end = models.DateTimeField(null=True, db_index=True)
     attributes = JSONField(default=dict({'score_factor': 1.0}))

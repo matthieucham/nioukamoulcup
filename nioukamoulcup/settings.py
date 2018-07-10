@@ -107,10 +107,10 @@ AUTHENTICATION_BACKENDS = (
 )
 
 REST_FRAMEWORK = {
-    'DEFAULT_FILTER_BACKENDS': (
-        'rest_framework.filters.DjangoFilterBackend',
-        'rest_framework.filters.OrderingFilter',
-    ),
+    # 'DEFAULT_FILTER_BACKENDS': (
+    #     'rest_framework.filters.DjangoFilterBackend',
+    #     'rest_framework.filters.OrderingFilter',
+    # ),
     'COERCE_DECIMAL_TO_STRING': False,
 }
 
@@ -188,7 +188,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'fr-fr'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Paris'
 
 USE_I18N = True
 
@@ -215,7 +215,7 @@ MEDIA_ROOT = 'D:\dev\git\www\media'
 SITE_ID = 1
 
 # Required by Guardian
-ANONYMOUS_USER_ID = -1
+ANONYMOUS_USER_NAME = 'AnonymousUser'
 
 # For django-wiki customization
 WIKI_ACCOUNT_HANDLING = False
@@ -245,3 +245,9 @@ if not DEBUG:
         'BUNDLE_DIR_NAME': 'dist/',
         'STATS_FILE': os.path.join(BASE_DIR, 'front', 'webpack-stats-prod.json'),
     })
+
+LOCALE_PATHS = (
+    os.path.join(BASE_DIR, 'locale'),
+)
+
+TEMPLATE_STRING_IF_INVALID = ''

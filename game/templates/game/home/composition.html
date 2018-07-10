@@ -1,0 +1,10 @@
+{% load l1results %}
+<div class="composition">
+    {% for line in selection %}
+        <div class="compoLine">
+            {% for jjs in line %}
+                {% compo_player jjs %}
+            {% endfor %}
+        </div>
+    {% endfor %}
+</div>

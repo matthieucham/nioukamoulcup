@@ -7,15 +7,15 @@
 {% endblock content-right %}
 
 {% block content-center %}
-    <small>{{ rencontre.date }}</small>
-    {% rencontre_summary rencontre %}
+    <article id="home-main">
+        {% rencontre_summary rencontre %}
 
-    <div class="col-md-6">
-        {% rencontre_team rencontre 'dom' %}
-    </div>
-
-    <div class="col-md-6">
-        {% rencontre_team rencontre 'ext' %}
-    </div>
-
+        <section id="rencontre-performances">
+            <h2>Performances</h2>
+            <div>
+                {% rencontre_team rencontre 'dom' %}
+                {% rencontre_team rencontre 'ext' %}
+            </div>
+        </section>
+    </article>
 {% endblock content-center %}

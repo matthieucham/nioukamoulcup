@@ -1,6 +1,6 @@
 from django.contrib import admin, messages
 from django.http import HttpResponseRedirect
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.contrib.admin.filters import RelatedOnlyFieldListFilter
 from inline_actions.admin import InlineActionsMixin
 from inline_actions.admin import InlineActionsModelAdminMixin

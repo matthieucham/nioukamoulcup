@@ -24,12 +24,12 @@ from ligue1.admin import admin_site
 urlpatterns = [
     url(r'^game/home/info/', include('zinnia.urls')),
     url(r'^game/', include('game.urls')),
-    url(r'^admin/', include(admin.site.urls)),
+    url(r'^admin/', admin.site.urls),
     url(r'^accounts/', include('userena.urls')),
     url(r'^comments/', include('django_comments.urls')),
     # url(r'^notifications/', get_nyt_pattern()),
     # url(r'^wiki/', get_wiki_pattern()),
-    url(r'^import/', include(admin_site.urls), name='import'),
+    url(r'^import/', admin_site.urls, name='import'),
 ]
 
 if settings.DEBUG:
