@@ -1,1 +1,1 @@
-from .stats_form import StatsForm
+from .stats_form import StatsForm, PositionForm

@@ -4,68 +4,77 @@
 {% load humanize %}
 
 {% block content-right %}
-<section>
-    <h1>Top 3</h1>
-    <ul>
-        {% for jjs in bestofall %}
-        <li>
-            <p>{{jjs.rencontre.date}}</p>
-            <p>{{ jjs.joueur.display_name }} {{ jjs.note }}
-                {% for bk, bv in jjs.details.bonuses.items %}
-                {% bonus bk bv %}
-                {% endfor %}</p>
-            <p>{% rencontre_score jjs.rencontre %}</p>
-        </li>
-        {% endfor %}
-    </ul>
+    <section>
 
-    <h1>Flop 3</h1>
-    <ul>
-        {% for jjs in worstofall %}
-        <li>
-            <p>{{jjs.rencontre.date}}</p>
-            <p>{{ jjs.joueur.display_name }} {{ jjs.note }}
-                {% for bk, bv in jjs.details.bonuses.items %}
-                {% bonus bk bv %}
-                {% endfor %}</p>
-            <p>{% rencontre_score jjs.rencontre %}</p>
-        </li>
-        {% endfor %}
-    </ul>
-</section>
-<section>
-    <h1>Journées</h1>
-    <ul>
-        {% for j in object.journees.all %}
-        <li><a href="{% url 'result_journee-detail' j.pk %}">{{ j }}</a></li>
-        {% endfor %}
-    </ul>
-</section>
+        <h1>Tops et flops</h1>
+
+        <form id="topFlopForm" action="{% url 'stat-detail' %}" method="get">
+            {% csrf_token %}
+            {{ position_form }}
+            <input type="submit" value="Tops et flops"/>
+        </form>
+        <h2>Top 3</h2>
+        <ul>
+            {% for jjs in bestofall %}
+                <li class="bestofentry">
+                    <div class="bestofindex"><h1>{{ forloop.counter }}</h1></div>
+                    <div class="bestofplayer">
+                        <p class="smalltext center">{{ jjs.rencontre.date }}</p>
+                        <h2>{{ jjs.joueur.display_name }}: <strong>{{ jjs.note }}</strong></h2>
+                        {% rencontre_score jjs.rencontre %}
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+
+        <h2>Flop 3</h2>
+        <ul>
+            {% for jjs in worstofall %}
+                <li class="bestofentry">
+                    <div class="bestofindex"><h1>{{ forloop.counter }}</h1></div>
+                    <div class="bestofplayer">
+                        <p class="smalltext center">{{ jjs.rencontre.date }}</p>
+                        <h2>{{ jjs.joueur.display_name }}: <strong>{{ jjs.note }}</strong></h2>
+                        {% rencontre_score jjs.rencontre %}
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    </section>
+    <section>
+        <h1>Journées</h1>
+        <ul>
+            {% for j in object.journees.all %}
+                <li><a href="{% url 'result_journee-detail' j.pk %}">{{ j }}</a></li>
+            {% endfor %}
+        </ul>
+    </section>
 {% endblock content-right %}
 
 {% block content-center %}
-<article id="home-main">
-    <section id="section-title">
-        <h1 class="center">Statistiques {{ object }}</h1>
-    </section>
-    <section id="saison_stat">
-        <form action="{% url 'stat-detail' %}" method="get">
-            {% csrf_token %}
-            {{ stats_form }}
-            <input type="submit" value="Rires"/>
-        </form>
-        <div>
-            <h2>Equipe de la saison</h2>
-            {% include 'game/home/composition.html' with selection=best %}
-        </div>
-        <div>
-            <h2>Pitres de la saison</h2>
-            {% include 'game/home/composition.html' with selection=worst %}
-        </div>
-        <div>
-            <h2>Indéboulonnables de la saison</h2>
-            {% include 'game/home/composition.html' with selection=all %}
-        </div>
-    </section>
-</article>
+    <article id="home-main">
+        <section id="section-title">
+            <h1 class="center">Statistiques {{ object }}</h1>
+        </section>
+        <section id="saison_stat">
+            <form action="{% url 'stat-detail' %}" method="get">
+                {% csrf_token %}
+                {{ stats_form }}
+                <input type="submit" value="Mettre à jour"/>
+            </form>
+            <div>
+                <h2>Equipe-type de la saison</h2>
+                {% include 'game/home/composition.html' with selection=best %}
+            </div>
+            <div>
+                <h2>Equipe-pitres de la saison</h2>
+                {% include 'game/home/composition.html' with selection=worst %}
+            </div>
+            <form action="{% url 'stat-detail' %}" method="get">
+                {% csrf_token %}
+                {{ stats_form }}
+                <input type="submit" value="Mettre à jour"/>
+            </form>
+        </section>
+    </article>
 {% endblock content-center %}

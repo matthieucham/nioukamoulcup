@@ -49,6 +49,10 @@ h1.page-title {
     font-size: 1.8em;
 }
 
+h2 {
+    font-size: 1.2em;
+}
+
 a {
     color: #2196F3;
     text-decoration: none;
@@ -81,6 +85,11 @@ a.navbutton.disabled {
 
 .center {
     text-align: center;
+}
+
+.smalltext {
+    color: rgba(0, 0, 0, 0.5);
+    font-size: 0.8em;
 }
 
 dl.card {
@@ -520,11 +529,11 @@ header nav a:hover, nav ul li ul li:hover {
     color: #b5b5b5;
 }
 
-.prog-up,.won {
+.prog-up, .won {
     color: #228B22;
 }
 
-.prog-down,.lost {
+.prog-down, .lost {
     color: #B22222;
 }
 
@@ -669,7 +678,7 @@ dl.kvgroup {
 }
 
 #chtcontainer {
-    height:400px;
+    height: 400px;
     width: 100%;
 }
 
@@ -688,7 +697,7 @@ dl.kvgroup {
 }
 
 #journee_result {
-    display:table;
+    display: table;
     width: 100%;
 }
 
@@ -696,4 +705,31 @@ dl.kvgroup {
     background-color: #212121;
     color: #f1f1f1;
     padding: 3px;
+}
+
+#topFlopForm, #saison_stat form {
+    padding: 0.8em 0;
+}
+
+#topFlopForm {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.bestofentry {
+    display: flex;
+    align-items: center;
+    padding-top: 0.8em;
+    border-bottom: 1px dotted #212121;
+}
+
+.bestofentry:last-child {
+    border-bottom: none;
+    padding-bottom: 1em;
+}
+
+.bestofentry .bestofplayer {
+    flex: 1;
 }
