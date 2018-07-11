@@ -1,3 +1,4 @@
+import re
 from django.db import models
 from django.contrib.postgres.fields import JSONField
 import datetime
@@ -48,7 +49,11 @@ class SaisonCourante(models.Model):
 
 class JourneeManager(models.Manager):
     def import_from_statnuts(self, saison, statnuts_step, sn_client, force_import=False):
-        defaults = {'numero': int(statnuts_step['name'])}
+        try:
+            numero = int(statnuts_step['name'])
+        except ValueError:
+            numero = re.search(r'^.*(\d+).*$', statnuts_step['name']).group(1)
+        defaults = {'numero': numero, 'name': statnuts_step['name']}
         journee, created = self.get_or_create(
             sn_step_uuid=statnuts_step['uuid'],
             saison=saison,
@@ -84,9 +89,9 @@ class Journee(Importe):
 
     def save(self, *args, **kwargs):
         if self.pk is not None:
-            debut, fin = timezone.make_aware(datetime.datetime(datetime.MAXYEAR, 1, 1),
+            debut, fin = timezone.make_aware(datetime.datetime(2100, 1, 1),
                                              timezone.get_default_timezone()), \
-                         timezone.make_aware(datetime.datetime(datetime.MINYEAR,
+                         timezone.make_aware(datetime.datetime(1998,
                                                                1, 1), timezone.get_default_timezone())
             for x in (rencontre.date for rencontre in Rencontre.objects.filter(journee=self)):
                 debut, fin = min(x, debut), max(x, fin)

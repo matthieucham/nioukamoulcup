@@ -63,7 +63,7 @@ class StatJoueurView(DetailView):
                                                                  saison_scoring=saisonscoring) \
             .select_related('rencontre__club_domicile') \
             .select_related('rencontre__club_exterieur').select_related('journee_scoring__journee')
-        context['stats'] = models.SJScore.objects.get(saison_scoring=saisonscoring, joueur=self.object)
+        context['stats'] = models.SJScore.objects.filter(saison_scoring=saisonscoring, joueur=self.object).first()
         context['jjscores'] = jjscores
         data_source_array = [['J', 'Note', 'Bonus']]
         for jjs in jjscores:

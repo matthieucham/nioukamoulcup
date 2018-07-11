@@ -17,7 +17,7 @@ class StatnutsClient():
 
     def _get_access_token(self):
         token = self.oauth.fetch_token(token_url=self.token_url, client_id=self.client_id,
-                                       client_secret=self.client_secret)
+                                       client_secret=self.client_secret, verify=False)
         return token
 
     def _get_data(self, target_url):
