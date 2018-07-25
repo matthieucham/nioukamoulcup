@@ -459,6 +459,7 @@ header nav a:hover, nav ul li ul li:hover {
     display: inline-block;
     text-align: center;
     margin: 8px;
+    font-size: 0.8em;
 }
 
 .fieldPlayer svg {
@@ -658,6 +659,7 @@ dl.kvgroup {
 .cell_table {
     display: table-cell;
     padding: 0 3px;
+    word-wrap: normal;
 }
 
 #player-performances .compensation {
