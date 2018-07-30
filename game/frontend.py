@@ -133,7 +133,7 @@ class ResultJourneeView(DetailView):
         pk = self.kwargs.get(self.pk_url_kwarg)
         if pk is None:
             # retrieve latest journee
-            return l1models.Journee.objects.order_by('-fin').first()
+            return l1models.Journee.objects.filter(saison__est_courante__isnull=False).order_by('-fin').first()
         else:
             return super(ResultJourneeView, self).get_object(queryset)
 
