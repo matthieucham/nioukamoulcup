@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import ReactSVG from 'react-svg';
 
-const Jersey = ({ club }) => {
+export const Jersey = ({ club }) => {
 
 	const svgPath = '/static/svg/'+(club ? club.maillot_svg : 'jersey-noclub2')+'.svg';
 	const colFill = club ? club.maillot_color_bg : '#000';
@@ -12,10 +12,17 @@ const Jersey = ({ club }) => {
 		path={ svgPath }
 		style={{ width:64, height:64, fill:colFill, stroke:colStroke }}
 		/>
+			<div className="clubName-container">
+			<span className="clubName">{ club ? club.nom : '-' }</span>
+			</div>
 		</div>
 		);
 }
 
+export const Position = ({ poste }) => {
+	const dico = {'G': 'Gardien', 'D': 'Défenseur', 'M': 'Milieu', 'A': 'Attaquant'}
+	return (<p>{dico[poste]}</p>);
+}
 
 export const JerseyPlaceHolder = () => {
 
@@ -36,7 +43,7 @@ const FieldPlayerDetails = ({player, club}) => {
 	if (bonus > 0) {
 		bonusDisplay = <span className="bonus">{bonus+'%'}</span>;
 	}
-	return <div className="playerDetails"><h1>{ player.player.name }</h1><p>{ player.score }{ bonusDisplay }</p><p>{ club ? club.nom : '-' }</p></div>
+	return <div className="playerDetails"><h1>{ player.player.name }</h1><p>{ player.score }{ bonusDisplay }</p></div>
 };
 
 

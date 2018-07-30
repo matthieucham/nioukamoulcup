@@ -19,14 +19,8 @@ class ClubSerializer(serializers.ModelSerializer):
                   )
 
 
-class ClubHdrSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = l1models.Club
-        fields = ('id', 'nom')
-
-
 class PlayerHdrSerializer(serializers.HyperlinkedModelSerializer):
-    club = ClubHdrSerializer()
+    club = ClubSerializer()
     url = serializers.HyperlinkedIdentityField(view_name='stat_joueur-detail')
 
     class Meta:
