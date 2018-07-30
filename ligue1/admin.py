@@ -8,7 +8,7 @@ from inline_actions.admin import InlineActionsModelAdminMixin
 import ligue1
 from ligue1 import models
 from statnuts import StatnutsClient
-from nioukamoulcup import settings
+from django.conf import settings
 
 
 class ImportStatnutsSite(admin.AdminSite):
