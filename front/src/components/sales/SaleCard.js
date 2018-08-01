@@ -1,9 +1,6 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
 import CardHeader from '@material-ui/core/CardHeader';
-import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import Button from '@material-ui/core/Button';
 import Avatar from '@material-ui/core/Avatar';
@@ -174,7 +171,7 @@ class SaleAfter extends React.Component {
 		if (sale.type == 'PA') {
 			offers.push({value: sale.min_price});
 		}
-		if (offers.length == 1) {
+		if (offers.length == 1 || (offers.length == 2 && sale.author.id == sale.winner.id) ) {
 			return sale.amount.toFixed(1);
 		} else {
 			return (sale.amount - offers[1].value).toFixed(1);
@@ -197,6 +194,7 @@ class SaleAfter extends React.Component {
 				hasWinner=true;
 				winnerName = sale.author.name;
 				winnerAmount = sale.min_price;
+				winnerDiff = winnerAmount;
 			} else {
 				hasWinner=false;
 			}
@@ -283,9 +281,8 @@ export class SaleCard extends React.Component {
 	render() {
 		const sale = this.props.sale;
 		return (
-			<div>
 				<Card>
-					<CardHeader title={ sale.player.display_name } 
+					<CardHeader title={<a href={sale.player.url}>{ sale.player.display_name }</a>}
 								subheader={ sale.player.poste + ', ' + sale.player.club.nom }
 								avatar={
 									<Avatar>{ sale.type}</Avatar>			
@@ -296,7 +293,6 @@ export class SaleCard extends React.Component {
 						<SaleCardContent sale={sale} />
 					</Collapse>
 				</Card>
-			</div>
 			)
 	}
 }

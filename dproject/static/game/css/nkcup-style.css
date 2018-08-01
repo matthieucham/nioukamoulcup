@@ -481,8 +481,11 @@ header nav a:hover, nav ul li ul li:hover {
 .fieldPlayer {
     display: inline-block;
     text-align: center;
-    margin: 8px;
-    font-size: 0.8em;
+    margin: 5px;
+}
+
+.fieldPlayer h1 {
+    font-size: 1.0em;
 }
 
 .fieldPlayer svg {
@@ -772,8 +775,17 @@ dl.kvgroup {
 /********************************************************/
 /*  SALES */
 /********************************************************/
-#salesList {
+.sales-list {
     display: flex;
+    flex-wrap: wrap;
+}
+
+.sales-list > div {
+    margin: 3px;
+}
+
+.sales-list > div:nth-child(2n) {
+    background-color: #f1f1f1;
 }
 
 .salecard-content {
@@ -830,4 +842,10 @@ dl.kvgroup {
 
 .past-offers p.invalid{
     text-decoration: line-through;
+}
+
+.releases-list{
+    display: table;
+    table-layout: fixed;
+    width: 100%;
 }
