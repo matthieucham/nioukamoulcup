@@ -460,7 +460,7 @@ header nav a:hover, nav ul li ul li:hover {
 }
 
 .jersey .clubName-container {
-    position:absolute;
+    position: absolute;
     bottom: 3px;
     left: 0;
     right: 0;
@@ -471,8 +471,11 @@ header nav a:hover, nav ul li ul li:hover {
     color: #f1f1f1;
     font-size: 0.8em;
     font-weight: bold;
-    background-color: rgba(0,0,0,0.6);
+    background-color: rgba(0, 0, 0, 0.6);
     border-radius: 2px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .fieldPlayer {
@@ -764,4 +767,67 @@ dl.kvgroup {
 
 .bestofentry .bestofplayer {
     flex: 1;
+}
+
+/********************************************************/
+/*  SALES */
+/********************************************************/
+#salesList {
+    display: flex;
+}
+
+.salecard-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    min-height: 6em;
+    max-height: 6em;
+    min-width: 18em;
+    max-width: 18em;
+}
+
+.salecard-content>* {
+    padding: 0 3px;
+}
+
+.salecard-content dt {
+    float: left;
+    clear: both;
+    width: 6em;
+    font-size: 0.8em;
+    color: rgba(0, 0, 0, 0.54);
+}
+.salecard-content dt:after {
+    content: ":";
+}
+
+.salecard-content dd {
+    float: left;
+}
+
+.salecard-winner {
+    font-size: 1.5em;
+}
+
+.salecard-content .past-offers{
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    flex: 1;
+    min-height: inherit;
+    max-height: inherit;
+}
+
+.past-offers p{
+    padding: 0 3px;
+    font-size: 0.8em;
+    color: rgba(0, 0, 0, 0.54);
+}
+
+.past-offers p.ismine{
+    font-weight: bold;
+}
+
+.past-offers p.invalid{
+    text-decoration: line-through;
 }
