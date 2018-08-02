@@ -52,3 +52,10 @@ class StateInitializerMixin:
             self.initial_state.update({'teams': self._to_json(teaminfo_serializer)})
             self.initial_state.update({'league_id': league.id})
             return self.initial_state
+
+    def init_from_merkatosession(self, request, session):
+        self._init_common(request)
+        with Timer(id='init_from_merkatosession', verbose=True):
+            session_serializer = serializers.MerkatoSessionSerializer(session, context={'request': request})
+            self.initial_state.update({'merkatosession': self._to_json(session_serializer)})
+            return self.initial_state

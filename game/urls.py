@@ -27,4 +27,8 @@ urlpatterns = [
         name="league_team-detail"),
     url(r'^league/ranking/(?P<pk>[0-9]+)/$', frontend.LeagueRankingView.as_view(),
         name="league_ranking-detail"),
+    url(r'^league/merkatoresults/(?P<pk>[0-9]+)/latest$', frontend.LeagueMerkatoResultsView.as_view(),
+        name="league_merkatoresults-latest"),
+    url(r'^league/merkatoresults/(?P<pk>[0-9]+)/(?P<session_pk>[0-9]+)$', frontend.LeagueMerkatoResultsView.as_view(),
+        name="league_merkatoresults-session"),
 ]

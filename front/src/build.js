@@ -11,6 +11,7 @@ import { TestPage } from './pages/TestPage'
 import EkypPage from './pages/EkypPage'
 import { LeaguePage } from './pages/LeaguePage'
 import { TeamPage } from './pages/TeamPage'
+import { MerkatoResultsPage } from './pages/MerkatoResultsPage'
 
 // ========================================
 
@@ -28,6 +29,7 @@ const pages = {
     'ekyp': EkypPage,
     'league': LeaguePage,
     'team': TeamPage,
+    'merkatoresults': MerkatoResultsPage
 };
 
 const preloadedStateSchema = { players: Schemas.PLAYER_ARRAY, clubs: Schemas.CLUB_ARRAY };
@@ -53,6 +55,9 @@ const initialState = {
 			phases_ranking: normalizedData.result.ranking,
 			teams: normalizedData.result.teams,
 		},
+		merkatosession: {
+			initial: normalizedData.result.merkatosession
+		}
 	},
 };
 console.log(initialState);

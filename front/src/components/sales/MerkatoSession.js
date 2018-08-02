@@ -3,7 +3,7 @@ import Moment from 'moment';
 import { SaleCard } from './SaleCard';
 
 
-export class SalesList extends React.Component {
+class SalesList extends React.Component {
 
 	render() {
 		const { sales } = this.props;
@@ -19,7 +19,7 @@ export class SalesList extends React.Component {
 	}
 }
 
-export class ReleasesList extends React.Component {
+class ReleasesList extends React.Component {
 
 	render() {
 		const { releases } = this.props;

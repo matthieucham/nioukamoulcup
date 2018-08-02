@@ -1,4 +1,4 @@
-from django.views.generic import TemplateView, DetailView
+from django.views.generic import TemplateView, DetailView, ListView
 from django.db.models import Sum, Avg, Count, Q, F
 from graphos.sources.model import SimpleDataSource
 from graphos.renderers.morris import AreaChart
@@ -297,4 +297,32 @@ class LeagueRankingView(PermissionRequiredMixin, StateInitializerMixin, CurrentL
         context['instance'] = self._get_current_league_instance(self.object)
 
         context['PRELOADED_STATE'] = self.init_from_league(self.request, self.object)
+        return context
+
+
+class LeagueMerkatoResultsView(PermissionRequiredMixin, StateInitializerMixin, CurrentLeagueInstanceMixin, DetailView):
+    model = models.League
+    template_name = 'game/league/merkato_results.html'
+    permission_required = 'game.view_league'
+
+    def _get_my_team(self):
+        return models.LeagueMembership.objects.get(user=self.request.user, league=self.object).team
+
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get a context
+        context = super(LeagueMerkatoResultsView, self).get_context_data(**kwargs)
+        context['sessions'] = models.MerkatoSession.objects.filter(
+            merkato__league_instance=self._get_current_league_instance(self.object), is_solved=True).order_by(
+            '-solving')
+        context['team'] = self._get_my_team()
+        context['instance'] = self._get_current_league_instance(self.object)
+        context['component'] = 'merkatoresults'
+        if 'session_pk' in self.kwargs:
+            msession = models.MerkatoSession.objects.get(
+                merkato__league_instance=self._get_current_league_instance(self.object), is_solved=True,
+                pk=self.kwargs['session_pk'])
+            context['PRELOADED_STATE'] = self.init_from_merkatosession(self.request, msession)
+        else:
+            # latest
+            context['PRELOADED_STATE'] = self.init_from_merkatosession(self.request, context['sessions'].first())
         return context
