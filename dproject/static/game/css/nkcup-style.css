@@ -455,11 +455,37 @@ header nav a:hover, nav ul li ul li:hover {
     padding: 3px;
 }
 
+.jersey {
+    position: relative;
+}
+
+.jersey .clubName-container {
+    position: absolute;
+    bottom: 3px;
+    left: 0;
+    right: 0;
+}
+
+.jersey .clubName-container .clubName {
+    padding: 2px;
+    color: #f1f1f1;
+    font-size: 0.8em;
+    font-weight: bold;
+    background-color: rgba(0, 0, 0, 0.6);
+    border-radius: 2px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 .fieldPlayer {
     display: inline-block;
     text-align: center;
-    margin: 8px;
-    font-size: 0.8em;
+    margin: 5px;
+}
+
+.fieldPlayer h1 {
+    font-size: 1.0em;
 }
 
 .fieldPlayer svg {
@@ -476,7 +502,7 @@ header nav a:hover, nav ul li ul li:hover {
 
 .fieldPlayer .playerDetails {
     position: relative;
-    top: -15px;
+    top: -10px;
     padding: 5px;
     background-color: rgba(255, 255, 255, 0.2);
     border-radius: 3px;
@@ -744,4 +770,82 @@ dl.kvgroup {
 
 .bestofentry .bestofplayer {
     flex: 1;
+}
+
+/********************************************************/
+/*  SALES */
+/********************************************************/
+.sales-list {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.sales-list > div {
+    margin: 3px;
+}
+
+.sales-list > div:nth-child(2n) {
+    background-color: #f1f1f1;
+}
+
+.salecard-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    min-height: 6em;
+    max-height: 6em;
+    min-width: 18em;
+    max-width: 18em;
+}
+
+.salecard-content>* {
+    padding: 0 3px;
+}
+
+.salecard-content dt {
+    float: left;
+    clear: both;
+    width: 6em;
+    font-size: 0.8em;
+    color: rgba(0, 0, 0, 0.54);
+}
+.salecard-content dt:after {
+    content: ":";
+}
+
+.salecard-content dd {
+    float: left;
+}
+
+.salecard-winner {
+    font-size: 1.5em;
+}
+
+.salecard-content .past-offers{
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    flex: 1;
+    min-height: inherit;
+    max-height: inherit;
+}
+
+.past-offers p{
+    padding: 0 3px;
+    font-size: 0.8em;
+    color: rgba(0, 0, 0, 0.54);
+}
+
+.past-offers p.ismine{
+    font-weight: bold;
+}
+
+.past-offers p.invalid{
+    text-decoration: line-through;
+}
+
+.releases-list{
+    display: table;
+    table-layout: fixed;
+    width: 100%;
 }

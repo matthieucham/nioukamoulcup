@@ -19,14 +19,8 @@ class ClubSerializer(serializers.ModelSerializer):
                   )
 
 
-class ClubHdrSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = l1models.Club
-        fields = ('id', 'nom')
-
-
 class PlayerHdrSerializer(serializers.HyperlinkedModelSerializer):
-    club = ClubHdrSerializer()
+    club = ClubSerializer()
     url = serializers.HyperlinkedIdentityField(view_name='stat_joueur-detail')
 
     class Meta:
@@ -58,21 +52,14 @@ class PlayerScoreSerializer(PlayerHdrSerializer):
     perfs_agg = serializers.SerializerMethodField(source='*')
 
     def get_perfs_agg(self, value):
-        perfs = scoring_models.JJScore.objects.filter(joueur=value,
-                                                      journee_scoring__saison_scoring__saison__est_courante__isnull=False)
-        perfs_notes = list(filter(lambda n: n is not None, map(lambda jjs: jjs.note, perfs)))
-        count = len(perfs_notes)
-        avg = round(float(sum(perfs_notes)) / max(count, 1), 3)
-
-        output = {'NOTES_COUNT': count, 'NOTES_AVG': avg}
-        for metakey in scoring.BONUS:
-            for bonuskey in scoring.BONUS[metakey]:
-                bonusval = sum(map(lambda bo: bo[bonuskey], filter(lambda bo: bonuskey in bo,
-                                                                   map(lambda jjs: jjs.details['bonuses'], filter(
-                                                                       lambda j: j.details and 'bonuses' in j.details,
-                                                                       perfs)))))
-                output.update({bonuskey: bonusval})
-
+        try:
+            perfs = scoring_models.SJScore.objects.filter(joueur=value,
+                                                          saison_scoring__saison__est_courante__isnull=False).get()
+        except scoring_models.SJScore.DoesNotExist:
+            return {'NOTES_COUNT': 0, 'NOTES_AVG': None}
+        output = {'NOTES_COUNT': perfs.nb_notes, 'NOTES_AVG': perfs.avg_note}
+        for bonuskey, bonusval in perfs.details.items():
+            output.update({bonuskey: bonusval})
         return output
 
     class Meta:
@@ -86,7 +73,7 @@ class PlayerScoreSerializer(PlayerHdrSerializer):
                   'poste',
                   'club',
                   'perfs_agg'
-            # 'perfs',
+                  # 'perfs',
                   )
 
 

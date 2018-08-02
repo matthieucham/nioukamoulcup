@@ -39,7 +39,7 @@ def last_journees(nb=1):
     :param nb:
     :return:
     """
-    journees = l1models.Journee.objects.order_by('-fin')[:nb]
+    journees = l1models.Journee.objects.filter(saison__est_courante__isnull=False).order_by('-fin')[:nb]
     return {'journees': sorted(journees, key=operator.attrgetter('fin'))}
 
 

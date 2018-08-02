@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux'
 
-import LeagueRankingWidget from '../components/LeagueRanking';
-
 const mapStateToProps = state => {
 	return {
 		ranking: state.data.rankings.current,
@@ -10,14 +8,18 @@ const mapStateToProps = state => {
 }
 
 class App extends Component {
+
+	
 	render() {
 		return (
 			<div className="react-app-inner">
 			<main>
-			
+				<article id="home-main">
+					
+				</article>
 			</main>
 			<aside className="hg__right">
-			<LeagueRankingWidget ranking={ this.props.ranking }/>
+			
 			</aside>
 			</div>
 
