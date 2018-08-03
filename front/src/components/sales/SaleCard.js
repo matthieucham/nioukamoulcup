@@ -112,6 +112,7 @@ class SaleDuring extends React.Component {
 		if (auctionIndex >= allOffers.length) {
 			this.props.onLastOfferDone();
 			auctionIndex--;
+			return(<div></div>);
 		}
 
 		const pastP = allOffers.slice(0, auctionIndex).map( (auction, index) => {
