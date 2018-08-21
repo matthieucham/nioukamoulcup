@@ -24,7 +24,8 @@ class SaisonManager(models.Manager):
         instance_update = dateutil.parser.parse(statnuts_instance['updated_at'])
         if force_import or saison.derniere_maj is None or instance_update > saison.derniere_maj:
             for step in statnuts_instance['steps']:
-                Journee.objects.import_from_statnuts(saison, sn_client.get_step(step['uuid']), sn_client)
+                Journee.objects.import_from_statnuts(saison, sn_client.get_step(step['uuid']), sn_client,
+                                                     force_import=force_import)
         saison.derniere_maj = instance_update
         saison.save()
 
@@ -129,7 +130,7 @@ class JoueurManager(models.Manager):
                     'nom': statnuts_data['last_name'],
                     'surnom': statnuts_data['usual_name'],
                     'poste': statnuts_data['position']}
-        return self.get_or_create(sn_person_uuid=statnuts_data['uuid'],
+        return self.update_or_create(sn_person_uuid=statnuts_data['uuid'],
                                   defaults=defaults)
 
     def set_club_from_statnuts(self, joueur, statnuts_data_teams, maj):
