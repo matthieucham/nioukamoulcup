@@ -13,7 +13,7 @@ django-environ==0.4.4
 django-filter==1.1.0
 django-graphos==0.3.41
 django-guardian==1.4.9
-django-inline-actions==2.0.0
+django-inline-actions==2.0.2
 django-inline-svg==0.1.1
 django-mptt==0.9.0
 django-sekizai==0.10.0

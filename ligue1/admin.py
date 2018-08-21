@@ -61,7 +61,7 @@ class RencontreInline(InlineActionsMixin, admin.TabularInline):
     fields = ('date', 'resultat', 'sn_meeting_uuid', 'derniere_maj',)
     readonly_fields = ('date', 'resultat', 'sn_meeting_uuid', 'derniere_maj',)
 
-    actions = ['import_meeting_action']
+    inline_actions = ['import_meeting_action']
 
     def has_add_permission(self, request):
         return False

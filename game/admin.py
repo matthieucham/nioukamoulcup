@@ -15,7 +15,7 @@ class JourneeScoringInline(InlineActionsMixin, admin.TabularInline):
     can_delete = False
     fields = ('journee', 'status', 'get_derniere_maj', 'computed_at', 'locked_at',)
     readonly_fields = ('journee', 'status', 'get_derniere_maj', 'computed_at', 'locked_at',)
-    actions = ('compute_scores', 'lock',)
+    inline_actions = ('compute_scores', 'lock',)
 
     def has_add_permission(self, request):
         return False
