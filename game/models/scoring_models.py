@@ -20,9 +20,11 @@ class SaisonScoring(models.Model):
         for j in journees:
             js = JourneeScoring.objects.filter(saison_scoring=self, journee=j).first()
             if js:
-                if js.computed_at < j.derniere_maj:
-                    journees_to_recompute.append(j)
-                    js.delete()
+                # if js.computed_at < j.derniere_maj:
+                #     journees_to_recompute.append(j)
+                #     js.delete()
+                journees_to_recompute.append(j)
+                js.delete()
             else:
                 journees_to_recompute.append(j)
         for journee in journees_to_recompute:
@@ -65,16 +67,18 @@ class JJScoreManager(models.Manager):
             for r in journee_scoring.journee.rencontres.all():
                 computed_club_pks.extend([r.club_domicile.pk, r.club_exterieur.pk])
                 all_perfs = r.performances.select_related('joueur').select_related('rencontre').all()
-                bbp = None
                 if all_perfs:  # perform queryset
-                    if bbp is None:
-                        bbp = scoring.compute_best_by_position(all_perfs)
+                    bbp = scoring.compute_best_by_position(all_perfs)
                     for perf in all_perfs:
                         note, bonus, comp, earned_bonuses = scoring.compute_score_performance(perf, bbp)
                         jjscores.append(
-                            JJScore(journee_scoring=journee_scoring, joueur=perf.joueur, rencontre=r, note=note,
+                            JJScore(journee_scoring=journee_scoring,
+                                    joueur=perf.joueur,
+                                    rencontre=r,
+                                    note=note,
                                     bonus=bonus,
-                                    compensation=comp, details={'bonuses': earned_bonuses}))
+                                    compensation=comp,
+                                    details={'bonuses': earned_bonuses}))
                         # for cl in journee_scoring.journee.saison.participants:
                         # if not cl.pk in computed_club_pks:
                         # compenser scores matchs reportés ...

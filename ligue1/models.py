@@ -101,6 +101,23 @@ class Journee(Importe):
         super(Journee, self).save(*args, **kwargs)
 
 
+class ClubManager(models.Manager):
+
+    def import_from_statnuts(self, sn_team_with_members):
+        club = self.get(sn_team_uuid=sn_team_with_members['uuid'])
+        current_members = []
+        for snj in sn_team_with_members['members']:
+            joueur, _ = Joueur.objects.get_or_create_from_statnuts(snj)
+            joueur.club = club
+            joueur.save()
+            current_members.append(snj['uuid'])
+        joueurs_to_remove = []
+        for j in Joueur.objects.filter(club=club):
+            if str(j.sn_person_uuid) not in current_members:
+                joueurs_to_remove.append(j.pk)
+        Joueur.objects.filter(pk__in=joueurs_to_remove).update(club=None)
+
+
 class Club(Importe):
     SVG_TEMPLATES = (('jersey-plain2', 'uni'),
                      ('jersey-stripes-v2', 'rayures verticales'),
@@ -118,6 +135,8 @@ class Club(Importe):
     maillot_color_bg = RGBColorField(blank=False, default='#FFFFFF')
     maillot_color_stroke = RGBColorField(blank=True)
 
+    objects = ClubManager()
+
     def __str__(self):
         return self.nom
 
@@ -131,12 +150,13 @@ class JoueurManager(models.Manager):
                     'surnom': statnuts_data['usual_name'],
                     'poste': statnuts_data['position']}
         return self.update_or_create(sn_person_uuid=statnuts_data['uuid'],
-                                  defaults=defaults)
+                                     defaults=defaults)
 
-    def set_club_from_statnuts(self, joueur, statnuts_data_teams, maj):
+    def set_club_from_statnuts(self, joueur, statnuts_data_teams, maj, saison=None):
         for t in statnuts_data_teams:
+            # select the first found team with a participation in the current instance
             try:
-                club = Club.objects.get(sn_team_uuid=t['uuid'])
+                club = Club.objects.filter(participations=saison).get(sn_team_uuid=t['uuid'])
                 joueur.club = club
             except Club.DoesNotExist:
                 pass
@@ -204,7 +224,7 @@ class RencontreManager(models.Manager):
             joueur_updated_at = dateutil.parser.parse(ros['player']['updated_at'])
             if created or joueur.derniere_maj is None or joueur.derniere_maj < joueur_updated_at:  # or date de la rencontre > dernier maj du joueur !
                 Joueur.objects.set_club_from_statnuts(joueur, sn_client.get_person_teams(ros['player']['uuid']),
-                                                      joueur_updated_at)
+                                                      joueur_updated_at, saison=rencontre.journee.saison)
             club = Club.objects.get(sn_team_uuid=ros['played_for'])
             if ros['stats'] is None:
                 tps = 0  # TODO ?

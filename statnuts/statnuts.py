@@ -42,3 +42,7 @@ class StatnutsClient():
     def get_person_teams(self, person_uuid):
         teams_url = '/rest/football_players/%s/current_teams' % person_uuid
         return self._get_data(teams_url)
+
+    def get_team_members(self, team_uuid):
+        members_url = '/rest/football_teams/%s/?expand=members' % team_uuid
+        return self._get_data(members_url)

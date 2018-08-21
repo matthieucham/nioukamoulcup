@@ -137,11 +137,35 @@ class SaisonCouranteAdmin(admin.ModelAdmin):
         return False
 
 
+class ClubJoueurInline(admin.TabularInline):
+    model = models.Joueur
+    can_delete = False
+    fields = ('__str__', 'poste', 'sn_person_uuid',)
+    readonly_fields = ('__str__', 'poste', 'sn_person_uuid',)
+    ordering = ('poste', 'nom',)
+
+
+class ClubAdmin(admin.ModelAdmin):
+    actions = ['import_members_action']
+    list_display = ['nom', 'sn_team_uuid', 'maillot_svg', 'maillot_color_bg', 'maillot_color_stroke', 'derniere_maj']
+    inlines = [ClubJoueurInline, ]
+    search_fields = ('nom', )
+    readonly_fields = ('derniere_maj', )
+
+    def import_members_action(self, request, queryset):
+        # appeler Statnuts ici
+        client = StatnutsClient(settings.STATNUTS_CLIENT_ID, settings.STATNUTS_SECRET, settings.STATNUTS_URL)
+        for club in queryset:
+            models.Club.objects.import_from_statnuts(client.get_team_members(club.sn_team_uuid))
+        self.message_user(request, "Import effectué")
+        return HttpResponseRedirect(reverse('import_statnuts:ligue1_club_changelist'))
+
+
 admin_site = ImportStatnutsSite('import_statnuts')
 admin_site.disable_action('delete_selected')
 admin_site.register(models.SaisonCourante, SaisonCouranteAdmin)
 admin_site.register(models.Saison, SaisonAdmin)
 admin_site.register(models.Journee, JourneeAdmin)
 admin_site.register(models.Joueur)
-admin_site.register(models.Club)
+admin_site.register(models.Club, ClubAdmin)
 admin_site.register(models.Rencontre, RencontreAdmin)
