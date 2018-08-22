@@ -1,7 +1,48 @@
 __author__ = 'mgrandrie'
+
+from statistics import mean, stdev
+
 """
 Utilitaire de conversion et d'agglomération des notes "brutes" importées
 """
+
+
+def _extract_sources(statnuts_roster):
+    existing_sources = set()
+    for ros in statnuts_roster:
+        curr_srcs = set([r['source'] for r in ros['ratings']])
+        existing_sources |= curr_srcs
+    return existing_sources
+
+
+def harmonize_notes(statnuts_roster, target_avg=5.0, target_std=1.0):
+    # calcul de la fonction de conversion par source
+    by_src = dict()
+    for src in _extract_sources(statnuts_roster):
+        notes = [
+            float(r['rating']) for ros in statnuts_roster for r in ros['ratings'] if r['source'] == src
+        ]
+        if len(notes) > 1:
+            by_src[src] = {'MEAN': mean(notes), 'STDEV': stdev(notes)}
+
+    # application de la conversion sur chaque joueur
+    def conv_func(n, m, s):
+        return (target_std / s) * (n - m) + target_avg
+
+    for pl in statnuts_roster:
+        pl['temp_note'] = mean(
+            [conv_func(float(r['rating']), by_src[r['source']]['MEAN'], by_src[r['source']]['STDEV']) for r in
+             pl['ratings'] if r['source'] in by_src])
+
+    # calcul du nouveau facteur pour les temp_notes
+    temp_notes = [pl['temp_note'] for pl in statnuts_roster]
+    for_hnotes = {'MEAN': mean(temp_notes), 'STDEV': stdev(temp_notes)}
+
+    # calcul de la note finale:
+    for pl in statnuts_roster:
+        pl['hnote'] = round(conv_func(pl.pop('temp_note'), for_hnotes['MEAN'], for_hnotes['STDEV']), 1)
+
+    return statnuts_roster
 
 
 def compute_note(statnuts_ratings):

@@ -2,6 +2,7 @@
 {% load static %}
 {% load l1results %}
 {% load i18n %}
+{% load humanize %}
 
 {% block script %}
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
@@ -44,8 +45,10 @@
     <section id="player-bilan">
         <h2>Bilan</h2>
         <div>
+            {% with stats.avg_note|stringformat:'0.1f' as avgnote %}
             {% keyvalue 'Matchs notés' stats.nb_notes 'card' %}
-            {% keyvalue 'Note moyenne' stats.avg_note 'card' %}
+            {% keyvalue 'Note moyenne' avgnote 'card' %}
+            {% endwith %}
             {#            {% keyvalue 'Bonus' stats.total_bonuses 'card' %}#}
             <div id="player-bonuses">
                 {% bonusvalue 'GOAL' 'Buts h.p.' stats.details.GOAL %}

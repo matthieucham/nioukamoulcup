@@ -19,7 +19,7 @@
     </div>
     <div class="cell_table center">
         {% if jjs.note is not None %}
-            <span class="note">{{ jjs.note|stringformat:'0.2f' }}</span>
+            <span class="note">{{ jjs.note|stringformat:'0.1f' }}</span>
         {% elif jjs.compensation > 0 %}
             <span class="compensation">{{ jjs.compensation|stringformat:'0.0f' }}</span>
         {% else %}

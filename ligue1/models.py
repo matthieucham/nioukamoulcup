@@ -3,7 +3,6 @@ from django.db import models
 from django.contrib.postgres.fields import JSONField
 import datetime
 from django.utils import timezone
-from django.core.exceptions import ObjectDoesNotExist
 import dateutil.parser
 from colorful.fields import RGBColorField
 
@@ -219,7 +218,8 @@ class RencontreManager(models.Manager):
     def _delete_and_recreate_performances(self, rencontre, statnuts_meeting, sn_client):
         dom_or_ext = {statnuts_meeting['home_team']['uuid']: 'dom', statnuts_meeting['away_team']['uuid']: 'ext'}
         rosperfs = []
-        for ros in statnuts_meeting['roster']:
+        harmonized_roster = note_converter.harmonize_notes(statnuts_meeting['roster'])
+        for ros in harmonized_roster:
             joueur, created = Joueur.objects.get_or_create_from_statnuts(ros['player'])
             joueur_updated_at = dateutil.parser.parse(ros['player']['updated_at'])
             if created or joueur.derniere_maj is None or joueur.derniere_maj < joueur_updated_at:  # or date de la rencontre > dernier maj du joueur !
@@ -299,5 +299,4 @@ def make_rencontre_resultat(statnuts_meeting):
 
 
 def make_performance_details(statnuts_roster, dom_or_ext):
-    return {'equipe': dom_or_ext, 'stats': statnuts_roster['stats'], 'note': note_converter.compute_note(
-        statnuts_roster['ratings'])}
+    return {'equipe': dom_or_ext, 'stats': statnuts_roster['stats'], 'note': statnuts_roster['hnote']}

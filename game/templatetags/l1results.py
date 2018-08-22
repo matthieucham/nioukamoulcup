@@ -163,6 +163,6 @@ def compo_player(jjs):
     return {
         'club': jjs.joueur.club,
         'joueur': jjs.joueur,
-        'note': jjs.note if hasattr(jjs, 'note') else '%s [%dn]' % (jjs.avg_note, jjs.nb_notes),
+        'note': '%0.1f' % jjs.note if hasattr(jjs, 'note') else '%0.1f [%dn]' % (jjs.avg_note, jjs.nb_notes),
         'bonus': jjs.details['bonuses'] if 'bonuses' in jjs.details else None
     }

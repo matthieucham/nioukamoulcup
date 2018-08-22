@@ -13,7 +13,7 @@
     </div>
     <div class="cell_table center">
         {% if joueur.avg_note > 0 %}
-            <span class="note">{{ joueur.avg_note|stringformat:'0.2f' }}</span>
+            <span class="note">{{ joueur.avg_note|stringformat:'0.1f' }}</span>
         {% else %}
             -
         {% endif %}

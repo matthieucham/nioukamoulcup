@@ -20,7 +20,7 @@
                     <div class="bestofindex"><h1>{{ forloop.counter }}</h1></div>
                     <div class="bestofplayer">
                         <p class="smalltext center">{{ jjs.rencontre.date }}</p>
-                        <h2>{{ jjs.joueur.display_name }}: <strong>{{ jjs.note }}</strong></h2>
+                        <h2>{{ jjs.joueur.display_name }}: <strong>{{ jjs.note|stringformat:'0.1f' }}</strong></h2>
                         {% rencontre_score jjs.rencontre %}
                     </div>
                 </li>
@@ -34,7 +34,7 @@
                     <div class="bestofindex"><h1>{{ forloop.counter }}</h1></div>
                     <div class="bestofplayer">
                         <p class="smalltext center">{{ jjs.rencontre.date }}</p>
-                        <h2>{{ jjs.joueur.display_name }}: <strong>{{ jjs.note }}</strong></h2>
+                        <h2>{{ jjs.joueur.display_name }}: <strong>{{ jjs.note|stringformat:'0.1f' }}</strong></h2>
                         {% rencontre_score jjs.rencontre %}
                     </div>
                 </li>

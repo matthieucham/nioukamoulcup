@@ -1,4 +1,5 @@
 {% load l1results %}
+{% load humanize %}
 
 <div class="fieldPlayer">
     <div class="jersey">
@@ -10,7 +11,7 @@
     <div class="playerDetails">
         <h1>{{ joueur.display_name }}</h1>
         <p><span class="bonus-list">
-        {{ note }}
+            {{ note }}
             {% for bk, bv in bonus.items %}
                 {% bonus bk bv %}
             {% endfor %}
