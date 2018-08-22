@@ -15,7 +15,7 @@ def _extract_sources(statnuts_roster):
     return existing_sources
 
 
-def harmonize_notes(statnuts_roster, target_avg=5.0, target_std=1.0):
+def harmonize_notes(statnuts_roster, target_avg=5.0, target_std=1.2):
     # calcul de la fonction de conversion par source
     by_src = dict()
     for src in _extract_sources(statnuts_roster):
