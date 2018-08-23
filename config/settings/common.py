@@ -343,9 +343,12 @@ if not DEBUG:
     })
 
 # Connection to Statnuts
-STATNUTS_CLIENT_ID = 'nG7zDMPPAQwovoFPv2p8U2GQKmVBtYRop9yN6Qtr'
-STATNUTS_SECRET = 'XFHi7wNTLjNmlpfGkvl3bdPlfJ8uFRVNk3P8Qg5DLA4SO1vBgIMzsbdo9k9uNMkn1GbpEqslUqC7NNXHzBj3Krz3ks2M3kNkJYO4EuZ9W8OeYQlHeq0K76HorrfJe39Y'
+STATNUTS_CLIENT_ID = 'aLUoUeBI9Zuj7?JfC0t9U=P3mycANITG@0hvaQlZ'
+STATNUTS_SECRET = 'GsHk=.o2kTu9WkU!a:n1kqkQogZ4lXWitDGn2bZff=?YcdbI-;6h_Grusn@q56@;ttN9OMa9.dWcuBq4lJ8vu7;I9n_f:kJrZ5RUSNkAan088KLyv..7q_.Me94MB?Dy'
 STATNUTS_URL = 'https://statnuts.django.group'
+STATNUTS_NKCUP_USER = 'nioukamoulcupimport'
+STATNUTS_NKCUP_PWD = 'nioukamoulcupimport'
+
 
 # ...
 TEMPLATE_STRING_IF_INVALID = ''

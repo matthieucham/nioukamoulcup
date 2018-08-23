@@ -43,7 +43,8 @@ class RencontreAdmin(admin.ModelAdmin):
         return False
 
     def import_meetings_action(self, request, queryset):
-        client = StatnutsClient(settings.STATNUTS_CLIENT_ID, settings.STATNUTS_SECRET, settings.STATNUTS_URL)
+        client = StatnutsClient(settings.STATNUTS_CLIENT_ID, settings.STATNUTS_SECRET, settings.STATNUTS_URL,
+                                settings.STATNUTS_NKCUP_USER, settings.STATNUTS_NKCUP_PWD)
         for rencontre in queryset:
             models.Rencontre.objects.import_from_statnuts(rencontre.journee,
                                                           client.get_meeting(rencontre.sn_meeting_uuid),
@@ -67,7 +68,8 @@ class RencontreInline(InlineActionsMixin, admin.TabularInline):
         return False
 
     def import_meeting_action(self, request, obj, inline_obj):
-        client = StatnutsClient(settings.STATNUTS_CLIENT_ID, settings.STATNUTS_SECRET, settings.STATNUTS_URL)
+        client = StatnutsClient(settings.STATNUTS_CLIENT_ID, settings.STATNUTS_SECRET, settings.STATNUTS_URL,
+                                settings.STATNUTS_NKCUP_USER, settings.STATNUTS_NKCUP_PWD)
         models.Rencontre.objects.import_from_statnuts(obj, client.get_meeting(inline_obj.sn_meeting_uuid), client,
                                                       force_import=True)
         messages.info(request, "Import effectué")
@@ -92,7 +94,8 @@ class JourneeAdmin(InlineActionsModelAdminMixin, admin.ModelAdmin):
         return obj.saison.nom
 
     def import_step_action(self, request, queryset):
-        client = StatnutsClient(settings.STATNUTS_CLIENT_ID, settings.STATNUTS_SECRET, settings.STATNUTS_URL)
+        client = StatnutsClient(settings.STATNUTS_CLIENT_ID, settings.STATNUTS_SECRET, settings.STATNUTS_URL,
+                                settings.STATNUTS_NKCUP_USER, settings.STATNUTS_NKCUP_PWD)
         for journee in queryset:
             models.Journee.objects.import_from_statnuts(journee.saison, client.get_step(journee.sn_step_uuid), client,
                                                         force_import=True)
@@ -113,7 +116,8 @@ class SaisonAdmin(admin.ModelAdmin):
 
     def import_instance_action(self, request, queryset):
         # appeler Statnuts ici
-        client = StatnutsClient(settings.STATNUTS_CLIENT_ID, settings.STATNUTS_SECRET, settings.STATNUTS_URL)
+        client = StatnutsClient(settings.STATNUTS_CLIENT_ID, settings.STATNUTS_SECRET, settings.STATNUTS_URL,
+                                settings.STATNUTS_NKCUP_USER, settings.STATNUTS_NKCUP_PWD)
         for saison in queryset:
             models.Saison.objects.import_from_statnuts(client.get_tournament_instance(saison.sn_instance_uuid), client,
                                                        force_import=True)
@@ -149,12 +153,13 @@ class ClubAdmin(admin.ModelAdmin):
     actions = ['import_members_action']
     list_display = ['nom', 'sn_team_uuid', 'maillot_svg', 'maillot_color_bg', 'maillot_color_stroke', 'derniere_maj']
     inlines = [ClubJoueurInline, ]
-    search_fields = ('nom', )
-    readonly_fields = ('derniere_maj', )
+    search_fields = ('nom',)
+    readonly_fields = ('derniere_maj',)
 
     def import_members_action(self, request, queryset):
         # appeler Statnuts ici
-        client = StatnutsClient(settings.STATNUTS_CLIENT_ID, settings.STATNUTS_SECRET, settings.STATNUTS_URL)
+        client = StatnutsClient(settings.STATNUTS_CLIENT_ID, settings.STATNUTS_SECRET, settings.STATNUTS_URL,
+                                settings.STATNUTS_NKCUP_USER, settings.STATNUTS_NKCUP_PWD)
         for club in queryset:
             models.Club.objects.import_from_statnuts(client.get_team_members(club.sn_team_uuid))
         self.message_user(request, "Import effectué")
