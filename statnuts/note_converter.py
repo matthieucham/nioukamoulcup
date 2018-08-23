@@ -1,6 +1,6 @@
 __author__ = 'mgrandrie'
 
-from statistics import mean, stdev
+from statistics import mean, stdev, median_low
 
 """
 Utilitaire de conversion et d'agglomération des notes "brutes" importées
@@ -15,7 +15,7 @@ def _extract_sources(statnuts_roster):
     return existing_sources
 
 
-def harmonize_notes(statnuts_roster, target_avg=5.0, target_std=1.2):
+def harmonize_notes(statnuts_roster):
     # calcul de la fonction de conversion par source
     by_src = dict()
     for src in _extract_sources(statnuts_roster):
@@ -27,6 +27,8 @@ def harmonize_notes(statnuts_roster, target_avg=5.0, target_std=1.2):
 
     # application de la conversion sur chaque joueur
     def conv_func(n, m, s):
+        target_std = median_low([bs['STDEV'] for s, bs in by_src.items()])
+        target_avg = median_low([bs['MEAN'] for s, bs in by_src.items()])
         return (target_std / s) * (n - m) + target_avg
 
     for pl in statnuts_roster:
