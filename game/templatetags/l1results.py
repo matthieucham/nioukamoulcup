@@ -157,7 +157,8 @@ def bonus(bonuskey, position, bonusval=1):
         'HALFOFFENSIVE': ('fa-thermometer-half', 'Gold'),
         'CSC': ('fa-thumbs-down', 'DarkSlateGrey'),
     }
-    if (services.BONUS['COLLECTIVE'].get(bonuskey) or services.BONUS['PERSONAL'].get(bonuskey))[position] > 0:
+    if bonuskey == 'CSC' or (services.BONUS['COLLECTIVE'].get(bonuskey) or services.BONUS['PERSONAL'].get(bonuskey))[
+        position] > 0:
         ico, color = icon_dict[bonuskey]
         return {'icon': ico, 'color': color, 'nb': bonusval, 'masked': False}
     else:
