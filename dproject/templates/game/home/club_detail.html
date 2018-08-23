@@ -30,12 +30,12 @@
                 <div class="cell_table center" style="width:15%;">Position</div>
                 <div class="cell_table center" style="width:15%;">Note moyenne</div>
                 <div class="cell_table center" style="width:15%;">Nombre de notes</div>
-                <div class="cell_table center" style="width:5%;">{% bonus 'LEADER' %}</div>
-                <div class="cell_table center" style="width:5%;">{% bonus 'GOAL' %}</div>
-                <div class="cell_table center" style="width:5%;">{% bonus 'PENALTY' %}</div>
-                <div class="cell_table center" style="width:5%;">{% bonus 'PASS' %}</div>
-                <div class="cell_table center" style="width:5%;">{% bonus 'HALFPASS' %}</div>
-                <div class="cell_table center" style="width:5%;">{% bonus 'PENALSTOP' %}</div>
+                <div class="cell_table center" style="width:5%;">{% bonus 'LEADER' 'M' %}</div>
+                <div class="cell_table center" style="width:5%;">{% bonus 'GOAL' 'M' %}</div>
+                <div class="cell_table center" style="width:5%;">{% bonus 'PENALTY' 'M' %}</div>
+                <div class="cell_table center" style="width:5%;">{% bonus 'PASS' 'M' %}</div>
+                <div class="cell_table center" style="width:5%;">{% bonus 'HALFPASS' 'M' %}</div>
+                <div class="cell_table center" style="width:5%;">{% bonus 'PENALSTOP' 'M' %}</div>
             </div>
             {% for pl in players %}
                 {% include './club_joueur.html' with joueur=pl %}

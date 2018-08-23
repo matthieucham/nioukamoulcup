@@ -28,7 +28,7 @@
     </div>
     <div class="cell_table">
         {% for bk, bv in jjs.details.bonuses.items %}
-            {% bonus bk bv %}
+            {% bonus bk jjs.joueur.poste bv %}
         {% endfor %}
     </div>
 </div>

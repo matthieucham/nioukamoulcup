@@ -126,8 +126,12 @@ def keyvalue(key, val, classname='kvgroup'):
 
 
 @register.inclusion_tag('game/tags/l1results_bonusvalue.html')
-def bonusvalue(bonuskey, label, val):
-    return {'bonuskey': bonuskey, 'label': label, 'value': val if val is not None else '-'}
+def bonusvalue(bonuskey, poste, label, val):
+    if (services.BONUS['COLLECTIVE'].get(bonuskey) or services.BONUS['PERSONAL'].get(bonuskey))[poste] > 0:
+        return {'bonuskey': bonuskey, 'poste': poste, 'label': label, 'value': val if val is not None else '-',
+                'masked': False}
+    else:
+        return {'masked': True}
 
 
 @register.inclusion_tag('game/tags/l1results_performance_joueur.html')
@@ -138,7 +142,7 @@ def perf_joueur(jjs):
 
 
 @register.inclusion_tag('game/tags/l1results_bonus.html')
-def bonus(bonuskey, bonusval=1):
+def bonus(bonuskey, position, bonusval=1):
     icon_dict = {
         'GOAL': ('fa-trophy', 'Tomato'),
         'PENALTY': ('fa-trophy fa-rotate-90', 'Orange'),
@@ -153,8 +157,11 @@ def bonus(bonuskey, bonusval=1):
         'HALFOFFENSIVE': ('fa-thermometer-half', 'Gold'),
         'CSC': ('fa-thumbs-down', 'DarkSlateGrey'),
     }
-    ico, color = icon_dict[bonuskey]
-    return {'icon': ico, 'color': color, 'nb': bonusval}
+    if (services.BONUS['COLLECTIVE'].get(bonuskey) or services.BONUS['PERSONAL'].get(bonuskey))[position] > 0:
+        ico, color = icon_dict[bonuskey]
+        return {'icon': ico, 'color': color, 'nb': bonusval, 'masked': False}
+    else:
+        return {'masked': True}
 
 
 @register.inclusion_tag('game/tags/l1results_compo_player.html')

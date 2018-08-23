@@ -12,7 +12,7 @@
     <div class="cell_table" style="width:50%;">
         <ul>
             {% for j in prop.dom %}
-                <li>{% bonus bonuskey %}<a
+                <li>{% bonus bonuskey j.poste %}<a
                         href="{% url 'stat_joueur-detail' j.pk %}">{{ j|format_scorer:prop.dom }}</a></li>
             {% endfor %}
         </ul>
@@ -20,7 +20,7 @@
     <div class="cell_table" style="width:50%;">
         <ul>
             {% for j in prop.ext %}
-                <li>{% bonus bonuskey %}<a
+                <li>{% bonus bonuskey j.poste %}<a
                         href="{% url 'stat_joueur-detail' j.pk %}">{{ j|format_scorer:prop.ext }}</a></li>
             {% endfor %}
         </ul>

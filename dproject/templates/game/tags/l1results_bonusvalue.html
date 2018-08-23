@@ -1,6 +1,8 @@
 {%  load l1results %}
 
+{% if not masked %}
 <dl class="kvgroup">
-    <dd>{%  bonus bonuskey %} {{ label }}</dd>
+    <dd>{%  bonus bonuskey poste %} {{ label }}</dd>
     <dt>{{ value }}</dt>
 </dl>
+{% endif %}

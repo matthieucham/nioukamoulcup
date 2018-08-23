@@ -13,7 +13,7 @@
         <p><span class="bonus-list">
             {{ note }}
             {% for bk, bv in bonus.items %}
-                {% bonus bk bv %}
+                {% bonus bk joueur.poste bv %}
             {% endfor %}
         </span>
         </p>

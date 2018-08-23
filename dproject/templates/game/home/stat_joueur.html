@@ -51,17 +51,17 @@
             {% endwith %}
             {#            {% keyvalue 'Bonus' stats.total_bonuses 'card' %}#}
             <div id="player-bonuses">
-                {% bonusvalue 'GOAL' 'Buts h.p.' stats.details.GOAL %}
-                {% bonusvalue 'PASS' 'Passes' stats.details.PASS %}
-                {% bonusvalue 'PENALTY' 'Pénos' stats.details.PENALTY %}
-                {% bonusvalue 'HALFPASS' 'Pén obt' stats.details.HALFPASS %}
-                {% bonusvalue 'LEADER' '++' stats.details.LEADER %}
-                {% bonusvalue 'MSTOPS' 'Arr.' stats.details.MSTOPS %}
-                {% bonusvalue 'PENALSTOP' 'Pén arr' stats.details.PENALSTOP %}
-                {% bonusvalue 'CLEANSHEET' 'CS' stats.details.CLEANSHEET %}
-                {% bonusvalue 'HALFCLEANSHEET' 'demie CS' stats.details.HALFCLEANSHEET %}
-                {% bonusvalue 'OFFENSIVE' 'Off.' stats.details.OFFENSIVE %}
-                {% bonusvalue 'HALFOFFENSIVE' 'Demi off' stats.details.HALFOFFENSIVE %}
+                {% bonusvalue 'GOAL' joueur.poste 'Buts h.p.' stats.details.GOAL %}
+                {% bonusvalue 'PASS' joueur.poste 'Passes' stats.details.PASS %}
+                {% bonusvalue 'PENALTY' joueur.poste 'Pénos' stats.details.PENALTY %}
+                {% bonusvalue 'HALFPASS' joueur.poste 'Pén obt' stats.details.HALFPASS %}
+                {% bonusvalue 'LEADER' joueur.poste '++' stats.details.LEADER %}
+                {% bonusvalue 'MSTOPS' joueur.poste "+ d'arr." stats.details.MSTOPS %}
+                {% bonusvalue 'PENALSTOP' joueur.poste 'Pén arr' stats.details.PENALSTOP %}
+                {% bonusvalue 'CLEANSHEET' joueur.poste 'CS' stats.details.CLEANSHEET %}
+                {% bonusvalue 'HALFCLEANSHEET' joueur.poste 'demie CS' stats.details.HALFCLEANSHEET %}
+                {% bonusvalue 'OFFENSIVE' joueur.poste 'Off.' stats.details.OFFENSIVE %}
+                {% bonusvalue 'HALFOFFENSIVE' joueur.poste 'Demi off' stats.details.HALFOFFENSIVE %}
             </div>
         </div>
         <section id="player-performances">
