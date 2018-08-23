@@ -9,7 +9,7 @@ BONUS = {
     },
     'PERSONAL': {
         'LEADER': {'G': 0, 'D': 1.2, 'M': 0.6, 'A': 0},
-        '3STOPS': {'G': 0.9, 'D': 0, 'M': 0, 'A': 0},
+        'MSTOPS': {'G': 0.9, 'D': 0, 'M': 0, 'A': 0},
         'PENALSTOP': {'G': 3, 'D': 3, 'M': 3, 'A': 3},
         'GOAL': {'G': 3, 'D': 3, 'M': 3, 'A': 3},
         'PENALTY': {'G': 1.5, 'D': 1.5, 'M': 1.5, 'A': 1.5},
@@ -27,9 +27,10 @@ SALARY_SCORE_BOUNDS = [(6.1, 'cl1'), (6.3, 'cl2'), (6.3, 'cl3'), (6.5, 'cl4'), (
                        (8, 'cl8'), (8.4, 'cl9'), (8.9, 'cl10')]
 
 
-def compute_best_by_position(all_perfs):
-    with Timer(id='compute_best_by_position', verbose=False):
+def compute_comparative_bonuses(all_perfs):
+    with Timer(id='compute_comparative_bonuses', verbose=False):
         best_by_position = {'dom': {'G': 0, 'D': 0, 'M': 0, 'A': 0}, 'ext': {'G': 0, 'D': 0, 'M': 0, 'A': 0}}
+        most_saves = 0
         for pj in all_perfs:
             if pj.joueur.poste is None:
                 continue
@@ -37,17 +38,18 @@ def compute_best_by_position(all_perfs):
                 best_by_position[pj.details['equipe']][pj.joueur.poste] = max(pj.details['note'],
                                                                               best_by_position[pj.details['equipe']][
                                                                                   pj.joueur.poste])
-        return best_by_position
+            most_saves = max(most_saves, pj.details['stats']['goals_saved'])
+        return best_by_position, most_saves
 
 
-def compute_score_performance(perf, best_note_by_position):
+def compute_score_performance(perf, best_note_by_position, most_saves):
     with Timer(id='compute_score_performance', verbose=False):
         if perf.joueur.poste is None:
             return None, 0, None, []
 
         note = _compute_note(perf)
         compensation = _compute_compensation(perf)
-        bonus, earned = _compute_bonus(perf, best_note_by_position)
+        bonus, earned = _compute_bonus(perf, best_note_by_position, most_saves)
         return note, bonus, compensation, earned
 
 
@@ -67,7 +69,7 @@ def _compute_compensation(perf):
         return None
 
 
-def _compute_bonus(perf, best_note_by_position):
+def _compute_bonus(perf, best_note_by_position, most_saves):
     poste = perf.joueur.poste
     base = 0
     earned = dict()
@@ -79,9 +81,9 @@ def _compute_bonus(perf, best_note_by_position):
         if val:
             earned.update({i: val})
             base += (BONUS['PERSONAL'][i][poste] * val)
-    if perf.details['stats']['goals_saved'] > 3:
-        earned.update({'3STOPS': 1})
-        base += BONUS['PERSONAL']['3STOPS'][poste]
+    if most_saves > 0 and perf.details['stats']['goals_saved'] == most_saves:
+        earned.update({'MSTOPS': 1})
+        base += BONUS['PERSONAL']['MSTOPS'][poste]
     if 'note' in perf.details and perf.temps_de_jeu >= PLAYTIME['MAX_LONG'] and perf.details['note'] >= \
             best_note_by_position[perf.details['equipe']][poste]:
         earned.update({'LEADER': 1})

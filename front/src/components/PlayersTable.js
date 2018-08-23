@@ -77,7 +77,7 @@ export class PlayersTable extends Component {
 				width={40}/>
 
 				<Column	label="Rempart"
-				dataKey="3STOPS"
+				dataKey="MSTOPS"
 				width={40}/>
 
 				<Column	label="Pén. Arr."

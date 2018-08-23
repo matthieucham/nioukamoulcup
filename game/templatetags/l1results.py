@@ -145,7 +145,7 @@ def bonus(bonuskey, bonusval=1):
         'PASS': ('fa-gift', 'DodgerBlue'),
         'HALFPASS': ('fa-ambulance', 'Sienna'),
         'LEADER': ('fa-plus-circle', 'MediumSeaGreen'),
-        '3STOPS': ('fa-lock', 'LimeGreen'),
+        'MSTOPS': ('fa-lock', 'LimeGreen'),
         'PENALSTOP': ('fa-ban', 'SlateBlue'),
         'CLEANSHEET': ('fa-shield', 'Gray'),
         'HALFCLEANSHEET': ('fa-shield fa-rotate-90', 'LightGray'),
