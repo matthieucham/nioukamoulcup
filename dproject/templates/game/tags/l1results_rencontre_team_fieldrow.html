@@ -2,7 +2,11 @@
 
 <div class="cell_table"><a href="{% url 'stat_joueur-detail' stat.joueur.pk %}">{{ stat.joueur.display_name }}</a></div>
 <div class="cell_table center">{{ stat.joueur.poste }}</div>
-<div class="cell_table center">{{ stat.time }}</div>
+<div class="cell_table">
+    {% for bk, bv in stat.bonuses.items %}
+       {% bonus bk stat.joueur.poste bv %}
+    {% endfor %}
+</div>
 <div class="cell_table center">
     {% if stat.rating > 0 %}
         {{ stat.rating }}

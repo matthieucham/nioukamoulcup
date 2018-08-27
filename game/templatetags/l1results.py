@@ -5,6 +5,7 @@ from django.template import defaultfilters
 
 from ligue1 import models as l1models
 from game import services
+from game.models import JJScore
 
 register = template.Library()
 
@@ -101,12 +102,14 @@ def rencontre_summary(rencontre):
 @register.inclusion_tag('game/tags/l1results_rencontre_team.html')
 def rencontre_team(rencontre, equipe):
     out = {'G': [], 'D': [], 'M': [], 'A': []}
+    jjs_dict = dict(JJScore.objects.filter(rencontre=rencontre).values_list('joueur', 'details'))
     for perf in rencontre.performances.filter(details__equipe=equipe):
         base_stats = {'time': perf.temps_de_jeu,
                       'rating': perf.details['note'] if ('note' in perf.details
                                                          and perf.temps_de_jeu >= services.PLAYTIME['MAX_LONG'])
                       else None,
-                      'joueur': perf.joueur}
+                      'joueur': perf.joueur,
+                      'bonuses': jjs_dict.get(perf.joueur.pk).get('bonuses') or None}
         position = perf.joueur.poste
         out[position].append(base_stats)
     return out
@@ -149,7 +152,6 @@ def bonus(bonuskey, position, bonusval=1):
         'PASS': ('fa-gift', 'DodgerBlue'),
         'HALFPASS': ('fa-ambulance', 'Sienna'),
         'LEADER': ('fa-plus-circle', 'MediumSeaGreen'),
-        'MSTOPS': ('fa-lock', 'LimeGreen'),
         'PENALSTOP': ('fa-ban', 'SlateBlue'),
         'CLEANSHEET': ('fa-shield', 'Gray'),
         'HALFCLEANSHEET': ('fa-shield fa-rotate-90', 'LightGray'),

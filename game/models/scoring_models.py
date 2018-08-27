@@ -68,9 +68,9 @@ class JJScoreManager(models.Manager):
                 computed_club_pks.extend([r.club_domicile.pk, r.club_exterieur.pk])
                 all_perfs = r.performances.select_related('joueur').select_related('rencontre').all()
                 if all_perfs:  # perform queryset
-                    bbp, ms = scoring.compute_comparative_bonuses(all_perfs)
+                    bbp = scoring.compute_comparative_bonuses(all_perfs)
                     for perf in all_perfs:
-                        note, bonus, comp, earned_bonuses = scoring.compute_score_performance(perf, bbp, ms)
+                        note, bonus, comp, earned_bonuses = scoring.compute_score_performance(perf, bbp)
                         jjscores.append(
                             JJScore(journee_scoring=journee_scoring,
                                     joueur=perf.joueur,
