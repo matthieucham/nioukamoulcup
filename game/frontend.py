@@ -147,6 +147,12 @@ class ResultJourneeView(DetailView):
                 'M': [],
                 'A': [],
             },
+            'bonuses': {
+                'G': [],
+                'D': [],
+                'M': [],
+                'A': [],
+            },
             'worst': {
                 'G': [],
                 'D': [],
@@ -157,11 +163,14 @@ class ResultJourneeView(DetailView):
         for p, nb in [('G', 1), ('D', 5), ('M', 5), ('A', 3)]:
             selection['best'][p].extend(
                 models.JJScore.objects.get_n_best_or_worst(nb, self.object.saison, journee=self.object, poste=p))
+            selection['bonuses'][p].extend(
+                models.JJScore.objects.get_n_best_bonuses(nb, self.object.saison, journee=self.object, poste=p))
             selection['worst'][p].extend(
                 models.JJScore.objects.get_n_best_or_worst(nb, self.object.saison, journee=self.object, poste=p,
                                                            best=False))
 
         context['best'] = compute_team(selection['best'])
+        context['bonuses'] = compute_team(selection['bonuses'], criteria='bonus')
         context['worst'] = compute_team(selection['worst'], False)
         return context
 
@@ -186,7 +195,7 @@ class StatView(DetailView):
                 'M': [],
                 'A': [],
             },
-            'all': {
+            'bonuses': {
                 'G': [],
                 'D': [],
                 'M': [],
@@ -203,8 +212,8 @@ class StatView(DetailView):
         for p, nb in [('G', 1), ('D', 5), ('M', 5), ('A', 3)]:
             selection['best'][p].extend(
                 models.SJScore.objects.get_n_best_or_worst(self.object, nb, p, nb_notes_min=nb_notes_min))
-            selection['all'][p].extend(
-                models.SJScore.objects.get_n_best_or_worst(self.object, nb, p, criteria='nb_notes'))
+            selection['bonuses'][p].extend(
+                models.SJScore.objects.get_n_best_bonuses(self.object, nb, p))
             selection['worst'][p].extend(
                 models.SJScore.objects.get_n_best_or_worst(self.object, nb, p, False, nb_notes_min=nb_notes_min))
 
@@ -218,6 +227,7 @@ class StatView(DetailView):
                                                                            poste=self.request.GET.get(
                                                                                'position') or None)
         context['best'] = compute_team(selection['best'], criteria='avg_note')
+        context['bonuses'] = compute_team(selection['bonuses'], criteria='total_bonuses')
         context['worst'] = compute_team(selection['worst'], False, criteria='avg_note')
         return context
 

@@ -116,6 +116,15 @@ class JJScoreManager(models.Manager):
             ordering = 'note'
         return ofjournee.order_by(ordering)[:numberof]
 
+    def get_n_best_bonuses(self, numberof, saison, journee=None, poste=None):
+        ofjournee = self.filter(journee_scoring__saison_scoring__saison=saison)
+        if journee is not None:
+            ofjournee = ofjournee.filter(journee_scoring__journee=journee)
+        if poste is not None:
+            ofjournee = ofjournee.filter(joueur__poste=poste)
+        ordering = '-bonus'
+        return ofjournee.order_by(ordering)[:numberof]
+
 
 class JJScore(models.Model):
     computed_at = models.DateTimeField(auto_now=True, null=False)
@@ -175,6 +184,13 @@ class SJScoreManager(models.Manager):
             ordering = '-%s' % criteria
         else:
             ordering = '%s' % criteria
+        return ofsaison.order_by(ordering)[:numberof]
+
+    def get_n_best_bonuses(self, saison, numberof, poste=None):
+        ofsaison = self.filter(saison_scoring__saison=saison)
+        if poste is not None:
+            ofsaison = ofsaison.filter(joueur__poste=poste)
+        ordering = '-total_bonuses'
         return ofsaison.order_by(ordering)[:numberof]
 
 

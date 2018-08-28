@@ -12,6 +12,9 @@
         <h1>{{ joueur.display_name }}</h1>
         <p><span class="bonus-list">
             {{ note }}
+            {% if total_bonuses is not None %}
+                + {{ total_bonuses }}
+            {% endif %}
             {% for bk, bv in bonus.items %}
                 {% bonus bk joueur.poste bv %}
             {% endfor %}

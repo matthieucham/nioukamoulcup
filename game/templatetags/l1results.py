@@ -52,7 +52,8 @@ def sort_position_function(joueur):
 @register.inclusion_tag('game/tags/l1results_club_logo.html')
 def club_logo(club, size='medium'):
     mapping = {'small': 32, 'medium': 48, 'big': 64, 'biggest': 128}
-    return {'svg': club.maillot_svg, 'stroke': club.maillot_color_stroke, 'fill': club.maillot_color_bg,
+    return {'svg': club.maillot_svg if club else 'jersey-noclub2',
+            'stroke': club.maillot_color_stroke if club else '#FFFFFF', 'fill': club.maillot_color_bg if club else '',
             'size': mapping.get(size, mapping.get('medium'))}
 
 
@@ -170,9 +171,21 @@ def bonus(bonuskey, position, bonusval=1):
 @register.inclusion_tag('game/tags/l1results_compo_player.html')
 def compo_player(jjs):
     # TODO if no club
+    if hasattr(jjs, 'note'):
+        if jjs.note is not None:
+            note = '%0.1f' % jjs.note
+        else:
+            note = '-'
+    else:
+        note = '%0.1f [%dn]' % (jjs.avg_note, jjs.nb_notes)
+    if hasattr(jjs, 'total_bonuses'):
+        tb = '%0.1f' % jjs.total_bonuses
+    else:
+        tb = None
     return {
         'club': jjs.joueur.club,
         'joueur': jjs.joueur,
-        'note': '%0.1f' % jjs.note if hasattr(jjs, 'note') else '%0.1f [%dn]' % (jjs.avg_note, jjs.nb_notes),
+        'note': note,
+        'total_bonuses': tb,
         'bonus': jjs.details['bonuses'] if 'bonuses' in jjs.details else None
     }

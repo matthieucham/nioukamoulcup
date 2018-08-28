@@ -45,11 +45,13 @@
     <section id="player-bilan">
         <h2>Bilan</h2>
         <div>
-            {% with stats.avg_note|stringformat:'0.1f' as avgnote %}
             {% keyvalue 'Matchs notés' stats.nb_notes 'card' %}
-            {% keyvalue 'Note moyenne' avgnote 'card' %}
+            {% with stats.avg_note|stringformat:'0.1f' as avgnote %}
+                {% keyvalue 'Note moyenne' avgnote 'card' %}
             {% endwith %}
-            {#            {% keyvalue 'Bonus' stats.total_bonuses 'card' %}#}
+            {% with stats.total_bonuses|stringformat:'0.1f' as totbonus %}
+                {% keyvalue 'Bonus' totbonus 'card' %}
+            {% endwith %}
             <div id="player-bonuses">
                 {% bonusvalue 'GOAL' joueur.poste 'Buts h.p.' stats.details.GOAL %}
                 {% bonusvalue 'PASS' joueur.poste 'Passes' stats.details.PASS %}
