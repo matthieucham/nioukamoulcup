@@ -376,9 +376,6 @@ class TransferTestCase(TestCase):
         tick_1 = models.MerkatoManager._find_next_tick_to_close(test_date_1, 48, ticks_list)
         self.assertEqual(pytz.timezone('UTC').localize(datetime.datetime(2017, 9, 3, 12, 0)), tick_1)
 
-        merkato = models.Merkato.objects.setup(self.instance, 'BID', datetime.datetime(2017, 9, 1),
-                                               datetime.datetime(2017, 9, 13), 7)
-
     def test_valid_auctions_against_FULL(self):
         merkato = models.Merkato.objects.setup(self.instance, 'BID',
                                                datetime.datetime(2016, 9, 1, tzinfo=pytz.timezone('Europe/Paris')),

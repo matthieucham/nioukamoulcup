@@ -19,7 +19,7 @@ from django.conf.urls import url, include
 from django.contrib import admin
 #from wiki.urls import get_pattern as get_wiki_pattern
 #from django_nyt.urls import get_pattern as get_nyt_pattern
-from ligue1.admin import admin_site
+from ligue1.admin_import import admin_import_site
 
 urlpatterns = [
     url(r'^game/home/info/', include('zinnia.urls')),
@@ -29,7 +29,7 @@ urlpatterns = [
     url(r'^comments/', include('django_comments.urls')),
     # url(r'^notifications/', get_nyt_pattern()),
     # url(r'^wiki/', get_wiki_pattern()),
-    url(r'^import/', admin_site.urls, name='import'),
+    url(r'^import/', admin_import_site.urls, name='import'),
 ]
 
 if settings.DEBUG:

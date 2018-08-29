@@ -1,6 +1,7 @@
 from django.conf.urls import url, include
 from rest_framework.urlpatterns import format_suffix_patterns
 
+from .admin_import import admin_import_site
 from . import frontend
 
 urlpatterns = [
@@ -31,4 +32,5 @@ urlpatterns = [
         name="league_merkatoresults-latest"),
     url(r'^league/merkatoresults/(?P<pk>[0-9]+)/(?P<session_pk>[0-9]+)$', frontend.LeagueMerkatoResultsView.as_view(),
         name="league_merkatoresults-session"),
+    url(r'^import/', admin_import_site.urls, name='import'),
 ]
