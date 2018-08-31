@@ -32,16 +32,19 @@ def _do_transfer(sale):
     if sale.type == 'PA':
         winner, value = sale.get_winner_and_price()  # winner cannot be None (PA)
         league_models.Signing.objects.create(player=sale.player, team=winner,
+                                             league_instance=sale.merkato_session.merkato.league_instance,
                                              attributes=_make_signing_attr(sale))
         league_models.BankAccount.objects.buy(sale)
     elif sale.type == 'MV':
         if sale.winning_auction is not None:
             # end contract with selling team:
-            signing = league_models.Signing.objects.get(player=sale.player, team=sale.team, end__isnull=True)
+            signing = league_models.Signing.objects.get(player=sale.player, team=sale.team, end__isnull=True,
+                                                        league_instance=sale.merkato_session.merkato.league_instance)
             league_models.Signing.objects.end(signing, 'MV', sale.get_selling_price())
             league_models.BankAccount.objects.sell(sale)
             # start new contract:
             league_models.Signing.objects.create(player=sale.player, team=sale.winning_auction,
+                                                 league_instance=sale.merkato_session.merkato.league_instance,
                                                  attributes=_make_signing_attr(sale))
             league_models.BankAccount.objects.buy(sale)
         else:

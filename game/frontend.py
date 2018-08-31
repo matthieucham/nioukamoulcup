@@ -232,7 +232,7 @@ class StatView(DetailView):
         return context
 
 
-class LeagueWallView(PermissionRequiredMixin, CurrentLeagueInstanceMixin, DetailView):
+class LeagueWallView(PermissionRequiredMixin, StateInitializerMixin, CurrentLeagueInstanceMixin, DetailView):
     model = models.League
     template_name = 'game/league/wall.html'
     permission_required = 'game.view_league'
@@ -243,13 +243,13 @@ class LeagueWallView(PermissionRequiredMixin, CurrentLeagueInstanceMixin, Detail
         league = self.object
 
         instance = self._get_current_league_instance(league)
-        serializer = serializers.LeagueInstancePhaseDaySerializer(
-            models.LeagueInstancePhaseDay.objects.get_latest_day_for_phases(
-                models.LeagueInstancePhase.objects.filter(league_instance=instance)), many=True,
-            context={'request': self.request})
-        context['PRELOADED_STATE'] = {
-            'ranking': json.loads(str(JSONRenderer().render(serializer.data), 'utf-8'))
-        }
+        # serializer = serializers.LeagueInstancePhaseDaySerializer(
+        #     models.LeagueInstancePhaseDay.objects.get_latest_day_for_phases(
+        #         models.LeagueInstancePhase.objects.filter(league_instance=instance)), many=True,
+        #     context={'request': self.request})
+        # context['PRELOADED_STATE'] = {
+        #     'ranking': json.loads(str(JSONRenderer().render(serializer.data), 'utf-8'))
+        # }
 
         # Get active team from league
         try:
@@ -260,6 +260,7 @@ class LeagueWallView(PermissionRequiredMixin, CurrentLeagueInstanceMixin, Detail
 
         context['component'] = 'test'
         context['instance'] = instance
+        # context['PRELOADED_STATE'] = self.init_merkatoplayers(self.request, league)
         return context
 
 

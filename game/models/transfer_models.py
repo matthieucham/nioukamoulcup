@@ -244,7 +244,10 @@ class Auction(models.Model):
         if available < self.value:
             raise Auction.AuctionNotValidException(code='MONEY')
         # FULL
-        current_roster_size = league_models.Signing.objects.filter(team=self.team, end__isnull=True).count()
+        current_roster_size = league_models.Signing.objects.filter(team=self.team,
+                                                                   league_instance=league_models.LeagueInstance.objects.get_current(
+                                                                       self.team.league),
+                                                                   end__isnull=True).count()
         future_pa_locked = Sale.objects.filter(team=self.team).filter(
             models.Q(merkato_session__solving__gt=self.sale.merkato_session.solving) | models.Q(
                 merkato_session=self.sale.merkato_session, rank__gt=self.sale.rank)).count()

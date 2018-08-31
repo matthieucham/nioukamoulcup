@@ -2,22 +2,24 @@ from django.http import Http404
 import datetime
 
 from rest_framework import generics
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.filters import SearchFilter
+from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from django.db.models import Prefetch
 
 from dry_rest_permissions.generics import DRYObjectPermissions
 
 from game.models import league_models, transfer_models
 from ligue1 import models as l1models
 from game.rest import serializers
+from utils.timer import timed
 
 
 class CurrentLeagueInstanceMixin:
     def _get_current_league_instance(self, pk):
-        try:
-            return league_models.LeagueInstance.objects.get(league=pk, current=True)
-        except league_models.LeagueInstance.DoesNotExist:
-            raise Http404
+        return league_models.LeagueInstance.objects.get_current(league=pk)
 
 
 class LeagueInstanceRankingView(generics.RetrieveAPIView):
@@ -53,8 +55,9 @@ class TeamSigningsListView(CurrentLeagueInstanceMixin, generics.ListAPIView):
     ordering = ('begin',)
 
     def get_queryset(self):
-        team_pk = self.kwargs['team_pk']
-        return league_models.Signing.objects.filter(team=team_pk).order_by('begin')
+        team = league_models.Team.objects.get(pk=self.kwargs['team_pk'])
+        return league_models.Signing.objects.filter(team=team, league_instance=self._get_current_league_instance(
+            team.league)).order_by('begin')
 
 
 class TeamBankAccountHistoryListView(CurrentLeagueInstanceMixin, generics.ListAPIView):
@@ -138,3 +141,46 @@ class MerkatoSessionView(CurrentLeagueInstanceMixin, generics.RetrieveAPIView):
     serializer_class = serializers.MerkatoSessionSerializer
     queryset = transfer_models.MerkatoSession.objects.filter(is_solved=True)
 
+
+class PlayersForMerkatoView(CurrentLeagueInstanceMixin, generics.ListAPIView):
+    permission_classes = (DRYObjectPermissions,)
+    serializer_class = serializers.PlayerMerkatoSerializer
+    pagination_class = LimitOffsetPagination
+    filter_backends = (DjangoFilterBackend, SearchFilter,)
+    filter_fields = ('poste', 'club',)
+    search_fields = ('nom', '=prenom',)
+
+    @timed
+    def get_queryset(self):
+        # limit to players which :
+        # - are members of participating teams of the season of the current instance
+        # - or have played at least one meeting in the season of the current instance
+        # order by club then name
+        instance = self._get_current_league_instance(self.kwargs['league_pk'])
+        qs = (
+                l1models.Joueur.objects.filter(club__participations=instance.saison) |
+                l1models.Joueur.objects.filter(performances__rencontre__journee__saison=instance.saison)
+        ).distinct().order_by('club__nom', 'nom')
+        # qs.prefetch_related(
+        #     'signing_set'
+        # )
+        return qs
+
+    @timed
+    def get_serializer_context(self):
+        base_context = super(PlayersForMerkatoView, self).get_serializer_context()
+        league_pk = self.kwargs['league_pk']
+        user = base_context.get('request').user
+        team = league_models.LeagueMembership.objects.filter(user=user, league=league_pk).first().team
+        base_context['signings_map'] = dict(league_models.Signing.objects.filter(team__division=team.division,
+                                                                                 end__isnull=True,
+                                                                                 league_instance=self._get_current_league_instance(
+                                                                                     league_pk)).select_related(
+            'team').values_list('player_id', 'team__name'))
+        base_context['sales_map'] = dict(
+            transfer_models.Sale.objects.filter(merkato_session__is_solved=False)
+                .filter(team__division=team.division,
+                        merkato_session__merkato__league_instance=self._get_current_league_instance(
+                            league_pk)).select_related(
+                'team').values_list('player_id', 'team__name'))
+        return base_context

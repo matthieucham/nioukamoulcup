@@ -3,7 +3,7 @@ __author__ = 'Matt'
 import json
 from requests_oauthlib import OAuth2Session
 from oauthlib.oauth2 import LegacyApplicationClient
-from utils.timer import Timer
+from utils.timer import timed
 
 
 class StatnutsClient:
@@ -24,12 +24,12 @@ class StatnutsClient:
                                        verify=False)
         return token
 
+    @timed
     def _get_data(self, target_url):
-        with Timer(id='_get_data', verbose=True):
-            if self.access_token is None:
-                self.access_token = self._get_access_token()
-            data = self.oauth.get(self.sn_base_url + target_url).json()
-            return data
+        if self.access_token is None:
+            self.access_token = self._get_access_token()
+        data = self.oauth.get(self.sn_base_url + target_url).json()
+        return data
 
     def get_tournament_instance(self, saison_uuid):
         journees_url = '/rest/tournament_instances/%s/?expand=steps' % saison_uuid

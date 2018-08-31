@@ -307,10 +307,10 @@ LOGGING = {
 # Third parties
 # ------------------------------------------------------------------------------
 REST_FRAMEWORK = {
-    # 'DEFAULT_FILTER_BACKENDS': (
-    #     'rest_framework.filters.DjangoFilterBackend',
-    #     'rest_framework.filters.OrderingFilter',
-    # ),
+    'DEFAULT_FILTER_BACKENDS': (
+        'django_filters.rest_framework.DjangoFilterBackend',
+    ),
+    'PAGE_SIZE': 100,
     'COERCE_DECIMAL_TO_STRING': False,
 }
 
