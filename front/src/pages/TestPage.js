@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux'
+import TutoList from '../components/sales/PlayersList'
 
 const mapStateToProps = state => {
 	return {
@@ -7,7 +8,7 @@ const mapStateToProps = state => {
 	}
 }
 
-class App extends Component {
+export class TestPage extends Component {
 
 	
 	render() {
@@ -15,7 +16,7 @@ class App extends Component {
 			<div className="react-app-inner">
 			<main>
 				<article id="home-main">
-					
+					<TutoList />
 				</article>
 			</main>
 			<aside className="hg__right">
@@ -27,4 +28,4 @@ class App extends Component {
 	}
 }
 
-export const TestPage = connect(mapStateToProps)(App)
+/* export const TestPage = connect(mapStateToProps)(App) */

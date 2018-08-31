@@ -243,13 +243,13 @@ class LeagueWallView(PermissionRequiredMixin, StateInitializerMixin, CurrentLeag
         league = self.object
 
         instance = self._get_current_league_instance(league)
-        # serializer = serializers.LeagueInstancePhaseDaySerializer(
-        #     models.LeagueInstancePhaseDay.objects.get_latest_day_for_phases(
-        #         models.LeagueInstancePhase.objects.filter(league_instance=instance)), many=True,
-        #     context={'request': self.request})
-        # context['PRELOADED_STATE'] = {
-        #     'ranking': json.loads(str(JSONRenderer().render(serializer.data), 'utf-8'))
-        # }
+        serializer = serializers.LeagueInstancePhaseDaySerializer(
+            models.LeagueInstancePhaseDay.objects.get_latest_day_for_phases(
+                models.LeagueInstancePhase.objects.filter(league_instance=instance)), many=True,
+            context={'request': self.request})
+        context['PRELOADED_STATE'] = {
+            'ranking': []  # json.loads(str(JSONRenderer().render(serializer.data), 'utf-8'))
+        }
 
         # Get active team from league
         try:

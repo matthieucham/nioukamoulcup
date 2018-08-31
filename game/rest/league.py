@@ -3,8 +3,8 @@ import datetime
 
 from rest_framework import generics
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.filters import SearchFilter
-from rest_framework.pagination import LimitOffsetPagination
+from rest_framework.filters import SearchFilter, OrderingFilter
+from rest_framework.pagination import LimitOffsetPagination, PageNumberPagination
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.db.models import Prefetch
@@ -145,7 +145,7 @@ class MerkatoSessionView(CurrentLeagueInstanceMixin, generics.RetrieveAPIView):
 class PlayersForMerkatoView(CurrentLeagueInstanceMixin, generics.ListAPIView):
     permission_classes = (DRYObjectPermissions,)
     serializer_class = serializers.PlayerMerkatoSerializer
-    pagination_class = LimitOffsetPagination
+    pagination_class = PageNumberPagination
     filter_backends = (DjangoFilterBackend, SearchFilter,)
     filter_fields = ('poste', 'club',)
     search_fields = ('nom', '=prenom',)
@@ -161,9 +161,6 @@ class PlayersForMerkatoView(CurrentLeagueInstanceMixin, generics.ListAPIView):
                 l1models.Joueur.objects.filter(club__participations=instance.saison) |
                 l1models.Joueur.objects.filter(performances__rencontre__journee__saison=instance.saison)
         ).distinct().order_by('club__nom', 'nom')
-        # qs.prefetch_related(
-        #     'signing_set'
-        # )
         return qs
 
     @timed
