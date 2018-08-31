@@ -148,7 +148,7 @@ class PlayersForMerkatoView(CurrentLeagueInstanceMixin, generics.ListAPIView):
     pagination_class = PageNumberPagination
     filter_backends = (DjangoFilterBackend, SearchFilter,)
     filter_fields = ('poste', 'club',)
-    search_fields = ('nom', '=prenom',)
+    search_fields = ('nom', 'surnom', '=prenom',)
 
     @timed
     def get_queryset(self):

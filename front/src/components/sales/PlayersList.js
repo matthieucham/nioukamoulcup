@@ -1,17 +1,20 @@
 import React from "react";
+import {compose} from "recompose"
 
 const applyUpdateResult = result => prevState => ({
   hits: [...prevState.hits, ...result.results],
   next: result.next,
   previous: result.previous,
-  count: result.count
+  count: result.count,
+  isLoading: false
 });
 
 const applySetResult = result => prevState => ({
   hits: result.results,
   next: result.next,
   previous: result.previous,
-  count: result.count
+  count: result.count,
+  isLoading: false
 });
 
 const getHackerNewsUrl = value =>
@@ -26,7 +29,8 @@ class TutoList extends React.Component {
       hits: [],
       next: null,
       previous: null,
-      count: 0
+      count: 0,
+      isLoading: false
     };
   }
 
@@ -39,10 +43,10 @@ class TutoList extends React.Component {
       return;
     }
 
-    this.fetchStories(value);
+    this.fetchPlayers(value);
   };
 
-  onPaginatedSearch = e => this.fetchStories(this.input.value);
+  onPaginatedSearch = e => this.fetchPlayers(this.input.value);
 
   onFilterChange = e => {
     e.preventDefault();
@@ -50,10 +54,12 @@ class TutoList extends React.Component {
     this.setState({ next: null });
   };
 
-  fetchStories = value =>
+  fetchPlayers = value => {
+    this.setState({ isLoading: true });
     fetch(this.state.next == null ? getHackerNewsUrl(value) : this.state.next)
       .then(response => response.json())
       .then(result => this.onSetResult(result));
+  };
 
   onSetResult = result =>
     result.previous === null
@@ -74,8 +80,9 @@ class TutoList extends React.Component {
           </form>
         </div>
 
-        <List
+        <ListWithLoadingWithPaginated
           list={this.state.hits}
+          isLoading={this.state.isLoading}
           hasNext={this.state.next != null}
           onPaginatedSearch={this.onPaginatedSearch}
         />
@@ -84,26 +91,44 @@ class TutoList extends React.Component {
   }
 }
 
-const List = ({ list, hasNext, onPaginatedSearch }) => (
+const withLoading = Component => props => (
   <div>
+    <Component {...props} />
+
+    <div className="interactions">
+      {props.isLoading && <span>Loading...</span>}
+    </div>
+  </div>
+);
+
+const withPaginated = Component => props => (
+  <div>
+    <Component {...props} />
+
+    <div className="interactions">
+      {props.hasNext &&
+        !props.isLoading && (
+          <button type="button" onClick={props.onPaginatedSearch}>
+            More
+          </button>
+        )}
+    </div>
+  </div>
+);
+
+const List = ({ list, isLoading, hasNext, onPaginatedSearch }) => (
     <div className="list">
       {list.map(item => (
         <div className="list-row" key={item.id}>
           <a href={item.url}>{item.display_name}</a>
         </div>
-        /* <div className="list-row" key={item.objectID}>
-        <a href={item.url}>{item.title}</a>
-      </div> */
       ))}
     </div>
-    <div className="interactions">
-      {hasNext && (
-        <button type="button" onClick={onPaginatedSearch}>
-          More
-        </button>
-      )}
-    </div>
-  </div>
 );
+
+const ListWithLoadingWithPaginated = compose(
+    withPaginated,
+    withLoading,
+  )(List);
 
 export default TutoList;
