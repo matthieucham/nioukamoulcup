@@ -49,7 +49,9 @@ THIRD_PARTY_APPS = (
     'easy_thumbnails',
 	'mptt',
     'tagging',
+    'ckeditor',
     'zinnia',
+    'zinnia_ckeditor',
     'django_comments',
 	# dj-wiki
     # 'django_nyt',
