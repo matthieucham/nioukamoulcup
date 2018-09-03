@@ -1,4 +1,9 @@
 from django.contrib import admin
+from django.utils.translation import ugettext_lazy as _
+
+from zinnia.models.entry import Entry
+from zinnia.admin.entry import EntryAdmin
+from zinnia_ckeditor.admin import EntryAdminCKEditor
 
 from game import models
 from ligue1 import models as l1models
@@ -50,3 +55,16 @@ class SaisonScoringAdmin(InlineActionsModelAdminMixin, admin.ModelAdmin):
 
 
 admin_site.register(models.SaisonScoring, SaisonScoringAdmin)
+
+
+class EntryLeagueAdmin(EntryAdminCKEditor):
+    # In our case we put the gallery field
+    # into the 'Content' fieldset
+    fieldsets = (
+                    (_('Content'), {
+                        'fields': (('title', 'status'), 'lead', 'content', 'league')}),
+                ) + \
+                EntryAdmin.fieldsets[1:]
+
+
+admin.site.register(Entry, EntryLeagueAdmin)
