@@ -147,7 +147,10 @@ class PlayersForMerkatoView(CurrentLeagueInstanceMixin, generics.ListAPIView):
     serializer_class = serializers.PlayerMerkatoSerializer
     pagination_class = PageNumberPagination
     filter_backends = (DjangoFilterBackend, SearchFilter,)
-    filter_fields = ('poste', 'club',)
+    filter_fields = {
+        'poste': ['exact'],
+        'club': ['exact', 'isnull']
+    }
     search_fields = ('nom', 'surnom', '=prenom',)
 
     @timed
