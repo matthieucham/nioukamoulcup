@@ -147,13 +147,21 @@ table.ktable-class .ktable-heading-class {
     font-weight: bold;
 }
 
-.ReactVirtualized__Table__row {
+.bigtable__odd {
     background-color: #FFFFFF;
 }
 
-.ReactVirtualized__Table__row:nth-child(odd) {
+.bigtable__even {
     background-color: #f1f1f1;
 }
+
+/*.ReactVirtualized__Table__row {*/
+    /*background-color: #FFFFFF;*/
+/*}*/
+
+/*.ReactVirtualized__Table__row:nth-child(odd) {*/
+    /*background-color: #f1f1f1;*/
+/*}*/
 
 .team-header section {
     width: 100%;

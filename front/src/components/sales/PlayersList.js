@@ -265,6 +265,13 @@ class PlayerFilterResults extends React.Component {
             rowGetter={({ index }) =>
               index < results.length ? results[index] : {}
             }
+            rowClassName={({ index }) =>
+              index < 0
+                ? ""
+                : index % 2 == 0
+                  ? "bigtable__even"
+                  : "bigtable__odd"
+            }
           >
             <Column
               label="Joueur"
