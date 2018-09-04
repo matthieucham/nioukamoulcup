@@ -1,5 +1,14 @@
 import React from "react";
 import { compose } from "recompose";
+import {
+  AutoSizer,
+  Column,
+  Table,
+  InfiniteLoader,
+  List
+} from "react-virtualized";
+import "react-virtualized/styles.css"; // only needs to be imported once
+import { Jersey } from "../FieldPlayer";
 
 const applyUpdateResult = result => prevState => ({
   hits: [...prevState.hits, ...result.results],
@@ -117,6 +126,12 @@ class TutoList extends React.Component {
 
   onPaginatedSearch = e => this.fetchPlayers(null);
 
+  loadMoreRows = ({ startIndex, stopIndex }) => {
+    return fetch(this.state.next)
+      .then(response => response.json())
+      .then(result => this.onSetResult(result));
+  };
+
   fetchPlayers = value => {
     this.setState({ isLoading: true });
     fetch(value == null ? this.state.next : getPlayers(value))
@@ -131,8 +146,21 @@ class TutoList extends React.Component {
 
   onPlayerFilterSubmitted = query => {
     this.setState({ next: null });
+    this.Loader.resetLoadMoreRowsCache();
     this.fetchPlayers(query);
   };
+
+  isRowLoaded = ({ index }) => {
+    const result = !!this.state.hits[index];
+    return result;
+  };
+
+  rowCount() {
+    let count = !!this.state.next
+      ? this.state.hits.length + 1
+      : this.state.hits.length;
+    return count;
+  }
 
   render() {
     return (
@@ -144,12 +172,26 @@ class TutoList extends React.Component {
           />
         </div>
 
-        <ListWithLoadingWithInfinite
-          list={this.state.hits}
-          isLoading={this.state.isLoading}
-          hasNext={this.state.next != null}
-          onPaginatedSearch={this.onPaginatedSearch}
-        />
+        <InfiniteLoader
+          rowCount={this.rowCount()}
+          isRowLoaded={this.isRowLoaded}
+          loadMoreRows={this.loadMoreRows}
+          threshold={75}
+          minimumBatchSize={100}
+          ref={ref => {
+            this.Loader = ref;
+          }}
+        >
+          {({ onRowsRendered, registerChild }) => (
+            <PlayerFilterResults
+              results={this.state.hits}
+              height={400}
+              onRowsRendered={onRowsRendered}
+              registerChild={registerChild}
+              rowCount={this.rowCount()}
+            />
+          )}
+        </InfiniteLoader>
       </div>
     );
   }
@@ -176,10 +218,19 @@ const withInfiniteScroll = Component =>
     }
 
     onScroll = () => {
+      console.log(
+        "window.innerHeight=" +
+          window.innerHeight +
+          " window.scrollY=" +
+          window.scrollY +
+          " document.body.offsetHeight=" +
+          document.body.offsetHeight
+      );
       if (
-        (this.props.hasNext && window.innerHeight + window.scrollY) >=
+        this.props.hasNext &&
+        window.innerHeight + window.scrollY >=
           document.body.offsetHeight - 500 &&
-        this.props.list.length &&
+        this.props.results.length &&
         !this.props.isLoading
       ) {
         this.props.onPaginatedSearch();
@@ -191,24 +242,77 @@ const withInfiniteScroll = Component =>
     }
   };
 
-class List extends React.Component {
+class PlayerFilterResults extends React.Component {
   render() {
-    const { list } = this.props;
+    const {
+      results,
+      height,
+      rowCount,
+      onRowsRendered,
+      registerChild
+    } = this.props;
     return (
-      <div className="list">
-        {list.map(item => (
-          <div className="list-row" key={item.id}>
-            <a href={item.url}>{item.display_name}</a>
-          </div>
-        ))}
-      </div>
+      <AutoSizer disableHeight>
+        {({ width }) => (
+          <Table
+            onRowsRendered={onRowsRendered}
+            registerChild={registerChild}
+            height={height}
+            width={width}
+            headerHeight={30}
+            rowHeight={40}
+            rowCount={rowCount}
+            rowGetter={({ index }) =>
+              index < results.length ? results[index] : {}
+            }
+          >
+            <Column
+              label="Joueur"
+              dataKey="display_name"
+              cellRenderer={({ rowData }) => (
+                <a href={rowData.url}>{rowData.display_name}</a>
+              )}
+              width={200}
+              flexGrow={1}
+            />
+
+            <Column label="Poste" dataKey="poste" width={80} />
+
+            <Column
+              label="Club"
+              dataKey="display_name"
+              cellRenderer={({ rowData }) => (
+                <Jersey club={rowData.club} jerseysize={32} />
+              )}
+              width={80}
+            />
+            <Column
+              label="Engagement"
+              dataKey="display_name"
+              cellDataGetter={({ rowData }) =>
+                rowData.current_signing
+                  ? rowData.current_signing.team
+                  : rowData.current_sale == null
+                    ? ""
+                    : rowData.current_sale.team
+              }
+              width={160}
+            />
+          </Table>
+        )}
+      </AutoSizer>
     );
   }
 }
 
-const ListWithLoadingWithInfinite = compose(
+/* const ListWithLoadingWithInfinite = compose(
   withInfiniteScroll,
   withLoading
 )(List);
+ */
+const ResultsWithLoadingWithInfinite = compose(
+  withInfiniteScroll,
+  withLoading
+)(PlayerFilterResults);
 
 export default TutoList;
