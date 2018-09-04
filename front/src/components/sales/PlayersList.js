@@ -4,7 +4,6 @@ import { compose } from "recompose";
 const applyUpdateResult = result => prevState => ({
   hits: [...prevState.hits, ...result.results],
   next: result.next,
-  previous: result.previous,
   count: result.count,
   isLoading: false
 });
@@ -12,21 +11,19 @@ const applyUpdateResult = result => prevState => ({
 const applySetResult = result => prevState => ({
   hits: result.results,
   next: result.next,
-  previous: result.previous,
   count: result.count,
   isLoading: false
 });
 
-const getHackerNewsUrl = value =>
-  `http://127.0.0.1:8001/game/rest/leagues/1/playersformerkato?search=${value}`;
-/* `https://hn.algolia.com/api/v1/search?query=${value}&page=${page}&hitsPerPage=100`; */
+const getPlayers = filterQuery =>
+  `http://127.0.0.1:8001/game/rest/leagues/1/playersformerkato?format=json&${filterQuery}`;
 
 class PlayerFilter extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      name: null,
+      name: "",
       poste: "",
       club: ""
     };
@@ -73,12 +70,12 @@ class PlayerFilter extends React.Component {
       </option>
     ));
     return (
-      <form type="submit" onSubmit={this.onFormSubmit}>
+      <form ref="filterFormRef" type="submit" onSubmit={this.onFormSubmit}>
         <label>
           Nom:
           <input
             type="text"
-            ref={node => (this.input = node)}
+            value={this.state.name}
             onChange={this.handleNameChange}
           />
         </label>
@@ -113,35 +110,16 @@ class TutoList extends React.Component {
     this.state = {
       hits: [],
       next: null,
-      previous: null,
       count: 0,
       isLoading: false
     };
   }
 
-  onInitialSearch = e => {
-    e.preventDefault();
-
-    const { value } = this.input;
-
-    if (value === "") {
-      return;
-    }
-
-    this.fetchPlayers(value);
-  };
-
-  onPaginatedSearch = e => this.fetchPlayers(this.input.value);
-
-  onFilterChange = e => {
-    e.preventDefault();
-
-    this.setState({ next: null });
-  };
+  onPaginatedSearch = e => this.fetchPlayers(null);
 
   fetchPlayers = value => {
     this.setState({ isLoading: true });
-    fetch(this.state.next == null ? getHackerNewsUrl(value) : this.state.next)
+    fetch(value == null ? this.state.next : getPlayers(value))
       .then(response => response.json())
       .then(result => this.onSetResult(result));
   };
@@ -151,20 +129,15 @@ class TutoList extends React.Component {
       ? this.setState(applySetResult(result))
       : this.setState(applyUpdateResult(result));
 
-  onPlayerFilterSubmitted = query => console.log(query);
+  onPlayerFilterSubmitted = query => {
+    this.setState({ next: null });
+    this.fetchPlayers(query);
+  };
 
   render() {
     return (
       <div className="page">
         <div className="interactions">
-          <form
-            type="submit"
-            onSubmit={this.onInitialSearch}
-            onChange={this.onFilterChange}
-          >
-            <input type="text" ref={node => (this.input = node)} />
-            <button type="submit">Search</button>
-          </form>
           <PlayerFilter
             clubs={[{ id: 22, nom: "Amiens" }, { id: 23, nom: "Strasbourg" }]}
             performSearch={this.onPlayerFilterSubmitted}
@@ -188,21 +161,6 @@ const withLoading = Component => props => (
 
     <div className="interactions">
       {props.isLoading && <span>Loading...</span>}
-    </div>
-  </div>
-);
-
-const withPaginated = Component => props => (
-  <div>
-    <Component {...props} />
-
-    <div className="interactions">
-      {props.hasNext &&
-        !props.isLoading && (
-          <button type="button" onClick={props.onPaginatedSearch}>
-            More
-          </button>
-        )}
     </div>
   </div>
 );
@@ -247,11 +205,6 @@ class List extends React.Component {
     );
   }
 }
-
-const ListWithLoadingWithPaginated = compose(
-  withPaginated,
-  withLoading
-)(List);
 
 const ListWithLoadingWithInfinite = compose(
   withInfiniteScroll,
