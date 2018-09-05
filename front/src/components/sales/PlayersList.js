@@ -1,5 +1,4 @@
 import React from "react";
-import { compose } from "recompose";
 import {
   AutoSizer,
   Column,
@@ -8,6 +7,14 @@ import {
   List
 } from "react-virtualized";
 import "react-virtualized/styles.css"; // only needs to be imported once
+import Button from "@material-ui/core/Button";
+import TextField from "@material-ui/core/TextField";
+import MenuItem from "@material-ui/core/MenuItem";
+import Select from "@material-ui/core/Select";
+import InputLabel from "@material-ui/core/InputLabel";
+import FormControl from "@material-ui/core/FormControl";
+import PropTypes from "prop-types";
+import { withStyles } from "@material-ui/core/styles";
 import { Jersey } from "../FieldPlayer";
 
 const applyUpdateResult = result => prevState => ({
@@ -26,6 +33,20 @@ const applySetResult = result => prevState => ({
 
 const getPlayers = filterQuery =>
   `http://127.0.0.1:8001/game/rest/leagues/1/playersformerkato?format=json&${filterQuery}`;
+
+const styles = theme => ({
+  root: {
+    display: "flex",
+    flexWrap: "wrap"
+  },
+  formControl: {
+    margin: theme.spacing.unit,
+    minWidth: 120
+  },
+  selectEmpty: {
+    marginTop: theme.spacing.unit * 2
+  }
+});
 
 class PlayerFilter extends React.Component {
   constructor(props) {
@@ -72,59 +93,81 @@ class PlayerFilter extends React.Component {
   };
 
   render() {
-    const { clubs } = this.props;
+    const { clubs, classes } = this.props;
     const clubOptions = clubs.map((cl, index) => (
-      <option value={cl.id} key={"option" + cl.id}>
+      <MenuItem value={cl.id} key={"option" + cl.id}>
         {cl.nom}
-      </option>
+      </MenuItem>
     ));
     return (
-      <form ref="filterFormRef" type="submit" onSubmit={this.onFormSubmit}>
-        <label>
-          Nom:
-          <input
-            type="text"
+      <form
+        className={classes.root}
+        autoComplete="off"
+        onSubmit={this.onFormSubmit}
+      >
+        <FormControl className={classes.formControl}>
+          <TextField
+            label="Nom"
+            autoComplete="off"
             value={this.state.name}
             onChange={this.handleNameChange}
           />
-        </label>
-        <label>
-          Poste:
-          <select value={this.state.poste} onChange={this.handlePosteChange}>
-            <option value="" />
-            <option value="G">Gardien</option>
-            <option value="D">Défenseur</option>
-            <option value="M">Milieu</option>
-            <option value="A">Attaquant</option>
-          </select>
-        </label>
-        <label>
-          Club:
-          <select value={this.state.club} onChange={this.handleClubChange}>
-            <option value="" />
+        </FormControl>
+        <FormControl className={classes.formControl}>
+          <InputLabel htmlFor="posteField">Poste</InputLabel>
+          <Select
+            value={this.state.poste}
+            onChange={this.handlePosteChange}
+            inputProps={{
+              name: "poste",
+              id: "posteField"
+            }}
+          >
+            <MenuItem value="" />
+            <MenuItem value="G">Gardien</MenuItem>
+            <MenuItem value="D">Défenseur</MenuItem>
+            <MenuItem value="M">Milieu</MenuItem>
+            <MenuItem value="A">Attaquant</MenuItem>
+          </Select>
+        </FormControl>
+
+        <FormControl className={classes.formControl}>
+          <InputLabel htmlFor="clubField">Club</InputLabel>
+          <Select
+            value={this.state.club}
+            onChange={this.handleClubChange}
+            inputProps={{
+              name: "club",
+              id: "clubField"
+            }}
+          >
+            <MenuItem value="" />
             {clubOptions}
-            <option value="__noclub__">Hors L1</option>
-          </select>
-        </label>
-        <button type="submit">Search</button>
+            <MenuItem value="__noclub__">Hors L1</MenuItem>
+          </Select>
+        </FormControl>
+        <FormControl className={classes.formControl}>
+          <Button type="submit" color="primary" variant="contained">
+            Filtrer
+          </Button>
+        </FormControl>
       </form>
     );
   }
 }
 
-class TutoList extends React.Component {
+const StyledPlayerFilter = withStyles(styles)(PlayerFilter);
+
+class FilteredPlayerList extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
       hits: [],
       next: null,
-      count: 0,
-      isLoading: false
+      count: 0
     };
   }
-
-  onPaginatedSearch = e => this.fetchPlayers(null);
 
   loadMoreRows = ({ startIndex, stopIndex }) => {
     return fetch(this.state.next)
@@ -133,7 +176,6 @@ class TutoList extends React.Component {
   };
 
   fetchPlayers = value => {
-    this.setState({ isLoading: true });
     fetch(value == null ? this.state.next : getPlayers(value))
       .then(response => response.json())
       .then(result => this.onSetResult(result));
@@ -164,9 +206,9 @@ class TutoList extends React.Component {
 
   render() {
     return (
-      <div className="page">
-        <div className="interactions">
-          <PlayerFilter
+      <div>
+        <div>
+          <StyledPlayerFilter
             clubs={[{ id: 22, nom: "Amiens" }, { id: 23, nom: "Strasbourg" }]}
             performSearch={this.onPlayerFilterSubmitted}
           />
@@ -189,6 +231,7 @@ class TutoList extends React.Component {
               onRowsRendered={onRowsRendered}
               registerChild={registerChild}
               rowCount={this.rowCount()}
+              freePickableOnly={true}
             />
           )}
         </InfiniteLoader>
@@ -197,59 +240,20 @@ class TutoList extends React.Component {
   }
 }
 
-const withLoading = Component => props => (
-  <div>
-    <Component {...props} />
-
-    <div className="interactions">
-      {props.isLoading && <span>Loading...</span>}
-    </div>
-  </div>
-);
-
-const withInfiniteScroll = Component =>
-  class WithInfiniteScroll extends React.Component {
-    componentDidMount() {
-      window.addEventListener("scroll", this.onScroll, false);
-    }
-
-    componentWillUnmount() {
-      window.removeEventListener("scroll", this.onScroll, false);
-    }
-
-    onScroll = () => {
-      console.log(
-        "window.innerHeight=" +
-          window.innerHeight +
-          " window.scrollY=" +
-          window.scrollY +
-          " document.body.offsetHeight=" +
-          document.body.offsetHeight
-      );
-      if (
-        this.props.hasNext &&
-        window.innerHeight + window.scrollY >=
-          document.body.offsetHeight - 500 &&
-        this.props.results.length &&
-        !this.props.isLoading
-      ) {
-        this.props.onPaginatedSearch();
-      }
-    };
-
-    render() {
-      return <Component {...this.props} />;
-    }
-  };
-
 class PlayerFilterResults extends React.Component {
+  handleClick(player, e) {
+    e.preventDefault();
+    console.log(player);
+  }
+
   render() {
     const {
       results,
       height,
       rowCount,
       onRowsRendered,
-      registerChild
+      registerChild,
+      freePickableOnly
     } = this.props;
     return (
       <AutoSizer disableHeight>
@@ -294,15 +298,27 @@ class PlayerFilterResults extends React.Component {
               width={80}
             />
             <Column
-              label="Engagement"
+              label=""
               dataKey="display_name"
-              cellDataGetter={({ rowData }) =>
-                rowData.current_signing
-                  ? rowData.current_signing.team
-                  : rowData.current_sale == null
-                    ? ""
-                    : rowData.current_sale.team
-              }
+              cellRenderer={({ rowData }) => {
+                if (freePickableOnly && !!rowData.current_sale)
+                  return <span className="unpickable">Déjà en vente</span>;
+                else if (freePickableOnly && !!rowData.current_signing)
+                  return (
+                    <span className="unpickable">
+                      {rowData.current_signing.team}
+                    </span>
+                  );
+                else
+                  return (
+                    <Button
+                      color="primary"
+                      onClick={this.handleClick.bind(this, rowData)}
+                    >
+                      Choisir
+                    </Button>
+                  );
+              }}
               width={160}
             />
           </Table>
@@ -312,14 +328,4 @@ class PlayerFilterResults extends React.Component {
   }
 }
 
-/* const ListWithLoadingWithInfinite = compose(
-  withInfiniteScroll,
-  withLoading
-)(List);
- */
-const ResultsWithLoadingWithInfinite = compose(
-  withInfiniteScroll,
-  withLoading
-)(PlayerFilterResults);
-
-export default TutoList;
+export default FilteredPlayerList;
