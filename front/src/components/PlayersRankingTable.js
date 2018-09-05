@@ -98,6 +98,13 @@ export class PlayersRankingTable extends Component {
             sort={this._sort}
             sortBy={sortBy}
             sortDirection={sortDirection}
+            rowClassName={({ index }) =>
+              index < 0
+                ? ""
+                : index % 2 == 0
+                  ? "bigtable__even"
+                  : "bigtable__odd"
+            }
           >
             <Column
               label="Rang"
