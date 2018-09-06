@@ -42,7 +42,8 @@ const initialState = {
 		},
 		clubs: {
 			allIds: normalizedData.result.clubs,
-			byId: normalizedData.entities.clubs
+			byId: normalizedData.entities.clubs,
+			flat: preloadedState.clubs
 		},
 		team: {
 			initial: normalizedData.result.team,

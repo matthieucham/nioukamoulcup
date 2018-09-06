@@ -94,7 +94,7 @@ class PlayerFilter extends React.Component {
 
   render() {
     const { clubs, classes } = this.props;
-    const clubOptions = clubs.map((cl, index) => (
+    const clubOptions = clubs.sort((c1,c2) => c1.nom.localeCompare(c2.nom)).map((cl, index) => (
       <MenuItem value={cl.id} key={"option" + cl.id}>
         {cl.nom}
       </MenuItem>
@@ -205,12 +205,12 @@ class FilteredPlayersList extends React.Component {
   }
 
   render() {
-    const { onPlayerPicked } = this.props;
+    const { clubs, onPlayerPicked } = this.props;
     return (
       <div>
         <div>
           <StyledPlayerFilter
-            clubs={[{ id: 22, nom: "Amiens" }, { id: 23, nom: "Strasbourg" }]}
+            clubs={clubs}
             performSearch={this.onPlayerFilterSubmitted}
           />
         </div>
@@ -246,7 +246,7 @@ class PlayerFilterResults extends React.Component {
   handleClick(player, e) {
     e.preventDefault();
 
-    this.props.onPlayerPicked(player)
+    this.props.onPlayerPicked(player);
   }
 
   render() {

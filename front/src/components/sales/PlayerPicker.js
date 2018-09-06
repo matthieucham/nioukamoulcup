@@ -4,8 +4,23 @@ import Dialog from "@material-ui/core/Dialog";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import TextField from "@material-ui/core/TextField";
+import { connect } from "react-redux";
 
+import { fetchPlayersForSale } from "../../actions";
 import FilteredPlayersList from "./FilteredPlayersList";
+
+const mapStateToProps = state => {
+  return {
+    clubs: state.data.clubs.allIds
+    /* players: state.data.merkatosession.playersforsale */
+  };
+};
+
+/* const mapDispatchToProps = dispatch => {
+  return {
+    fetchPlayers: () => dispatch(fetchPlayersForSale(""))
+  };
+}; */
 
 class PlayersListDialog extends React.Component {
   handleClose = () => {
@@ -18,12 +33,18 @@ class PlayersListDialog extends React.Component {
 
   render() {
     const { open } = this.props;
+    const ConnectedFilteredPlayersList = connect(state => {
+      return {
+        clubs: state.data.clubs.flat,
+        onPlayerPicked: this.handlePlayerPicked
+      };
+    })(FilteredPlayersList);
 
     return (
       <Dialog open={open} onClose={this.handleClose}>
         <DialogTitle>Choisir un joueur</DialogTitle>
         <DialogContent>
-          <FilteredPlayersList onPlayerPicked={this.handlePlayerPicked} />
+          <ConnectedFilteredPlayersList />
         </DialogContent>
       </Dialog>
     );

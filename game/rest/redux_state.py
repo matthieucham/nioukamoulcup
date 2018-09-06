@@ -30,6 +30,11 @@ class StateInitializerMixin:
         self.initial_state['clubs'] += self._to_json(clubs_serializer)
 
     @timed
+    def init_common(self, request):
+        self._init_common(request)
+        return self.initial_state
+
+    @timed
     def init_from_team(self, request, team):
         self._init_common(request)
         team_serializer = serializers.TeamDetailSerializer(team, context={'request': request})

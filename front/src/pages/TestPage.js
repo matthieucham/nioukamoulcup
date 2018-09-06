@@ -2,11 +2,11 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import PlayerPicker from "../components/sales/PlayerPicker";
 
-const mapStateToProps = state => {
+/* const mapStateToProps = state => {
   return {
     ranking: state.data.rankings.current
   };
-};
+}; */
 
 export class TestPage extends Component {
   render() {

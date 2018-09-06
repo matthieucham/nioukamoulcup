@@ -247,9 +247,9 @@ class LeagueWallView(PermissionRequiredMixin, StateInitializerMixin, CurrentLeag
             models.LeagueInstancePhaseDay.objects.get_latest_day_for_phases(
                 models.LeagueInstancePhase.objects.filter(league_instance=instance)), many=True,
             context={'request': self.request})
-        context['PRELOADED_STATE'] = {
-            'ranking': []  # json.loads(str(JSONRenderer().render(serializer.data), 'utf-8'))
-        }
+        # context['PRELOADED_STATE'] = {
+        #     'ranking': []  # json.loads(str(JSONRenderer().render(serializer.data), 'utf-8'))
+        # }
 
         # Get active team from league
         try:
@@ -260,7 +260,7 @@ class LeagueWallView(PermissionRequiredMixin, StateInitializerMixin, CurrentLeag
 
         context['component'] = 'test'
         context['instance'] = instance
-        # context['PRELOADED_STATE'] = self.init_merkatoplayers(self.request, league)
+        context['PRELOADED_STATE'] = self.init_common(self.request)
         return context
 
 
