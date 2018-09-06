@@ -30,8 +30,9 @@ class StateInitializerMixin:
         self.initial_state['clubs'] += self._to_json(clubs_serializer)
 
     @timed
-    def init_common(self, request):
+    def init_common(self, request, league_id=None):
         self._init_common(request)
+        self.initial_state.update({'league_id': league_id})
         return self.initial_state
 
     @timed

@@ -260,7 +260,7 @@ class LeagueWallView(PermissionRequiredMixin, StateInitializerMixin, CurrentLeag
 
         context['component'] = 'test'
         context['instance'] = instance
-        context['PRELOADED_STATE'] = self.init_common(self.request)
+        context['PRELOADED_STATE'] = self.init_common(self.request, self.object.pk)
         return context
 
 

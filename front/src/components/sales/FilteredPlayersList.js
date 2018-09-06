@@ -1,11 +1,6 @@
 import React from "react";
-import {
-  AutoSizer,
-  Column,
-  Table,
-  InfiniteLoader,
-  List
-} from "react-virtualized";
+import fetch from "cross-fetch";
+import { AutoSizer, Column, Table, InfiniteLoader } from "react-virtualized";
 import "react-virtualized/styles.css"; // only needs to be imported once
 import Button from "@material-ui/core/Button";
 import TextField from "@material-ui/core/TextField";
@@ -13,9 +8,10 @@ import MenuItem from "@material-ui/core/MenuItem";
 import Select from "@material-ui/core/Select";
 import InputLabel from "@material-ui/core/InputLabel";
 import FormControl from "@material-ui/core/FormControl";
-import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
+
 import { Jersey } from "../FieldPlayer";
+import { API_ROOT, LEAGUE_ID } from "../../build";
 
 const applyUpdateResult = result => prevState => ({
   hits: [...prevState.hits, ...result.results],
@@ -32,7 +28,9 @@ const applySetResult = result => prevState => ({
 });
 
 const getPlayers = filterQuery =>
-  `http://127.0.0.1:8001/game/rest/leagues/1/playersformerkato?format=json&${filterQuery}`;
+  API_ROOT.concat(
+    `leagues/${LEAGUE_ID}/playersformerkato?format=json&` + filterQuery
+  );
 
 const styles = theme => ({
   root: {
@@ -94,11 +92,13 @@ class PlayerFilter extends React.Component {
 
   render() {
     const { clubs, classes } = this.props;
-    const clubOptions = clubs.sort((c1,c2) => c1.nom.localeCompare(c2.nom)).map((cl, index) => (
-      <MenuItem value={cl.id} key={"option" + cl.id}>
-        {cl.nom}
-      </MenuItem>
-    ));
+    const clubOptions = clubs
+      .sort((c1, c2) => c1.nom.localeCompare(c2.nom))
+      .map((cl, index) => (
+        <MenuItem value={cl.id} key={"option" + cl.id}>
+          {cl.nom}
+        </MenuItem>
+      ));
     return (
       <form
         className={classes.root}
@@ -204,6 +204,10 @@ class FilteredPlayersList extends React.Component {
     return count;
   }
 
+  componentDidMount() {
+    this.fetchPlayers("");
+  }
+
   render() {
     const { clubs, onPlayerPicked } = this.props;
     return (
@@ -256,8 +260,7 @@ class PlayerFilterResults extends React.Component {
       rowCount,
       onRowsRendered,
       registerChild,
-      freePickableOnly,
-      onPlayerPicked
+      freePickableOnly
     } = this.props;
     return (
       <AutoSizer disableHeight>

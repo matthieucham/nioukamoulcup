@@ -6,21 +6,7 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 import TextField from "@material-ui/core/TextField";
 import { connect } from "react-redux";
 
-import { fetchPlayersForSale } from "../../actions";
 import FilteredPlayersList from "./FilteredPlayersList";
-
-const mapStateToProps = state => {
-  return {
-    clubs: state.data.clubs.allIds
-    /* players: state.data.merkatosession.playersforsale */
-  };
-};
-
-/* const mapDispatchToProps = dispatch => {
-  return {
-    fetchPlayers: () => dispatch(fetchPlayersForSale(""))
-  };
-}; */
 
 class PlayersListDialog extends React.Component {
   handleClose = () => {
