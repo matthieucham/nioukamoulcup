@@ -798,7 +798,7 @@ dl.kvgroup {
     max-width: 18em;
 }
 
-.salecard-content>* {
+.salecard-content > * {
     padding: 0 3px;
 }
 
@@ -809,6 +809,7 @@ dl.kvgroup {
     font-size: 0.8em;
     color: rgba(0, 0, 0, 0.54);
 }
+
 .salecard-content dt:after {
     content: ":";
 }
@@ -821,7 +822,7 @@ dl.kvgroup {
     font-size: 1.5em;
 }
 
-.salecard-content .past-offers{
+.salecard-content .past-offers {
     display: flex;
     flex-direction: column;
     flex-wrap: wrap;
@@ -830,22 +831,37 @@ dl.kvgroup {
     max-height: inherit;
 }
 
-.past-offers p{
+.past-offers p {
     padding: 0 3px;
     font-size: 0.8em;
     color: rgba(0, 0, 0, 0.54);
 }
 
-.past-offers p.ismine{
+.past-offers p.ismine {
     font-weight: bold;
 }
 
-.past-offers p.invalid{
+.past-offers p.invalid {
     text-decoration: line-through;
 }
 
-.releases-list{
+.releases-list {
     display: table;
     table-layout: fixed;
     width: 100%;
+}
+
+.player-picker-fields {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.player-picker-fields > div {
+    margin: 0.5em;
+}
+
+.player-picker-fields > button {
+    margin-right: 0.5em;
 }

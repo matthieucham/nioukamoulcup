@@ -41,7 +41,7 @@ const styles = theme => ({
   },
   formControl: {
     margin: theme.spacing.unit,
-    minWidth: 120
+    minWidth: 100
   },
   selectEmpty: {
     marginTop: theme.spacing.unit * 2
@@ -123,7 +123,7 @@ class PlayerFilter extends React.Component {
               id: "posteField"
             }}
           >
-            <MenuItem value="" />
+            <MenuItem value="">Tous</MenuItem>
             <MenuItem value="G">Gardien</MenuItem>
             <MenuItem value="D">Défenseur</MenuItem>
             <MenuItem value="M">Milieu</MenuItem>
@@ -141,7 +141,7 @@ class PlayerFilter extends React.Component {
               id: "clubField"
             }}
           >
-            <MenuItem value="" />
+            <MenuItem value="">Tous</MenuItem>
             {clubOptions}
             <MenuItem value="__noclub__">Hors L1</MenuItem>
           </Select>
@@ -158,7 +158,7 @@ class PlayerFilter extends React.Component {
 
 const StyledPlayerFilter = withStyles(styles)(PlayerFilter);
 
-class FilteredPlayerList extends React.Component {
+class FilteredPlayersList extends React.Component {
   constructor(props) {
     super(props);
 
@@ -205,6 +205,7 @@ class FilteredPlayerList extends React.Component {
   }
 
   render() {
+    const { onPlayerPicked } = this.props;
     return (
       <div>
         <div>
@@ -232,6 +233,7 @@ class FilteredPlayerList extends React.Component {
               registerChild={registerChild}
               rowCount={this.rowCount()}
               freePickableOnly={true}
+              onPlayerPicked={onPlayerPicked}
             />
           )}
         </InfiniteLoader>
@@ -243,7 +245,8 @@ class FilteredPlayerList extends React.Component {
 class PlayerFilterResults extends React.Component {
   handleClick(player, e) {
     e.preventDefault();
-    console.log(player);
+
+    this.props.onPlayerPicked(player)
   }
 
   render() {
@@ -253,7 +256,8 @@ class PlayerFilterResults extends React.Component {
       rowCount,
       onRowsRendered,
       registerChild,
-      freePickableOnly
+      freePickableOnly,
+      onPlayerPicked
     } = this.props;
     return (
       <AutoSizer disableHeight>
@@ -328,4 +332,4 @@ class PlayerFilterResults extends React.Component {
   }
 }
 
-export default FilteredPlayerList;
+export default FilteredPlayersList;
