@@ -31,7 +31,7 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 # APP CONFIGURATION
 # ------------------------------------------------------------------------------
 DJANGO_APPS = (
-	'django.contrib.admin',
+    'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -44,16 +44,16 @@ DJANGO_APPS = (
 THIRD_PARTY_APPS = (
     'rules.apps.AutodiscoverRulesConfig',
     'inline_actions',
-	'userena',
+    'userena',
     'guardian',
     'easy_thumbnails',
-	'mptt',
+    'mptt',
     'tagging',
     'ckeditor',
     'zinnia',
     'zinnia_ckeditor',
     'django_comments',
-	# dj-wiki
+    # dj-wiki
     # 'django_nyt',
     # 'sekizai',
     # 'sorl.thumbnail',
@@ -62,7 +62,7 @@ THIRD_PARTY_APPS = (
     # 'wiki.plugins.notifications',
     # 'wiki.plugins.images',
     # 'wiki.plugins.macros',
-	'graphos',
+    'graphos',
     'colorful',
     'svg',
     'django_filters',
@@ -109,6 +109,12 @@ DEFAULT_FROM_EMAIL = env(
 )
 
 SERVER_EMAIL = env('DJANGO_SERVER_EMAIL', default=DEFAULT_FROM_EMAIL)
+
+EMAIL_HOST = env('DJANGO_EMAIL_HOST')
+EMAIL_USE_TLS = env('DJANGO_EMAIL_USE_TLS')
+EMAIL_PORT = env('DJANGO_EMAIL_PORT')
+EMAIL_HOST_USER = env('DJANGO_EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = env('DJANGO_EMAIL_HOST_PASSWORD')
 
 # MANAGER CONFIGURATION
 # ------------------------------------------------------------------------------
@@ -179,7 +185,7 @@ TEMPLATES = [
             # See: https://docs.djangoproject.com/en/dev/ref/settings/#template-loaders
             # https://docs.djangoproject.com/en/dev/ref/templates/api/#loader-types
             'loaders': [
-				'app_namespace.Loader',
+                'app_namespace.Loader',
                 'django.template.loaders.filesystem.Loader',
                 'django.template.loaders.app_directories.Loader',
             ],
@@ -215,7 +221,8 @@ STATIC_URL = '/static/'
 # See: https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#std:setting-STATICFILES_DIRS
 STATICFILES_DIRS = (
     str(APPS_DIR.path('static')),
-	str(ROOT_DIR.path('assets')), # We do this so that django's collectstatic copies our bundles to the STATIC_ROOT or syncs them to whatever storage we use.
+    str(ROOT_DIR.path('assets')),
+# We do this so that django's collectstatic copies our bundles to the STATIC_ROOT or syncs them to whatever storage we use.
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#staticfiles-finders
@@ -305,7 +312,6 @@ LOGGING = {
     },
 }
 
-
 # Third parties
 # ------------------------------------------------------------------------------
 REST_FRAMEWORK = {
@@ -335,7 +341,7 @@ ANONYMOUS_USER_NAME = 'AnonymousUser'
 WEBPACK_LOADER = {
     'DEFAULT': {
         'BUNDLE_DIR_NAME': 'bundles/',
-        'STATS_FILE':  str(ROOT_DIR('front', 'webpack-stats.json')),
+        'STATS_FILE': str(ROOT_DIR('front', 'webpack-stats.json')),
     }
 }
 if not DEBUG:
@@ -350,7 +356,6 @@ STATNUTS_SECRET = 'GsHk=.o2kTu9WkU!a:n1kqkQogZ4lXWitDGn2bZff=?YcdbI-;6h_Grusn@q5
 STATNUTS_URL = 'https://statnuts.django.group'
 STATNUTS_NKCUP_USER = 'nioukamoulcupimport'
 STATNUTS_NKCUP_PWD = 'nioukamoulcupimport'
-
 
 # ...
 TEMPLATE_STRING_IF_INVALID = ''
