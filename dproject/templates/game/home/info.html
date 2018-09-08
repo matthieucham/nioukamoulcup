@@ -1,6 +1,7 @@
 {% extends "game/home/home_base.html" %}
 {% load static %}
 {% load l1results %}
+{% load zinnia %}
 
 {% block content-center %}
     <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
@@ -17,8 +18,6 @@
 {% endblock content-center %}
 
 {% block content-right %}
- {% comment %}
-    {% get_recent_entries 3 'game/home/zinnia_recent_articles_list.html' %}
- {% endcomment %}
  {% last_journees %}
+    {% get_recent_entries 3 %}
 {% endblock content-right %}

@@ -49,7 +49,9 @@ THIRD_PARTY_APPS = (
     'easy_thumbnails',
 	'mptt',
     'tagging',
+    'ckeditor',
     'zinnia',
+    'zinnia_ckeditor',
     'django_comments',
 	# dj-wiki
     # 'django_nyt',
@@ -90,6 +92,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # 'game.middleware.ActiveLeagueMiddleware',
 ]
 
 # DEBUG
@@ -265,7 +268,6 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
 )
 
-
 # Custom user app defaults
 # Select the correct user model
 # AUTH_USER_MODEL = 'users.User'
@@ -352,3 +354,5 @@ STATNUTS_NKCUP_PWD = 'nioukamoulcupimport'
 
 # ...
 TEMPLATE_STRING_IF_INVALID = ''
+
+ZINNIA_ENTRY_BASE_MODEL = 'game.models.EntryLeague'

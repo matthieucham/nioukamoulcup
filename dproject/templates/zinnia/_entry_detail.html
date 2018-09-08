@@ -1,0 +1,28 @@
+{% extends "zinnia/_entry_detail_base.html" %}
+{% load i18n %}
+{% load zinnia %}
+
+ {% block entry-title %}
+    <h1 class="entry-title" itemprop="name">
+        {{ object.title|widont }}
+    </h1>
+{% endblock entry-title %}
+
+{% block continue-reading %}
+    {% if continue_reading and object_content.has_more %}
+    <p class="continue-reading">
+      <a href="{{ object.get_absolute_url }}"
+         title="{% blocktrans with object=object.title percent=object_content.remaining_percent|floatformat:0 %}{{ percent }}% of {{ object }} still remains to read.{% endblocktrans %}"
+         rel="bookmark" itemprop="url"
+         class="navlink"
+      >
+        {% trans "Continue reading" %}
+      </a>
+    </p>
+    {% endif %}
+{% endblock continue-reading %}
+
+{% block entry-shorturl %}
+{% endblock entry-shorturl %}
+{% block entry-discussions %}
+{% endblock entry-discussions %}

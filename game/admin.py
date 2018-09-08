@@ -1,7 +1,11 @@
 from django.contrib import admin
+from django.utils.translation import ugettext_lazy as _
+
+from zinnia.models.entry import Entry
+from zinnia.admin.entry import EntryAdmin
+from zinnia_ckeditor.admin import EntryAdminCKEditor
 
 from game import models
-from ligue1 import models as l1models
 from ligue1.admin import admin_site
 from inline_actions.admin import InlineActionsMixin
 from inline_actions.admin import InlineActionsModelAdminMixin
@@ -50,3 +54,28 @@ class SaisonScoringAdmin(InlineActionsModelAdminMixin, admin.ModelAdmin):
 
 
 admin_site.register(models.SaisonScoring, SaisonScoringAdmin)
+
+
+class EntryLeagueAdmin(EntryAdminCKEditor):
+    # In our case we put the gallery field
+    # into the 'Content' fieldset
+    fieldsets = (
+                    (_('Content'), {
+                        'fields': (('title', 'status'), 'lead', 'content', 'league')}),
+                ) + \
+                EntryAdmin.fieldsets[1:]
+    readonly_fields = (
+        'league',
+    )
+
+    def save_model(self, request, obj, form, change):
+        # TODO : pass a param to know if league entry / info entry : param set on the template ?
+        visited_league_pk = request.session.get('visited_league', None)
+        if visited_league_pk:
+            obj.league = models.LeagueMembership.objects.filter(user=request.user).get(league=visited_league_pk).league
+        else:
+            obj.league = None
+        super().save_model(request, obj, form, change)
+
+
+admin.site.register(Entry, EntryLeagueAdmin)

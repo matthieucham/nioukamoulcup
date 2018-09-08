@@ -21,6 +21,9 @@ class League(models.Model):
     def has_object_read_permission(self, request):
         return request.user in self.members.all()
 
+    def __str__(self):
+        return self.name
+
 
 class LeagueMembership(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
