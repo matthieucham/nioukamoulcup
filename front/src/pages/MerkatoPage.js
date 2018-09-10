@@ -15,6 +15,7 @@ const Page = ({ merkatosession }) => {
 			<div className="react-app-inner">
 			<main>
 				<article id="home-main">
+				
 					<SolvedMerkatoSession session={merkatosession} />
 				</article>
 			</main>
@@ -22,4 +23,4 @@ const Page = ({ merkatosession }) => {
 			);
 }
 
-export const MerkatoResultsPage = connect(mapStateToProps)(Page)
+export const MerkatoPage = connect(mapStateToProps)(Page)

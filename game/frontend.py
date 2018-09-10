@@ -327,7 +327,7 @@ class LeagueMerkatoResultsView(PermissionRequiredMixin, StateInitializerMixin, C
             '-solving')
         context['team'] = self._get_my_team()
         context['instance'] = self._get_current_league_instance(self.object)
-        context['component'] = 'merkatoresults'
+        context['component'] = 'merkato'
         if 'session_pk' in self.kwargs:
             msession = models.MerkatoSession.objects.get(
                 merkato__league_instance=self._get_current_league_instance(self.object), is_solved=True,
