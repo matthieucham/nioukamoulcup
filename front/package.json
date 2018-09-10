@@ -7,7 +7,7 @@
     "@material-ui/core": "^1.4.2",
     "babel-plugin-transform-class-properties": "^6.24.1",
     "cross-fetch": "^1.1.1",
-    "moment": "^2.19.1",
+    "date-fns": "^1.29.0",
     "normalizr": "^3.2.4",
     "rc-collapse": "^1.7.6",
     "react-redux": "^5.0.6",

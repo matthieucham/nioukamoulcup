@@ -1,10 +1,8 @@
 import React, { Component } from "react";
 import { AutoSizer, Column, Table, SortDirection } from "react-virtualized";
-import Moment from "moment";
+import { format } from "date-fns";
 
 export const SalesTable = ({ sales, height }) => {
-  Moment.locale("fr");
-
   return (
     <AutoSizer disableHeight>
       {({ width }) => (
@@ -24,7 +22,7 @@ export const SalesTable = ({ sales, height }) => {
             label="Date"
             dataKey="merkato_session.closing"
             cellDataGetter={({ rowData }) =>
-              Moment(rowData.merkato_session.closing).format("DD/MM/YYYY")
+              format(rowData.merkato_session.closing, "DD/MM/YYYY")
             }
             width={120}
           />

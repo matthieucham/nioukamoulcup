@@ -1,5 +1,5 @@
 import React from "react";
-import Moment from "moment";
+import { format } from "date-fns";
 import { SaleCard } from "./SaleCard";
 
 class SalesList extends React.Component {
@@ -51,8 +51,8 @@ class ReleasesList extends React.Component {
 export class SolvedMerkatoSession extends React.Component {
   render() {
     const { session } = this.props;
-    const start = Moment(session.closing).format("DD/MM/YYYY HH:mm");
-    const end = Moment(session.solving).format("DD/MM/YYYY HH:mm");
+    const start = format(session.closing, "DD/MM/YYYY HH:mm");
+    const end = format(session.solving, "DD/MM/YYYY HH:mm");
     const bonus = (session.attributes.score_factor - 1.0).toFixed(2) * 100;
     var bonusDisplay;
     if (bonus > 0) {

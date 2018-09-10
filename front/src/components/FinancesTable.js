@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { AutoSizer, Column, Table, SortDirection } from "react-virtualized";
-import Moment from "moment";
+import { format } from "date-fns";
 
 function getNumber(theNumber) {
   if (theNumber > 0) {
@@ -30,8 +30,6 @@ function getInfos(info) {
 }
 
 export const FinancesTable = ({ history, height }) => {
-  Moment.locale("fr");
-
   return (
     <AutoSizer disableHeight>
       {({ width }) => (
@@ -50,9 +48,7 @@ export const FinancesTable = ({ history, height }) => {
           <Column
             label="Date"
             dataKey="date"
-            cellDataGetter={({ rowData }) =>
-              Moment(rowData.date).format("DD/MM/YYYY")
-            }
+            cellDataGetter={({ rowData }) => format(rowData.date, "DD/MM/YYYY")}
             width={120}
           />
 

@@ -1,10 +1,8 @@
 import React, { Component } from "react";
 import { AutoSizer, Column, Table, SortDirection } from "react-virtualized";
-import Moment from "moment";
+import { format } from "date-fns";
 
 export const ReleasesTable = ({ releases, height }) => {
-  Moment.locale("fr");
-
   return (
     <AutoSizer disableHeight>
       {({ width }) => (
@@ -24,7 +22,7 @@ export const ReleasesTable = ({ releases, height }) => {
             label="Date"
             dataKey="signing.end"
             cellDataGetter={({ rowData }) =>
-              Moment(rowData.signing.end).format("DD/MM/YYYY")
+              format(rowData.signing.end, "DD/MM/YYYY")
             }
             width={120}
           />

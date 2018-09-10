@@ -1,10 +1,8 @@
 import React, { Component } from "react";
 import { AutoSizer, Column, Table, SortDirection } from "react-virtualized";
-import Moment from "moment";
+import { format } from "date-fns";
 
 export const SigningsTable = ({ signings, height }) => {
-  Moment.locale("fr");
-
   return (
     <AutoSizer disableHeight>
       {({ width }) => (
@@ -24,7 +22,7 @@ export const SigningsTable = ({ signings, height }) => {
             label="Date"
             dataKey="begin"
             cellDataGetter={({ rowData }) =>
-              Moment(rowData.begin).format("DD/MM/YYYY")
+              format(rowData.begin, "DD/MM/YYYY")
             }
             width={120}
           />
@@ -51,7 +49,7 @@ export const SigningsTable = ({ signings, height }) => {
             label="Départ"
             dataKey="end"
             cellDataGetter={({ rowData }) =>
-              rowData.end ? Moment(rowData.end).format("DD/MM/YYYY") : "-"
+              rowData.end ? format(rowData.end, "DD/MM/YYYY") : "-"
             }
             width={120}
           />
