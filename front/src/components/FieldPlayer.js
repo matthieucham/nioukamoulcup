@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import ReactSVG from "react-svg";
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
 
-export const Jersey = ({ club, jerseysize }) => {
+export const Jersey = ({ club, jerseysize, displayName }) => {
   const svgPath =
     "/static/svg/" + (club ? club.maillot_svg : "jersey-noclub2") + ".svg";
   const colFill = club ? club.maillot_color_bg : "#000";
@@ -11,18 +11,26 @@ export const Jersey = ({ club, jerseysize }) => {
     <div className="jersey">
       <ReactSVG
         path={svgPath}
-        style={{ width: jerseysize, height: jerseysize, fill: colFill, stroke: colStroke }}
+        style={{
+          width: jerseysize,
+          height: jerseysize,
+          fill: colFill,
+          stroke: colStroke
+        }}
       />
-      <div className="clubName-container">
-        <span className="clubName">{club ? club.nom : "-"}</span>
-      </div>
+      {displayName && (
+        <div className="clubName-container">
+          <span className="clubName">{club ? club.nom : "-"}</span>
+        </div>
+      )}
     </div>
   );
 };
 
 Jersey.defaultProps = {
-  jerseysize: 64
-}
+  jerseysize: 64,
+  displayName: true
+};
 
 export const Position = ({ poste }) => {
   const dico = { G: "Gardien", D: "Défenseur", M: "Milieu", A: "Attaquant" };

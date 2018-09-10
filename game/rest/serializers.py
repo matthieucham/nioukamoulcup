@@ -3,6 +3,7 @@ from rest_framework import serializers
 from rest_framework.reverse import reverse
 from dry_rest_permissions.generics import DRYPermissionsField
 from django.db import models
+from django.utils.timezone import localtime, now
 
 from game.models import league_models, transfer_models, scoring_models
 from ligue1 import models as l1models
@@ -534,6 +535,19 @@ class SaleSummarySerializer(serializers.ModelSerializer):
         fields = ('id', 'rank', 'type', 'player', 'author', 'min_price')
 
 
+class SaleSummaryWithMyAuctionSerializer(SaleSummarySerializer):
+    my_auction = serializers.SerializerMethodField()
+
+    def get_my_auction(self, obj):
+        if 'request' in self.context:
+            mb = league_models.LeagueMembership.objects.get(user=self.context['request'].user)
+            return transfer_models.Auction.objects.filter(sale=obj, team=mb.team).first()
+        return None
+
+    class Meta(SaleSummarySerializer.Meta):
+        fields = SaleSummarySerializer.Meta.fields + ('my_auction',)
+
+
 class SaleSerializer(SaleSummarySerializer):
     winner = serializers.SerializerMethodField()
     amount = serializers.SlugRelatedField(source='winning_auction', slug_field='value', read_only=True)
@@ -603,7 +617,6 @@ class PlayerMerkatoSerializer(PlayerHdrSerializer):
     current_signing = serializers.SerializerMethodField()
     current_sale = serializers.SerializerMethodField()
 
-
     def get_current_signing(self, obj):
         signing = self.context.get('signings_map').get(obj.id) or None
         if signing is not None:
@@ -632,3 +645,29 @@ class PlayerMerkatoSerializer(PlayerHdrSerializer):
             'current_signing',
             'current_sale',
         )
+
+
+class OpenMerkatoSessionSerializer(MerkatoSessionSummarySerializer):
+    sales = serializers.SerializerMethodField()
+
+    def get_sales(self, obj):
+        ordered_sales = transfer_models.Sale.objects.filter(merkato_session=obj).order_by('rank')
+        return SaleSummaryWithMyAuctionSerializer(ordered_sales, many=True, read_only=True, context=self.context).data
+
+    class Meta(MerkatoSessionSummarySerializer.Meta):
+        model = transfer_models.MerkatoSession
+        fields = MerkatoSessionSummarySerializer.Meta.fields + ('sales',)
+
+
+class CurrentMerkatoSerializer(serializers.ModelSerializer):
+    sessions = serializers.SerializerMethodField()
+
+    def get_sessions(self, obj):
+        ordered_sessions = transfer_models.MerkatoSession.objects.filter(merkato=obj, is_solved=False,
+                                                                         solving__gt=localtime(now())).annotate(
+            num_sales=models.Count('sale')).filter(num_sales__gt=0).order_by('number')
+        return OpenMerkatoSessionSerializer(ordered_sessions, many=True, read_only=True, context=self.context).data
+
+    class Meta:
+        model = transfer_models.Merkato
+        fields = ('begin', 'end', 'mode', 'configuration', 'league_instance', 'sessions',)

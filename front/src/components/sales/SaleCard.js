@@ -6,6 +6,7 @@ import Button from "@material-ui/core/Button";
 import Avatar from "@material-ui/core/Avatar";
 import Collapse from "@material-ui/core/Collapse";
 import ReactRevealText from "react-reveal-text";
+import { Jersey } from "../FieldPlayer";
 
 class SaleBefore extends React.Component {
   constructor(props) {
@@ -19,8 +20,10 @@ class SaleBefore extends React.Component {
   }
 
   findMyOffer(auctions) {
-    for (const auction of auctions) {
-      if (auction.is_mine === true) return "" + auction.value + " Ka";
+    if (auctions != null) {
+      for (const auction of auctions) {
+        if (auction.is_mine === true) return "" + auction.value + " Ka";
+      }
     }
     return "-";
   }
@@ -32,9 +35,10 @@ class SaleBefore extends React.Component {
 
   render() {
     const sale = this.props.sale;
+    const displayActions = this.props.displayActions;
     return (
       <div>
-        <div className="salecard-content">
+        <div className="salecard-content salecard-reveal-content">
           <dl>
             <dt>Auteur</dt>
             <dd>{sale.author.name}</dd>
@@ -130,7 +134,7 @@ class SaleDuring extends React.Component {
     });
     return (
       <div>
-        <div className="salecard-content">
+        <div className="salecard-content salecard-reveal-content">
           <div className="past-offers">{pastP}</div>
           <div className="current-offer">
             <h1>{allOffers[auctionIndex].value} Ka</h1>
@@ -213,7 +217,7 @@ class SaleAfter extends React.Component {
     return (
       <div>
         {hasWinner ? (
-          <div className="salecard-content">
+          <div className="salecard-content salecard-reveal-content">
             <div className="winner">
               <ReactRevealText
                 show={this.state.showWinner}
@@ -228,7 +232,7 @@ class SaleAfter extends React.Component {
             </div>
           </div>
         ) : (
-          <div className="salecard-content">
+          <div className="salecard-content salecard-reveal-content">
             <h1>Aucune offre</h1>
             <p>Vente annulée</p>
           </div>
@@ -242,7 +246,7 @@ class SaleAfter extends React.Component {
   }
 }
 
-class SaleCardContent extends React.Component {
+export class SaleCardContent extends React.Component {
   constructor(props) {
     super(props);
 
@@ -285,6 +289,20 @@ class SaleCardContent extends React.Component {
   }
 }
 
+export const SaleCardHeader = ({ sale, onClick }) => (
+  <CardHeader
+    title={<a href={sale.player.url}>{sale.player.display_name}</a>}
+    subheader={
+      sale.player.poste + ", " + (sale.player.club ? sale.player.club.nom : "?")
+    }
+    avatar={<Avatar>{sale.type}</Avatar>}
+    action={
+      <Jersey club={sale.player.club} jerseysize={48} displayName={false} />
+    }
+    onClick={onClick}
+  />
+);
+
 export class SaleCard extends React.Component {
   constructor(props) {
     super(props);
@@ -304,12 +322,7 @@ export class SaleCard extends React.Component {
     const sale = this.props.sale;
     return (
       <Card>
-        <CardHeader
-          title={<a href={sale.player.url}>{sale.player.display_name}</a>}
-          subheader={sale.player.poste + ", " + (sale.player.club ? sale.player.club.nom : "?")}
-          avatar={<Avatar>{sale.type}</Avatar>}
-          onClick={this.handleExpandClick}
-        />
+        <SaleCardHeader sale={sale} onClick={this.handleExpandClick} />
         <Collapse in={this.state.expanded} timeout="auto" unmountOnExit>
           <SaleCardContent sale={sale} />
         </Collapse>

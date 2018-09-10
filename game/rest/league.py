@@ -1,5 +1,5 @@
 from django.http import Http404
-import datetime
+from django.utils.timezone import localtime, now
 
 from rest_framework import generics
 from django_filters.rest_framework import DjangoFilterBackend
@@ -7,7 +7,7 @@ from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.pagination import LimitOffsetPagination, PageNumberPagination
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from django.db.models import Prefetch
+from django.db.models import Count
 
 from dry_rest_permissions.generics import DRYObjectPermissions
 
@@ -184,3 +184,13 @@ class PlayersForMerkatoView(CurrentLeagueInstanceMixin, generics.ListAPIView):
                             league_pk)).select_related(
                 'team').values_list('player_id', 'team__name'))
         return base_context
+
+
+class CurrentMerkatoView(CurrentLeagueInstanceMixin, generics.ListAPIView):
+    permission_classes = (DRYObjectPermissions,)
+    serializer_class = serializers.CurrentMerkatoSerializer
+
+    def get_queryset(self):
+        instance = self._get_current_league_instance(self.kwargs['league_pk'])
+        return transfer_models.Merkato.objects.filter(league_instance=instance, end__gt=localtime(now())).order_by(
+            'begin')

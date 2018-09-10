@@ -457,6 +457,7 @@ header nav a:hover, nav ul li ul li:hover {
 
 .jersey {
     position: relative;
+    margin: 3px;
 }
 
 .jersey .clubName-container {
@@ -585,6 +586,10 @@ dl.kvgroup {
 
 #home-main {
     padding: 10px 0;
+}
+
+#home-main p {
+    padding: 0 10px;
 }
 
 #home-main h2 {
@@ -794,6 +799,9 @@ dl.kvgroup {
     align-items: center;
     min-height: 6em;
     max-height: 6em;
+}
+
+.salecard-reveal-content {
     min-width: 18em;
     max-width: 18em;
 }
@@ -864,4 +872,8 @@ dl.kvgroup {
 
 .player-picker-fields > button {
     margin-right: 0.5em;
+}
+
+div.opensales-container {
+    display: flex;
 }
