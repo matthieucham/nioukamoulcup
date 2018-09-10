@@ -332,7 +332,8 @@ MESSAGE_TAGS = {
 
 # Required by Userena
 AUTH_PROFILE_MODULE = 'accounts.KcupUserProfile'
-USERENA_SIGNIN_REDIRECT_URL = '/game/home/info/'
+USERENA_SIGNIN_REDIRECT_URL = '/accounts/%(username)s/'
+USERENA_REDIRECT_ON_SIGNOUT = '/game/home/info/'
 
 # Required by Guardian
 ANONYMOUS_USER_NAME = 'AnonymousUser'
