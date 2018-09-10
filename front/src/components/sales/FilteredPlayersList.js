@@ -223,8 +223,8 @@ class FilteredPlayersList extends React.Component {
           rowCount={this.rowCount()}
           isRowLoaded={this.isRowLoaded}
           loadMoreRows={this.loadMoreRows}
-          threshold={75}
-          minimumBatchSize={100}
+          threshold={30}
+          minimumBatchSize={40}
           ref={ref => {
             this.Loader = ref;
           }}
