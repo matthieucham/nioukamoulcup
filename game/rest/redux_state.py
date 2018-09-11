@@ -60,33 +60,17 @@ class StateInitializerMixin:
         self.initial_state.update({'league_id': league.id})
         return self.initial_state
 
-    # @timed
-    # def init_merkatoplayers(self, request, league):
-    #     self._init_common(request)
-    #     instance = models.LeagueInstance.objects.get_current(league)
-    #     user = request.user
-    #     team = models.LeagueMembership.objects.filter(user=user, league=league).first().team
-    #     qs = (
-    #             l1models.Joueur.objects.filter(club__participations=instance.saison) |
-    #             l1models.Joueur.objects.filter(performances__rencontre__journee__saison=instance.saison)
-    #     ).distinct().order_by('club', 'nom')
-    #     base_context = dict({'request': request})
-    #     base_context['signings_map'] = dict(models.Signing.objects.filter(team__division=team.division,
-    #                                                                       end__isnull=True,
-    #                                                                       league_instance=instance).select_related(
-    #         'team').values_list('player_id', 'team__name'))
-    #     base_context['sales_map'] = dict(
-    #         models.Sale.objects.filter(merkato_session__is_solved=False)
-    #             .filter(team__division=team.division,
-    #                     merkato_session__merkato__league_instance=instance).select_related(
-    #             'team').values_list('player_id', 'team__name'))
-    #     players_srz = serializers.PlayerMerkatoSerializer(qs, many=True, context=base_context)
-    #     self.initial_state.update({'merkatoplayers': self._to_json(players_srz)})
-    #     return self.initial_state
-
     @timed
     def init_from_merkatosession(self, request, session):
         self._init_common(request)
         session_serializer = serializers.MerkatoSessionSerializer(session, context={'request': request})
         self.initial_state.update({'merkatosession': self._to_json(session_serializer)})
+        return self.initial_state
+
+    @timed
+    def init_current_merkatos(self, request, team, merkatos):
+        self._init_common(request)
+        merkato_serializer = serializers.CurrentMerkatoSerializer(merkatos, many=True,
+                                                                  context={'request': request, 'team': team})
+        self.initial_state.update({'merkatos': self._to_json(merkato_serializer)})
         return self.initial_state

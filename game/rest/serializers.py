@@ -7,6 +7,7 @@ from django.utils.timezone import localtime, now
 
 from game.models import league_models, transfer_models, scoring_models
 from ligue1 import models as l1models
+from game.services import auctions
 from utils.timer import timed
 
 
@@ -661,6 +662,7 @@ class OpenMerkatoSessionSerializer(MerkatoSessionSummarySerializer):
 
 class CurrentMerkatoSerializer(serializers.ModelSerializer):
     sessions = serializers.SerializerMethodField()
+    permissions = serializers.SerializerMethodField()
 
     def get_sessions(self, obj):
         ordered_sessions = transfer_models.MerkatoSession.objects.filter(merkato=obj, is_solved=False,
@@ -668,6 +670,28 @@ class CurrentMerkatoSerializer(serializers.ModelSerializer):
             num_sales=models.Count('sale')).filter(num_sales__gt=0).order_by('number')
         return OpenMerkatoSessionSerializer(ordered_sessions, many=True, read_only=True, context=self.context).data
 
+    def get_permissions(self, obj):
+        auc, auc_reason = auctions.can_register_auction(self.context.get('team'), obj)
+        pa, pa_reason = auctions.can_register_pa(self.context.get('team'), obj)
+        mv, mv_reason = auctions.can_register_mv(self.context.get('team'), obj)
+        return {
+            'auctions': {
+                'can': auc,
+                'reason': auc_reason
+            },
+            'pa': {
+                'can': pa,
+                'reason': pa_reason
+            },
+            'mv': {
+                'can': mv,
+                'reason': mv_reason
+            },
+            'next_session': MerkatoSessionSummarySerializer(
+                transfer_models.MerkatoSession.objects.get_next_available(obj), read_only=True,
+                context=self.context).data
+        }
+
     class Meta:
         model = transfer_models.Merkato
-        fields = ('begin', 'end', 'mode', 'configuration', 'league_instance', 'sessions',)
+        fields = ('begin', 'end', 'mode', 'configuration', 'league_instance', 'sessions', 'permissions')

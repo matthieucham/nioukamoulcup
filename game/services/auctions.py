@@ -142,13 +142,52 @@ def can_register_auction(team, merkato):
     """
     expired_sessions = merkato.merkatosession_set.filter(solving__lt=timezone.now()).count()
     if expired_sessions < 4:
-        return True
+        return True, 'BEGINNING'
     current_pa = transfer_models.Sale.objects.filter(merkato_session__merkato=merkato,
                                                      merkato_session__solving__gt=timezone.now(),
+                                                     type='PA',
                                                      team=team).count()
     if current_pa > 0:
-        return True
+        return True, 'CURRENT_PA'
     previous_pas = transfer_models.Sale.objects.filter(merkato_session__merkato=merkato,
                                                        merkato_session__solving__lt=timezone.now(),
+                                                       type='PA',
                                                        team=team).count()
-    return (expired_sessions // 2) - 1 <= previous_pas
+    if (expired_sessions // 2) - 1 <= previous_pas:
+        return True, 'ENOUGH_PA'
+    else:
+        return False, 'NOT_ENOUGH_PA'
+
+
+def can_register_pa(team, merkato):
+    """
+    Vérifie que cette ékyp est autorisée à envoyer une PA. La règle:
+    - pas de PA en cours
+    - avoir une place dans la team (TODO)
+    :return: True |False
+    """
+    current_pa_count = transfer_models.Sale.objects.filter(merkato_session__merkato=merkato,
+                                                           merkato_session__solving__gt=timezone.now(),
+                                                           type='PA',
+                                                           team=team).count()
+    current_roster = team.signing_set.filter(league_instance=merkato.league_instance, end__isnull=True).count()
+    if current_pa_count >= merkato.configuration.get('pa_number'):
+        return False, 'CURRENT_PA'
+    if current_roster >= merkato.configuration.get('roster_size_max'):
+        return False, 'ROSTER_FULL'
+    return True, None
+
+def can_register_mv(team, merkato):
+    """
+    Vérifie que cette ékyp est autorisée à envoyer une MV. La règle:
+    - pas de MV en cours
+    :return: True |False
+    """
+    current_mv_count = transfer_models.Sale.objects.filter(merkato_session__merkato=merkato,
+                                                           merkato_session__solving__gt=timezone.now(),
+                                                           type='MV',
+                                                           team=team).count()
+    if current_mv_count >= merkato.configuration.get('mv_number'):
+        return False, 'CURRENT_MV'
+    return True, None
+

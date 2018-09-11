@@ -17,6 +17,9 @@ from game.rest import serializers
 from utils.timer import timed
 
 
+# TODO : Faire le ménage dans ces vues, ne garder que celles utilisées par le composant React
+
+
 class CurrentLeagueInstanceMixin:
     def _get_current_league_instance(self, pk):
         return league_models.LeagueInstance.objects.get_current(league=pk)
