@@ -5,6 +5,7 @@ import CardContent from "@material-ui/core/CardContent";
 import Button from "@material-ui/core/Button";
 import Avatar from "@material-ui/core/Avatar";
 import Collapse from "@material-ui/core/Collapse";
+import IconButton from "@material-ui/core/IconButton";
 import ReactRevealText from "react-reveal-text";
 import { Jersey } from "../FieldPlayer";
 
@@ -289,7 +290,7 @@ export class SaleCardContent extends React.Component {
   }
 }
 
-export const SaleCardHeader = ({ sale, onClick }) => (
+export const SaleCardHeader = ({ sale, expanded, onClick }) => (
   <CardHeader
     title={<a href={sale.player.url}>{sale.player.display_name}</a>}
     subheader={
@@ -297,13 +298,15 @@ export const SaleCardHeader = ({ sale, onClick }) => (
     }
     avatar={<Avatar>{sale.type}</Avatar>}
     action={
-      <Jersey club={sale.player.club} jerseysize={48} displayName={false} />
+      <IconButton aria-label="Déplier" onClick={onClick}>
+        {!expanded && <i className="fa fa fa-chevron-down" />}
+        {expanded && <i className="fa fa fa-chevron-up" />}
+      </IconButton>
     }
-    onClick={onClick}
   />
 );
 
-export class SaleCard extends React.Component {
+export class SaleCardComponent extends React.Component {
   constructor(props) {
     super(props);
 
@@ -319,14 +322,33 @@ export class SaleCard extends React.Component {
   }
 
   render() {
-    const sale = this.props.sale;
+    const { sale, extraHeader, children } = this.props;
     return (
       <Card>
-        <SaleCardHeader sale={sale} onClick={this.handleExpandClick} />
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between"
+          }}
+        >
+          <SaleCardHeader
+            sale={sale}
+            expanded={this.state.expanded}
+            onClick={this.handleExpandClick}
+          />
+          {extraHeader}
+        </div>
         <Collapse in={this.state.expanded} timeout="auto" unmountOnExit>
-          <SaleCardContent sale={sale} />
+          {children}
         </Collapse>
       </Card>
     );
   }
 }
+
+export const SaleCard = ({ sale }) => (
+  <SaleCardComponent sale={sale}>
+    <SaleCardContent sale={sale} />
+  </SaleCardComponent>
+);

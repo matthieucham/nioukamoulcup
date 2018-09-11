@@ -6,41 +6,35 @@ import Avatar from "@material-ui/core/Avatar";
 import TextField from "@material-ui/core/TextField";
 import InputAdornment from "@material-ui/core/InputAdornment";
 import { Jersey } from "../FieldPlayer";
-import { SaleCardHeader, SaleCardContent } from "./SaleCard";
+import { SaleCardHeader, SaleCardContent, SaleCardComponent } from "./SaleCard";
 
 const CurrentSale = ({ sale, onChange }) => (
-  <Card>
-    <SaleCardHeader sale={sale} />
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between"
-      }}
-    >
-      <div
-        className="salecard-content"
-        style={{ marginLeft: "24px", paddingRight: "24px" }}
-      >
-        <dl>
-          <dt>Auteur</dt>
-          <dd>{sale.author.name}</dd>
-          <dt>Mise à prix</dt>
-          <dd>{sale.min_price} Ka</dd>
-        </dl>
-      </div>
-
+  <SaleCardComponent
+    sale={sale}
+    extraHeader={
       <TextField
         label="Offre"
-        value={!!sale.my_auction ? sale.my_auction.value : ""}
+        defaultValue={!!sale.my_auction ? sale.my_auction.value : ""}
         InputProps={{
           endAdornment: <InputAdornment position="end">Ka</InputAdornment>
         }}
         style={{ marginLeft: "24px", paddingRight: "24px", width: 80 }}
         onChange={onChange}
       />
+    }
+  >
+    <div
+      className="salecard-content"
+      style={{ marginLeft: "24px" }}
+    >
+      <dl>
+        <dt>Auteur</dt>
+        <dd>{sale.author.name}</dd>
+        <dt>Mise à prix</dt>
+        <dd>{sale.min_price} Ka</dd>
+      </dl>
     </div>
-  </Card>
+  </SaleCardComponent>
 );
 
 export class OpenMerkatoSession extends React.Component {
@@ -53,7 +47,10 @@ export class OpenMerkatoSession extends React.Component {
     const sales = session.sales.map(sale => <CurrentSale sale={sale} />);
     return (
       <div>
-        <h2>Session n°{session.number} </h2>
+        <h2>
+          Session n°
+          {session.number}{" "}
+        </h2>
         <p>
           Enchères ouvertes jusqu'au{" "}
           <strong>{format(session.solving, "DD/MM/YYYY HH:mm")}</strong>
