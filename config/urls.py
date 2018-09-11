@@ -20,8 +20,10 @@ from django.contrib import admin
 #from wiki.urls import get_pattern as get_wiki_pattern
 #from django_nyt.urls import get_pattern as get_nyt_pattern
 from ligue1.admin_import import admin_import_site
+from game.views import LeagueEntryDetail
 
 urlpatterns = [
+    url(r'^game/home/info/$', LeagueEntryDetail.as_view()),
     url(r'^game/home/info/', include('zinnia.urls')),
     url(r'^game/', include('game.urls')),
     url(r'^admin/', admin.site.urls),

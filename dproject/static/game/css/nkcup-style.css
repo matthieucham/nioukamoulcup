@@ -63,9 +63,9 @@ a:hover {
 }
 
 a.navlink {
-    color: #5f5f5f;
+    color: rgb(0,0,0,0.54);
     display: block;
-    text-align: right;
+    /*text-align: right;*/
     margin-top: 5px;
 }
 
@@ -243,7 +243,7 @@ section.expanded {
     }
 
     .hg__right .navlink {
-        background-color: #5f5f5f;
+        background-color: rgb(0,0,0,0.54);
         color: #FFFFFF;
     }
 }
@@ -877,3 +877,33 @@ dl.kvgroup {
 div.opensales-container {
     display: flex;
 }
+
+/****************************************************************/
+/*                          ZINNIA                              */
+/****************************************************************/
+article.hentry {
+    border-bottom: 1px solid #5f5f5f;
+    padding: 5px;
+}
+
+h2.entry-title {
+    font-size: 1.5em;
+}
+
+p.entry-info, p.entry-last-update, p.entry-tags, p.entry-shorturl {
+    font-size: 0.8em;
+    color: rgba(0, 0, 0, 0.54);
+}
+
+div.entry-body {
+    padding: 1em 0;
+}
+
+aside.entry-widgets {
+    padding: 5px;
+    font-size: 0.8em;
+}
+
+/*article.hentry:nth-child(even) {
+    background-color: #f1f1f1;
+}*/
