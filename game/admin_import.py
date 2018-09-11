@@ -1,4 +1,4 @@
-from django.contrib import admin
+ï»¿from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _
 
 from zinnia.models.entry import Entry
@@ -50,7 +50,7 @@ class SaisonScoringAdmin(InlineActionsModelAdminMixin, admin.ModelAdmin):
     def compute_scores_action(self, request, queryset):
         for ss in queryset:
             ss.compute()
-        self.message_user(request, "Calcul effectué")
+        self.message_user(request, "Calcul effectuÃ©")
 
     compute_scores_action.short_description = "Recalculer les scores"
 
@@ -74,12 +74,12 @@ class MerkatoAdmin(admin.ModelAdmin):
     def generate_sessions_action(self, request, queryset):
         for m in queryset:
             if m.begin < timezone.now():
-                self.message_user(request, "Le merkato %s ayant déjà  démarré, impossible de modifier ses sessions" % m,
+                self.message_user(request, "Le merkato %s ayant dÃ©marrÃ©, impossible de modifier ses sessions" % m,
                                   level=messages.ERROR)
             else:
                 models.MerkatoSession.objects.filter(merkato=m).delete()
                 models.Merkato.objects.create_sessions(m)
-        self.message_user(request, "Sessions créées")
+        self.message_user(request, "Sessions crÃ©Ã©es")
         return HttpResponseRedirect(reverse('import_statnuts:game_merkato_changelist'))
 
 
