@@ -193,7 +193,13 @@ class CurrentMerkatoView(CurrentLeagueInstanceMixin, generics.ListAPIView):
     permission_classes = (DRYObjectPermissions,)
     serializer_class = serializers.CurrentMerkatoSerializer
 
+    def get_serializer_context(self):
+        instance = self._get_current_league_instance(self.kwargs['league_pk'])
+        return {'request': self.request,
+                'team': league_models.LeagueMembership.objects.get(user=self.request.user, league=instance.league).team}
+
     def get_queryset(self):
         instance = self._get_current_league_instance(self.kwargs['league_pk'])
+        league_models.LeagueMembership.objects.get(user=self.request.user, league=instance.league).team
         return transfer_models.Merkato.objects.filter(league_instance=instance, end__gt=localtime(now())).order_by(
             'begin')

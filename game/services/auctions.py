@@ -177,6 +177,7 @@ def can_register_pa(team, merkato):
         return False, 'ROSTER_FULL'
     return True, None
 
+
 def can_register_mv(team, merkato):
     """
     Vérifie que cette ékyp est autorisée à envoyer une MV. La règle:
@@ -190,4 +191,3 @@ def can_register_mv(team, merkato):
     if current_mv_count >= merkato.configuration.get('mv_number'):
         return False, 'CURRENT_MV'
     return True, None
-

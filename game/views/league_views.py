@@ -1,10 +1,11 @@
-from django.views.generic import DetailView
+from django.views.generic import DetailView, FormView
 from rules.contrib.views import PermissionRequiredMixin
 from game.models import League, LeagueInstance, LeagueInstancePhase, LeagueInstancePhaseDay, LeagueMembership, Team, \
     MerkatoSession, Merkato
 from django.utils.timezone import localtime, now
 from game.rest.redux_state import StateInitializerMixin
 from game.rest import serializers
+from game.forms import RegisterPaForm
 
 
 class BaseLeagueView(PermissionRequiredMixin, DetailView):
@@ -106,7 +107,7 @@ class LeagueMerkatoResultsView(BaseMerkatoSessionsListView):
 
 
 class LeagueMerkatoView(BaseMerkatoSessionsListView):
-    template_name = 'game/league/merkato_results.html'
+    template_name = 'game/league/merkato.html'
     component = 'merkato'
 
     def get_context_data(self, **kwargs):
@@ -115,3 +116,14 @@ class LeagueMerkatoView(BaseMerkatoSessionsListView):
             'begin')
         context['PRELOADED_STATE'] = self.init_current_merkatos(self.request, context['team'], merkatos)
         return context
+
+
+class LeagueRegisterPAView(FormView):
+    template_name = 'game/league/merkato.html'
+    form_class = RegisterPaForm
+
+    def get_context_data(self, **kwargs):
+        return super(LeagueMerkatoView, self).get_context_data(**kwargs)  # TODO
+
+    def form_valid(self, form):
+        return super(LeagueRegisterPAView, self).form_valid(form)

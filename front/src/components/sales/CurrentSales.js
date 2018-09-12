@@ -2,8 +2,11 @@ import React from "react";
 import { format } from "date-fns";
 import TextField from "@material-ui/core/TextField";
 import InputAdornment from "@material-ui/core/InputAdornment";
+import Button from "@material-ui/core/Button";
 import { SaleCardComponent } from "./SaleCard";
 import KeyValueBox from "../KeyValueBox";
+import PlayerPicker from "./PlayerPicker";
+import CSRFToken from "../csrftoken";
 
 class CurrentSale extends React.Component {
   render() {
@@ -45,7 +48,7 @@ class CurrentSale extends React.Component {
   }
 }
 
-export class OpenMerkatoSession extends React.Component {
+export class OpenBidMerkatoSession extends React.Component {
   constructor(props) {
     super(props);
   }
@@ -66,10 +69,7 @@ export class OpenMerkatoSession extends React.Component {
             label="Enchères avant le"
             value={format(session.solving, "DD/MM HH:mm")}
           />
-          <KeyValueBox
-            label="Nombre"
-            value={session.sales_count}
-          />
+          <KeyValueBox label="Nombre" value={session.sales_count} />
           {session.attributes.score_factor > 1.0 && (
             <KeyValueBox
               label="Bonification"
@@ -81,6 +81,75 @@ export class OpenMerkatoSession extends React.Component {
         </div>
         <div className="opensales-container">{sales}</div>
       </div>
+    );
+  }
+}
+
+export class CurrentMerkatoBid extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.reasonMap = {
+      BEGINNING: "C'est l'ouverture",
+      CURRENT_PA: "PA en cours",
+      ENOUGH_PA: "Nombre de PA suffisant",
+      NOT_ENOUGH_PA: "Pas assez de PA",
+      ROSTER_FULL: "Plus de place dans l'effectif",
+      CURRENT_MV: "MV en cours"
+    };
+
+    this.handleSubmit = this.handleSubmit.bind(this);
+  }
+
+  handleSubmit(event) {
+    event.preventDefault();
+    const data = new FormData(event.target);
+
+    console.log(data);
+  }
+
+  render() {
+    const { merkato } = this.props;
+    return (
+      <section>
+        <h1>Merkato en cours</h1>
+        <div>
+          <KeyValueBox
+            label="Début"
+            value={format(merkato.begin, "DD/MM HH:mm")}
+          />
+          <KeyValueBox label="Fin" value={format(merkato.end, "DD/MM HH:mm")} />
+          <KeyValueBox
+            label="Nb par session"
+            value={merkato.configuration.sales_per_session}
+          />
+          <KeyValueBox
+            label="Durée enchères"
+            value={merkato.configuration.session_duration + "h"}
+          />
+        </div>
+        <section>
+          <h2>Poster une PA</h2>
+          {merkato.permissions.pa.can && (
+            <form action="/game/league/1/merkato/pa/" method="POST">
+              <CSRFToken />
+              <label>Joueur : </label>
+              <PlayerPicker />
+              <Button type="submit" color="primary" variant="contained">
+                Poster
+              </Button>
+            </form>
+          )}
+          {!merkato.permissions.pa.can && (
+            <p>
+              <span className="lost">
+                <i className="fa fa fa-exclamation-triangle" />
+              </span>{" "}
+              {this.reasonMap[merkato.permissions.pa.reason]}
+            </p>
+          )}
+        </section>
+      </section>
     );
   }
 }

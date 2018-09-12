@@ -95,7 +95,8 @@ class PlayerPicker extends React.Component {
           pickedPlayer={this.state.picked}
         />
         <input
-          id="playerPickerField"
+          id="picked_id_field"
+          name="picked_id"
           type="hidden"
           value={this.state.picked ? this.state.picked.id : ""}
         />
