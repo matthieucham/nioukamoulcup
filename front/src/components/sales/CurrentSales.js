@@ -1,41 +1,49 @@
 import React from "react";
 import { format } from "date-fns";
-import Card from "@material-ui/core/Card";
-import CardHeader from "@material-ui/core/CardHeader";
-import Avatar from "@material-ui/core/Avatar";
 import TextField from "@material-ui/core/TextField";
 import InputAdornment from "@material-ui/core/InputAdornment";
-import { Jersey } from "../FieldPlayer";
-import { SaleCardHeader, SaleCardContent, SaleCardComponent } from "./SaleCard";
+import { SaleCardComponent } from "./SaleCard";
+import KeyValueBox from "../KeyValueBox";
 
-const CurrentSale = ({ sale, onChange }) => (
-  <SaleCardComponent
-    sale={sale}
-    extraHeader={
-      <TextField
-        label="Offre"
-        defaultValue={!!sale.my_auction ? sale.my_auction.value : ""}
-        InputProps={{
-          endAdornment: <InputAdornment position="end">Ka</InputAdornment>
-        }}
-        style={{ marginLeft: "24px", paddingRight: "24px", width: 80 }}
-        onChange={onChange}
-      />
+class CurrentSale extends React.Component {
+  render() {
+    const { sale, enabled, onChange } = this.props;
+    var extraHeader = null;
+    if (enabled) {
+      extraHeader = (
+        <TextField
+          label="Offre"
+          defaultValue={!!sale.my_auction ? sale.my_auction.value : ""}
+          InputProps={{
+            endAdornment: <InputAdornment position="end">Ka</InputAdornment>
+          }}
+          style={{ marginLeft: "24px", paddingRight: "24px", width: 80 }}
+          onChange={onChange}
+        />
+      );
+    } else {
+      extraHeader = (
+        <div style={{ marginLeft: "24px", paddingRight: "24px" }}>
+          <span className="lost">
+            <i className="fa fa-2x fa-exclamation-triangle" />
+          </span>
+        </div>
+      );
     }
-  >
-    <div
-      className="salecard-content"
-      style={{ marginLeft: "24px" }}
-    >
-      <dl>
-        <dt>Auteur</dt>
-        <dd>{sale.author.name}</dd>
-        <dt>Mise à prix</dt>
-        <dd>{sale.min_price} Ka</dd>
-      </dl>
-    </div>
-  </SaleCardComponent>
-);
+    return (
+      <SaleCardComponent sale={sale} extraHeader={extraHeader}>
+        <div className="salecard-content" style={{ marginLeft: "24px" }}>
+          <dl>
+            <dt>Auteur</dt>
+            <dd>{sale.author.name}</dd>
+            <dt>Mise à prix</dt>
+            <dd>{sale.min_price} Ka</dd>
+          </dl>
+        </div>
+      </SaleCardComponent>
+    );
+  }
+}
 
 export class OpenMerkatoSession extends React.Component {
   constructor(props) {
@@ -44,26 +52,33 @@ export class OpenMerkatoSession extends React.Component {
 
   render() {
     const { session } = this.props;
-    const sales = session.sales.map(sale => <CurrentSale sale={sale} />);
+    const sales = session.sales.map(sale => (
+      <CurrentSale sale={sale} enabled={false} />
+    ));
     return (
       <div>
         <h2>
           Session n°
           {session.number}{" "}
         </h2>
-        <p>
-          Enchères ouvertes jusqu'au{" "}
-          <strong>{format(session.solving, "DD/MM/YYYY HH:mm")}</strong>
-        </p>
-        {session.attributes.score_factor > 1.0 && (
-          <p>
-            Le score des joueurs achetés au cours de cette session sera bonifié
-            de{" "}
-            <strong>
-              {(session.attributes.score_factor - 1.0).toFixed(2) * 100}%
-            </strong>
-          </p>
-        )}
+        <div>
+          <KeyValueBox
+            label="Enchères avant le"
+            value={format(session.solving, "DD/MM HH:mm")}
+          />
+          <KeyValueBox
+            label="Nombre"
+            value={session.sales_count}
+          />
+          {session.attributes.score_factor > 1.0 && (
+            <KeyValueBox
+              label="Bonification"
+              value={
+                (session.attributes.score_factor - 1.0).toFixed(2) * 100 + "%"
+              }
+            />
+          )}
+        </div>
         <div className="opensales-container">{sales}</div>
       </div>
     );
