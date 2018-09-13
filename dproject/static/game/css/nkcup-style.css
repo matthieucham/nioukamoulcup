@@ -887,6 +887,7 @@ aside.entry-widgets {
 
 .kcup-login-form {
     background: #FFFFFF;
+    min-width: 500px;
     max-width: 500px;
     margin: 1em auto;
     padding: 3em;
@@ -909,6 +910,7 @@ aside.entry-widgets {
 
 .group {
     display: flex;
+    border: 1px solid #b5b5b5;
     padding: 15px 5px;
     background-color: #f1f1f1;
 }

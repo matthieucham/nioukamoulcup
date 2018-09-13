@@ -1,41 +1,40 @@
-{% extends 'game/skeleton.html' %}
+{% extends 'userena/base_userena_central.html' %}
 {% load i18n %}
 
 {% block title %}{% trans "Signin" %}{% endblock %}
 
-{% block gamecontent %}
-<div class="kcup-login-form">
-    <h2>{% trans "Signin" %}</h2>
-    <form action="" method="post">
-        {% csrf_token %}
-        <div class="kcup-form-group">
-            {{ form.non_field_errors }}
+{% block formtitle %}{% trans "Signin" %}{% endblock %}
+
+{% block formcontent %}
+<form action="" method="post">
+    {% csrf_token %}
+    <div class="kcup-form-group">
+        {{ form.non_field_errors }}
+    </div>
+    {% for field in form %}
+    {% if not field.name == 'remember_me' %}
+    <div class="kcup-form-group">
+        {{ field.label_tag }}
+        {{ field.errors }}
+        <div class="group">
+            {% if field.name == 'identification' %}
+            <i class="fa fa fa-user"></i>
+            {% elif field.name == 'password' %}
+            <i class="fa fa fa-unlock"></i>
+            {% endif %}
+            {{ field }}
         </div>
-        {% for field in form %}
-        {% if not field.name == 'remember_me' %}
-        <div class="kcup-form-group">
-            {{ field.label_tag }}
-            {{ field.errors }}
-            <div class="group">
-                {% if field.name == 'identification' %}
-                <i class="fa fa fa-user"></i>
-                {% elif field.name == 'password' %}
-                <i class="fa fa fa-unlock"></i>
-                {% endif %}
-                {{ field }}
-            </div>
-        </div>
-        {% endif %}
-        {% endfor %}
-        <div class="kcup-form-group">
-            <label for="id_{{ form.remember_me.name }}">{{ form.remember_me }} {{ form.remember_me.label }}</label>
-        </div>
-        {% if next %}<input type="hidden" name="next" value="{{ next }}"/>{% endif %}
-        <input type="submit" value="{% trans 'Signin' %}"/>
-    </form>
-    <p><a href="{% url 'userena_password_reset' %}"
-       title="{% trans 'Forgot your password?' %}">{% trans "Forgot your password?" %}</a></p>
-    <p>Pas encore de compte ?<a href="{% url 'userena_signup' %}" class="register"> {% trans "Signup" %}</a>
-    </p>
-</div>
+    </div>
+    {% endif %}
+    {% endfor %}
+    <div class="kcup-form-group">
+        <label for="id_{{ form.remember_me.name }}">{{ form.remember_me }} {{ form.remember_me.label }}</label>
+    </div>
+    {% if next %}<input type="hidden" name="next" value="{{ next }}"/>{% endif %}
+    <input type="submit" value="{% trans 'Signin' %}"/>
+</form>
+<p><a href="{% url 'userena_password_reset' %}"
+      title="{% trans 'Forgot your password?' %}">{% trans "Forgot your password?" %}</a></p>
+<p>Pas encore de compte ?<a href="{% url 'userena_signup' %}" class="register"> {% trans "Signup" %}</a>
+</p>
 {% endblock %}
