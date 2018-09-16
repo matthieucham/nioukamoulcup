@@ -949,3 +949,7 @@ input[type="submit"] {
     padding: 12px 60px;
     width: 100%;
 }
+
+.account_section {
+    padding: 5px;
+}
