@@ -27,9 +27,10 @@ class League(models.Model):
 
 class LeagueMembership(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    league = models.ForeignKey(League, on_delete=models.CASCADE)
+    league = models.ForeignKey(League, on_delete=models.SET_NULL, null=True)
     is_baboon = models.BooleanField(default=False)
-    date_joined = models.DateField()
+    is_team_captain = models.BooleanField(default=True)
+    date_joined = models.DateField(null=True)
     team = models.ForeignKey('Team', on_delete=models.CASCADE, related_name='managers', null=True)
 
 
@@ -65,9 +66,9 @@ class TeamManager(models.Manager):
 
 class Team(models.Model):
     name = models.CharField(max_length=100, blank=False)
-    league = models.ForeignKey(League, on_delete=models.CASCADE, null=False)
-    division = models.ForeignKey(LeagueDivision, on_delete=models.CASCADE)
-    attributes = JSONField()
+    league = models.ForeignKey(League, on_delete=models.SET_NULL, null=True)
+    division = models.ForeignKey(LeagueDivision, on_delete=models.SET_NULL, null=True)
+    attributes = JSONField(default=dict)
 
     objects = TeamManager()
 
