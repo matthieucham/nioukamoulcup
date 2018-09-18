@@ -23,4 +23,4 @@ const Page = ({ merkatosession }) => {
 			);
 }
 
-export const MerkatoResultsPage = connect(mapStateToProps)(Page)
+export const MerkatoPage = connect(mapStateToProps)(Page)

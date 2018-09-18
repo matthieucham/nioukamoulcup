@@ -1,4 +1,4 @@
-from django.contrib import admin
+﻿from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _
 
 from zinnia.models.entry import Entry
@@ -6,11 +6,13 @@ from zinnia.admin.entry import EntryAdmin
 from zinnia_ckeditor.admin import EntryAdminCKEditor
 
 from game import models
-from ligue1.admin import admin_site
+from ligue1.admin_import import admin_import_site
 from inline_actions.admin import InlineActionsMixin
 from inline_actions.admin import InlineActionsModelAdminMixin
 from django.http import HttpResponseRedirect
 from django.urls import reverse
+from django.utils import timezone
+from django.contrib import messages
 
 
 # Register your models here.
@@ -53,8 +55,36 @@ class SaisonScoringAdmin(InlineActionsModelAdminMixin, admin.ModelAdmin):
     compute_scores_action.short_description = "Recalculer les scores"
 
 
-admin_site.register(models.SaisonScoring, SaisonScoringAdmin)
+class MerkatoSessionInline(admin.TabularInline):
+    model = models.MerkatoSession
+    fields = ['closing', 'solving', 'is_solved', 'attributes']
+    can_delete = False
+    extra = 0
 
+
+class MerkatoAdmin(admin.ModelAdmin):
+    model = models.Merkato
+    list_display = ['begin', 'end', 'mode']
+    actions = ['generate_sessions_action']
+    inlines = [MerkatoSessionInline, ]
+
+    def has_delete_permission(self, request, obj=None):
+        return True
+
+    def generate_sessions_action(self, request, queryset):
+        for m in queryset:
+            if m.begin < timezone.now():
+                self.message_user(request, "Le merkato %s ayant démarré, impossible de modifier ses sessions" % m,
+                                  level=messages.ERROR)
+            else:
+                models.MerkatoSession.objects.filter(merkato=m).delete()
+                models.Merkato.objects.create_sessions(m)
+        self.message_user(request, "Sessions créées")
+        return HttpResponseRedirect(reverse('import_statnuts:game_merkato_changelist'))
+
+
+admin_import_site.register(models.SaisonScoring, SaisonScoringAdmin)
+admin_import_site.register(models.Merkato, MerkatoAdmin)
 
 class EntryLeagueAdmin(EntryAdminCKEditor):
     # In our case we put the gallery field

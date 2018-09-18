@@ -11,18 +11,15 @@ from ligue1 import models as l1models
 
 
 class MerkatoManager(models.Manager):
-    def setup(self, league_instance, mode, begin, end, roster_size_max, closing_times=['12:00', '20:00'],
-              session_duration=48, initial_team_balance=None):
-        assert mode in ['BID', 'DRFT']
-        merkato = self.create(mode=mode, begin=begin, end=end, league_instance=league_instance,
-                              configuration=MerkatoManager._make_config(roster_size_max,
-                                                                        initial_team_balance=initial_team_balance))
+
+    def create_sessions(self, merkato):
         # create sessions
-        ticks = [t for t in MerkatoManager._generate_ticks(begin, end, closing_times)]
+        ticks = [t for t in
+                 MerkatoManager._generate_ticks(merkato.begin, merkato.end, merkato.configuration.get('closing_times'))]
         nb = 1
         for t in ticks:
             closing = t
-            solving = closing + timedelta(hours=session_duration)
+            solving = closing + timedelta(hours=merkato.configuration.get('session_duration'))
             merkato.merkatosession_set.add(
                 MerkatoSession.objects.create(merkato=merkato, number=nb, closing=closing, solving=solving))
             nb += 1
@@ -55,16 +52,6 @@ class MerkatoManager(models.Manager):
             return previous_tick
         return None
 
-    @staticmethod
-    def _make_config(roster_size_max, sales_per_session=-1, pa_number=1, mv_number=1, mv_tax_rate=0.1,
-                     re_tax_rate=0.5, initial_team_balance=None):
-        conf = {'roster_size_max': roster_size_max, 'sales_per_session': sales_per_session, 'pa_number': pa_number,
-                'mv_number': mv_number,
-                'mv_tax_rate': mv_tax_rate, 're_tax_rate': re_tax_rate}
-        if initial_team_balance:
-            conf['init_balance'] = initial_team_balance
-        return conf
-
 
 class Merkato(models.Model):
     MODES = (('DRFT', 'Draft'), ('BID', 'Bid'))
@@ -72,10 +59,31 @@ class Merkato(models.Model):
     begin = models.DateTimeField(blank=False)
     end = models.DateTimeField(blank=False)
     mode = models.CharField(max_length=4, blank=False, choices=MODES)
-    configuration = JSONField()
+    configuration = JSONField(blank=True)
     league_instance = models.ForeignKey(league_models.LeagueInstance, on_delete=models.CASCADE, null=False)
 
     objects = MerkatoManager()
+
+    @staticmethod
+    def _make_config(roster_size_max=9, sales_per_session=-1, pa_number=1, mv_number=1, mv_tax_rate=0.1,
+                     re_tax_rate=0.5, initial_team_balance=100, closing_times=['10:00', '18:00'], session_duration=48):
+        conf = {'roster_size_max': roster_size_max,
+                'sales_per_session': sales_per_session,
+                'pa_number': pa_number,
+                'mv_number': mv_number,
+                'mv_tax_rate': mv_tax_rate,
+                're_tax_rate': re_tax_rate,
+                'closing_times': closing_times,
+                'session_duration': session_duration,
+                'init_balance': initial_team_balance,
+                'default_score_factor': 1.00
+                }
+        return conf
+
+    def save(self, *args, **kwargs):
+        if self.configuration is None:
+            self.configuration = self._make_config()
+        return super(Merkato, self).save(*args, **kwargs)
 
 
 class MerkatoSessionManager(models.Manager):
@@ -108,6 +116,16 @@ class MerkatoSession(models.Model):
 
     def has_object_read_permission(self, request):
         return request.user in self.merkato.league_instance.league.members.all()
+
+    def _make_attributes(self, score_factor=1.00):
+        return {
+            'score_factor': score_factor
+        }
+
+    def save(self, *args, **kwargs):
+        if self.attributes is None:
+            self.attributes = self._make_attributes()
+        return super(MerkatoSession, self).save(*args, **kwargs)
 
     class Meta:
         ordering = ('closing',)
@@ -168,7 +186,7 @@ class Sale(models.Model):
         assert self.type == 'MV'
         assert self.winning_auction is not None
         return self.winning_auction.value * (
-            1.0 - self.merkato_session.merkato.configuration['mv_tax_rate'])
+                1.0 - self.merkato_session.merkato.configuration['mv_tax_rate'])
 
     def get_winner_and_price(self):
         if self.winning_auction is None and self.type == 'PA':
@@ -226,7 +244,10 @@ class Auction(models.Model):
         if available < self.value:
             raise Auction.AuctionNotValidException(code='MONEY')
         # FULL
-        current_roster_size = league_models.Signing.objects.filter(team=self.team, end__isnull=True).count()
+        current_roster_size = league_models.Signing.objects.filter(team=self.team,
+                                                                   league_instance=league_models.LeagueInstance.objects.get_current(
+                                                                       self.team.league),
+                                                                   end__isnull=True).count()
         future_pa_locked = Sale.objects.filter(team=self.team).filter(
             models.Q(merkato_session__solving__gt=self.sale.merkato_session.solving) | models.Q(
                 merkato_session=self.sale.merkato_session, rank__gt=self.sale.rank)).count()

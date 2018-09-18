@@ -3,12 +3,12 @@ from rest_framework import serializers
 from rest_framework.reverse import reverse
 from dry_rest_permissions.generics import DRYPermissionsField
 from django.db import models
-from game.services import scoring
-from django.contrib.auth.models import User
+from django.utils.timezone import localtime, now
 
 from game.models import league_models, transfer_models, scoring_models
 from ligue1 import models as l1models
-from utils.timer import Timer
+from game.services import auctions
+from utils.timer import timed
 
 
 class ClubSerializer(serializers.ModelSerializer):
@@ -133,30 +133,30 @@ class TeamDayScoreSerializer(serializers.ModelSerializer):
             return False
         return self._compute_is_complete(obj.attributes)
 
+    @timed
     def get_missing_notes(self, obj):
         """
         Count missing notes in team
         """
-        with Timer(id='get_missing_notes', verbose=False):
-            if not self.get_is_complete(obj):
-                return None
-            attrs = obj.attributes
-            phase_type = obj.day.league_instance_phase.type
-            jfirst = obj.day.league_instance_phase.journee_first
-            jlast = obj.day.league_instance_phase.journee_last
-            target_nb_per_player = obj.day.league_instance_phase.league_instance.configuration['notes'][phase_type]
-            # missing = 0
-            joueur_ids = []
-            for pos, req_nb in attrs['formation'].items():
-                for i in range(min(req_nb, len(attrs['composition'][pos]))):
-                    joueur_ids.append(attrs['composition'][pos][i]['player']['id'])
-                    # missing += max([(target_nb_per_player - scoring_models.JJScore.objects.count_notes(
-                    #     obj.day.league_instance_phase.league_instance.saison, player, journee_first=jfirst,
-                    #     journee_last=jlast)), 0])
-            return max([((target_nb_per_player * len(joueur_ids)) - scoring_models.JJScore.objects.count_notes(
-                obj.day.league_instance_phase.league_instance.saison, joueur_ids, target_nb_per_player,
-                journee_first=jfirst,
-                journee_last=jlast)), 0])
+        if not self.get_is_complete(obj):
+            return None
+        attrs = obj.attributes
+        phase_type = obj.day.league_instance_phase.type
+        jfirst = obj.day.league_instance_phase.journee_first
+        jlast = obj.day.league_instance_phase.journee_last
+        target_nb_per_player = obj.day.league_instance_phase.league_instance.configuration['notes'][phase_type]
+        # missing = 0
+        joueur_ids = []
+        for pos, req_nb in attrs['formation'].items():
+            for i in range(min(req_nb, len(attrs['composition'][pos]))):
+                joueur_ids.append(attrs['composition'][pos][i]['player']['id'])
+                # missing += max([(target_nb_per_player - scoring_models.JJScore.objects.count_notes(
+                #     obj.day.league_instance_phase.league_instance.saison, player, journee_first=jfirst,
+                #     journee_last=jlast)), 0])
+        return max([((target_nb_per_player * len(joueur_ids)) - scoring_models.JJScore.objects.count_notes(
+            obj.day.league_instance_phase.league_instance.saison, joueur_ids, target_nb_per_player,
+            journee_first=jfirst,
+            journee_last=jlast)), 0])
 
     @staticmethod
     def _compute_is_complete(tds_attrs):
@@ -227,23 +227,23 @@ class PlayerWithScoreSerializer(PlayerHdrSerializer):
 class PhaseDayPlayersRankingSerializer(serializers.ModelSerializer):
     ranking = serializers.SerializerMethodField()
 
+    @timed
     def get_ranking(self, obj):
-        with Timer('get_ranking', verbose=False):
-            score_by_id = dict()
-            # fetch scores
-            for tds in obj.teamdayscore_set.all():
-                if tds.attributes and 'composition' in tds.attributes:
-                    for poste in ['G', 'D', 'M', 'A']:
-                        for psco in tds.attributes['composition'][poste]:
-                            score_by_id.update({psco['player']['id']: psco['score']})
-            sorted_by_scores = sorted(score_by_id.items(), key=operator.itemgetter(1), reverse=True)
-            # fetch players
-            players = l1models.Joueur.objects.select_related('club').filter(
-                pk__in=[key for key, _ in score_by_id.items()])
-            return PlayerWithScoreSerializer(
-                many=True, read_only=True,
-                context={'request': self.context['request'], 'score_by_id': score_by_id,
-                         'sorted_by_scores': sorted_by_scores}).to_representation(players)
+        score_by_id = dict()
+        # fetch scores
+        for tds in obj.teamdayscore_set.all():
+            if tds.attributes and 'composition' in tds.attributes:
+                for poste in ['G', 'D', 'M', 'A']:
+                    for psco in tds.attributes['composition'][poste]:
+                        score_by_id.update({psco['player']['id']: psco['score']})
+        sorted_by_scores = sorted(score_by_id.items(), key=operator.itemgetter(1), reverse=True)
+        # fetch players
+        players = l1models.Joueur.objects.select_related('club').filter(
+            pk__in=[key for key, _ in score_by_id.items()])
+        return PlayerWithScoreSerializer(
+            many=True, read_only=True,
+            context={'request': self.context['request'], 'score_by_id': score_by_id,
+                     'sorted_by_scores': sorted_by_scores}).to_representation(players)
 
     class Meta:
         model = league_models.LeagueInstancePhaseDay
@@ -268,10 +268,10 @@ class PhaseRankingSerializer(serializers.ModelSerializer):
         return league_models.LeagueInstancePhaseDay.objects.select_related('journee').prefetch_related(
             'teamdayscore_set').filter(league_instance_phase=obj).order_by('-journee__numero').first()
 
+    @timed
     def get_current_ranking(self, obj):
-        with Timer('get_current_ranking', verbose=False):
-            return PhaseDayRankingSerializer(context={'request': self.context['request']}).to_representation(
-                self._get_latest_day(obj))
+        return PhaseDayRankingSerializer(context={'request': self.context['request']}).to_representation(
+            self._get_latest_day(obj))
 
     class Meta:
         model = league_models.LeagueInstancePhase
@@ -351,15 +351,19 @@ class TotalReleaseField(serializers.Field):
 
 class TotalSignings(serializers.Field):
     def to_representation(self, value):
-        return league_models.Signing.objects.filter(team=value).count()
+        return league_models.Signing.objects.filter(team=value,
+                                                    league_instance=league_models.LeagueInstance.objects.get_current(
+                                                        value.league)).count()
 
 
 class CurrentSignings(serializers.Field):
     def to_representation(self, value):
         total = 0
         output = dict()
-        for spcount in league_models.Signing.objects.filter(team=value, end__isnull=True).values(
-                'player__poste').annotate(models.Count('player')):
+        for spcount in league_models.Signing.objects.filter(team=value, end__isnull=True,
+                                                            league_instance=league_models.LeagueInstance.objects.get_current(
+                                                                value.league)).values(
+            'player__poste').annotate(models.Count('player')):
             total += spcount['player__count']
             output.update({spcount['player__poste']: spcount['player__count']})
         output.update({'total': total})
@@ -480,29 +484,29 @@ class PlayersRankingSerializer(serializers.ModelSerializer):
     players_ranking = serializers.SerializerMethodField()
     phases = LeagueInstancePhaseSerializer(source="leagueinstancephase_set", many=True, read_only=True)
 
+    @timed
     def get_players_ranking(self, obj):
-        with Timer('get_ranking', verbose=False):
-            latest_day_by_phase = league_models.LeagueInstancePhase.objects.filter(league_instance=obj).annotate(
-                latest_day=models.Max('leagueinstancephaseday__journee__numero'))
-            score_by_id = dict()
-            for phase in latest_day_by_phase:
-                for tds in league_models.TeamDayScore.objects.filter(day__league_instance_phase=phase,
-                                                                     day__journee__numero=phase.latest_day).select_related(
-                    'day__league_instance_phase'):
-                    if tds.attributes and 'composition' in tds.attributes:
-                        for poste in ['G', 'D', 'M', 'A']:
-                            for psco in tds.attributes['composition'][poste]:
-                                if not psco['player']['id'] in score_by_id:
-                                    score_by_id.update({psco['player']['id']: dict({'scores': []})})
-                                scoval = float('%.2f' % round(psco['score'] / psco['score_factor'], 2))
-                                score_by_id[psco['player']['id']]['scores'].append(dict({'phase': phase.id,
-                                                                                         'score': scoval}))
-            # fetch players
-            players = l1models.Joueur.objects.select_related('club').filter(
-                pk__in=[key for key, _ in score_by_id.items()])
-            return PlayerWithScoreSerializer(
-                many=True, read_only=True,
-                context={'request': self.context['request'], 'score_by_id': score_by_id}).to_representation(players)
+        latest_day_by_phase = league_models.LeagueInstancePhase.objects.filter(league_instance=obj).annotate(
+            latest_day=models.Max('leagueinstancephaseday__journee__numero'))
+        score_by_id = dict()
+        for phase in latest_day_by_phase:
+            for tds in league_models.TeamDayScore.objects.filter(day__league_instance_phase=phase,
+                                                                 day__journee__numero=phase.latest_day).select_related(
+                'day__league_instance_phase'):
+                if tds.attributes and 'composition' in tds.attributes:
+                    for poste in ['G', 'D', 'M', 'A']:
+                        for psco in tds.attributes['composition'][poste]:
+                            if not psco['player']['id'] in score_by_id:
+                                score_by_id.update({psco['player']['id']: dict({'scores': []})})
+                            scoval = float('%.2f' % round(psco['score'] / psco['score_factor'], 2))
+                            score_by_id[psco['player']['id']]['scores'].append(dict({'phase': phase.id,
+                                                                                     'score': scoval}))
+        # fetch players
+        players = l1models.Joueur.objects.select_related('club').filter(
+            pk__in=[key for key, _ in score_by_id.items()])
+        return PlayerWithScoreSerializer(
+            many=True, read_only=True,
+            context={'request': self.context['request'], 'score_by_id': score_by_id}).to_representation(players)
 
     class Meta:
         model = league_models.LeagueInstance
@@ -530,6 +534,19 @@ class SaleSummarySerializer(serializers.ModelSerializer):
     class Meta:
         model = transfer_models.Sale
         fields = ('id', 'rank', 'type', 'player', 'author', 'min_price')
+
+
+class SaleSummaryWithMyAuctionSerializer(SaleSummarySerializer):
+    my_auction = serializers.SerializerMethodField()
+
+    def get_my_auction(self, obj):
+        if 'request' in self.context:
+            mb = league_models.LeagueMembership.objects.get(user=self.context['request'].user)
+            return transfer_models.Auction.objects.filter(sale=obj, team=mb.team).first()
+        return None
+
+    class Meta(SaleSummarySerializer.Meta):
+        fields = SaleSummarySerializer.Meta.fields + ('my_auction',)
 
 
 class SaleSerializer(SaleSummarySerializer):
@@ -595,3 +612,86 @@ class MerkatoSerializer(serializers.ModelSerializer):
     class Meta:
         model = transfer_models.Merkato
         fields = ('begin', 'end', 'mode', 'configuration', 'league_instance', 'sessions',)
+
+
+class PlayerMerkatoSerializer(PlayerHdrSerializer):
+    current_signing = serializers.SerializerMethodField()
+    current_sale = serializers.SerializerMethodField()
+
+    def get_current_signing(self, obj):
+        signing = self.context.get('signings_map').get(obj.id) or None
+        if signing is not None:
+            return {'team': signing}
+        else:
+            return None
+
+    def get_current_sale(self, obj):
+        sale = self.context.get('sales_map').get(obj.id) or None
+        if sale is not None:
+            return {'team': sale}
+        else:
+            return None
+
+    class Meta:
+        model = l1models.Joueur
+        fields = (
+            'id',
+            'url',
+            'prenom',
+            'nom',
+            'surnom',
+            'display_name',
+            'poste',
+            'club',
+            'current_signing',
+            'current_sale',
+        )
+
+
+class OpenMerkatoSessionSerializer(MerkatoSessionSummarySerializer):
+    sales = serializers.SerializerMethodField()
+
+    def get_sales(self, obj):
+        ordered_sales = transfer_models.Sale.objects.filter(merkato_session=obj).order_by('rank')
+        return SaleSummaryWithMyAuctionSerializer(ordered_sales, many=True, read_only=True, context=self.context).data
+
+    class Meta(MerkatoSessionSummarySerializer.Meta):
+        model = transfer_models.MerkatoSession
+        fields = MerkatoSessionSummarySerializer.Meta.fields + ('sales',)
+
+
+class CurrentMerkatoSerializer(serializers.ModelSerializer):
+    sessions = serializers.SerializerMethodField()
+    permissions = serializers.SerializerMethodField()
+
+    def get_sessions(self, obj):
+        ordered_sessions = transfer_models.MerkatoSession.objects.filter(merkato=obj, is_solved=False,
+                                                                         solving__gt=localtime(now())).annotate(
+            num_sales=models.Count('sale')).filter(num_sales__gt=0).order_by('number')
+        return OpenMerkatoSessionSerializer(ordered_sessions, many=True, read_only=True, context=self.context).data
+
+    def get_permissions(self, obj):
+        auc, auc_reason = auctions.can_register_auction(self.context.get('team'), obj)
+        pa, pa_reason = auctions.can_register_pa(self.context.get('team'), obj)
+        mv, mv_reason = auctions.can_register_mv(self.context.get('team'), obj)
+        return {
+            'auctions': {
+                'can': auc,
+                'reason': auc_reason
+            },
+            'pa': {
+                'can': pa,
+                'reason': pa_reason
+            },
+            'mv': {
+                'can': mv,
+                'reason': mv_reason
+            },
+            'next_session': MerkatoSessionSummarySerializer(
+                transfer_models.MerkatoSession.objects.get_next_available(obj), read_only=True,
+                context=self.context).data
+        }
+
+    class Meta:
+        model = transfer_models.Merkato
+        fields = ('begin', 'end', 'mode', 'configuration', 'league_instance', 'sessions', 'permissions')

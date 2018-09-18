@@ -147,11 +147,11 @@ table.ktable-class .ktable-heading-class {
     font-weight: bold;
 }
 
-.ReactVirtualized__Table__row {
+.bigtable__odd {
     background-color: #FFFFFF;
 }
 
-.ReactVirtualized__Table__row:nth-child(odd) {
+.bigtable__even {
     background-color: #f1f1f1;
 }
 
@@ -457,6 +457,7 @@ header nav a:hover, nav ul li ul li:hover {
 
 .jersey {
     position: relative;
+    margin: 3px;
 }
 
 .jersey .clubName-container {
@@ -585,6 +586,10 @@ dl.kvgroup {
 
 #home-main {
     padding: 10px 0;
+}
+
+#home-main p {
+    padding: 0 10px;
 }
 
 #home-main h2 {
@@ -794,11 +799,14 @@ dl.kvgroup {
     align-items: center;
     min-height: 6em;
     max-height: 6em;
+}
+
+.salecard-reveal-content {
     min-width: 18em;
     max-width: 18em;
 }
 
-.salecard-content>* {
+.salecard-content > * {
     padding: 0 3px;
 }
 
@@ -809,6 +817,7 @@ dl.kvgroup {
     font-size: 0.8em;
     color: rgba(0, 0, 0, 0.54);
 }
+
 .salecard-content dt:after {
     content: ":";
 }
@@ -821,7 +830,7 @@ dl.kvgroup {
     font-size: 1.5em;
 }
 
-.salecard-content .past-offers{
+.salecard-content .past-offers {
     display: flex;
     flex-direction: column;
     flex-wrap: wrap;
@@ -830,26 +839,44 @@ dl.kvgroup {
     max-height: inherit;
 }
 
-.past-offers p{
+.past-offers p {
     padding: 0 3px;
     font-size: 0.8em;
     color: rgba(0, 0, 0, 0.54);
 }
 
-.past-offers p.ismine{
+.past-offers p.ismine {
     font-weight: bold;
 }
 
-.past-offers p.invalid{
+.past-offers p.invalid {
     text-decoration: line-through;
 }
 
-.releases-list{
+.releases-list {
     display: table;
     table-layout: fixed;
     width: 100%;
 }
 
+.player-picker-fields {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.player-picker-fields > div {
+    margin: 0.5em;
+}
+
+.player-picker-fields > button {
+    margin-right: 0.5em;
+}
+
+div.opensales-container {
+    display: flex;
+}
 
 /****************************************************************/
 /*                          ZINNIA                              */

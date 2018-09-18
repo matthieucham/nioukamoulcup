@@ -10,7 +10,7 @@ import {
 	REQUEST_SALES,
 	RECEIVE_SALES,
 	RECEIVE_COMPOSCORE,
-	RECEIVE_PLAYERSRANKING
+	RECEIVE_PLAYERSRANKING,
 } from '../actions'
 
 
@@ -137,6 +137,7 @@ const rankings = combineReducers({
 	players_ranking,
 	teams,
 })
+
 
 const merkatosession = combineReducers({
 	initial,
