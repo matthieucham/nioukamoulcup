@@ -8,6 +8,10 @@ from game.models import SaisonScoring, JJScore, SJScore
 from game.forms import StatsForm, PositionForm
 
 
+class LandingPage(TemplateView):
+    template_name = 'game/landing.html'
+
+
 class HomePage(TemplateView):
     template_name = 'game/home/info.html'
 
