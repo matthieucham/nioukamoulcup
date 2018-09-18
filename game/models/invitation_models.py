@@ -9,11 +9,17 @@ from .league_models import Team, LeagueMembership, League
 class BaseInvitation(models.Model):
     STATUS_CHOICES = (('OPEN', 'OPEN'),
                       ('ACCEPTED', 'ACCEPTED'),
-                      ('REJECTED', 'REJECTED'))
+                      ('REJECTED', 'REJECTED'),
+                      ('CLOSE', 'CLOSE'),
+                      )
 
     code = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=8, choices=STATUS_CHOICES, default='OPEN')
+
+    def close(self):
+        self.status = 'CLOSE'
+        self.save()
 
     class Meta:
         abstract = True
@@ -36,6 +42,12 @@ class TeamInvitation(BaseInvitation):
         self.save()
 
     def reject(self):
+        if self.user:
+            LeagueMembership.objects.filter(
+                user=self.user,
+                league=self.team.league,
+                team=self.team
+            ).delete()
         self.status = 'REJECTED'
         self.save()
 
@@ -62,5 +74,11 @@ class LeagueInvitation(BaseInvitation):
         self.save()
 
     def reject(self):
+        if self.team:
+            LeagueMembership.objects.filter(
+                user=self.user,
+                league=self.team.league,
+                team=self.team
+            ).delete()
         self.status = 'REJECTED'
         self.save()
