@@ -1,0 +1,25 @@
+{% extends "game/user/user_base.html" %}
+{% load static %}
+{% load i18n %}
+{% load humanize %}
+
+{% block content_title %}Mes équipes{% endblock %}
+
+{% block content %}
+{% for t in teams %}
+<div>
+    <h2>{{ t.name }}</h2>
+    <ul>
+        {% for manager in t.managers.all %}
+        <li><i class="fa fa fa-user"></i>{{ manager.user.username }}</li>
+        {% endfor %}
+    </ul>
+    {% if t.league %}
+    <p>Ligue: {{ t.league.name }}</p>
+    {% else %}
+    <p>Rejoindre une ligue</p>
+    <form><label>Clé d'invitation:</label><input name="invite_key"/></form>
+    {% endif %}
+</div>
+{% endfor %}
+{% endblock %}

@@ -2,9 +2,9 @@ from django.conf.urls import url, include
 from rest_framework.urlpatterns import format_suffix_patterns
 
 from .admin_import import admin_import_site
-from .views import HomePage, ResultRencontreView, ClubView, StatView, StatJoueurView, ResultJourneeView, \
+from .views import ResultRencontreView, ClubView, StatView, StatJoueurView, ResultJourneeView, \
     LeagueEntryDetail, LeagueWallView, LeagueEkypView, LeagueRankingView, LeagueMerkatoResultsView, LeagueMerkatoView, \
-    LeagueRegisterPAView
+    LeagueRegisterPAView, TeamListView
 
 home_urls = [
     url(r'^info/$', LeagueEntryDetail.as_view(), name="home_info"),
@@ -29,9 +29,14 @@ league_urls = [
         name="league_merkatoresults-session"),
 ]
 
+user_urls = [
+    url(r'^teams/$', TeamListView.as_view(), name="user-teams-list"),
+]
+
 urlpatterns = [
     url(r'^rest/', include('game.rest.urls')),
     url(r'^home/', include(home_urls)),
     url(r'^league/(?P<pk>[0-9]+)/', include(league_urls)),
+    url(r'^user/', include(user_urls)),
     url(r'^import/', admin_import_site.urls, name='import'),
 ]
