@@ -14,12 +14,19 @@
         <li><i class="fa fa fa-user"></i>{{ manager.user.username }}</li>
         {% endfor %}
     </ul>
+    {% if not t.is_captain == 0 %}
+    <p><a href="#">Ajouter un manager</a></p>
+    {% endif %}
     {% if t.league %}
     <p>Ligue: {{ t.league.name }}</p>
     {% else %}
     <p>Rejoindre une ligue</p>
-    <form><label>Clé d'invitation:</label><input name="invite_key"/></form>
+    <p><a href="#">Rejoindre une ligue</a></p>
     {% endif %}
 </div>
 {% endfor %}
+
+<div>
+    <p>Créer une équipe</p>
+</div>
 {% endblock %}
