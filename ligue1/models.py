@@ -120,6 +120,7 @@ class ClubManager(models.Manager):
 class Club(Importe):
     SVG_TEMPLATES = (('jersey-plain2', 'uni'),
                      ('jersey-stripes-v2', 'rayures verticales'),
+                     ('jersey-sleeves2', 'manches'),
                      ('jersey-diag-half-white2.svg', 'moitié diagonale blanche'),
                      ('jersey-scap2', 'scapulaire'), ('jersey-shoulders2', 'épaules'),
                      ('jersey-halfdark2', 'moitié assombrie'), ('jersey-stripe-center2', 'bande centrale'),
