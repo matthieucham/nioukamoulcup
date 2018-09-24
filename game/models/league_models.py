@@ -64,6 +64,14 @@ class TeamManager(models.Manager):
         t.attributes = team_config
         t.save()
 
+    @transaction.atomic()
+    def create_for_user(self, *args, user, **kwargs):
+        assert user is not None
+        t = self.create(*args, **kwargs)
+        LeagueMembership.objects.create(user=user, is_team_captain=True, team=t)
+        t.refresh_from_db()
+        return t
+
 
 class Team(models.Model):
     name = models.CharField(max_length=100, blank=False)

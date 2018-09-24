@@ -534,15 +534,20 @@ header nav a:hover, nav ul li ul li:hover {
     padding: 10px 20px;
 }
 
-.team-title li.manager {
+li.manager {
     display: inline-block;
     color: #5f5f5f;
     margin-right: 10px;
 }
 
-.team-title li.manager::before {
+li.manager::before {
     font-family: FontAwesome;
     content: "\f007   ";
+}
+
+li.captain::after {
+    font-family: FontAwesome;
+    content: "   \f005";
 }
 
 /* LEAGUE - Classements */
@@ -959,8 +964,8 @@ aside.entry-widgets {
     font-style: italic;
 }
 
-input[type="text"],
-input[type="password"] {
+.kcup-login-form input[type="text"],
+.kcup-login-form input[type="password"] {
     width: 100%;
     border: none;
     box-sizing: border-box;
@@ -968,15 +973,38 @@ input[type="password"] {
     color: #000;
 }
 
-input[type="text"]:focus,
-input[type="password"]:focus {
+.kcup-login-form input[type="text"]:focus,
+.kcup-login-form input[type="password"]:focus {
     outline: none;
 }
-input[type="submit"] {
+.kcup-login-form input[type="submit"] {
     padding: 12px 60px;
     width: 100%;
 }
 
 .account_section {
     padding: 5px;
+}
+
+.account-teams-container {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.account-team-box {
+    border: 1px solid;
+    border-radius: 4px;
+    margin: 8px;
+    padding: 1em;
+    min-width: 80px;
+}
+
+.account-team-box h2 {
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 0.8em;
+}
+
+.account-team-box-action {
+    padding 0.8em 0;
 }

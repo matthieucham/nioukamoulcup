@@ -1,0 +1,14 @@
+{% extends "game/user/user_base.html" %}
+{% load static %}
+{% load i18n %}
+{% load humanize %}
+
+{% block content_title %}Créer une équipe{% endblock %}
+
+{% block content %}
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Créer"/>
+</form>
+{% endblock %}

@@ -6,27 +6,33 @@
 {% block content_title %}Mes équipes{% endblock %}
 
 {% block content %}
-{% for t in teams %}
-<div>
-    <h2>{{ t.name }}</h2>
-    <ul>
-        {% for manager in t.managers.all %}
-        <li><i class="fa fa fa-user"></i>{{ manager.user.username }}</li>
-        {% endfor %}
-    </ul>
-    {% if not t.is_captain == 0 %}
-    <p><a href="#">Ajouter un manager</a></p>
-    {% endif %}
-    {% if t.league %}
-    <p>Ligue: {{ t.league.name }}</p>
-    {% else %}
-    <p>Rejoindre une ligue</p>
-    <p><a href="#">Rejoindre une ligue</a></p>
-    {% endif %}
+<div class="account-teams-container">
+    {% for t in teams %}
+    <div class="account-team-box">
+        <h2>{{ t.name }}</h2>
+        <ul class="account-team-box-managers">
+            {% for manager in t.managers.all %}
+            {% if manager.is_team_captain %}
+            <li class="manager captain">
+            {% else %}
+            <li class="manager">
+            {% endif %}
+                {{ manager.user.username }}
+            </li>
+            {% endfor %}
+        </ul>
+        {% if not t.is_captain == 0 %}
+        <p><a href="#" class="navlink">Inviter un manager</a></p>
+        {% endif %}
+        {% if t.league %}
+        <p>Ligue: <a href="{% url 'league_ekyp-detail' t.league.id %}">{{ t.league.name }}</a></p>
+        {% else %}
+        <p><a href="#" class="navlink">Rejoindre une ligue</a></p>
+        {% endif %}
+    </div>
+    {% endfor %}
 </div>
-{% endfor %}
-
 <div>
-    <p>Créer une équipe</p>
+    <a href="{% url 'user-teams-create' %}">Créer une équipe</a>
 </div>
 {% endblock %}
