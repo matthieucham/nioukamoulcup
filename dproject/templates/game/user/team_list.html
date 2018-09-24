@@ -27,7 +27,10 @@
         {% if t.league %}
         <p>Ligue: <a href="{% url 'league_ekyp-detail' t.league.id %}">{{ t.league.name }}</a></p>
         {% else %}
-        <p><a href="#" class="navlink">Rejoindre une ligue</a></p>
+            {% if not t.is_captain == 0 %}
+            <p><a href="#" class="navlink">Rejoindre une ligue</a></p>
+            <p><a href="{% url 'user-teams-delete' t.id %}" class="navlink">Supprimer l'équipe</a></p>
+            {% endif %}
         {% endif %}
     </div>
     {% endfor %}

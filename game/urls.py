@@ -1,10 +1,9 @@
 from django.conf.urls import url, include
-from rest_framework.urlpatterns import format_suffix_patterns
 
 from .admin_import import admin_import_site
 from .views import ResultRencontreView, ClubView, StatView, StatJoueurView, ResultJourneeView, \
     LeagueEntryDetail, LeagueWallView, LeagueEkypView, LeagueRankingView, LeagueMerkatoResultsView, LeagueMerkatoView, \
-    LeagueRegisterPAView, TeamListView, TeamCreateView
+    LeagueRegisterPAView, TeamListView, TeamCreateView, TeamDeleteView
 
 home_urls = [
     url(r'^info/$', LeagueEntryDetail.as_view(), name="home_info"),
@@ -32,6 +31,7 @@ league_urls = [
 user_urls = [
     url(r'^teams/$', TeamListView.as_view(), name="user-teams-list"),
     url(r'^teams/creation/$', TeamCreateView.as_view(), name="user-teams-create"),
+    url(r'^teams/(?P<pk>[0-9]+)/$', TeamDeleteView.as_view(), name="user-teams-delete"),
 ]
 
 urlpatterns = [

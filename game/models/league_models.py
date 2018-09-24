@@ -75,8 +75,8 @@ class TeamManager(models.Manager):
 
 class Team(models.Model):
     name = models.CharField(max_length=100, blank=False)
-    league = models.ForeignKey(League, on_delete=models.SET_NULL, null=True)
-    division = models.ForeignKey(LeagueDivision, on_delete=models.SET_NULL, null=True)
+    league = models.ForeignKey(League, on_delete=models.PROTECT, null=True)
+    division = models.ForeignKey(LeagueDivision, on_delete=models.PROTECT, null=True)
     attributes = JSONField(default=dict)
 
     objects = TeamManager()
@@ -85,7 +85,7 @@ class Team(models.Model):
         return request.user in self.league.members.all()
 
     def has_object_write_permission(self, request):
-        return LeagueMembership.objects.filter(user=request.user, team=self).count() > 0
+        return LeagueMembership.objects.filter(user=request.user, team=self, is_team_captain=True).count() > 0
 
     def __str__(self):
         return self.name
@@ -179,7 +179,6 @@ class BankAccountHistory(models.Model):
 
 
 class LeagueInstanceManager(models.Manager):
-
     def get_current(self, league):
         return self.filter(league=league, current=True).first()
 

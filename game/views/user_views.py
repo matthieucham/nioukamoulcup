@@ -1,6 +1,8 @@
-from django.views.generic import TemplateView, ListView, FormView
+from django.views.generic import ListView, FormView, DeleteView
+from django.urls import reverse_lazy
 from django.shortcuts import reverse
 from django.db.models import Count, Q
+from django.core.exceptions import PermissionDenied
 from game.forms import CreateTeamForm
 from game.models.league_models import Team
 
@@ -29,3 +31,18 @@ class TeamCreateView(FormView):
     def form_valid(self, form):
         Team.objects.create_for_user(name=form.data.get('name'), user=self.request.user)
         return super(TeamCreateView, self).form_valid(form)
+
+
+class TeamDeleteView(DeleteView):
+    model = Team
+    success_url = reverse_lazy('user-teams-list')
+    template_name = 'game/user/team_confirm_delete.html'
+
+    def get_queryset(self):
+        return Team.objects.filter(managers__user=self.request.user, managers__is_team_captain=True)
+
+    def get_object(self, queryset=None):
+        obj = super(TeamDeleteView, self).get_object(queryset)
+        if obj.league is not None:
+            raise PermissionDenied()
+        return obj
