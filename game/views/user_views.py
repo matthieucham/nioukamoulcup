@@ -1,10 +1,11 @@
-from django.views.generic import ListView, FormView, DeleteView
+from django.views.generic import ListView, FormView, DeleteView, DetailView
 from django.urls import reverse_lazy
-from django.shortcuts import reverse
+from django.shortcuts import reverse, redirect
 from django.db.models import Count, Q
 from django.core.exceptions import PermissionDenied
 from game.forms import CreateTeamForm
 from game.models.league_models import Team
+from game.models.invitation_models import TeamInvitation
 
 
 class TeamListView(ListView):
@@ -18,6 +19,8 @@ class TeamListView(ListView):
 
     def get_context_data(self, *args, **kwargs):
         context = super(TeamListView, self).get_context_data(*args, **kwargs)
+        # team invitations
+        context['team_invitations'] = TeamInvitation.objects.filter(team__managers__user=self.request.user)
         return context
 
 
@@ -31,6 +34,20 @@ class TeamCreateView(FormView):
     def form_valid(self, form):
         Team.objects.create_for_user(name=form.data.get('name'), user=self.request.user)
         return super(TeamCreateView, self).form_valid(form)
+
+
+class TeamInvitationView(DetailView):
+    template_name = TeamListView.template_name
+
+    def get_queryset(self):
+        return Team.objects.filter(managers__user=self.request.user, managers__is_team_captain=True)
+
+    def get(self, request, *args, **kwargs):
+        # get existing invitation
+        invite = TeamInvitation.objects.filter(team=self.get_object(), status='OPENED').first()
+        if invite is None:
+            TeamInvitation.objects.create(team=self.get_object())
+        return redirect('user-teams-list')
 
 
 class TeamDeleteView(DeleteView):

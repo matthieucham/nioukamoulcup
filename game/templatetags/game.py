@@ -29,3 +29,18 @@ def json(value):
     uncleaned = jsonlib.dumps(value, iterable_as_array=True)
     clean = html.parser.unescape(bleach.clean(uncleaned))
     return mark_safe(clean)
+
+
+@register.inclusion_tag('game/tags/user_teams_invitation_code.html')
+def user_teams_invitation_code(team):
+    invite = models.TeamInvitation.objects.filter(team=team, status='OPENED').first()
+    return {'invite': invite, 'team': team}
+
+
+@register.inclusion_tag('game/tags/user_teams_invitations_pending.html', takes_context=True)
+def user_teams_invitations_pending(context):
+    invitations = models.TeamInvitation.objects.filter(team__managers__user=context.request.user,
+                                                       team__managers__is_team_captain=True,
+                                                       status='OPENED',
+                                                       user__isnull=False)  # TODO filter with user is not null
+    return {'pending_invitations': invitations}

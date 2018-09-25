@@ -7,18 +7,18 @@ from .league_models import Team, LeagueMembership, League
 
 
 class BaseInvitation(models.Model):
-    STATUS_CHOICES = (('OPEN', 'OPEN'),
+    STATUS_CHOICES = (('OPENED', 'OPENED'),
                       ('ACCEPTED', 'ACCEPTED'),
                       ('REJECTED', 'REJECTED'),
-                      ('CLOSE', 'CLOSE'),
+                      ('CLOSED', 'CLOSED'),
                       )
 
     code = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
-    status = models.CharField(max_length=8, choices=STATUS_CHOICES, default='OPEN')
+    status = models.CharField(max_length=8, choices=STATUS_CHOICES, default='OPENED')
 
     def close(self):
-        self.status = 'CLOSE'
+        self.status = 'CLOSED'
         self.save()
 
     class Meta:

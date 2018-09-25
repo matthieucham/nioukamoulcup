@@ -2,6 +2,7 @@
 {% load static %}
 {% load i18n %}
 {% load humanize %}
+{% load game %}
 
 {% block content_title %}Mes équipes{% endblock %}
 
@@ -14,23 +15,21 @@
             {% for manager in t.managers.all %}
             {% if manager.is_team_captain %}
             <li class="manager captain">
-            {% else %}
+                {% else %}
             <li class="manager">
-            {% endif %}
+                {% endif %}
                 {{ manager.user.username }}
             </li>
             {% endfor %}
         </ul>
-        {% if not t.is_captain == 0 %}
-        <p><a href="#" class="navlink">Inviter un manager</a></p>
-        {% endif %}
+        {% user_teams_invitation_code t %}
         {% if t.league %}
         <p>Ligue: <a href="{% url 'league_ekyp-detail' t.league.id %}">{{ t.league.name }}</a></p>
         {% else %}
-            {% if not t.is_captain == 0 %}
-            <p><a href="#" class="navlink">Rejoindre une ligue</a></p>
-            <p><a href="{% url 'user-teams-delete' t.id %}" class="navlink">Supprimer l'équipe</a></p>
-            {% endif %}
+        {% if not t.is_captain == 0 %}
+        <p><a href="#" class="navlink">Rejoindre une ligue</a></p>
+        <p><a href="{% url 'user-teams-deletions' t.id %}" class="navlink">Supprimer l'équipe</a></p>
+        {% endif %}
         {% endif %}
     </div>
     {% endfor %}
@@ -38,4 +37,7 @@
 <div>
     <a href="{% url 'user-teams-create' %}">Créer une équipe</a>
 </div>
+
+    {% user_teams_invitations_pending %}
+
 {% endblock %}

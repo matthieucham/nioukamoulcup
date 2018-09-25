@@ -1,0 +1,10 @@
+{% if pending_invitations %}
+<div>
+    <h2>Invitations en attente</h2>
+    <ul>
+        {% for i in pending_invitations %}
+        <li>{{ i.code }} {{ i.status }}</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
