@@ -51,9 +51,6 @@ class TeamInvitation(BaseInvitation):
         self.status = 'REJECTED'
         self.save()
 
-    def has_object_create_permission(self, request):
-        return LeagueMembership.objects.filter(user=request.user, team=self.team, is_team_captain=True).count() > 0
-
 
 class LeagueInvitation(BaseInvitation):
     league = models.ForeignKey(League, on_delete=models.CASCADE)

@@ -1,15 +1,19 @@
 from django.views.generic import ListView, FormView, DeleteView, DetailView
+from django.views.generic.edit import FormMixin
 from django.urls import reverse_lazy
 from django.shortcuts import reverse, redirect
 from django.db.models import Count, Q
 from django.core.exceptions import PermissionDenied
-from game.forms import CreateTeamForm
+from django.http import HttpResponseRedirect
+
+from game.forms import CreateTeamForm, JoinTeamForm
 from game.models.league_models import Team
 from game.models.invitation_models import TeamInvitation
 
 
-class TeamListView(ListView):
+class TeamListView(FormMixin, ListView):
     template_name = 'game/user/team_list.html'
+    form_class = JoinTeamForm
 
     def get_queryset(self):
         return Team.objects.filter(managers__user=self.request.user).annotate(
@@ -22,6 +26,24 @@ class TeamListView(ListView):
         # team invitations
         context['team_invitations'] = TeamInvitation.objects.filter(team__managers__user=self.request.user)
         return context
+
+    def post(self, request, *args, **kwargs):
+        """
+        Handle POST requests: instantiate a form instance with the passed
+        POST variables and then check if it's valid.
+        """
+        form = self.get_form()
+        if form.is_valid():
+            return self.form_valid(form)
+
+    def get_success_url(self):
+        return reverse('user-teams-list')
+
+    def form_valid(self, form):
+        teaminvite = TeamInvitation.objects.get(code=form.data.get('code'))
+        teaminvite.user = self.request.user
+        teaminvite.save()
+        return super(TeamListView, self).form_valid(form)
 
 
 class TeamCreateView(FormView):
@@ -63,3 +85,19 @@ class TeamDeleteView(DeleteView):
         if obj.league is not None:
             raise PermissionDenied()
         return obj
+
+
+class TeamInvitationAcceptView(DetailView):
+    model = TeamInvitation
+    success_url = reverse_lazy('user-teams-list')
+    template_name = 'game/user/teaminvitation_confirm_accept.html'
+
+    def get_queryset(self):
+        return TeamInvitation.objects.filter(team__managers__user=self.request.user,
+                                             team__managers__is_team_captain=True,
+                                             user__isnull=False)
+
+    def post(self, request, *args, **kwargs):
+        success_url = self.get_success_url()
+        self.get_object().accept()
+        return HttpResponseRedirect(success_url)
