@@ -3,7 +3,8 @@ from django.conf.urls import url, include
 from .admin_import import admin_import_site
 from .views import ResultRencontreView, ClubView, StatView, StatJoueurView, ResultJourneeView, \
     LeagueEntryDetail, LeagueWallView, LeagueEkypView, LeagueRankingView, LeagueMerkatoResultsView, LeagueMerkatoView, \
-    LeagueRegisterPAView, TeamListView, TeamCreateView, TeamDeleteView, TeamInvitationView
+    LeagueRegisterPAView, TeamListView, TeamCreateView, TeamDeleteView, TeamInvitationView, TeamInvitationAcceptView, \
+    TeamInvitationRejectView
 
 home_urls = [
     url(r'^info/$', LeagueEntryDetail.as_view(), name="home_info"),
@@ -33,6 +34,10 @@ user_urls = [
     url(r'^teams/creation/$', TeamCreateView.as_view(), name="user-teams-create"),
     url(r'^teams/(?P<pk>[0-9]+)/deletions$', TeamDeleteView.as_view(), name="user-teams-deletions"),
     url(r'^teams/(?P<pk>[0-9]+)/invitations', TeamInvitationView.as_view(), name="user-teams-invitations"),
+    url(r'^teaminvitations/(?P<pk>[a-f0-9\-]{36})/accept', TeamInvitationAcceptView.as_view(),
+        name="teaminvitations-accept"),
+    url(r'^teaminvitations/(?P<pk>[a-f0-9\-]{36})/reject', TeamInvitationRejectView.as_view(),
+        name="teaminvitations-reject"),
 ]
 
 urlpatterns = [

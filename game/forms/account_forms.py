@@ -14,9 +14,18 @@ class CreateTeamForm(forms.ModelForm):
 class JoinTeamForm(forms.Form):
     code = forms.CharField(max_length=38, required=True)
 
+    def __init__(self, *args, **kwargs):
+        # important to "pop" added kwarg before call to parent's constructor
+        self.request = kwargs.pop('request')
+        super(JoinTeamForm, self).__init__(*args, **kwargs)
+
     def clean_code(self):
         code = self.cleaned_data['code']
         try:
-            TeamInvitation.objects.filter(status='OPENED').get(code=code)
+            invit = TeamInvitation.objects.filter(status='OPENED').get(code=code)
         except TeamInvitation.DoesNotExist:
             raise forms.ValidationError('Ce code est inconnu')
+        try:
+            assert invit.team.managers.filter(user=self.request.user).count() == 0
+        except AssertionError:
+            raise forms.ValidationError('Vous êtes déjà manager de cette équipe')

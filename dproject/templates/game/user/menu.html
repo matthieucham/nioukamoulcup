@@ -2,5 +2,5 @@
 {% block left-menu %}
 <a href="{% url 'userena_profile_detail' user.get_username %}"
    class="button {% is_navbar_active request user.get_username %}">Profil</a>
-<a href="{% url 'user-teams-list' %}" class="button {% is_navbar_active request 'teams' %}">Equipes</a>
+<a href="{% url 'user-teams-list' %}" class="button {% is_navbar_active request 'team' %}">Equipes</a>
 {% endblock left-menu %}

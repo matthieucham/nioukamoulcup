@@ -81,6 +81,9 @@ class Team(models.Model):
 
     objects = TeamManager()
 
+    def get_pending_manager_invitations(self):
+        return self.teaminvitation_set.filter(status='OPENED', user__isnull=False)
+
     def has_object_read_permission(self, request):
         return request.user in self.league.members.all()
 

@@ -1,7 +1,10 @@
 {% if invite %}
-    <p>Code d'invitation: <strong>{{ invite.code }}</strong></p>
+<div class="space-around-me">
+    <p>Code d'invitation:</p>
+    <p><strong>{{ invite.code }}</strong></p>
+</div>
 {% else %}
-    {% if team.is_captain == 1 %}
-        <p><a href="{% url 'user-teams-invitations' team.id %}" class="navlink">Générer un code d'invitation</a></p>
-    {% endif %}
+{% if team.is_captain == 1 %}
+<p><a href="{% url 'user-teams-invitations' team.id %}" class="navlink">Générer un code d'invitation</a></p>
+{% endif %}
 {% endif %}

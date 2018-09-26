@@ -22,6 +22,21 @@
             </li>
             {% endfor %}
         </ul>
+        {% for invit in t.get_pending_manager_invitations %}
+        <div class="confirmation">
+            {% if forloop.first %}
+            <div><h3>A confirmer:</h3></div>
+            {% endif %}
+            <div class="manager_form">
+                <div>{{ invit.user }}</div>
+                {% if t.is_captain == 1 %}
+                <div><a href="{% url 'teaminvitations-accept' invit.code %}">Accepter</a></div>
+                <div><a href="{% url 'teaminvitations-reject' invit.code %}">Refuser</a></div>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+
         {% user_teams_invitation_code t %}
         {% if t.league %}
         <p>Ligue: <a href="{% url 'league_ekyp-detail' t.league.id %}">{{ t.league.name }}</a></p>
@@ -33,19 +48,45 @@
         {% endif %}
     </div>
     {% endfor %}
-</div>
-<div>
-    <a href="{% url 'user-teams-create' %}">Créer une équipe</a>
-    <form method="post">
-        <h2>Rejoindre une équipe déjà créée</h2>
-        <p>Pour cela, demandez au manager de l'équipe qu'il génére et vous communique un code d'invitation.</p>
-        <p>Puis copiez le code dans ce champs et validez.</p>
-        {% csrf_token %}
-        {{ form.as_p }}
-        <input type="submit" value="Valider"/>
-    </form>
-</div>
+    {% for ti in team_invitations_waiting %}
+    <div class="account-team-box waiting">
+        <h2>{{ ti.team.name }}</h2>
+        <ul class="account-team-box-managers">
+            {% for manager in ti.team.managers.all %}
+            {% if manager.is_team_captain %}
+            <li class="manager captain">
+                {% else %}
+            <li class="manager">
+                {% endif %}
+                {{ manager.user.username }}
+            </li>
+            {% endfor %}
+        </ul>
+        <p>En attente de confirmation</p>
 
-{% user_teams_invitations_pending %}
+        {% if ti.team.league %}
+        <p>Ligue: <a href="{% url 'league_ekyp-detail' t.league.id %}">{{ t.league.name }}</a></p>
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>
+<section id="join-or-create-team">
+    <div>
+        <h2>Créer une nouvelle équipe ?</h2>
+        <a href="{% url 'user-teams-create' %}">Cliquez ici</a>
+    </div>
+    <div>
+
+        <h2>Rejoindre une équipe existante ?</h2>
+        <p class="explanation">Pour cela, demandez au manager de l'équipe qu'il génére et vous communique un code
+            d'invitation.</p>
+        <p class="explanation">Puis copiez le code dans ce champs et validez.</p>
+        <form method="post" class="space-around-me">
+            {% csrf_token %}
+            {{ form }}
+            <input type="submit" value="Valider"/>
+        </form>
+    </div>
+</section>
 
 {% endblock %}

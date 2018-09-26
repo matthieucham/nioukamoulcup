@@ -14,6 +14,12 @@ from game.models.invitation_models import TeamInvitation
 class TeamListView(FormMixin, ListView):
     template_name = 'game/user/team_list.html'
     form_class = JoinTeamForm
+    object_list = []
+
+    def get_form_kwargs(self):
+        kw = super(TeamListView, self).get_form_kwargs()
+        kw['request'] = self.request  # the trick!
+        return kw
 
     def get_queryset(self):
         return Team.objects.filter(managers__user=self.request.user).annotate(
@@ -22,9 +28,9 @@ class TeamListView(FormMixin, ListView):
     context_object_name = 'teams'
 
     def get_context_data(self, *args, **kwargs):
-        context = super(TeamListView, self).get_context_data(*args, **kwargs)
+        context = super(TeamListView, self).get_context_data(*args, object_list=self.get_queryset(), **kwargs)
         # team invitations
-        context['team_invitations'] = TeamInvitation.objects.filter(team__managers__user=self.request.user)
+        context['team_invitations_waiting'] = TeamInvitation.objects.filter(user=self.request.user, status='OPENED')
         return context
 
     def post(self, request, *args, **kwargs):
@@ -35,6 +41,7 @@ class TeamListView(FormMixin, ListView):
         form = self.get_form()
         if form.is_valid():
             return self.form_valid(form)
+        return self.form_invalid(form)
 
     def get_success_url(self):
         return reverse('user-teams-list')
@@ -95,9 +102,23 @@ class TeamInvitationAcceptView(DetailView):
     def get_queryset(self):
         return TeamInvitation.objects.filter(team__managers__user=self.request.user,
                                              team__managers__is_team_captain=True,
-                                             user__isnull=False)
+                                             user__isnull=False).exclude(user=self.request.user)
 
     def post(self, request, *args, **kwargs):
-        success_url = self.get_success_url()
         self.get_object().accept()
-        return HttpResponseRedirect(success_url)
+        return HttpResponseRedirect(self.success_url)
+
+
+class TeamInvitationRejectView(DetailView):
+    model = TeamInvitation
+    success_url = reverse_lazy('user-teams-list')
+    template_name = 'game/user/teaminvitation_confirm_reject.html'
+
+    def get_queryset(self):
+        return TeamInvitation.objects.filter(team__managers__user=self.request.user,
+                                             team__managers__is_team_captain=True,
+                                             user__isnull=False).exclude(user=self.request.user)
+
+    def post(self, request, *args, **kwargs):
+        self.get_object().reject()
+        return HttpResponseRedirect(self.success_url)
