@@ -54,14 +54,10 @@ class TeamInvitation(BaseInvitation):
 
 class LeagueInvitation(BaseInvitation):
     league = models.ForeignKey(League, on_delete=models.CASCADE)
-    team = models.ForeignKey(Team, null=True, on_delete=models.CASCADE)
-
-    def has_object_create_permission(self, request):
-        return LeagueMembership.objects.filter(user=request.user, league=self.league, is_baboon=True).count() > 0
+    team = models.ForeignKey(Team, on_delete=models.CASCADE)
 
     @transaction.atomic
     def accept(self):
-        assert self.team is not None
         LeagueMembership.objects.filter(
             team=self.team,
             league__isnull=True,
@@ -71,11 +67,9 @@ class LeagueInvitation(BaseInvitation):
         self.save()
 
     def reject(self):
-        if self.team:
-            LeagueMembership.objects.filter(
-                user=self.user,
-                league=self.team.league,
-                team=self.team
-            ).delete()
+        LeagueMembership.objects.filter(
+            league=self.team.league,
+            team=self.team
+        ).delete()
         self.status = 'REJECTED'
         self.save()

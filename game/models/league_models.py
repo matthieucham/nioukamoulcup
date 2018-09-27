@@ -1,3 +1,4 @@
+import uuid
 from django.db import models, transaction
 from django.contrib.postgres.fields import JSONField
 from django.contrib.auth.models import User
@@ -17,6 +18,7 @@ class League(models.Model):
     official = models.BooleanField(default=False)
     mode = models.CharField(max_length=4, choices=MODES)
     members = models.ManyToManyField(User, through='LeagueMembership', related_name='leagues')
+    code = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
 
     def has_object_read_permission(self, request):
         return request.user in self.members.all()

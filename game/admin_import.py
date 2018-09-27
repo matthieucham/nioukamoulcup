@@ -86,6 +86,7 @@ class MerkatoAdmin(admin.ModelAdmin):
 admin_import_site.register(models.SaisonScoring, SaisonScoringAdmin)
 admin_import_site.register(models.Merkato, MerkatoAdmin)
 
+
 class EntryLeagueAdmin(EntryAdminCKEditor):
     # In our case we put the gallery field
     # into the 'Content' fieldset
@@ -108,4 +109,36 @@ class EntryLeagueAdmin(EntryAdminCKEditor):
         super().save_model(request, obj, form, change)
 
 
+class LeagueInvitationInline(InlineActionsMixin, admin.TabularInline):
+    model = models.LeagueInvitation
+    fields = ('team', 'status',)
+    can_delete = False
+
+    def get_inline_actions(self, request, obj=None):
+        actions = super(LeagueInvitationInline, self).get_inline_actions(request, obj)
+        if obj:
+            if obj.status == 'OPENED':
+                actions.append('accept')
+                actions.append('reject')
+        return actions
+
+    def has_add_permission(self, request):
+        return False
+
+    def accept(self, request, obj, inline_obj):
+        inline_obj.accept()
+        return HttpResponseRedirect(reverse('admin:game_league_change', args=[obj.pk]))
+
+    def reject(self, request, obj, inline_obj):
+        inline_obj.reject()
+        return HttpResponseRedirect(reverse('admin:game_league_change', args=[obj.pk]))
+
+
+class LeagueAdmin(InlineActionsModelAdminMixin, admin.ModelAdmin):
+    model = models.League
+    readonly_fields = ('code',)
+    inlines = [LeagueInvitationInline, ]
+
+
 admin.site.register(Entry, EntryLeagueAdmin)
+admin.site.register(models.League, LeagueAdmin)
