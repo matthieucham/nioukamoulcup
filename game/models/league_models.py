@@ -41,8 +41,8 @@ class LeagueDivision(models.Model):
     level = models.PositiveSmallIntegerField(null=False)
     name = models.CharField(max_length=100, blank=False)
     capacity = models.PositiveSmallIntegerField()
-    upper_division = models.ForeignKey("self", on_delete=models.SET_NULL, related_name='lower', null=True)
-    lower_division = models.ForeignKey("self", on_delete=models.SET_NULL, related_name='upper', null=True)
+    upper_division = models.ForeignKey("self", on_delete=models.SET_NULL, related_name='lower', null=True, blank=True)
+    lower_division = models.ForeignKey("self", on_delete=models.SET_NULL, related_name='upper', null=True, blank=True)
 
     def __str__(self):
         return self.name

@@ -109,6 +109,11 @@ class EntryLeagueAdmin(EntryAdminCKEditor):
         super().save_model(request, obj, form, change)
 
 
+class LeagueDivisionInline(admin.TabularInline):
+    model = models.LeagueDivision
+    extra = 0
+
+
 class LeagueInvitationInline(InlineActionsMixin, admin.TabularInline):
     model = models.LeagueInvitation
     fields = ('team', 'status',)
@@ -137,7 +142,7 @@ class LeagueInvitationInline(InlineActionsMixin, admin.TabularInline):
 class LeagueAdmin(InlineActionsModelAdminMixin, admin.ModelAdmin):
     model = models.League
     readonly_fields = ('code',)
-    inlines = [LeagueInvitationInline, ]
+    inlines = [LeagueDivisionInline, LeagueInvitationInline, ]
 
 
 admin.site.register(Entry, EntryLeagueAdmin)
