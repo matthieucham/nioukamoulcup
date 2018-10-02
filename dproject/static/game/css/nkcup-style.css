@@ -565,7 +565,7 @@ li.captain::after {
     color: #228B22;
 }
 
-.prog-down, .lost {
+.prog-down, .lost, .errorlist {
     color: #B22222;
 }
 
