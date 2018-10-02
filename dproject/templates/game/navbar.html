@@ -1,33 +1,33 @@
 {% load game %}
 
-    <nav>
+<nav>
     <label id="navbarDropLink" for="drop" class="toggle"><i class="fa fa fa-ellipsis-h fa-2x fa-border"></i></label>
     <div id="logo">Kamoulcup</div>
-    <input type="checkbox" id="drop" />
+    <input type="checkbox" id="drop"/>
     <ul class="menu">
         <li class="{% is_navbar_active request 'home' %}"><a href="{% url 'home_info' %}">Maison</a></li>
         {% if user.is_authenticated %}
-            <li class="dropdown {% is_navbar_active request 'league' %}">
-                <!-- First Tier Drop Down -->
-                <label for="drop-1" class="toggle">Mes ligues</label>
-                <a href="#">Mes ligues <i class="fa fa-caret-down"></i></a>
-                <input type="checkbox" id="drop-1"/>
-                {% leagues_navbar_content %}
-            </li>
+        <li class="dropdown {% is_navbar_active request 'league' %}">
+            <!-- First Tier Drop Down -->
+            <label for="drop-1" class="toggle">Mes ligues</label>
+            <a href="#">Mes ligues <i class="fa fa-caret-down"></i></a>
+            <input type="checkbox" id="drop-1"/>
+            {% leagues_navbar_content %}
+        </li>
         {% endif %}
         <li class="{% is_navbar_active request 'wiki' %}"><a href="#">Wiki</a></li>
         {% if user.is_authenticated %}
-            <li>
-                <label for="drop-2" class="toggle">{{ user.get_username }}&nbsp;<i class="fa fa fa-gear"></i></label>
-                <a href="#">{{ user.get_username }}&nbsp;<i class="fa fa fa-gear"></i></a>
-                <input type="checkbox" id="drop-2"/>
-                <ul>
-                    <li><a href="#">Mon compte</a></li>
-                    <li><a href="{% url 'userena_signout' %}">Déconnexion</a></li>
-                </ul>
-            </li>
+        <li class="{% is_navbar_active request 'accounts' %}">
+            <label for="drop-2" class="toggle">{{ user.get_username }}&nbsp;<i class="fa fa fa-gear"></i></label>
+            <a href="#">{{ user.get_username }}&nbsp;<i class="fa fa fa-gear"></i></a>
+            <input type="checkbox" id="drop-2"/>
+            <ul>
+                <li><a href="{% url 'userena_profile_detail' user.get_username %}">Mon compte</a></li>
+                <li><a href="{% url 'userena_signout' %}">Déconnexion</a></li>
+            </ul>
+        </li>
         {% else %}
-            <li><a href="{% url 'userena_signin' %}">Log in please</a></li>
+        <li class="{% is_navbar_active request 'accounts' %}"><a href="{% url 'userena_signin' %}">Connexion</a></li>
         {% endif %}
     </ul>
-    </nav>
+</nav>

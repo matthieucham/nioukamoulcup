@@ -315,10 +315,10 @@ LOGGING = {
 # Third parties
 # ------------------------------------------------------------------------------
 REST_FRAMEWORK = {
-    # 'DEFAULT_FILTER_BACKENDS': (
-    #     'rest_framework.filters.DjangoFilterBackend',
-    #     'rest_framework.filters.OrderingFilter',
-    # ),
+    'DEFAULT_FILTER_BACKENDS': (
+        'django_filters.rest_framework.DjangoFilterBackend',
+    ),
+    'PAGE_SIZE': 40,
     'COERCE_DECIMAL_TO_STRING': False,
 }
 
@@ -332,7 +332,8 @@ MESSAGE_TAGS = {
 
 # Required by Userena
 AUTH_PROFILE_MODULE = 'accounts.KcupUserProfile'
-USERENA_SIGNIN_REDIRECT_URL = '/game/home/info/'
+USERENA_SIGNIN_REDIRECT_URL = '/accounts/%(username)s/'
+USERENA_REDIRECT_ON_SIGNOUT = '/game/home/info/'
 
 # Required by Guardian
 ANONYMOUS_USER_NAME = 'AnonymousUser'

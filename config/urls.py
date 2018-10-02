@@ -19,19 +19,18 @@ from django.conf.urls import url, include
 from django.contrib import admin
 #from wiki.urls import get_pattern as get_wiki_pattern
 #from django_nyt.urls import get_pattern as get_nyt_pattern
-from ligue1.admin import admin_site
-from game.views import LeagueEntryDetail
+from ligue1.admin_import import admin_import_site
+from game.views import LandingPage
 
 urlpatterns = [
-    url(r'^game/home/info/$', LeagueEntryDetail.as_view()),
-    url(r'^game/home/info/', include('zinnia.urls')),
+    url(r'^$', LandingPage.as_view()),
     url(r'^game/', include('game.urls')),
     url(r'^admin/', admin.site.urls),
     url(r'^accounts/', include('userena.urls')),
     url(r'^comments/', include('django_comments.urls')),
     # url(r'^notifications/', get_nyt_pattern()),
     # url(r'^wiki/', get_wiki_pattern()),
-    url(r'^import/', admin_site.urls, name='import'),
+    url(r'^import/', admin_import_site.urls, name='import'),
 ]
 
 if settings.DEBUG:

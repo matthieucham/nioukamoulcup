@@ -15,6 +15,7 @@ const Page = ({ merkatosession }) => {
 			<div className="react-app-inner">
 			<main>
 				<article id="home-main">
+				
 					<SolvedMerkatoSession session={merkatosession} />
 				</article>
 			</main>

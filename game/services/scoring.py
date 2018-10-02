@@ -1,5 +1,3 @@
-from utils.timer import Timer
-
 BONUS = {
     'COLLECTIVE': {
         'CLEANSHEET': {'G': 3.4, 'D': 2.5, 'M': 1.0, 'A': 0},
@@ -27,27 +25,25 @@ SALARY_SCORE_BOUNDS = [(6.1, 'cl1'), (6.3, 'cl2'), (6.3, 'cl3'), (6.5, 'cl4'), (
 
 
 def compute_comparative_bonuses(all_perfs):
-    with Timer(id='compute_comparative_bonuses', verbose=False):
-        best_by_position = {'dom': {'G': 0, 'D': 0, 'M': 0, 'A': 0}, 'ext': {'G': 0, 'D': 0, 'M': 0, 'A': 0}}
-        for pj in all_perfs:
-            if pj.joueur.poste is None:
-                continue
-            if 'note' in pj.details and pj.temps_de_jeu >= PLAYTIME['MAX_LONG'] and pj.details['note'] is not None:
-                best_by_position[pj.details['equipe']][pj.joueur.poste] = max(pj.details['note'],
-                                                                              best_by_position[pj.details['equipe']][
-                                                                                  pj.joueur.poste])
-        return best_by_position
+    best_by_position = {'dom': {'G': 0, 'D': 0, 'M': 0, 'A': 0}, 'ext': {'G': 0, 'D': 0, 'M': 0, 'A': 0}}
+    for pj in all_perfs:
+        if pj.joueur.poste is None:
+            continue
+        if 'note' in pj.details and pj.temps_de_jeu >= PLAYTIME['MAX_LONG'] and pj.details['note'] is not None:
+            best_by_position[pj.details['equipe']][pj.joueur.poste] = max(pj.details['note'],
+                                                                          best_by_position[pj.details['equipe']][
+                                                                              pj.joueur.poste])
+    return best_by_position
 
 
 def compute_score_performance(perf, best_note_by_position):
-    with Timer(id='compute_score_performance', verbose=False):
-        if perf.joueur.poste is None:
-            return None, 0, None, []
+    if perf.joueur.poste is None:
+        return None, 0, None, []
 
-        note = _compute_note(perf)
-        compensation = _compute_compensation(perf)
-        bonus, earned = _compute_bonus(perf, best_note_by_position)
-        return note, bonus, compensation, earned
+    note = _compute_note(perf)
+    compensation = _compute_compensation(perf)
+    bonus, earned = _compute_bonus(perf, best_note_by_position)
+    return note, bonus, compensation, earned
 
 
 def _compute_note(perf):

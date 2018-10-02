@@ -6,7 +6,7 @@ from django.utils import timezone
 import dateutil.parser
 from colorful.fields import RGBColorField
 
-from utils.timer import Timer
+from utils.timer import timed
 from statnuts import note_converter
 
 
@@ -61,8 +61,7 @@ class JourneeManager(models.Manager):
         step_update = dateutil.parser.parse(statnuts_step['updated_at'])
         if force_import or created or journee.derniere_maj is None or step_update > journee.derniere_maj:
             for meeting in statnuts_step['meetings']:
-                with Timer(id='Rencontre import_from_statnuts', verbose=True):
-                    Rencontre.objects.import_from_statnuts(journee, sn_client.get_meeting(meeting['uuid']), sn_client,
+                Rencontre.objects.import_from_statnuts(journee, sn_client.get_meeting(meeting['uuid']), sn_client,
                                                            force_import=force_import)
         journee.derniere_maj = step_update
         journee.save()
@@ -190,6 +189,8 @@ class Joueur(Importe):
 
 
 class RencontreManager(models.Manager):
+
+    @timed
     def import_from_statnuts(self, journee, statnuts_meeting, sn_client, force_import=False):
         rencontre, created = self._get_or_create_from_statnuts(journee, statnuts_meeting)
         meeting_update = dateutil.parser.parse(statnuts_meeting['updated_at'])

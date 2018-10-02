@@ -6,7 +6,7 @@ from django.contrib.postgres.fields import JSONField
 from ligue1 import models as l1models
 # from game import models as gamemodels
 from game.services import scoring
-from utils.timer import Timer
+from utils.timer import timed
 
 
 class SaisonScoring(models.Model):
@@ -59,35 +59,36 @@ class JourneeScoring(models.Model):
 
 
 class JJScoreManager(models.Manager):
+
+    @timed
     def create_jjscore_from_ligue1(self, journee_scoring):
-        with Timer(id='create_jjscore_from_ligue1', verbose=False):
-            computed_club_pks = []
-            jjscores = []
-            computed_joueurs = []
-            for r in journee_scoring.journee.rencontres.all():
-                computed_club_pks.extend([r.club_domicile.pk, r.club_exterieur.pk])
-                all_perfs = r.performances.select_related('joueur').select_related('rencontre').all()
-                if all_perfs:  # perform queryset
-                    bbp = scoring.compute_comparative_bonuses(all_perfs)
-                    for perf in all_perfs:
-                        note, bonus, comp, earned_bonuses = scoring.compute_score_performance(perf, bbp)
-                        jjscores.append(
-                            JJScore(journee_scoring=journee_scoring,
-                                    joueur=perf.joueur,
-                                    rencontre=r,
-                                    note=note,
-                                    bonus=bonus,
-                                    compensation=comp,
-                                    details={'bonuses': earned_bonuses}))
-                        # for cl in journee_scoring.journee.saison.participants:
-                        # if not cl.pk in computed_club_pks:
-                        # compenser scores matchs reportés ...
-                        computed_joueurs.append(perf.joueur.pk)
-            # "pour les joueurs qui n'ont pas joué lors de cette journée insert 0":
-            for j in l1models.Joueur.objects.exclude(pk__in=computed_joueurs):
-                jjscores.append(JJScore(journee_scoring=journee_scoring, joueur=j, compensation=0, bonus=0))
-            JJScore.objects.filter(journee_scoring=journee_scoring).delete()
-            JJScore.objects.bulk_create(jjscores)
+        computed_club_pks = []
+        jjscores = []
+        computed_joueurs = []
+        for r in journee_scoring.journee.rencontres.all():
+            computed_club_pks.extend([r.club_domicile.pk, r.club_exterieur.pk])
+            all_perfs = r.performances.select_related('joueur').select_related('rencontre').all()
+            if all_perfs:  # perform queryset
+                bbp = scoring.compute_comparative_bonuses(all_perfs)
+                for perf in all_perfs:
+                    note, bonus, comp, earned_bonuses = scoring.compute_score_performance(perf, bbp)
+                    jjscores.append(
+                        JJScore(journee_scoring=journee_scoring,
+                                joueur=perf.joueur,
+                                rencontre=r,
+                                note=note,
+                                bonus=bonus,
+                                compensation=comp,
+                                details={'bonuses': earned_bonuses}))
+                    # for cl in journee_scoring.journee.saison.participants:
+                    # if not cl.pk in computed_club_pks:
+                    # compenser scores matchs reportés ...
+                    computed_joueurs.append(perf.joueur.pk)
+        # "pour les joueurs qui n'ont pas joué lors de cette journée insert 0":
+        for j in l1models.Joueur.objects.exclude(pk__in=computed_joueurs):
+            jjscores.append(JJScore(journee_scoring=journee_scoring, joueur=j, compensation=0, bonus=0))
+        JJScore.objects.filter(journee_scoring=journee_scoring).delete()
+        JJScore.objects.bulk_create(jjscores)
 
     def list_scores_for_joueur(self, joueur, saison_scoring):
         return self.filter(joueur=joueur, journee_scoring__saison_scoring=saison_scoring).order_by(
@@ -141,23 +142,23 @@ class JJScore(models.Model):
 
 class SJScoreManager(models.Manager):
 
+    @timed
     def create_sjscore_from_ligue1(self, saison_scoring):
-        with Timer(id='create_sjscore_from_ligue1', verbose=True):
-            sjscores = []
-            jjscores_by_joueur = dict()
-            for jjs in JJScore.objects.select_related('joueur').filter(journee_scoring__saison_scoring=saison_scoring):
-                jjscores_by_joueur.setdefault(jjs.joueur, []).append(jjs)
-            for jpk, scores in jjscores_by_joueur.items():
-                agglo = self._compute_stats_agg(scores)
-                sjscores.append(SJScore(saison_scoring=saison_scoring,
-                                        joueur=jpk,
-                                        avg_note=agglo.pop('AVGNOTE'),
-                                        nb_notes=agglo.pop('NBNOTE'),
-                                        total_bonuses=agglo.pop('BONUS'),
-                                        sum_compensations=agglo.pop('SUMCOMP'),
-                                        details=agglo))
-            self.filter(saison_scoring=saison_scoring).delete()
-            self.bulk_create(sjscores)
+        sjscores = []
+        jjscores_by_joueur = dict()
+        for jjs in JJScore.objects.select_related('joueur').filter(journee_scoring__saison_scoring=saison_scoring):
+            jjscores_by_joueur.setdefault(jjs.joueur, []).append(jjs)
+        for jpk, scores in jjscores_by_joueur.items():
+            agglo = self._compute_stats_agg(scores)
+            sjscores.append(SJScore(saison_scoring=saison_scoring,
+                                    joueur=jpk,
+                                    avg_note=agglo.pop('AVGNOTE'),
+                                    nb_notes=agglo.pop('NBNOTE'),
+                                    total_bonuses=agglo.pop('BONUS'),
+                                    sum_compensations=agglo.pop('SUMCOMP'),
+                                    details=agglo))
+        self.filter(saison_scoring=saison_scoring).delete()
+        self.bulk_create(sjscores)
 
     def _compute_stats_agg(self, jjscores):
         agg = dict()

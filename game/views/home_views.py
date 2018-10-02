@@ -1,18 +1,15 @@
-from django.views.generic import TemplateView, DetailView, ListView
-from django.db.models import Sum, Avg, Count, Q, F
+from django.views.generic import TemplateView, DetailView
+from django.db.models import Q, F
 from graphos.sources.model import SimpleDataSource
 from graphos.renderers.morris import AreaChart
 # from graphos.renderers.gchart import AreaChart
-from rules.contrib.views import PermissionRequiredMixin
-from rest_framework.renderers import JSONRenderer
-import json
-
-from . import models
 from ligue1 import models as l1models
-from .rest.league import CurrentLeagueInstanceMixin
-from .rest.redux_state import StateInitializerMixin
-from .rest import serializers
-from .forms import StatsForm, PositionForm
+from game.models import SaisonScoring, JJScore, SJScore
+from game.forms import StatsForm, PositionForm
+
+
+class LandingPage(TemplateView):
+    template_name = 'game/landing.html'
 
 
 class HomePage(TemplateView):
@@ -30,7 +27,7 @@ class ClubView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(ClubView, self).get_context_data(**kwargs)
-        saisonscoring = models.SaisonScoring.objects.filter(saison__est_courante__isnull=False).first()
+        saisonscoring = SaisonScoring.objects.filter(saison__est_courante__isnull=False).first()
         context['players'] = []
         deco_joueurs = self.object.joueurs.filter(sjscore__saison_scoring=saisonscoring).annotate(
             nb_notes=F('sjscore__nb_notes')).annotate(avg_note=F('sjscore__avg_note')).annotate(
@@ -58,12 +55,12 @@ class StatJoueurView(DetailView):
         # Call the base implementation first to get a context
         context = super(StatJoueurView, self).get_context_data(**kwargs)
         # Step 1: Create a DataPool with the data we want to retrieve.
-        saisonscoring = models.SaisonScoring.objects.filter(saison__est_courante__isnull=False).first()
-        jjscores = models.JJScore.objects.list_scores_for_joueur(joueur=self.object,
-                                                                 saison_scoring=saisonscoring) \
+        saisonscoring = SaisonScoring.objects.filter(saison__est_courante__isnull=False).first()
+        jjscores = JJScore.objects.list_scores_for_joueur(joueur=self.object,
+                                                          saison_scoring=saisonscoring) \
             .select_related('rencontre__club_domicile') \
             .select_related('rencontre__club_exterieur').select_related('journee_scoring__journee')
-        context['stats'] = models.SJScore.objects.filter(saison_scoring=saisonscoring, joueur=self.object).first()
+        context['stats'] = SJScore.objects.filter(saison_scoring=saisonscoring, joueur=self.object).first()
         context['jjscores'] = jjscores
         data_source_array = [['J', 'Note', 'Bonus']]
         for jjs in jjscores:
@@ -162,12 +159,12 @@ class ResultJourneeView(DetailView):
         }
         for p, nb in [('G', 1), ('D', 5), ('M', 5), ('A', 3)]:
             selection['best'][p].extend(
-                models.JJScore.objects.get_n_best_or_worst(nb, self.object.saison, journee=self.object, poste=p))
+                JJScore.objects.get_n_best_or_worst(nb, self.object.saison, journee=self.object, poste=p))
             selection['bonuses'][p].extend(
-                models.JJScore.objects.get_n_best_bonuses(nb, self.object.saison, journee=self.object, poste=p))
+                JJScore.objects.get_n_best_bonuses(nb, self.object.saison, journee=self.object, poste=p))
             selection['worst'][p].extend(
-                models.JJScore.objects.get_n_best_or_worst(nb, self.object.saison, journee=self.object, poste=p,
-                                                           best=False))
+                JJScore.objects.get_n_best_or_worst(nb, self.object.saison, journee=self.object, poste=p,
+                                                    best=False))
 
         context['best'] = compute_team(selection['best'])
         context['bonuses'] = compute_team(selection['bonuses'], criteria='bonus')
@@ -211,128 +208,22 @@ class StatView(DetailView):
         nb_notes_min = self.request.GET.get('nb_notes') or 1
         for p, nb in [('G', 1), ('D', 5), ('M', 5), ('A', 3)]:
             selection['best'][p].extend(
-                models.SJScore.objects.get_n_best_or_worst(self.object, nb, p, nb_notes_min=nb_notes_min))
+                SJScore.objects.get_n_best_or_worst(self.object, nb, p, nb_notes_min=nb_notes_min))
             selection['bonuses'][p].extend(
-                models.SJScore.objects.get_n_best_bonuses(self.object, nb, p))
+                SJScore.objects.get_n_best_bonuses(self.object, nb, p))
             selection['worst'][p].extend(
-                models.SJScore.objects.get_n_best_or_worst(self.object, nb, p, False, nb_notes_min=nb_notes_min))
+                SJScore.objects.get_n_best_or_worst(self.object, nb, p, False, nb_notes_min=nb_notes_min))
 
         context['stats_form'] = StatsForm(self.request.GET, saison=self.object) if self.request.GET.get(
             'nb_notes') else StatsForm(saison=self.object)
         context['position_form'] = PositionForm(self.request.GET) if self.request.GET.get(
             'position') else PositionForm()
-        context['bestofall'] = models.JJScore.objects.get_n_best_or_worst(3, self.object, poste=self.request.GET.get(
+        context['bestofall'] = JJScore.objects.get_n_best_or_worst(3, self.object, poste=self.request.GET.get(
             'position') or None)
-        context['worstofall'] = models.JJScore.objects.get_n_best_or_worst(3, self.object, best=False,
-                                                                           poste=self.request.GET.get(
-                                                                               'position') or None)
+        context['worstofall'] = JJScore.objects.get_n_best_or_worst(3, self.object, best=False,
+                                                                    poste=self.request.GET.get(
+                                                                        'position') or None)
         context['best'] = compute_team(selection['best'], criteria='avg_note')
         context['bonuses'] = compute_team(selection['bonuses'], criteria='total_bonuses')
         context['worst'] = compute_team(selection['worst'], False, criteria='avg_note')
-        return context
-
-
-class LeagueWallView(PermissionRequiredMixin, CurrentLeagueInstanceMixin, DetailView):
-    model = models.League
-    template_name = 'game/league/wall.html'
-    permission_required = 'game.view_league'
-
-    def get_context_data(self, **kwargs):
-        # Call the base implementation first to get a context
-        context = super(LeagueWallView, self).get_context_data(**kwargs)
-        league = self.object
-
-        instance = self._get_current_league_instance(league)
-        serializer = serializers.LeagueInstancePhaseDaySerializer(
-            models.LeagueInstancePhaseDay.objects.get_latest_day_for_phases(
-                models.LeagueInstancePhase.objects.filter(league_instance=instance)), many=True,
-            context={'request': self.request})
-        context['PRELOADED_STATE'] = {
-            'ranking': json.loads(str(JSONRenderer().render(serializer.data), 'utf-8'))
-        }
-
-        # Get active team from league
-        try:
-            mb = models.LeagueMembership.objects.get(user=self.request.user, league=league)
-            context['team'] = mb.team
-        except models.LeagueMembership.DoesNotExist:
-            pass
-
-        context['component'] = 'test'
-        context['instance'] = instance
-        return context
-
-
-class LeagueEkypView(PermissionRequiredMixin, StateInitializerMixin, CurrentLeagueInstanceMixin, DetailView):
-    model = models.League
-    template_name = 'game/league/ekyp.html'
-    permission_required = 'game.view_league'
-
-    def _get_my_team(self):
-        return models.LeagueMembership.objects.get(user=self.request.user, league=self.object).team
-
-    def get_context_data(self, **kwargs):
-        # Call the base implementation first to get a context
-        context = super(LeagueEkypView, self).get_context_data(**kwargs)
-        my_team = self._get_my_team()
-        context['team'] = my_team
-        context['instance'] = self._get_current_league_instance(self.object)
-
-        if 'team_pk' in self.kwargs and self.kwargs['team_pk'] != my_team.pk:
-            context['component'] = 'team'
-            context['PRELOADED_STATE'] = self.init_from_team(self.request,
-                                                             models.Team.objects.filter(
-                                                                 managers__league=self.kwargs['pk']).distinct().get(
-                                                                 pk=self.kwargs['team_pk']))
-        else:
-            context['component'] = 'ekyp'
-            context['PRELOADED_STATE'] = self.init_from_team(self.request, my_team)
-        return context
-
-
-class LeagueRankingView(PermissionRequiredMixin, StateInitializerMixin, CurrentLeagueInstanceMixin, DetailView):
-    model = models.League
-    template_name = 'game/league/league_base.html'
-    permission_required = 'game.view_league'
-
-    def _get_my_team(self):
-        return models.LeagueMembership.objects.get(user=self.request.user, league=self.object).team
-
-    def get_context_data(self, **kwargs):
-        # Call the base implementation first to get a context
-        context = super(LeagueRankingView, self).get_context_data(**kwargs)
-        my_team = self._get_my_team()
-        context['team'] = my_team
-        context['component'] = 'league'
-        context['instance'] = self._get_current_league_instance(self.object)
-
-        context['PRELOADED_STATE'] = self.init_from_league(self.request, self.object)
-        return context
-
-
-class LeagueMerkatoResultsView(PermissionRequiredMixin, StateInitializerMixin, CurrentLeagueInstanceMixin, DetailView):
-    model = models.League
-    template_name = 'game/league/merkato_results.html'
-    permission_required = 'game.view_league'
-
-    def _get_my_team(self):
-        return models.LeagueMembership.objects.get(user=self.request.user, league=self.object).team
-
-    def get_context_data(self, **kwargs):
-        # Call the base implementation first to get a context
-        context = super(LeagueMerkatoResultsView, self).get_context_data(**kwargs)
-        context['sessions'] = models.MerkatoSession.objects.filter(
-            merkato__league_instance=self._get_current_league_instance(self.object), is_solved=True).order_by(
-            '-solving')
-        context['team'] = self._get_my_team()
-        context['instance'] = self._get_current_league_instance(self.object)
-        context['component'] = 'merkatoresults'
-        if 'session_pk' in self.kwargs:
-            msession = models.MerkatoSession.objects.get(
-                merkato__league_instance=self._get_current_league_instance(self.object), is_solved=True,
-                pk=self.kwargs['session_pk'])
-            context['PRELOADED_STATE'] = self.init_from_merkatosession(self.request, msession)
-        else:
-            # latest
-            context['PRELOADED_STATE'] = self.init_from_merkatosession(self.request, context['sessions'].first())
         return context

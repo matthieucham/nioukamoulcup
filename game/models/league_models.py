@@ -1,3 +1,4 @@
+import uuid
 from django.db import models, transaction
 from django.contrib.postgres.fields import JSONField
 from django.contrib.auth.models import User
@@ -7,7 +8,7 @@ import datetime
 
 from . import scoring_models
 from ligue1 import models as l1models
-from utils.timer import Timer
+from utils.timer import timed
 from django.utils import timezone
 
 
@@ -17,6 +18,7 @@ class League(models.Model):
     official = models.BooleanField(default=False)
     mode = models.CharField(max_length=4, choices=MODES)
     members = models.ManyToManyField(User, through='LeagueMembership', related_name='leagues')
+    code = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
 
     def has_object_read_permission(self, request):
         return request.user in self.members.all()
@@ -27,9 +29,10 @@ class League(models.Model):
 
 class LeagueMembership(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    league = models.ForeignKey(League, on_delete=models.CASCADE)
+    league = models.ForeignKey(League, on_delete=models.SET_NULL, null=True)
     is_baboon = models.BooleanField(default=False)
-    date_joined = models.DateField()
+    is_team_captain = models.BooleanField(default=True)
+    date_joined = models.DateField(null=True)
     team = models.ForeignKey('Team', on_delete=models.CASCADE, related_name='managers', null=True)
 
 
@@ -38,8 +41,8 @@ class LeagueDivision(models.Model):
     level = models.PositiveSmallIntegerField(null=False)
     name = models.CharField(max_length=100, blank=False)
     capacity = models.PositiveSmallIntegerField()
-    upper_division = models.ForeignKey("self", on_delete=models.SET_NULL, related_name='lower', null=True)
-    lower_division = models.ForeignKey("self", on_delete=models.SET_NULL, related_name='upper', null=True)
+    upper_division = models.ForeignKey("self", on_delete=models.SET_NULL, related_name='lower', null=True, blank=True)
+    lower_division = models.ForeignKey("self", on_delete=models.SET_NULL, related_name='upper', null=True, blank=True)
 
     def __str__(self):
         return self.name
@@ -56,26 +59,38 @@ class TeamManager(models.Manager):
 
     @transaction.atomic()
     def setup_joker(self, team, joueur):
-        assert Signing.objects.filter(player=joueur, team=team, end__isnull=True) is not None
+        assert Signing.objects.filter(player=joueur, team=team, end__isnull=True,
+                                      league_instance=LeagueInstance.objects.get_current(team.league)) is not None
         t = self.select_for_update().get(pk=team.pk)
         team_config = t.attributes['joker'] = joueur.pk
         t.attributes = team_config
         t.save()
 
+    @transaction.atomic()
+    def create_for_user(self, *args, user, **kwargs):
+        assert user is not None
+        t = self.create(*args, **kwargs)
+        LeagueMembership.objects.create(user=user, is_team_captain=True, team=t)
+        t.refresh_from_db()
+        return t
+
 
 class Team(models.Model):
     name = models.CharField(max_length=100, blank=False)
-    league = models.ForeignKey(League, on_delete=models.CASCADE, null=False)
-    division = models.ForeignKey(LeagueDivision, on_delete=models.CASCADE)
-    attributes = JSONField()
+    league = models.ForeignKey(League, on_delete=models.PROTECT, null=True)
+    division = models.ForeignKey(LeagueDivision, on_delete=models.PROTECT, null=True)
+    attributes = JSONField(default=dict, blank=True)
 
     objects = TeamManager()
+
+    def get_pending_manager_invitations(self):
+        return self.teaminvitation_set.filter(status='OPENED', user__isnull=False)
 
     def has_object_read_permission(self, request):
         return request.user in self.league.members.all()
 
     def has_object_write_permission(self, request):
-        return LeagueMembership.objects.filter(user=request.user, team=self).count() > 0
+        return LeagueMembership.objects.filter(user=request.user, team=self, is_team_captain=True).count() > 0
 
     def __str__(self):
         return self.name
@@ -142,7 +157,8 @@ class BankAccount(models.Model):
 
 
 class BankAccountHistory(models.Model):
-    bank_account = models.ForeignKey(BankAccount, on_delete=models.CASCADE, null=True)  # entries with null ref will be deleted by batch
+    bank_account = models.ForeignKey(BankAccount, on_delete=models.CASCADE,
+                                     null=True)  # entries with null ref will be deleted by batch
     date = models.DateTimeField()
     amount = models.DecimalField(max_digits=4, decimal_places=1)
     new_balance = models.DecimalField(max_digits=4, decimal_places=1)
@@ -167,6 +183,11 @@ class BankAccountHistory(models.Model):
         return {'type': 'RELEASE', 'player_id': player.pk, 'player_name': player.display_name()}
 
 
+class LeagueInstanceManager(models.Manager):
+    def get_current(self, league):
+        return self.filter(league=league, current=True).first()
+
+
 class LeagueInstance(models.Model):
     name = models.CharField(max_length=100, blank=False)
     slogan = models.CharField(max_length=255)
@@ -177,6 +198,8 @@ class LeagueInstance(models.Model):
     saison = models.ForeignKey(l1models.Saison, on_delete=models.CASCADE)
     configuration = JSONField(
         default=dict({'notes': {'HALFSEASON': 13, 'FULLSEASON': 26, 'TOURNAMENT': 3}}))
+
+    objects = LeagueInstanceManager()
 
     def has_object_read_permission(self, request):
         return request.user in self.league.members.all()
@@ -193,19 +216,19 @@ class LeagueInstancePhase(models.Model):
 
 
 class LeagueInstancePhaseDayManager(models.Manager):
+    @timed
     def compute_results(self, league_instance, journee):
-        with Timer(id='compute_results', verbose=True):
-            # find the phase
-            phases = LeagueInstancePhase.objects.filter(league_instance=league_instance,
-                                                        journee_first__lte=journee.numero,
-                                                        journee_last__gte=journee.numero)
-            for ph in phases:
-                lipd, created = self.get_or_create(league_instance_phase=ph, journee=journee,
-                                                   defaults={'number': journee.numero})
-                team_day_scores = self._compute_scores_for_phaseday(lipd)
-                if not created:
-                    TeamDayScore.objects.filter(day=lipd).delete()  # delete existing and recompute.
-                TeamDayScore.objects.bulk_create(team_day_scores)
+        # find the phase
+        phases = LeagueInstancePhase.objects.filter(league_instance=league_instance,
+                                                    journee_first__lte=journee.numero,
+                                                    journee_last__gte=journee.numero)
+        for ph in phases:
+            lipd, created = self.get_or_create(league_instance_phase=ph, journee=journee,
+                                               defaults={'number': journee.numero})
+            team_day_scores = self._compute_scores_for_phaseday(lipd)
+            if not created:
+                TeamDayScore.objects.filter(day=lipd).delete()  # delete existing and recompute.
+            TeamDayScore.objects.bulk_create(team_day_scores)
 
     def _compute_scores_for_phaseday(self, lipd):
         return [self._compute_teamdayscore(team, lipd) for team in
@@ -341,6 +364,7 @@ class SigningManager(models.Manager):
 class Signing(models.Model):
     player = models.ForeignKey(l1models.Joueur, on_delete=models.CASCADE, null=False)
     team = models.ForeignKey(Team, on_delete=models.CASCADE, null=False)
+    league_instance = models.ForeignKey(LeagueInstance, on_delete=models.CASCADE, null=False)
     begin = models.DateTimeField(auto_now_add=True, db_index=True)
     end = models.DateTimeField(null=True, db_index=True)
     attributes = JSONField(default=dict({'score_factor': 1.0}))

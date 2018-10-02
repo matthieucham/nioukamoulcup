@@ -1,0 +1,16 @@
+{% extends "game/league/league_central_reactapp.html" %}
+{% load l1results %}
+{% load humanize %}
+
+{% block content-right %}
+ <section id="merkato-sessions">
+    <h1>Enchères passées</h1>
+    <ul>
+        {% for session in sessions %}
+            <li>
+                <a href="{% url 'league_merkatoresults-session' object.pk session.pk %}">Session #{{ session.number }} du {{ session.solving|date:"SHORT_DATETIME_FORMAT" }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+</section>
+{% endblock content-right %}
