@@ -61,15 +61,15 @@ class LeagueInvitation(BaseInvitation):
         LeagueMembership.objects.filter(
             team=self.team,
             league__isnull=True,
-            date_joined=timezone.now().date(),
-        ).update(league=self.league)
+        ).update(league=self.league, date_joined=timezone.now().date())
+        self.team.league = self.league
+        self.team.save()
         self.status = 'ACCEPTED'
         self.save()
 
+    @transaction.atomic
     def reject(self):
-        LeagueMembership.objects.filter(
-            league=self.team.league,
-            team=self.team
-        ).delete()
+        self.team.league = None
+        self.team.save()
         self.status = 'REJECTED'
         self.save()

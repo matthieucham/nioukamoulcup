@@ -79,7 +79,7 @@ class Team(models.Model):
     name = models.CharField(max_length=100, blank=False)
     league = models.ForeignKey(League, on_delete=models.PROTECT, null=True)
     division = models.ForeignKey(LeagueDivision, on_delete=models.PROTECT, null=True)
-    attributes = JSONField(default=dict)
+    attributes = JSONField(default=dict, blank=True)
 
     objects = TeamManager()
 

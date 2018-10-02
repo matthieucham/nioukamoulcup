@@ -4,7 +4,7 @@ from .admin_import import admin_import_site
 from .views import ResultRencontreView, ClubView, StatView, StatJoueurView, ResultJourneeView, \
     LeagueEntryDetail, LeagueWallView, LeagueEkypView, LeagueRankingView, LeagueMerkatoResultsView, LeagueMerkatoView, \
     LeagueRegisterPAView, TeamListView, TeamCreateView, TeamDeleteView, TeamInvitationView, TeamInvitationAcceptView, \
-    TeamInvitationRejectView
+    TeamInvitationRejectView, TeamJoinLeagueView
 
 home_urls = [
     url(r'^info/$', LeagueEntryDetail.as_view(), name="home_info"),
@@ -38,6 +38,7 @@ user_urls = [
         name="teaminvitations-accept"),
     url(r'^teaminvitations/(?P<pk>[a-f0-9\-]{36})/reject', TeamInvitationRejectView.as_view(),
         name="teaminvitations-reject"),
+    url(r'^teams/(?P<pk>[0-9]+)/joinleague', TeamJoinLeagueView.as_view(), name="user-teams-joinleague"),
 ]
 
 urlpatterns = [

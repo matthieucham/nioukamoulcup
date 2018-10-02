@@ -1,5 +1,5 @@
 from django import forms
-from game.models.league_models import Team
+from game.models.league_models import Team, League
 from game.models.invitation_models import TeamInvitation
 
 
@@ -29,3 +29,14 @@ class JoinTeamForm(forms.Form):
             assert invit.team.managers.filter(user=self.request.user).count() == 0
         except AssertionError:
             raise forms.ValidationError('Vous êtes déjà manager de cette équipe')
+
+
+class JoinLeagueForm(forms.Form):
+    code = forms.CharField(max_length=38, required=True)
+
+    def clean_code(self):
+        code = self.cleaned_data['code'].strip()
+        try:
+            League.objects.get(code=code)
+        except League.DoesNotExist:
+            raise forms.ValidationError('Ce code est inconnu')

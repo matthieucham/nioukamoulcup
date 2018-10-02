@@ -42,7 +42,7 @@
         <p>Ligue: <a href="{% url 'league_ekyp-detail' t.league.id %}">{{ t.league.name }}</a></p>
         {% else %}
         {% if not t.is_captain == 0 %}
-        <p><a href="#" class="navlink">Rejoindre une ligue</a></p>
+        <p><a href="{% url 'user-teams-joinleague' t.id %}" class="navlink">Rejoindre une ligue</a></p>
         <p><a href="{% url 'user-teams-deletions' t.id %}" class="navlink">Supprimer l'équipe</a></p>
         {% endif %}
         {% endif %}
@@ -80,7 +80,7 @@
         <h2>Rejoindre une équipe existante ?</h2>
         <p class="explanation">Pour cela, demandez au manager de l'équipe qu'il génére et vous communique un code
             d'invitation.</p>
-        <p class="explanation">Puis copiez le code dans ce champs et validez.</p>
+        <p class="explanation">Puis copiez le code dans ce champ et validez.</p>
         <form method="post" class="space-around-me">
             {% csrf_token %}
             {{ form }}

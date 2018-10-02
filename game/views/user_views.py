@@ -6,9 +6,9 @@ from django.db.models import Count, Q
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
 
-from game.forms import CreateTeamForm, JoinTeamForm
-from game.models.league_models import Team
-from game.models.invitation_models import TeamInvitation
+from game.forms import CreateTeamForm, JoinTeamForm, JoinLeagueForm
+from game.models.league_models import Team, League
+from game.models.invitation_models import TeamInvitation, LeagueInvitation
 
 
 class TeamListView(FormMixin, ListView):
@@ -122,3 +122,20 @@ class TeamInvitationRejectView(DetailView):
     def post(self, request, *args, **kwargs):
         self.get_object().reject()
         return HttpResponseRedirect(self.success_url)
+
+
+class TeamJoinLeagueView(FormView, DetailView):
+    template_name = 'game/user/team_joinleague.html'
+    form_class = JoinLeagueForm
+
+    def get_queryset(self):
+        return Team.objects.filter(managers__user=self.request.user, managers__is_team_captain=True)
+
+    def get_success_url(self):
+        return reverse('user-teams-list')
+
+    def form_valid(self, form):
+        team = self.get_object()
+        league = League.objects.get(code=form.data.get('code').strip())
+        LeagueInvitation.objects.get_or_create(team=team, league=league)
+        return super(TeamJoinLeagueView, self).form_valid(form)

@@ -67,10 +67,10 @@ class RencontreInline(InlineActionsMixin, admin.TabularInline):
     def has_add_permission(self, request):
         return False
 
-    def import_meeting_action(self, request, obj, inline_obj):
+    def import_meeting_action(self, request, obj, parent_obj):
         client = StatnutsClient(settings.STATNUTS_CLIENT_ID, settings.STATNUTS_SECRET, settings.STATNUTS_URL,
                                 settings.STATNUTS_NKCUP_USER, settings.STATNUTS_NKCUP_PWD)
-        models.Rencontre.objects.import_from_statnuts(obj, client.get_meeting(inline_obj.sn_meeting_uuid), client,
+        models.Rencontre.objects.import_from_statnuts(obj, client.get_meeting(obj.sn_meeting_uuid), client,
                                                       force_import=True)
         messages.info(request, "Import effectué")
         return HttpResponseRedirect(reverse('import_statnuts:ligue1_rencontre_changelist'))
