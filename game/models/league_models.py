@@ -83,6 +83,11 @@ class Team(models.Model):
 
     objects = TeamManager()
 
+    def get_managers_names(self):
+        if self.managers.count() > 0:
+            return ' '.join([m.user.__str__() for m in self.managers.all()])
+        return ''
+
     def get_pending_manager_invitations(self):
         return self.teaminvitation_set.filter(status='OPENED', user__isnull=False)
 
@@ -203,6 +208,9 @@ class LeagueInstance(models.Model):
 
     def has_object_read_permission(self, request):
         return request.user in self.league.members.all()
+
+    def __str__(self):
+        return "%s (%s)" % (self.name, self.league)
 
 
 class LeagueInstancePhase(models.Model):
