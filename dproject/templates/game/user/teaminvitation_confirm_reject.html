@@ -1,0 +1,11 @@
+{% extends "game/user/user_base.html" %}
+
+{% block content_title %}Refuser un manager{% endblock %}
+
+{% block content %}
+<form method="post">
+    {% csrf_token %}
+    <p>Etes vous sûr de vouloir refuser <strong>{{ object.user }}</strong> en tant que co-manager de <strong>{{ object.team }}</strong>?</p>
+    <input type="submit" value="Confirmer">
+</form>
+{% endblock %}

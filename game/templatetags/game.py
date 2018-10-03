@@ -29,3 +29,10 @@ def json(value):
     uncleaned = jsonlib.dumps(value, iterable_as_array=True)
     clean = html.parser.unescape(bleach.clean(uncleaned))
     return mark_safe(clean)
+
+
+@register.inclusion_tag('game/tags/user_teams_invitation_code.html')
+def user_teams_invitation_code(team):
+    invite = models.TeamInvitation.objects.filter(team=team, status='OPENED', user__isnull=True).first()
+    return {'invite': invite, 'team': team}
+

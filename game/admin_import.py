@@ -29,13 +29,13 @@ class JourneeScoringInline(InlineActionsMixin, admin.TabularInline):
     def get_derniere_maj(self, obj):
         return obj.journee.derniere_maj.strftime('%d-%m-%Y %H:%M')
 
-    def compute_scores(self, request, obj, inline_obj):
-        inline_obj.save()
-        return HttpResponseRedirect(reverse('import_statnuts:game_saisonscoring_change', args=[obj.pk]))
+    def compute_scores(self, request, obj, parent_obj):
+        obj.save()
+        return HttpResponseRedirect(reverse('import_statnuts:game_saisonscoring_change', args=[parent_obj.pk]))
 
-    def lock(self, request, obj, inline_obj):
-        inline_obj.lock()
-        return HttpResponseRedirect(reverse('import_statnuts:game_saisonscoring_change', args=[obj.pk]))
+    def lock(self, request, obj, parent_obj):
+        obj.lock()
+        return HttpResponseRedirect(reverse('import_statnuts:game_saisonscoring_change', args=[parent_obj.pk]))
 
 
 class SaisonScoringAdmin(InlineActionsModelAdminMixin, admin.ModelAdmin):
@@ -86,6 +86,7 @@ class MerkatoAdmin(admin.ModelAdmin):
 admin_import_site.register(models.SaisonScoring, SaisonScoringAdmin)
 admin_import_site.register(models.Merkato, MerkatoAdmin)
 
+
 class EntryLeagueAdmin(EntryAdminCKEditor):
     # In our case we put the gallery field
     # into the 'Content' fieldset
@@ -108,4 +109,49 @@ class EntryLeagueAdmin(EntryAdminCKEditor):
         super().save_model(request, obj, form, change)
 
 
+class LeagueDivisionInline(admin.TabularInline):
+    model = models.LeagueDivision
+    extra = 0
+
+
+class LeagueInvitationInline(InlineActionsMixin, admin.TabularInline):
+    model = models.LeagueInvitation
+    readonly_fields = ('team', 'status',)
+
+    def get_inline_actions(self, request, obj=None):
+        actions = super(LeagueInvitationInline, self).get_inline_actions(request, obj)
+        if obj:
+            if obj.status == 'OPENED':
+                actions.extend(('accept', 'reject'))
+        return actions
+
+    def has_add_permission(self, request):
+        return False
+
+    def accept(self, request, obj, parent_obj):
+        obj.accept()
+        return HttpResponseRedirect(reverse('admin:game_league_change', args=[parent_obj.pk]))
+
+    def reject(self, request, obj, parent_obj):
+        obj.reject()
+        return HttpResponseRedirect(reverse('admin:game_league_change', args=[parent_obj.pk]))
+
+
+class TeamInline(admin.TabularInline):
+    model = models.Team
+    extra = 0
+    fields = ('name', 'attributes', 'division')
+    can_delete = False
+
+    def has_add_permission(self, request):
+        return False
+
+
+class LeagueAdmin(InlineActionsModelAdminMixin, admin.ModelAdmin):
+    model = models.League
+    readonly_fields = ('code',)
+    inlines = [LeagueDivisionInline, TeamInline, LeagueInvitationInline, ]
+
+
 admin.site.register(Entry, EntryLeagueAdmin)
+admin.site.register(models.League, LeagueAdmin)

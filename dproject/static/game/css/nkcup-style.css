@@ -25,8 +25,8 @@ time, mark, audio, video {
     padding: 0;
     border: 0;
     list-style: none;
-    font-size: 100%;
-    font: inherit;
+    /*font-size: 100%;
+    font: inherit;*/
     vertical-align: baseline;
 }
 
@@ -534,15 +534,20 @@ header nav a:hover, nav ul li ul li:hover {
     padding: 10px 20px;
 }
 
-.team-title li.manager {
+li.manager {
     display: inline-block;
     color: #5f5f5f;
     margin-right: 10px;
 }
 
-.team-title li.manager::before {
+li.manager::before {
     font-family: FontAwesome;
     content: "\f007   ";
+}
+
+li.captain::after {
+    font-family: FontAwesome;
+    content: "   \f005";
 }
 
 /* LEAGUE - Classements */
@@ -560,7 +565,7 @@ header nav a:hover, nav ul li ul li:hover {
     color: #228B22;
 }
 
-.prog-down, .lost {
+.prog-down, .lost, .errorlist {
     color: #B22222;
 }
 
@@ -734,7 +739,7 @@ dl.kvgroup {
 
 #rencontre-performances .result-rencontre-performances-team {
     flex: 50%;
-    width: 50%;
+    /*width: 50%;*/
     display: table;
     table-layout: fixed;
 }
@@ -886,6 +891,11 @@ article.hentry {
     padding: 5px;
 }
 
+div.entry-summary {
+    margin-bottom: 1em;
+    font-weight: bold;
+}
+
 h2.entry-title {
     font-size: 1.5em;
 }
@@ -907,3 +917,138 @@ aside.entry-widgets {
 /*article.hentry:nth-child(even) {
     background-color: #f1f1f1;
 }*/
+
+/************************************/
+/*         ACCOUNTS                 */
+/***********************************/
+
+.kcup-login-form {
+    background: #FFFFFF;
+    min-width: 500px;
+    max-width: 500px;
+    margin: 1em auto;
+    padding: 3em;
+    border-radius: 10px;
+    box-sizing: border-box;
+}
+
+.kcup-login-form form {
+    padding-bottom: 1.5em;
+}
+
+.kcup-login-form p {
+    padding: 0.5em 0;
+}
+
+.kcup-login-form h2 {
+    text-align: center;
+    padding-bottom: 2em;
+}
+
+.group {
+    display: flex;
+    border: 1px solid #b5b5b5;
+    padding: 15px 5px;
+    background-color: #f1f1f1;
+}
+
+.group i {
+    color: #f9bee5;
+    font-size: 20px;
+    padding: 0 10px;
+}
+
+.kcup-form-group {
+    margin: 20px 0;
+}
+
+.kcup-form-group label {
+    display: block;
+    color: #5f5f5f;
+    margin-bottom: 10px;
+    font-style: italic;
+}
+
+.kcup-login-form input[type="text"],
+.kcup-login-form input[type="password"] {
+    width: 100%;
+    border: none;
+    box-sizing: border-box;
+    background: transparent;
+    color: #000;
+}
+
+.kcup-login-form input[type="text"]:focus,
+.kcup-login-form input[type="password"]:focus {
+    outline: none;
+}
+.kcup-login-form input[type="submit"] {
+    padding: 12px 60px;
+    width: 100%;
+}
+
+.account_section {
+    padding: 5px;
+}
+
+.account-teams-container {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.account-team-box {
+    border: 1px solid;
+    border-radius: 4px;
+    margin: 8px;
+    padding: 1em;
+    min-width: 80px;
+}
+
+.waiting {
+    border-style: dashed;
+    border-color: #5f5f5f;
+    color: color: rgba(0, 0, 0, 0.54);
+}
+
+.account-team-box h2 {
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 0.8em;
+}
+
+.account-team-box-action {
+    padding 0.8em 0;
+}
+
+.account-team-box .confirmation .manager_form {
+    display: flex;
+    justify-content: space-between;
+}
+
+#join-or-create-team {
+    display: flex;
+}
+
+#join-or-create-team {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+#join-or-create-team > div {
+    flex: 1;
+    border-left : 1px solid #f1f1f1;
+    padding: 1em;
+}
+
+#join-or-create-team h2 {
+    margin-bottom: 0.8em;
+}
+
+.space-around-me {
+    margin: 0.8em;
+}
+
+.explanation {
+    font-size: 0.8em;
+    color: color: rgba(0, 0, 0, 0.54);
+}

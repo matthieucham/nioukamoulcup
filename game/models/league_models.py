@@ -1,3 +1,4 @@
+import uuid
 from django.db import models, transaction
 from django.contrib.postgres.fields import JSONField
 from django.contrib.auth.models import User
@@ -17,6 +18,7 @@ class League(models.Model):
     official = models.BooleanField(default=False)
     mode = models.CharField(max_length=4, choices=MODES)
     members = models.ManyToManyField(User, through='LeagueMembership', related_name='leagues')
+    code = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
 
     def has_object_read_permission(self, request):
         return request.user in self.members.all()
@@ -27,9 +29,10 @@ class League(models.Model):
 
 class LeagueMembership(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    league = models.ForeignKey(League, on_delete=models.CASCADE)
+    league = models.ForeignKey(League, on_delete=models.SET_NULL, null=True)
     is_baboon = models.BooleanField(default=False)
-    date_joined = models.DateField()
+    is_team_captain = models.BooleanField(default=True)
+    date_joined = models.DateField(null=True)
     team = models.ForeignKey('Team', on_delete=models.CASCADE, related_name='managers', null=True)
 
 
@@ -38,8 +41,8 @@ class LeagueDivision(models.Model):
     level = models.PositiveSmallIntegerField(null=False)
     name = models.CharField(max_length=100, blank=False)
     capacity = models.PositiveSmallIntegerField()
-    upper_division = models.ForeignKey("self", on_delete=models.SET_NULL, related_name='lower', null=True)
-    lower_division = models.ForeignKey("self", on_delete=models.SET_NULL, related_name='upper', null=True)
+    upper_division = models.ForeignKey("self", on_delete=models.SET_NULL, related_name='lower', null=True, blank=True)
+    lower_division = models.ForeignKey("self", on_delete=models.SET_NULL, related_name='upper', null=True, blank=True)
 
     def __str__(self):
         return self.name
@@ -63,20 +66,31 @@ class TeamManager(models.Manager):
         t.attributes = team_config
         t.save()
 
+    @transaction.atomic()
+    def create_for_user(self, *args, user, **kwargs):
+        assert user is not None
+        t = self.create(*args, **kwargs)
+        LeagueMembership.objects.create(user=user, is_team_captain=True, team=t)
+        t.refresh_from_db()
+        return t
+
 
 class Team(models.Model):
     name = models.CharField(max_length=100, blank=False)
-    league = models.ForeignKey(League, on_delete=models.CASCADE, null=False)
-    division = models.ForeignKey(LeagueDivision, on_delete=models.CASCADE)
-    attributes = JSONField()
+    league = models.ForeignKey(League, on_delete=models.PROTECT, null=True)
+    division = models.ForeignKey(LeagueDivision, on_delete=models.PROTECT, null=True)
+    attributes = JSONField(default=dict, blank=True)
 
     objects = TeamManager()
+
+    def get_pending_manager_invitations(self):
+        return self.teaminvitation_set.filter(status='OPENED', user__isnull=False)
 
     def has_object_read_permission(self, request):
         return request.user in self.league.members.all()
 
     def has_object_write_permission(self, request):
-        return LeagueMembership.objects.filter(user=request.user, team=self).count() > 0
+        return LeagueMembership.objects.filter(user=request.user, team=self, is_team_captain=True).count() > 0
 
     def __str__(self):
         return self.name
@@ -170,7 +184,6 @@ class BankAccountHistory(models.Model):
 
 
 class LeagueInstanceManager(models.Manager):
-
     def get_current(self, league):
         return self.filter(league=league, current=True).first()
 

@@ -23,8 +23,7 @@ class SaisonManager(models.Manager):
         instance_update = dateutil.parser.parse(statnuts_instance['updated_at'])
         if force_import or saison.derniere_maj is None or instance_update > saison.derniere_maj:
             for step in statnuts_instance['steps']:
-                Journee.objects.import_from_statnuts(saison, sn_client.get_step(step['uuid']), sn_client,
-                                                     force_import=force_import)
+                Journee.objects.import_from_statnuts(saison, sn_client.get_step(step['uuid']), sn_client)
         saison.derniere_maj = instance_update
         saison.save()
 
@@ -119,6 +118,7 @@ class ClubManager(models.Manager):
 class Club(Importe):
     SVG_TEMPLATES = (('jersey-plain2', 'uni'),
                      ('jersey-stripes-v2', 'rayures verticales'),
+                     ('jersey-sleeves2', 'manches'),
                      ('jersey-diag-half-white2.svg', 'moitié diagonale blanche'),
                      ('jersey-scap2', 'scapulaire'), ('jersey-shoulders2', 'épaules'),
                      ('jersey-halfdark2', 'moitié assombrie'), ('jersey-stripe-center2', 'bande centrale'),

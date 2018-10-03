@@ -1,0 +1,16 @@
+{% extends 'userena/base_userena.html' %}
+{% load i18n %}
+
+{% block title %}{% blocktrans with profile.user.username as username %}{{ username }}'s profile.{% endblocktrans %}{% endblock %}
+{% block content_title %}{{ profile.user.username }} {% endblock %}
+
+{% block content %}
+  <div class="white-box">
+    {% include "./profile_nav.html" %}
+
+    <div id="details">
+      {% block profile_details %}
+      {% endblock %}
+    </div>
+  </div>
+{% endblock %}

@@ -1,5 +1,6 @@
 from zinnia.views.channels import EntryChannel
 from zinnia.models.entry import Entry
+from django.views.generic import TemplateView
 
 # Create your views here.
 
@@ -15,3 +16,8 @@ class LeagueEntryDetail(EntryChannel):
                 return Entry.published.filter(league__isnull=True)
         else:
             return Entry.published.filter(league__isnull=True)
+
+
+class LandingPageView(TemplateView):
+
+    template_name = 'game/landing.html'
