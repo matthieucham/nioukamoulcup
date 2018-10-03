@@ -7,6 +7,7 @@ import { SaleCardComponent } from "./SaleCard";
 import KeyValueBox from "../KeyValueBox";
 import PlayerPicker from "./PlayerPicker";
 import CSRFToken from "../csrftoken";
+import { FormControl, InputLabel } from "@material-ui/core";
 
 class CurrentSale extends React.Component {
   render() {
@@ -133,8 +134,20 @@ export class CurrentMerkatoBid extends React.Component {
           {merkato.permissions.pa.can && (
             <form action="/game/league/1/merkato/pa/" method="POST">
               <CSRFToken />
-              <label>Joueur : </label>
-              <PlayerPicker />
+              <FormControl>
+                <PlayerPicker id="paPlayerPicker" />
+              </FormControl>
+              <TextField
+                label="Montant"
+                id="paPlayerAmount"
+                defaultValue={0.1}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">Ka</InputAdornment>
+                  )
+                }}
+                style={{ marginLeft: "24px", paddingRight: "24px", width: 80 }}
+              />
               <Button type="submit" color="primary" variant="contained">
                 Poster
               </Button>
