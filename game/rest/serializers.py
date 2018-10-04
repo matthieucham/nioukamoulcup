@@ -663,6 +663,13 @@ class OpenMerkatoSessionSerializer(MerkatoSessionSummarySerializer):
 class CurrentMerkatoSerializer(serializers.ModelSerializer):
     sessions = serializers.SerializerMethodField()
     permissions = serializers.SerializerMethodField()
+    account_balance = serializers.SerializerMethodField()
+
+    def get_account_balance(self, obj):
+        try:
+            return self.context.get('team').bank_account.balance
+        except league_models.BankAccount.DoesNotExist:
+            return None
 
     def get_sessions(self, obj):
         ordered_sessions = transfer_models.MerkatoSession.objects.filter(merkato=obj, is_solved=False,
@@ -694,4 +701,5 @@ class CurrentMerkatoSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = transfer_models.Merkato
-        fields = ('begin', 'end', 'mode', 'configuration', 'league_instance', 'sessions', 'permissions')
+        fields = (
+        'begin', 'end', 'mode', 'configuration', 'league_instance', 'account_balance', 'sessions', 'permissions',)

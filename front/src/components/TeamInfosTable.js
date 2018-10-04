@@ -80,6 +80,9 @@ class TeamInfosTable extends Component {
   }
 
   _countMissingRecrues(team) {
+    if (! team["attributes"]["formation"]) {
+      return "-";
+    }
     let miss = 0;
     ["G", "D", "M", "A"].forEach(pos => {
       miss += Math.max(

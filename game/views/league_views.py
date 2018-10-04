@@ -1,4 +1,5 @@
 from django.views.generic import DetailView, FormView
+from django.shortcuts import reverse
 from rules.contrib.views import PermissionRequiredMixin
 from game.models import League, LeagueInstance, LeagueInstancePhase, LeagueInstancePhaseDay, LeagueMembership, Team, \
     MerkatoSession, Merkato
@@ -118,9 +119,12 @@ class LeagueMerkatoView(BaseMerkatoSessionsListView):
         return context
 
 
-class LeagueRegisterPAView(FormView):
+class LeagueRegisterPAView(BaseLeagueView, FormView):
     template_name = 'game/league/merkato.html'
     form_class = RegisterPaForm
+
+    def get_success_url(self):
+        return reverse('league_merkato', kwargs={'pk': self.get_object().pk})
 
     def get_context_data(self, **kwargs):
         return super(LeagueMerkatoView, self).get_context_data(**kwargs)  # TODO

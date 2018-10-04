@@ -98,15 +98,6 @@ export class CurrentMerkatoBid extends React.Component {
       ROSTER_FULL: "Plus de place dans l'effectif",
       CURRENT_MV: "MV en cours"
     };
-
-    this.handleSubmit = this.handleSubmit.bind(this);
-  }
-
-  handleSubmit(event) {
-    event.preventDefault();
-    const data = new FormData(event.target);
-
-    console.log(data);
   }
 
   render() {
@@ -128,6 +119,10 @@ export class CurrentMerkatoBid extends React.Component {
             label="Durée enchères"
             value={merkato.configuration.session_duration + "h"}
           />
+          <KeyValueBox
+            label="Solde"
+            value={merkato.account_balance + " Ka"}
+          />
         </div>
         <section>
           <h2>Poster une PA</h2>
@@ -138,6 +133,7 @@ export class CurrentMerkatoBid extends React.Component {
                 <PlayerPicker id="paPlayerPicker" />
               </FormControl>
               <TextField
+                name="amount"
                 label="Montant"
                 id="paPlayerAmount"
                 defaultValue={0.1}

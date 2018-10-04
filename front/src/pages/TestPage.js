@@ -45,6 +45,7 @@ const MERKATO = {
     init_balance: 100
   },
   league_instance: 6,
+  account_balance: 56.4,
   sessions: [
     {
       url: "http://127.0.0.1:8001/game/rest/merkatosessions/220",
