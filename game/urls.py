@@ -23,7 +23,7 @@ league_urls = [
     url(r'^ekyp/(?P<team_pk>[0-9]+)$', LeagueEkypView.as_view(), name="league_team-detail"),
     url(r'^ranking/$', LeagueRankingView.as_view(), name="league_ranking-detail"),
     url(r'^merkato/$', LeagueMerkatoView.as_view(), name="league_merkato"),
-    url(r'^merkato/pa/$', LeagueRegisterPAView.as_view()),
+    url(r'^merkato/(?P<merkato_pk>[0-9]+)/pa$', LeagueRegisterPAView.as_view()),
     url(r'^merkatoresults/latest$', LeagueMerkatoResultsView.as_view(), name="league_merkatoresults-latest"),
     url(r'^merkatoresults/(?P<session_pk>[0-9]+)$', LeagueMerkatoResultsView.as_view(),
         name="league_merkatoresults-session"),

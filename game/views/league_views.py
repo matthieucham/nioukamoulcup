@@ -16,10 +16,10 @@ class BaseLeagueView(PermissionRequiredMixin, DetailView):
     component = 'test'
 
     def get_current_league_instance(self):
-        return LeagueInstance.objects.get_current(league=self.object)
+        return LeagueInstance.objects.get_current(league=self.get_object())
 
     def get_my_team(self):
-        return LeagueMembership.objects.get(user=self.request.user, league=self.object).team
+        return LeagueMembership.objects.get(user=self.request.user, league=self.get_object()).team
 
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get a context
@@ -119,9 +119,15 @@ class LeagueMerkatoView(BaseMerkatoSessionsListView):
         return context
 
 
-class LeagueRegisterPAView(BaseLeagueView, FormView):
+class LeagueRegisterPAView(FormView, BaseLeagueView):
     template_name = 'game/league/merkato.html'
     form_class = RegisterPaForm
+
+    def get_form_kwargs(self):
+        kw = super(LeagueRegisterPAView, self).get_form_kwargs()
+        kw['team'] = self.get_my_team()
+        kw['merkato'] = Merkato.objects.get(pk=self.kwargs['merkato_pk'])
+        return kw
 
     def get_success_url(self):
         return reverse('league_merkato', kwargs={'pk': self.get_object().pk})
@@ -130,4 +136,7 @@ class LeagueRegisterPAView(BaseLeagueView, FormView):
         return super(LeagueMerkatoView, self).get_context_data(**kwargs)  # TODO
 
     def form_valid(self, form):
+
+
+
         return super(LeagueRegisterPAView, self).form_valid(form)

@@ -7,7 +7,6 @@ import {
 } from "react-sortable-hoc";
 import PlayerPicker from "../components/sales/PlayerPicker";
 import {
-  OpenBidMerkatoSession,
   CurrentMerkatoBid
 } from "../components/sales/CurrentSales";
 

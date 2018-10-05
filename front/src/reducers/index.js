@@ -143,12 +143,18 @@ const merkatosession = combineReducers({
 	initial,
 })
 
+const merkatos = combineReducers({
+	initial,
+})
+
+
 const data = combineReducers({
 	players,
 	clubs,
 	team,
 	rankings,
 	merkatosession,
+	merkatos,
 })
 
 

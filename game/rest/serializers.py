@@ -614,23 +614,15 @@ class MerkatoSerializer(serializers.ModelSerializer):
         fields = ('begin', 'end', 'mode', 'configuration', 'league_instance', 'sessions',)
 
 
-class PlayerMerkatoSerializer(PlayerHdrSerializer):
+class BasePlayerForPickerSerializer(PlayerHdrSerializer):
     current_signing = serializers.SerializerMethodField()
     current_sale = serializers.SerializerMethodField()
 
     def get_current_signing(self, obj):
-        signing = self.context.get('signings_map').get(obj.id) or None
-        if signing is not None:
-            return {'team': signing}
-        else:
-            return None
+        raise NotImplementedError('Override me')
 
     def get_current_sale(self, obj):
-        sale = self.context.get('sales_map').get(obj.id) or None
-        if sale is not None:
-            return {'team': sale}
-        else:
-            return None
+        raise NotImplementedError('Override me')
 
     class Meta:
         model = l1models.Joueur
@@ -646,6 +638,42 @@ class PlayerMerkatoSerializer(PlayerHdrSerializer):
             'current_signing',
             'current_sale',
         )
+
+
+class PlayerMerkatoSerializer(BasePlayerForPickerSerializer):
+
+    def get_current_signing(self, obj):
+        signing = self.context.get('signings_map').get(obj.id) or None
+        if signing is not None:
+            return {'team': signing}
+        else:
+            return None
+
+    def get_current_sale(self, obj):
+        sale = self.context.get('sales_map').get(obj.id) or None
+        if sale is not None:
+            return {'team': sale}
+        else:
+            return None
+
+    class Meta(BasePlayerForPickerSerializer.Meta):
+        pass
+
+
+class PlayerForMVSerializer(BasePlayerForPickerSerializer):
+
+    def get_current_signing(self, obj):
+        return None
+
+    def get_current_sale(self, obj):
+        sale = self.context.get('sales_map').get(obj.id) or None
+        if sale is not None:
+            return {'team': sale}
+        else:
+            return None
+
+    class Meta(BasePlayerForPickerSerializer.Meta):
+        pass
 
 
 class OpenMerkatoSessionSerializer(MerkatoSessionSummarySerializer):
@@ -702,4 +730,12 @@ class CurrentMerkatoSerializer(serializers.ModelSerializer):
     class Meta:
         model = transfer_models.Merkato
         fields = (
-        'begin', 'end', 'mode', 'configuration', 'league_instance', 'account_balance', 'sessions', 'permissions',)
+            'id',
+            'begin',
+            'end',
+            'mode',
+            'configuration',
+            'league_instance',
+            'account_balance',
+            'sessions',
+            'permissions',)

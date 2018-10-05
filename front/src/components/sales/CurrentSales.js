@@ -8,6 +8,7 @@ import KeyValueBox from "../KeyValueBox";
 import PlayerPicker from "./PlayerPicker";
 import CSRFToken from "../csrftoken";
 import { FormControl, InputLabel } from "@material-ui/core";
+import { LEAGUE_ID } from "../../build";
 
 class CurrentSale extends React.Component {
   render() {
@@ -49,7 +50,7 @@ class CurrentSale extends React.Component {
   }
 }
 
-export class OpenBidMerkatoSession extends React.Component {
+class OpenBidMerkatoSession extends React.Component {
   constructor(props) {
     super(props);
   }
@@ -119,18 +120,21 @@ export class CurrentMerkatoBid extends React.Component {
             label="Durée enchères"
             value={merkato.configuration.session_duration + "h"}
           />
-          <KeyValueBox
-            label="Solde"
-            value={merkato.account_balance + " Ka"}
-          />
+          <KeyValueBox label="Solde" value={merkato.account_balance + " Ka"} />
         </div>
         <section>
           <h2>Poster une PA</h2>
           {merkato.permissions.pa.can && (
-            <form action="/game/league/1/merkato/pa/" method="POST">
+            <form
+              action={`/game/league/${LEAGUE_ID}/merkato/${merkato.id}/pa`}
+              method="POST"
+            >
               <CSRFToken />
               <FormControl>
-                <PlayerPicker id="paPlayerPicker" />
+                <PlayerPicker
+                  id="paPlayerPicker"
+                  playersResource="playersformerkato"
+                />
               </FormControl>
               <TextField
                 name="amount"
@@ -158,6 +162,50 @@ export class CurrentMerkatoBid extends React.Component {
             </p>
           )}
         </section>
+        <section>
+          <h2>Poster une MV</h2>
+          {merkato.permissions.mv.can && (
+            <form
+              action={`/game/league/${LEAGUE_ID}/merkato/${merkato.id}/mv`}
+              method="POST"
+            >
+              <CSRFToken />
+              <FormControl>
+                <PlayerPicker
+                  id="mvPlayerPicker"
+                  playersResource="playersformv"
+                />
+              </FormControl>
+              <TextField
+                name="amount"
+                label="Montant"
+                id="mvPlayerAmount"
+                defaultValue={0.1}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">Ka</InputAdornment>
+                  )
+                }}
+                style={{ marginLeft: "24px", paddingRight: "24px", width: 80 }}
+              />
+              <Button type="submit" color="primary" variant="contained">
+                Poster
+              </Button>
+            </form>
+          )}
+          {!merkato.permissions.pa.can && (
+            <p>
+              <span className="lost">
+                <i className="fa fa fa-exclamation-triangle" />
+              </span>{" "}
+              {this.reasonMap[merkato.permissions.pa.reason]}
+            </p>
+          )}
+        </section>
+        {merkato.sessions &&
+          merkato.sessions.map((session, index) => (
+            <OpenBidMerkatoSession session={session} key={`session_${index}`} />
+          ))}
       </section>
     );
   }

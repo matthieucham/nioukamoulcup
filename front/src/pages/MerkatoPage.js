@@ -1,22 +1,30 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux'
-import { SolvedMerkatoSession } from '../components/sales/MerkatoSession';
+import {
+	CurrentMerkatoBid
+  } from "../components/sales/CurrentSales";
 
 const mapStateToProps = state => {
 	return {
-		merkatosession: state.data.merkatosession.initial,
+		merkatos: state.data.merkatos.initial,
 	}
 }
 
 
-const Page = ({ merkatosession }) => {
-
+const Page = ({ merkatos }) => {
+		const merkatosComp = merkatos.map((element, index) => {
+			if (element.mode == 'BID') {
+				return <CurrentMerkatoBid merkato={element} key={`merkato_${index}`} />
+			} else {
+				// TODO DRAFT
+				return <div />
+			}
+		});
 		return (
 			<div className="react-app-inner">
 			<main>
 				<article id="home-main">
-				
-					<SolvedMerkatoSession session={merkatosession} />
+					{ merkatosComp }
 				</article>
 			</main>
 			</div>

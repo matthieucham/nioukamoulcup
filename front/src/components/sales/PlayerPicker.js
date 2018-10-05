@@ -18,10 +18,11 @@ class PlayersListDialog extends React.Component {
   };
 
   render() {
-    const { open } = this.props;
+    const { open, playersResource } = this.props;
     const ConnectedFilteredPlayersList = connect(state => {
       return {
         clubs: state.data.clubs.flat,
+        playersResource: playersResource,
         onPlayerPicked: this.handlePlayerPicked
       };
     })(FilteredPlayersList);
@@ -93,6 +94,7 @@ class PlayerPicker extends React.Component {
           open={this.state.open}
           onClose={this.handleClose}
           pickedPlayer={this.state.picked}
+          playersResource={this.props.playersResource}
         />
         <input
           id="picked_id_field"

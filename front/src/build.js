@@ -60,6 +60,9 @@ const initialState = {
 		},
 		merkatosession: {
 			initial: normalizedData.result.merkatosession
+		},
+		merkatos: {
+			initial: normalizedData.result.merkatos
 		}
 	},
 };

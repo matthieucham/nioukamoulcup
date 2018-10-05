@@ -606,6 +606,10 @@ dl.kvgroup {
     padding-left: 8px;
 }
 
+#home-main section form {
+    padding: 5px 5px;
+}
+
 #section-title {
     display: flex;
     flex: 1;

@@ -22,7 +22,7 @@ class StateInitializerMixin:
             'clubs': list(),
             'players': list(),
             'team': None,
-            'apiroot': reverse('api-root', request=request)
+            'apiroot': reverse('api-root', request=request),
         }
         clubs_serializer = serializers.ClubSerializer(
             l1models.Club.objects.filter(participations__est_courante__isnull=False), many=True,
@@ -70,6 +70,7 @@ class StateInitializerMixin:
     @timed
     def init_current_merkatos(self, request, team, merkatos):
         self._init_common(request)
+        self.initial_state.update({'league_id': team.league.pk})
         merkato_serializer = serializers.CurrentMerkatoSerializer(merkatos, many=True,
                                                                   context={'request': request, 'team': team})
         self.initial_state.update({'merkatos': self._to_json(merkato_serializer)})

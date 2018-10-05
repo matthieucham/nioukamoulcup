@@ -189,6 +189,45 @@ class PlayersForMerkatoView(CurrentLeagueInstanceMixin, generics.ListAPIView):
         return base_context
 
 
+class PlayersForMVView(CurrentLeagueInstanceMixin, generics.ListAPIView):
+    permission_classes = (DRYObjectPermissions,)
+    serializer_class = serializers.PlayerForMVSerializer
+    pagination_class = PageNumberPagination
+    filter_backends = (DjangoFilterBackend, SearchFilter,)
+    filter_fields = {
+        'poste': ['exact'],
+        'club': ['exact', 'isnull']
+    }
+    search_fields = ('nom', 'surnom', '=prenom',)
+
+    @timed
+    def get_queryset(self):
+        # limit to players which :
+        # - are current signings of the team
+        # order by club then name
+        instance = self._get_current_league_instance(self.kwargs['league_pk'])
+        team = league_models.Team.objects.get(league=self.kwargs['league_pk'], managers__user=self.request.user)
+        qs = (
+            l1models.Joueur.objects.filter(signing__team=team, signing__begin__lt=now(), signing__end__isnull=True,
+                                           signing__league_instance=instance)
+        ).distinct().order_by('club__nom', 'nom')
+        return qs
+
+    @timed
+    def get_serializer_context(self):
+        base_context = super(PlayersForMVView, self).get_serializer_context()
+        league_pk = self.kwargs['league_pk']
+        user = base_context.get('request').user
+        team = league_models.LeagueMembership.objects.filter(user=user, league=league_pk).first().team
+        base_context['sales_map'] = dict(
+            transfer_models.Sale.objects.filter(merkato_session__is_solved=False)
+                .filter(team__division=team.division,
+                        merkato_session__merkato__league_instance=self._get_current_league_instance(
+                            league_pk)).select_related(
+                'team').values_list('player_id', 'team__name'))
+        return base_context
+
+
 class CurrentMerkatoView(CurrentLeagueInstanceMixin, generics.ListAPIView):
     permission_classes = (DRYObjectPermissions,)
     serializer_class = serializers.CurrentMerkatoSerializer
