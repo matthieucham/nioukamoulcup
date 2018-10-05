@@ -1,6 +1,7 @@
 from django import forms
 from game.services import auctions
 from decimal import Decimal
+from ligue1.models import Joueur
 
 
 class RegisterPaForm(forms.Form):
@@ -23,4 +24,8 @@ class RegisterPaForm(forms.Form):
             raise forms.ValidationError('Impossible de déposer une PA', code='forbidden')
 
     def clean_picked_id(self):
-        pass  # TODO verify player available : regarder des les Signings et les Sale
+        joueur = Joueur.objects.get(pk=self.cleaned_data.get('picked_id'))
+        try:
+            assert auctions.available_for_pa(joueur, self.team.division, self.merkato.league_instance)
+        except AssertionError:
+            raise forms.ValidationError('Ce joueur ne peut plus être sélectionné', code="invalid")

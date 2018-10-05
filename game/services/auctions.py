@@ -191,3 +191,14 @@ def can_register_mv(team, merkato):
     if current_mv_count >= merkato.configuration.get('mv_number'):
         return False, 'CURRENT_MV'
     return True, None
+
+
+def available_for_pa(joueur, division, instance):
+    c1 = league_models.Signing.objects.filter(team__division=division,
+                                              end__isnull=True,
+                                              league_instance=instance,
+                                              joueur=joueur).count()
+    c2 = transfer_models.Sale.objects.filter(merkato_session__is_solved=False).filter(team__division=division,
+                                                                                      merkato_session__merkato__league_instance=instance,
+                                                                                      joueur=joueur).count()
+    return c1 + c2 == 0
