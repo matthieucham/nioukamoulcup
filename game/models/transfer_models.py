@@ -284,3 +284,32 @@ class Release(models.Model):
     done = models.BooleanField(default=False)
 
     objects = ReleaseManager()
+
+
+class DraftSession(models.Model):
+    merkato = models.ForeignKey(Merkato, on_delete=models.CASCADE)
+    division = models.ForeignKey(league_models.LeagueDivision, on_delete=models.CASCADE)
+    number = models.PositiveIntegerField(blank=False)
+    closing = models.DateTimeField(blank=False)
+    is_solved = models.BooleanField(null=False, default=False)
+    attributes = JSONField(null=True)
+    teams = models.ManyToManyField(league_models.Team, through=DraftSessionRank)
+
+
+class DraftSessionRank(models.Model):
+    draft_session = models.ForeignKey(DraftSession, on_delete=models.CASCADE)
+    rank = models.PositiveIntegerField(blank=False)
+    team = models.ForeignKey(league_models.Team, on_delete=models.PROTECT)
+
+    class Meta:
+        unique_together = ('draft_session', 'rank', 'team')
+
+
+class DraftPick(models.Model):
+    pick_order = models.PositiveIntegerField(blank=False)
+    player = models.ForeignKey(l1models.Joueur, on_delete=models.PROTECT)
+    draft_session_rank = models.ForeignKey(DraftSessionRank, on_delete=models.CASCADE, related_name='picks')
+
+    class Meta:
+        unique_together = ('pick_order', 'player', 'draft_session_rank')
+
