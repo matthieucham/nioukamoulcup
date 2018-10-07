@@ -300,6 +300,7 @@ class DraftSessionRank(models.Model):
     draft_session = models.ForeignKey(DraftSession, on_delete=models.CASCADE)
     rank = models.PositiveIntegerField(blank=False)
     team = models.ForeignKey(league_models.Team, on_delete=models.PROTECT)
+    signing = models.ForeignKey(league_models.Signing, null=True, on_delete=models.CASCADE)
 
     class Meta:
         unique_together = ('draft_session', 'rank', 'team')
