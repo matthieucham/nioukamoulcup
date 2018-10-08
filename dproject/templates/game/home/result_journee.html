@@ -3,6 +3,8 @@
 {% load l1results %}
 {% load humanize %}
 
+{% block title-page %}Résultats {{ object }}{% endblock title-page %}
+
 {% block content-right %}
     <section>
         <h1>{{ object.saison }}</h1>

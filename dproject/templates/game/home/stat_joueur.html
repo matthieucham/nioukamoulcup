@@ -17,6 +17,8 @@
     {#    </script>#}
 {% endblock script %}
 
+{% block title-page %}{{ joueur.display_name }}{% endblock title-page %}
+
 {% block content-right %}
     {% joueurs_club joueur.club %}
 {% endblock content-right %}

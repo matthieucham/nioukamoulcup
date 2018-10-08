@@ -6,6 +6,7 @@ from django.utils import timezone
 
 from utils import locked_atomic_transaction
 from game.models import transfer_models, league_models
+from ligue1.models import Joueur
 
 
 class SaleSolvingException(Exception):
@@ -238,8 +239,13 @@ def available_for_pa(joueur, division, instance):
     c1 = league_models.Signing.objects.filter(team__division=division,
                                               end__isnull=True,
                                               league_instance=instance,
-                                              joueur=joueur).count()
+                                              player=joueur).count()
     c2 = transfer_models.Sale.objects.filter(merkato_session__is_solved=False).filter(team__division=division,
                                                                                       merkato_session__merkato__league_instance=instance,
-                                                                                      joueur=joueur).count()
+                                                                                      player=joueur).count()
     return c1 + c2 == 0
+
+
+def available_for_mv(joueur, team, instance):
+    return Joueur.objects.filter(signing__team=team, signing__begin__lt=timezone.now(), signing__end__isnull=True,
+                                 signing__league_instance=instance).filter(pk=joueur.pk).count() == 1

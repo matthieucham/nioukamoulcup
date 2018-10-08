@@ -593,9 +593,9 @@ dl.kvgroup {
     padding: 10px 0;
 }
 
-#home-main p {
+/*#home-main p {
     padding: 0 10px;
-}
+}*/
 
 #home-main h2 {
     background-color: rgba(0, 0, 0, 0.5);
@@ -885,6 +885,12 @@ dl.kvgroup {
 
 div.opensales-container {
     display: flex;
+    padding: 5px;
+}
+
+div.submit-merkato-container {
+    padding: 1em;
+    text-align: center;
 }
 
 /****************************************************************/
@@ -1055,4 +1061,5 @@ aside.entry-widgets {
 .explanation {
     font-size: 0.8em;
     color: color: rgba(0, 0, 0, 0.54);
+    padding: 5px;
 }

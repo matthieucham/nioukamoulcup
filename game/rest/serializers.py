@@ -538,15 +538,24 @@ class SaleSummarySerializer(serializers.ModelSerializer):
 
 class SaleSummaryWithMyAuctionSerializer(SaleSummarySerializer):
     my_auction = serializers.SerializerMethodField()
+    created_by_me = serializers.SerializerMethodField()
 
     def get_my_auction(self, obj):
         if 'request' in self.context:
             mb = league_models.LeagueMembership.objects.get(user=self.context['request'].user)
-            return transfer_models.Auction.objects.filter(sale=obj, team=mb.team).first()
+            try:
+                return transfer_models.Auction.objects.get(sale=obj, team=mb.team).value
+            except transfer_models.Auction.DoesNotExist:
+                return None
+        return None
+
+    def get_created_by_me(self, obj):
+        if 'team' in self.context:
+            return obj.team.pk == self.context.get('team').pk
         return None
 
     class Meta(SaleSummarySerializer.Meta):
-        fields = SaleSummarySerializer.Meta.fields + ('my_auction',)
+        fields = SaleSummarySerializer.Meta.fields + ('my_auction', 'created_by_me',)
 
 
 class SaleSerializer(SaleSummarySerializer):

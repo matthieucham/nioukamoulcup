@@ -14,16 +14,19 @@ class CurrentSale extends React.Component {
   render() {
     const { sale, enabled, onChange } = this.props;
     var extraHeader = null;
-    if (enabled) {
+    const can_put_auction =
+      enabled && !(sale.created_by_me && sale.type == "MV");
+    if (can_put_auction) {
       extraHeader = (
         <TextField
           label="Offre"
-          defaultValue={!!sale.my_auction ? sale.my_auction.value : ""}
+          defaultValue={!!sale.my_auction ? sale.my_auction : ""}
           InputProps={{
             endAdornment: <InputAdornment position="end">Ka</InputAdornment>
           }}
           style={{ marginLeft: "24px", paddingRight: "24px", width: 80 }}
           onChange={onChange}
+          name={`_offer_for_sale__${sale.id}`}
         />
       );
     } else {
@@ -56,9 +59,13 @@ class OpenBidMerkatoSession extends React.Component {
   }
 
   render() {
-    const { session } = this.props;
+    const { session, permission } = this.props;
     const sales = session.sales.map(sale => (
-      <CurrentSale sale={sale} enabled={false} />
+      <CurrentSale
+        key={`sale_${session.number}_${sale.id}`}
+        sale={sale}
+        enabled={permission.can}
+      />
     ));
     return (
       <div>
@@ -154,12 +161,12 @@ export class CurrentMerkatoBid extends React.Component {
             </form>
           )}
           {!merkato.permissions.pa.can && (
-            <p>
+            <div className="explanation">
               <span className="lost">
                 <i className="fa fa fa-exclamation-triangle" />
               </span>{" "}
               {this.reasonMap[merkato.permissions.pa.reason]}
-            </p>
+            </div>
           )}
         </section>
         <section>
@@ -193,19 +200,53 @@ export class CurrentMerkatoBid extends React.Component {
               </Button>
             </form>
           )}
-          {!merkato.permissions.pa.can && (
-            <p>
+          {!merkato.permissions.mv.can && (
+            <div className="explanation">
               <span className="lost">
                 <i className="fa fa fa-exclamation-triangle" />
               </span>{" "}
-              {this.reasonMap[merkato.permissions.pa.reason]}
-            </p>
+              {this.reasonMap[merkato.permissions.mv.reason]}
+            </div>
           )}
         </section>
-        {merkato.sessions &&
-          merkato.sessions.map((session, index) => (
-            <OpenBidMerkatoSession session={session} key={`session_${index}`} />
-          ))}
+        {merkato.sessions && (
+          <section>
+            <h2>Enchères</h2>
+            <form
+              action={`/game/league/${LEAGUE_ID}/merkato/${merkato.id}/`}
+              method="POST"
+            >
+              {!merkato.permissions.auctions.can && (
+                <div className="explanation">
+                  <span className="lost">
+                    <i className="fa fa fa-exclamation-triangle" />
+                  </span>{" "}
+                  Vous ne pouvez pas envoyer d'enchères, car vous n'avez pas
+                  encore posté suffisamment de PA. Pour pouvoir enchérir, vous
+                  devez d'abord poster une PA
+                </div>
+              )}
+              <CSRFToken />
+              {merkato.sessions.map((session, index) => (
+                <OpenBidMerkatoSession
+                  session={session}
+                  key={`session_${index}`}
+                  permission={merkato.permissions.auctions}
+                />
+              ))}
+              <div className="submit-merkato-container">
+                <Button
+                  type="submit"
+                  color="primary"
+                  variant="contained"
+                  disabled={!merkato.permissions.auctions.can}
+                >
+                  Poster les offres
+                </Button>
+              </div>
+            </form>
+          </section>
+        )}
       </section>
     );
   }
