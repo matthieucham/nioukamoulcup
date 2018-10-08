@@ -697,8 +697,25 @@ class OpenMerkatoSessionSerializer(MerkatoSessionSummarySerializer):
         fields = MerkatoSessionSummarySerializer.Meta.fields + ('sales',)
 
 
+class OpenDraftSessionSerializer(serializers.HyperlinkedModelSerializer):
+    my_rank = serializers.SerializerMethodField()
+
+    def get_my_rank(self, obj):
+        if 'team' in self.context:
+            try:
+                return obj.draftsessionrank_set.get(team=self.context['team']).rank
+            except transfer_models.DraftSessionRank.DoesNotExist:
+                return None
+        return None
+
+    class Meta:
+        model = transfer_models.DraftSession
+        fields = ('id', 'number', 'closing', 'my_rank',)
+
+
 class CurrentMerkatoSerializer(serializers.ModelSerializer):
     sessions = serializers.SerializerMethodField()
+    draft_sessions = serializers.SerializerMethodField()
     permissions = serializers.SerializerMethodField()
     account_balance = serializers.SerializerMethodField()
 
@@ -713,6 +730,11 @@ class CurrentMerkatoSerializer(serializers.ModelSerializer):
                                                                          solving__gt=localtime(now())).annotate(
             num_sales=models.Count('sale')).filter(num_sales__gt=0).order_by('number')
         return OpenMerkatoSessionSerializer(ordered_sessions, many=True, read_only=True, context=self.context).data
+
+    def get_draft_sessions(self, obj):
+        ordered_sessions = transfer_models.DraftSession.objects.filter(merkato=obj, is_solved=False,
+                                                                       closing__gt=localtime(now())).order_by('number')
+        return OpenDraftSessionSerializer(ordered_sessions, many=True, read_only=True, context=self.context).data
 
     def get_permissions(self, obj):
         auc, auc_reason = auctions.can_register_auction(self.context.get('team'), obj)
@@ -747,4 +769,5 @@ class CurrentMerkatoSerializer(serializers.ModelSerializer):
             'league_instance',
             'account_balance',
             'sessions',
+            'draft_sessions',
             'permissions',)

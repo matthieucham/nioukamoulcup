@@ -291,7 +291,7 @@ class DraftSession(models.Model):
     number = models.PositiveIntegerField(blank=False)
     closing = models.DateTimeField(blank=False)
     is_solved = models.BooleanField(null=False, default=False)
-    attributes = JSONField(null=True)
+    attributes = JSONField(null=True, blank=True)
     teams = models.ManyToManyField(league_models.Team, through='DraftSessionRank')
 
 
