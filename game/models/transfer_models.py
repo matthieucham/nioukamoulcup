@@ -288,12 +288,11 @@ class Release(models.Model):
 
 class DraftSession(models.Model):
     merkato = models.ForeignKey(Merkato, on_delete=models.CASCADE)
-    division = models.ForeignKey(league_models.LeagueDivision, on_delete=models.CASCADE)
     number = models.PositiveIntegerField(blank=False)
     closing = models.DateTimeField(blank=False)
     is_solved = models.BooleanField(null=False, default=False)
     attributes = JSONField(null=True)
-    teams = models.ManyToManyField(league_models.Team, through=DraftSessionRank)
+    teams = models.ManyToManyField(league_models.Team, through='DraftSessionRank')
 
 
 class DraftSessionRank(models.Model):

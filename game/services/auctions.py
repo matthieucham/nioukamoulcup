@@ -157,7 +157,7 @@ def solve_draft_pick(draft_session_rank, already_picked_players):
 def _do_draft_signing(draft_pick):
     signing = league_models.Signing.objects.create(
         player=draft_pick.player,
-        team=draft_pick.team,
+        team=draft_pick.draft_session_rank.team,
         league_instance=draft_pick.draft_session_rank.draft_session.merkato.league_instance,
         attributes=_make_draft_signing_attr(draft_pick)
     )
