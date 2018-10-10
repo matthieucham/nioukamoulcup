@@ -38,7 +38,12 @@
             {% endif %}
             <dl class='kvgroup'>
                 <dd>Club</dd>
-                <dt><a href="{% url 'club-detail' joueur.club.pk %}">{{ joueur.club.nom }}</a></dt>
+                <dt>
+                    {% if joueur.club %}
+                        <a href="{% url 'club-detail' joueur.club.pk %}">{{ joueur.club.nom }}</a></dt>
+                    {% else %}
+                        -
+                    {% endif %}
             </dl>
             {% trans joueur.poste as poste %}
             {% keyvalue 'Poste' poste %}

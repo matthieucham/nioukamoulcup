@@ -27,9 +27,12 @@ class SaisonScoring(models.Model):
                 js.delete()
             else:
                 journees_to_recompute.append(j)
+        output_js = []
         for journee in journees_to_recompute:
-            JourneeScoring.objects.select_related('journee').create(journee=journee, saison_scoring=self)
+            output_js.append(
+                JourneeScoring.objects.select_related('journee').create(journee=journee, saison_scoring=self))
         SJScore.objects.create_sjscore_from_ligue1(self)
+        return output_js
 
 
 class JourneeScoring(models.Model):
