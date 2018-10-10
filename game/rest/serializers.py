@@ -538,15 +538,24 @@ class SaleSummarySerializer(serializers.ModelSerializer):
 
 class SaleSummaryWithMyAuctionSerializer(SaleSummarySerializer):
     my_auction = serializers.SerializerMethodField()
+    created_by_me = serializers.SerializerMethodField()
 
     def get_my_auction(self, obj):
         if 'request' in self.context:
             mb = league_models.LeagueMembership.objects.get(user=self.context['request'].user)
-            return transfer_models.Auction.objects.filter(sale=obj, team=mb.team).first()
+            try:
+                return transfer_models.Auction.objects.get(sale=obj, team=mb.team).value
+            except transfer_models.Auction.DoesNotExist:
+                return None
+        return None
+
+    def get_created_by_me(self, obj):
+        if 'team' in self.context:
+            return obj.team.pk == self.context.get('team').pk
         return None
 
     class Meta(SaleSummarySerializer.Meta):
-        fields = SaleSummarySerializer.Meta.fields + ('my_auction',)
+        fields = SaleSummarySerializer.Meta.fields + ('my_auction', 'created_by_me',)
 
 
 class SaleSerializer(SaleSummarySerializer):
@@ -614,23 +623,15 @@ class MerkatoSerializer(serializers.ModelSerializer):
         fields = ('begin', 'end', 'mode', 'configuration', 'league_instance', 'sessions',)
 
 
-class PlayerMerkatoSerializer(PlayerHdrSerializer):
+class BasePlayerForPickerSerializer(PlayerHdrSerializer):
     current_signing = serializers.SerializerMethodField()
     current_sale = serializers.SerializerMethodField()
 
     def get_current_signing(self, obj):
-        signing = self.context.get('signings_map').get(obj.id) or None
-        if signing is not None:
-            return {'team': signing}
-        else:
-            return None
+        raise NotImplementedError('Override me')
 
     def get_current_sale(self, obj):
-        sale = self.context.get('sales_map').get(obj.id) or None
-        if sale is not None:
-            return {'team': sale}
-        else:
-            return None
+        raise NotImplementedError('Override me')
 
     class Meta:
         model = l1models.Joueur
@@ -648,6 +649,42 @@ class PlayerMerkatoSerializer(PlayerHdrSerializer):
         )
 
 
+class PlayerMerkatoSerializer(BasePlayerForPickerSerializer):
+
+    def get_current_signing(self, obj):
+        signing = self.context.get('signings_map').get(obj.id) or None
+        if signing is not None:
+            return {'team': signing}
+        else:
+            return None
+
+    def get_current_sale(self, obj):
+        sale = self.context.get('sales_map').get(obj.id) or None
+        if sale is not None:
+            return {'team': sale}
+        else:
+            return None
+
+    class Meta(BasePlayerForPickerSerializer.Meta):
+        pass
+
+
+class PlayerForMVSerializer(BasePlayerForPickerSerializer):
+
+    def get_current_signing(self, obj):
+        return None
+
+    def get_current_sale(self, obj):
+        sale = self.context.get('sales_map').get(obj.id) or None
+        if sale is not None:
+            return {'team': sale}
+        else:
+            return None
+
+    class Meta(BasePlayerForPickerSerializer.Meta):
+        pass
+
+
 class OpenMerkatoSessionSerializer(MerkatoSessionSummarySerializer):
     sales = serializers.SerializerMethodField()
 
@@ -660,15 +697,79 @@ class OpenMerkatoSessionSerializer(MerkatoSessionSummarySerializer):
         fields = MerkatoSessionSummarySerializer.Meta.fields + ('sales',)
 
 
+class DraftPickSerializer(serializers.ModelSerializer):
+    player = PlayerHdrSerializer(read_only=True)
+
+    class Meta:
+        model = transfer_models.DraftPick
+        fields = ('pick_order', 'player',)
+
+
+class DraftSessionRankSerializer(serializers.ModelSerializer):
+    picks = DraftPickSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = transfer_models.DraftSessionRank
+        fields = ('rank', 'picks',)
+
+
+class OpenDraftSessionSerializer(serializers.HyperlinkedModelSerializer):
+    my_rank = serializers.SerializerMethodField()
+
+    def get_my_rank(self, obj):
+        if 'team' in self.context:
+            try:
+                return DraftSessionRankSerializer(obj.draftsessionrank_set.get(team=self.context['team']), many=False,
+                                                  read_only=True, context={'request': self.context['request']}).data
+            except transfer_models.DraftSessionRank.DoesNotExist:
+                return None
+        return None
+
+    class Meta:
+        model = transfer_models.DraftSession
+        fields = ('id', 'number', 'closing', 'my_rank',)
+
+
+class DraftSessionRankSerializer(serializers.ModelSerializer):
+    team = TeamHdrSerializer(read_only=True)
+    signing = SigningSerializer(read_only=True)
+
+    class Meta:
+        model = transfer_models.DraftSessionRank
+        fields = ('rank', 'team', 'signing')
+
+
+class DraftSessionSerializer(serializers.ModelSerializer):
+    draftsessionrank_set = DraftSessionRankSerializer(read_only=True, many=True)
+
+    class Meta:
+        model = transfer_models.DraftSession
+        fields = (
+            'number', 'closing', 'is_solved', 'attributes', 'draftsessionrank_set',)
+
+
 class CurrentMerkatoSerializer(serializers.ModelSerializer):
     sessions = serializers.SerializerMethodField()
+    draft_sessions = serializers.SerializerMethodField()
     permissions = serializers.SerializerMethodField()
+    account_balance = serializers.SerializerMethodField()
+
+    def get_account_balance(self, obj):
+        try:
+            return self.context.get('team').bank_account.balance
+        except league_models.BankAccount.DoesNotExist:
+            return None
 
     def get_sessions(self, obj):
         ordered_sessions = transfer_models.MerkatoSession.objects.filter(merkato=obj, is_solved=False,
                                                                          solving__gt=localtime(now())).annotate(
             num_sales=models.Count('sale')).filter(num_sales__gt=0).order_by('number')
         return OpenMerkatoSessionSerializer(ordered_sessions, many=True, read_only=True, context=self.context).data
+
+    def get_draft_sessions(self, obj):
+        ordered_sessions = transfer_models.DraftSession.objects.filter(merkato=obj, is_solved=False,
+                                                                       closing__gt=localtime(now())).order_by('number')
+        return OpenDraftSessionSerializer(ordered_sessions, many=True, read_only=True, context=self.context).data
 
     def get_permissions(self, obj):
         auc, auc_reason = auctions.can_register_auction(self.context.get('team'), obj)
@@ -694,4 +795,14 @@ class CurrentMerkatoSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = transfer_models.Merkato
-        fields = ('begin', 'end', 'mode', 'configuration', 'league_instance', 'sessions', 'permissions')
+        fields = (
+            'id',
+            'begin',
+            'end',
+            'mode',
+            'configuration',
+            'league_instance',
+            'account_balance',
+            'sessions',
+            'draft_sessions',
+            'permissions',)

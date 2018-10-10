@@ -7,21 +7,26 @@ import { SaleCardComponent } from "./SaleCard";
 import KeyValueBox from "../KeyValueBox";
 import PlayerPicker from "./PlayerPicker";
 import CSRFToken from "../csrftoken";
+import { FormControl, InputLabel } from "@material-ui/core";
+import { LEAGUE_ID } from "../../build";
 
 class CurrentSale extends React.Component {
   render() {
     const { sale, enabled, onChange } = this.props;
     var extraHeader = null;
-    if (enabled) {
+    const can_put_auction =
+      enabled && !(sale.created_by_me && sale.type == "MV");
+    if (can_put_auction) {
       extraHeader = (
         <TextField
           label="Offre"
-          defaultValue={!!sale.my_auction ? sale.my_auction.value : ""}
+          defaultValue={!!sale.my_auction ? sale.my_auction : ""}
           InputProps={{
             endAdornment: <InputAdornment position="end">Ka</InputAdornment>
           }}
           style={{ marginLeft: "24px", paddingRight: "24px", width: 80 }}
           onChange={onChange}
+          name={`_offer_for_sale__${sale.id}`}
         />
       );
     } else {
@@ -48,15 +53,19 @@ class CurrentSale extends React.Component {
   }
 }
 
-export class OpenBidMerkatoSession extends React.Component {
+class OpenBidMerkatoSession extends React.Component {
   constructor(props) {
     super(props);
   }
 
   render() {
-    const { session } = this.props;
+    const { session, permission } = this.props;
     const sales = session.sales.map(sale => (
-      <CurrentSale sale={sale} enabled={false} />
+      <CurrentSale
+        key={`sale_${session.number}_${sale.id}`}
+        sale={sale}
+        enabled={permission.can}
+      />
     ));
     return (
       <div>
@@ -97,15 +106,6 @@ export class CurrentMerkatoBid extends React.Component {
       ROSTER_FULL: "Plus de place dans l'effectif",
       CURRENT_MV: "MV en cours"
     };
-
-    this.handleSubmit = this.handleSubmit.bind(this);
-  }
-
-  handleSubmit(event) {
-    event.preventDefault();
-    const data = new FormData(event.target);
-
-    console.log(data);
   }
 
   render() {
@@ -127,28 +127,126 @@ export class CurrentMerkatoBid extends React.Component {
             label="Durée enchères"
             value={merkato.configuration.session_duration + "h"}
           />
+          <KeyValueBox label="Solde" value={merkato.account_balance + " Ka"} />
         </div>
         <section>
           <h2>Poster une PA</h2>
           {merkato.permissions.pa.can && (
-            <form action="/game/league/1/merkato/pa/" method="POST">
+            <form
+              action={`/game/league/${LEAGUE_ID}/merkato/${merkato.id}/pa`}
+              method="POST"
+            >
               <CSRFToken />
-              <label>Joueur : </label>
-              <PlayerPicker />
+              <FormControl>
+                <PlayerPicker
+                  id="paPlayerPicker"
+                  playersResource="playersformerkato"
+                />
+              </FormControl>
+              <TextField
+                name="amount"
+                label="Montant"
+                id="paPlayerAmount"
+                defaultValue={0.1}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">Ka</InputAdornment>
+                  )
+                }}
+                style={{ marginLeft: "24px", paddingRight: "24px", width: 80 }}
+              />
               <Button type="submit" color="primary" variant="contained">
                 Poster
               </Button>
             </form>
           )}
           {!merkato.permissions.pa.can && (
-            <p>
+            <div className="explanation">
               <span className="lost">
                 <i className="fa fa fa-exclamation-triangle" />
               </span>{" "}
               {this.reasonMap[merkato.permissions.pa.reason]}
-            </p>
+            </div>
           )}
         </section>
+        <section>
+          <h2>Poster une MV</h2>
+          {merkato.permissions.mv.can && (
+            <form
+              action={`/game/league/${LEAGUE_ID}/merkato/${merkato.id}/mv`}
+              method="POST"
+            >
+              <CSRFToken />
+              <FormControl>
+                <PlayerPicker
+                  id="mvPlayerPicker"
+                  playersResource="playersformv"
+                />
+              </FormControl>
+              <TextField
+                name="amount"
+                label="Montant"
+                id="mvPlayerAmount"
+                defaultValue={0.1}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">Ka</InputAdornment>
+                  )
+                }}
+                style={{ marginLeft: "24px", paddingRight: "24px", width: 80 }}
+              />
+              <Button type="submit" color="primary" variant="contained">
+                Poster
+              </Button>
+            </form>
+          )}
+          {!merkato.permissions.mv.can && (
+            <div className="explanation">
+              <span className="lost">
+                <i className="fa fa fa-exclamation-triangle" />
+              </span>{" "}
+              {this.reasonMap[merkato.permissions.mv.reason]}
+            </div>
+          )}
+        </section>
+        {merkato.sessions && (
+          <section>
+            <h2>Enchères</h2>
+            <form
+              action={`/game/league/${LEAGUE_ID}/merkato/${merkato.id}/`}
+              method="POST"
+            >
+              {!merkato.permissions.auctions.can && (
+                <div className="explanation">
+                  <span className="lost">
+                    <i className="fa fa fa-exclamation-triangle" />
+                  </span>{" "}
+                  Vous ne pouvez pas envoyer d'enchères, car vous n'avez pas
+                  encore posté suffisamment de PA. Pour pouvoir enchérir, vous
+                  devez d'abord poster une PA
+                </div>
+              )}
+              <CSRFToken />
+              {merkato.sessions.map((session, index) => (
+                <OpenBidMerkatoSession
+                  session={session}
+                  key={`session_${index}`}
+                  permission={merkato.permissions.auctions}
+                />
+              ))}
+              <div className="submit-merkato-container">
+                <Button
+                  type="submit"
+                  color="primary"
+                  variant="contained"
+                  disabled={!merkato.permissions.auctions.can}
+                >
+                  Poster les offres
+                </Button>
+              </div>
+            </form>
+          </section>
+        )}
       </section>
     );
   }

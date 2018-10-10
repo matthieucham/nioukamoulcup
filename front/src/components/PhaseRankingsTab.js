@@ -116,24 +116,29 @@ export class PhaseRankingsTab extends Component {
         />
       </TabContent>
     );
+    const hasPhases = Array.isArray(phases) && phases.length;
     return (
       <section>
-        <h1 className="page-title">
-          Classements après la journée {phases[0].current_ranking.number}
-        </h1>
-        <Tabs
-          name="rankingTabs"
-          handleSelect={(selectedTab, namespace) => {
-            if (selectedTab == "ttab_players") {
-              onPlayersTab();
-            }
-            this.setState({ selectedTab: selectedTab });
-          }}
-          selectedTab={this.state.selectedTab}
-        >
-          {links}
-          {rankings}
-        </Tabs>
+        {hasPhases && (
+          <h1 className="page-title">
+            Classements après la journée {phases[0].current_ranking.number}
+          </h1>
+        )}
+        {hasPhases && (
+          <Tabs
+            name="rankingTabs"
+            handleSelect={(selectedTab, namespace) => {
+              if (selectedTab == "ttab_players") {
+                onPlayersTab();
+              }
+              this.setState({ selectedTab: selectedTab });
+            }}
+            selectedTab={this.state.selectedTab}
+          >
+            {links}
+            {rankings}
+          </Tabs>
+        )}
       </section>
     );
   }

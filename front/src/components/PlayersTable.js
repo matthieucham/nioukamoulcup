@@ -77,8 +77,6 @@ export class PlayersTable extends Component {
 
             <Column label="Pén. Obt." dataKey="HALFPASS" width={40} />
 
-            <Column label="Rempart" dataKey="MSTOPS" width={40} />
-
             <Column label="Pén. Arr." dataKey="PENALSTOP" width={40} />
 
             <Column label="Best" dataKey="LEADER" width={40} />

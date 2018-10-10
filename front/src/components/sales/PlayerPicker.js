@@ -18,10 +18,11 @@ class PlayersListDialog extends React.Component {
   };
 
   render() {
-    const { open } = this.props;
+    const { open, playersResource } = this.props;
     const ConnectedFilteredPlayersList = connect(state => {
       return {
         clubs: state.data.clubs.flat,
+        playersResource: playersResource,
         onPlayerPicked: this.handlePlayerPicked
       };
     })(FilteredPlayersList);
@@ -40,10 +41,9 @@ class PlayersListDialog extends React.Component {
 class PlayerPicker extends React.Component {
   constructor(props) {
     super(props);
-
     this.state = {
       open: false,
-      picked: null
+      picked: props.initialPickedPlayer
     };
   }
 
@@ -55,6 +55,9 @@ class PlayerPicker extends React.Component {
 
   handleClose = value => {
     this.setState({ picked: value, open: false });
+    if (this.props.onPlayerPicked && this.props.pickedOrder >= 0) {
+      this.props.onPlayerPicked(value, this.props.pickedOrder);
+    }
   };
 
   getDisplayedValue() {
@@ -93,6 +96,7 @@ class PlayerPicker extends React.Component {
           open={this.state.open}
           onClose={this.handleClose}
           pickedPlayer={this.state.picked}
+          playersResource={this.props.playersResource}
         />
         <input
           id="picked_id_field"

@@ -13,6 +13,7 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.utils import timezone
 from django.contrib import messages
+from game.services import auctions
 
 
 # Register your models here.
@@ -62,6 +63,27 @@ class MerkatoSessionInline(admin.TabularInline):
     extra = 0
 
 
+class DraftSessionRankInline(admin.TabularInline):
+    model = models.DraftSessionRank
+    fields = ['team', 'rank']
+
+
+class DraftSessionAdmin(admin.ModelAdmin):
+    model = models.DraftSession
+    list_display = ['merkato', 'number', 'closing', 'is_solved']
+    inlines = [DraftSessionRankInline, ]
+    actions = ['solve_draft_action', ]
+
+    def solve_draft_action(self, request, queryset):
+        for ds in queryset:
+            if ds.closing > timezone.now():
+                self.message_user(request, "C'est trop tôt !",
+                                  level=messages.ERROR)
+            else:
+                auctions.solve_draft_session(ds)
+        return HttpResponseRedirect(reverse('import_statnuts:game_draftsession_changelist'))
+
+
 class MerkatoAdmin(admin.ModelAdmin):
     model = models.Merkato
     list_display = ['begin', 'end', 'mode']
@@ -85,6 +107,7 @@ class MerkatoAdmin(admin.ModelAdmin):
 
 admin_import_site.register(models.SaisonScoring, SaisonScoringAdmin)
 admin_import_site.register(models.Merkato, MerkatoAdmin)
+admin_import_site.register(models.DraftSession, DraftSessionAdmin)
 
 
 class EntryLeagueAdmin(EntryAdminCKEditor):

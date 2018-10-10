@@ -4,6 +4,13 @@ import { connect } from "react-redux";
 import { fetchTeamScores } from "../actions";
 
 const JB = ({ team, journee, onPreviousClick, onNextClick }) => {
+  if (journee == null) {
+    return (
+      <div>
+        <h1>Pas encore de journée</h1>
+      </div>
+    );
+  }
   const previousClassName =
     journee && journee.is_first ? "navbutton disabled" : "navbutton";
   const nextClassName =
@@ -30,19 +37,26 @@ const JB = ({ team, journee, onPreviousClick, onNextClick }) => {
 };
 
 const mapDispatchToProps = (dispatch, ownProps) => {
-  const previousnum = ownProps.journee.is_first
-    ? ownProps.journee.numero
-    : ownProps.journee.numero - 1;
-  const nextnum = ownProps.journee.is_last
-    ? ownProps.journee.numero
-    : ownProps.journee.numero + 1;
+  if (ownProps.journee == null) {
+    return {
+      onPreviousClick: () => null,
+      onNextClick: () => null
+    };
+  } else {
+    const previousnum = ownProps.journee.is_first
+      ? ownProps.journee.numero
+      : ownProps.journee.numero - 1;
+    const nextnum = ownProps.journee.is_last
+      ? ownProps.journee.numero
+      : ownProps.journee.numero + 1;
 
-  return {
-    onPreviousClick: () =>
-      dispatch(fetchTeamScores(ownProps.team.initial.id, previousnum)),
-    onNextClick: () =>
-      dispatch(fetchTeamScores(ownProps.team.initial.id, nextnum))
-  };
+    return {
+      onPreviousClick: () =>
+        dispatch(fetchTeamScores(ownProps.team.initial.id, previousnum)),
+      onNextClick: () =>
+        dispatch(fetchTeamScores(ownProps.team.initial.id, nextnum))
+    };
+  }
 };
 
 export const JourneeBrowser = connect(

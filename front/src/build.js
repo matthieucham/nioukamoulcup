@@ -13,6 +13,7 @@ import { LeaguePage } from './pages/LeaguePage'
 import { TeamPage } from './pages/TeamPage'
 import { MerkatoPage } from './pages/MerkatoPage'
 import { MerkatoResultsPage } from './pages/MerkatoResultsPage'
+import { DraftResultsPage } from './pages/DraftResultsPage'
 
 // ========================================
 
@@ -32,6 +33,7 @@ const pages = {
     'team': TeamPage,
 	'merkato': MerkatoPage,
 	'merkatoresults': MerkatoResultsPage,
+	'draftresults': DraftResultsPage,
 };
 
 const preloadedStateSchema = { players: Schemas.PLAYER_ARRAY, clubs: Schemas.CLUB_ARRAY };
@@ -60,6 +62,12 @@ const initialState = {
 		},
 		merkatosession: {
 			initial: normalizedData.result.merkatosession
+		},
+		draftsession: {
+			initial: normalizedData.result.draftsession
+		},
+		merkatos: {
+			initial: normalizedData.result.merkatos
 		}
 	},
 };

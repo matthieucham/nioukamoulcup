@@ -53,25 +53,31 @@ export class SolvedMerkatoSession extends React.Component {
     const { session } = this.props;
     const start = format(session.closing, "DD/MM/YYYY HH:mm");
     const end = format(session.solving, "DD/MM/YYYY HH:mm");
-    const bonus = (session.attributes.score_factor - 1.0).toFixed(2) * 100;
+    const bonus = session.attributes
+      ? (session.attributes.score_factor - 1.0).toFixed(2) * 100
+      : 0;
     var bonusDisplay;
     if (bonus > 0) {
       bonusDisplay = <span className="bonus">{bonus + "%"}</span>;
     }
     return (
       <div>
-        <h1>
-          Session n°
-          {session.number}
-        </h1>
-        <ul>
-          <li>
-            Enchères du {start} au {end}
-          </li>
-          {bonus > 0 && <li>Bonification {bonusDisplay}</li>}
-        </ul>
-        <ReleasesList releases={session.releases} />
-        <SalesList sales={session.sales} />
+        {session.number && (
+          <h1>
+            Session n°
+            {session.number}
+          </h1>
+        )}
+        {session.closing && (
+          <ul>
+            <li>
+              Enchères du {start} au {end}
+            </li>
+            {bonus > 0 && <li>Bonification {bonusDisplay}</li>}
+          </ul>
+        )}
+        {session.releases && <ReleasesList releases={session.releases} />}
+        {session.sales && <SalesList sales={session.sales} />}
       </div>
     );
   }

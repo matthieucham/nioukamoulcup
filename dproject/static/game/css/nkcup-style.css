@@ -25,8 +25,8 @@ time, mark, audio, video {
     padding: 0;
     border: 0;
     list-style: none;
-    /*font-size: 100%;
-    font: inherit;*/
+    /*font-size: 100%;*/
+    font: inherit;
     vertical-align: baseline;
 }
 
@@ -593,9 +593,9 @@ dl.kvgroup {
     padding: 10px 0;
 }
 
-#home-main p {
+/*#home-main p {
     padding: 0 10px;
-}
+}*/
 
 #home-main h2 {
     background-color: rgba(0, 0, 0, 0.5);
@@ -604,6 +604,10 @@ dl.kvgroup {
     font-size: 0.8em;
     text-transform: uppercase;
     padding-left: 8px;
+}
+
+#home-main section form {
+    padding: 5px 5px;
 }
 
 #section-title {
@@ -879,8 +883,29 @@ dl.kvgroup {
     margin-right: 0.5em;
 }
 
+.draft-choice, .draft-team-result {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.draft-team-result > * {
+    margin: 0.8em;
+}
+
+.draft-team-result .salecard-winner {
+    flex: 1;
+}
+
+
 div.opensales-container {
     display: flex;
+    padding: 5px;
+}
+
+div.submit-merkato-container {
+    padding: 1em;
+    text-align: center;
 }
 
 /****************************************************************/
@@ -1051,4 +1076,5 @@ aside.entry-widgets {
 .explanation {
     font-size: 0.8em;
     color: color: rgba(0, 0, 0, 0.54);
+    padding: 5px;
 }

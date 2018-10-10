@@ -6,6 +6,7 @@ from django.utils import timezone
 
 from utils import locked_atomic_transaction
 from game.models import transfer_models, league_models
+from ligue1.models import Joueur
 
 
 class SaleSolvingException(Exception):
@@ -130,6 +131,48 @@ def _validate_auction(auction):
     return auction
 
 
+@transaction.atomic
+def solve_draft_session(draft_session):
+    assert draft_session.merkato.mode == 'DRFT'
+    if draft_session.closing > timezone.now():
+        raise SaleSolvingException('Draft session not over yet, solving time is %s' % draft_session.closing)
+    app = list()
+    for rk in draft_session.draftsessionrank_set.order_by('rank'):
+        pl = solve_draft_pick(rk, app)
+        if pl is not None:
+            app.append(pl)
+    draft_session.is_solved = True
+    draft_session.save()
+
+
+@transaction.atomic
+def solve_draft_pick(draft_session_rank, already_picked_players):
+    for pick in draft_session_rank.picks.order_by('pick_order').all():
+        if pick.player not in already_picked_players:
+            _do_draft_signing(pick)
+            return pick.player
+    return None
+
+
+@transaction.atomic
+def _do_draft_signing(draft_pick):
+    signing = league_models.Signing.objects.create(
+        player=draft_pick.player,
+        team=draft_pick.draft_session_rank.team,
+        league_instance=draft_pick.draft_session_rank.draft_session.merkato.league_instance,
+        attributes=_make_draft_signing_attr(draft_pick)
+    )
+    draft_pick.draft_session_rank.signing = signing
+    draft_pick.draft_session_rank.save()
+
+
+def _make_draft_signing_attr(draft_pick):
+    return {'rank': draft_pick.draft_session_rank.rank,
+            'pick_order': draft_pick.pick_order,
+            'type': 'DRFT',
+            'score_factor': draft_pick.draft_session_rank.draft_session.merkato.configuration.get('score_factor', 1.0)}
+
+
 def can_register_auction(team, merkato):
     """
     Vérifie que cette ékyp est autorisée à envoyer des enchères. La règle:
@@ -191,3 +234,19 @@ def can_register_mv(team, merkato):
     if current_mv_count >= merkato.configuration.get('mv_number'):
         return False, 'CURRENT_MV'
     return True, None
+
+
+def available_for_pa(joueur, division, instance):
+    c1 = league_models.Signing.objects.filter(team__division=division,
+                                              end__isnull=True,
+                                              league_instance=instance,
+                                              player=joueur).count()
+    c2 = transfer_models.Sale.objects.filter(merkato_session__is_solved=False).filter(team__division=division,
+                                                                                      merkato_session__merkato__league_instance=instance,
+                                                                                      player=joueur).count()
+    return c1 + c2 == 0
+
+
+def available_for_mv(joueur, team, instance):
+    return Joueur.objects.filter(signing__team=team, signing__begin__lt=timezone.now(), signing__end__isnull=True,
+                                 signing__league_instance=instance).filter(pk=joueur.pk).count() == 1

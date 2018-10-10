@@ -27,9 +27,9 @@ const applySetResult = result => prevState => ({
   isLoading: false
 });
 
-const getPlayers = filterQuery =>
+const getPlayers = (filterQuery, getPlayersResource) =>
   API_ROOT.concat(
-    `leagues/${LEAGUE_ID}/playersformerkato?format=json&` + filterQuery
+    `leagues/${LEAGUE_ID}/${getPlayersResource}?format=json&` + filterQuery
   );
 
 const styles = theme => ({
@@ -165,7 +165,7 @@ class FilteredPlayersList extends React.Component {
     this.state = {
       hits: [],
       next: null,
-      count: 0
+      count: 0,
     };
   }
 
@@ -176,7 +176,7 @@ class FilteredPlayersList extends React.Component {
   };
 
   fetchPlayers = value => {
-    fetch(value == null ? this.state.next : getPlayers(value))
+    fetch(value == null ? this.state.next : getPlayers(value, this.props.playersResource))
       .then(response => response.json())
       .then(result => this.onSetResult(result));
   };
