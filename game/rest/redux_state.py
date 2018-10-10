@@ -68,6 +68,13 @@ class StateInitializerMixin:
         return self.initial_state
 
     @timed
+    def init_from_draftsession(self, request, session):
+        self._init_common(request)
+        session_serializer = serializers.DraftSessionSerializer(session, context={'request': request})
+        self.initial_state.update({'draftsession': self._to_json(session_serializer)})
+        return self.initial_state
+
+    @timed
     def init_current_merkatos(self, request, team, merkatos):
         self._init_common(request)
         self.initial_state.update({'league_id': team.league.pk})

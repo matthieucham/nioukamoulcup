@@ -167,9 +167,10 @@ def _do_draft_signing(draft_pick):
 
 
 def _make_draft_signing_attr(draft_pick):
-    return json.dumps({'rank': draft_pick.draft_session_rank.rank, 'pick_order': draft_pick.pick_order, 'type': 'DRFT',
-                       'score_factor': draft_pick.draft_session_rank.draft_session.merkato.configuration.get(
-                           'score_factor', 1.0)})
+    return {'rank': draft_pick.draft_session_rank.rank,
+            'pick_order': draft_pick.pick_order,
+            'type': 'DRFT',
+            'score_factor': draft_pick.draft_session_rank.draft_session.merkato.configuration.get('score_factor', 1.0)}
 
 
 def can_register_auction(team, merkato):

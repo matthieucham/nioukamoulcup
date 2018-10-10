@@ -14,7 +14,7 @@ from django.http import HttpResponseRedirect
 
 class BaseLeagueView(PermissionRequiredMixin, DetailView):
     model = League
-    template_name = 'game/league/league_base.html'
+    template_name = 'game/league/league_react_base.html'
     permission_required = 'game.view_league'
     component = 'test'
 
@@ -41,15 +41,7 @@ class LeagueWallView(StateInitializerMixin, BaseLeagueView):
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get a context
         context = super(LeagueWallView, self).get_context_data(**kwargs)
-        serializer = serializers.LeagueInstancePhaseDaySerializer(
-            LeagueInstancePhaseDay.objects.get_latest_day_for_phases(
-                LeagueInstancePhase.objects.filter(league_instance=context.get('instance'))), many=True,
-            context={'request': self.request})
-        # context['PRELOADED_STATE'] = {
-        #     'ranking': []  # json.loads(str(JSONRenderer().render(serializer.data), 'utf-8'))
-        # }
-
-        context['PRELOADED_STATE'] = self.init_common(self.request, self.object.pk)
+        #context['PRELOADED_STATE'] = self.init_common(self.request, self.object.pk)
         return context
 
 
@@ -90,6 +82,9 @@ class BaseMerkatoSessionsListView(StateInitializerMixin, BaseLeagueView):
         context['sessions'] = MerkatoSession.objects.filter(
             merkato__league_instance=self.get_current_league_instance(), is_solved=True).order_by(
             '-solving')
+        context['draftsessions'] = DraftSession.objects.filter(
+            merkato__league_instance=self.get_current_league_instance(), is_solved=True).order_by(
+            '-closing')
         return context
 
 
@@ -108,6 +103,20 @@ class LeagueMerkatoResultsView(BaseMerkatoSessionsListView):
         else:
             # latest
             context['PRELOADED_STATE'] = self.init_from_merkatosession(self.request, context['sessions'].first())
+        return context
+
+
+class LeagueDraftResultsView(BaseMerkatoSessionsListView):
+    template_name = 'game/league/merkato_results.html'
+    component = 'draftresults'
+
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get a context
+        context = super(LeagueDraftResultsView, self).get_context_data(**kwargs)
+        dsession = DraftSession.objects.get(
+            merkato__league_instance=self.get_current_league_instance(), is_solved=True,
+            pk=self.kwargs['session_pk'])
+        context['PRELOADED_STATE'] = self.init_from_draftsession(self.request, dsession)
         return context
 
 

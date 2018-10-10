@@ -51,7 +51,6 @@ class ReleasesList extends React.Component {
 export class SolvedMerkatoSession extends React.Component {
   render() {
     const { session } = this.props;
-    console.log(session);
     const start = format(session.closing, "DD/MM/YYYY HH:mm");
     const end = format(session.solving, "DD/MM/YYYY HH:mm");
     const bonus = session.attributes

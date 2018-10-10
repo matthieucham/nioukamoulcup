@@ -1,10 +1,8 @@
 {% extends "game/league/league_base.html" %}
-{% load static %}
 {% load game %}
 {% load render_bundle from webpack_loader %}
 
 {% block undercover %}
-
     <div id="react-app"></div>
 
     <script>
@@ -15,5 +13,3 @@
     {% render_bundle 'main' %}
 
 {% endblock undercover %}
-
-{% block col-right %}<aside class="hg__right">{% block content-right %}{% endblock content-right %}</aside>{% endblock col-right %}

@@ -294,6 +294,9 @@ class DraftSession(models.Model):
     attributes = JSONField(null=True, blank=True)
     teams = models.ManyToManyField(league_models.Team, through='DraftSessionRank')
 
+    def has_object_read_permission(self, request):
+        return request.user in self.merkato.league_instance.league.members.all()
+
 
 class DraftSessionRank(models.Model):
     draft_session = models.ForeignKey(DraftSession, on_delete=models.CASCADE)
@@ -303,6 +306,7 @@ class DraftSessionRank(models.Model):
 
     class Meta:
         unique_together = ('draft_session', 'rank', 'team')
+        ordering = ('rank', )
 
 
 class DraftPick(models.Model):

@@ -145,6 +145,12 @@ class MerkatoSessionView(CurrentLeagueInstanceMixin, generics.RetrieveAPIView):
     queryset = transfer_models.MerkatoSession.objects.filter(is_solved=True)
 
 
+class DraftSessionView(CurrentLeagueInstanceMixin, generics.RetrieveAPIView):
+    permission_classes = (DRYObjectPermissions,)
+    serializer_class = serializers.DraftSessionSerializer
+    queryset = transfer_models.DraftSession.objects.filter(is_solved=True)
+
+
 class PlayersForMerkatoView(CurrentLeagueInstanceMixin, generics.ListAPIView):
     permission_classes = (DRYObjectPermissions,)
     serializer_class = serializers.PlayerMerkatoSerializer

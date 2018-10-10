@@ -883,9 +883,18 @@ dl.kvgroup {
     margin-right: 0.5em;
 }
 
-.draft-choice {
+.draft-choice, .draft-team-result {
     display: flex;
     align-items: center;
+    justify-content: space-between;
+}
+
+.draft-team-result > * {
+    margin: 0.8em;
+}
+
+.draft-team-result .salecard-winner {
+    flex: 1;
 }
 
 

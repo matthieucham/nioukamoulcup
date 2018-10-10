@@ -730,6 +730,24 @@ class OpenDraftSessionSerializer(serializers.HyperlinkedModelSerializer):
         fields = ('id', 'number', 'closing', 'my_rank',)
 
 
+class DraftSessionRankSerializer(serializers.ModelSerializer):
+    team = TeamHdrSerializer(read_only=True)
+    signing = SigningSerializer(read_only=True)
+
+    class Meta:
+        model = transfer_models.DraftSessionRank
+        fields = ('rank', 'team', 'signing')
+
+
+class DraftSessionSerializer(serializers.ModelSerializer):
+    draftsessionrank_set = DraftSessionRankSerializer(read_only=True, many=True)
+
+    class Meta:
+        model = transfer_models.DraftSession
+        fields = (
+            'number', 'closing', 'is_solved', 'attributes', 'draftsessionrank_set',)
+
+
 class CurrentMerkatoSerializer(serializers.ModelSerializer):
     sessions = serializers.SerializerMethodField()
     draft_sessions = serializers.SerializerMethodField()
