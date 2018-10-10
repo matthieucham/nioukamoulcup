@@ -17,7 +17,7 @@ const DragHandle = SortableHandle(({ pickOrder }) => (
 ));
 
 const SortableItem = SortableElement(({ value, sortIndex }) => (
-  <li>
+  <li className="draft-choice">
     <DragHandle pickOrder={sortIndex + 1} />
     {value}
   </li>
@@ -46,8 +46,15 @@ export class CurrentMerkatoDraftSession extends React.Component {
       slistDynKey: "initSlistKey",
       picks: [] /* TODO init from props */
     };
-    for (let i = 0; i < props.draftSession.my_rank.rank; i++) {
-      this.state.picks.push({ picked: null });
+    for (let i = 1; i <= props.draftSession.my_rank.rank; i++) {
+      var choice = props.draftSession.my_rank.picks.find(
+        p => p.pick_order == i
+      );
+      if (choice) {
+        this.state.picks.push({ picked: choice.player });
+      } else {
+        this.state.picks.push({ picked: null });
+      }
     }
   }
 
@@ -58,8 +65,6 @@ export class CurrentMerkatoDraftSession extends React.Component {
       picks: arrayMove(picks, oldIndex, newIndex),
       slistDynKey: "key" + Date.now()
     });
-    /*console.log("onSortEnd");
-    this.forceUpdate();*/
   };
 
   assignPlayerToChoice = (player, index) => {
@@ -74,15 +79,21 @@ export class CurrentMerkatoDraftSession extends React.Component {
 
   render() {
     const { draftSession } = this.props;
-    console.log(this.state.picks);
     const pickers = this.state.picks.map(({ picked }, index) => (
-      <PlayerPicker
-        key={`pick_${index}`}
-        playersResource="playersformerkato"
-        initialPickedPlayer={picked}
-        pickedOrder={index}
-        onPlayerPicked={this.assignPlayerToChoice}
-      />
+      <div>
+        <PlayerPicker
+          key={`pick_${index}`}
+          playersResource="playersformerkato"
+          initialPickedPlayer={picked}
+          pickedOrder={index}
+          onPlayerPicked={this.assignPlayerToChoice}
+        />
+        <input
+          type="hidden"
+          value={picked == null ? 0 : picked.id}
+          name={`_pick_for_rank__${index + 1}`}
+        />
+      </div>
     ));
     return (
       <section>

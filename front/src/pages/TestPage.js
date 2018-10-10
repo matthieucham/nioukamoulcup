@@ -122,7 +122,27 @@ const DRAFT = {
   closing: "2018-12-08T17:33:32+01:00",
   my_rank: {
     rank: 8,
-    picks: []
+    picks: [
+      {
+        pick_order: 5,
+        player: {
+          id: 1,
+          url: "http://127.0.0.1:8000/game/home/stat/joueur/1/",
+          prenom: "Yohann",
+          nom: "Pelé",
+          surnom: "",
+          display_name: "Yohann Pelé",
+          poste: "G",
+          club: {
+            id: 1,
+            nom: "Marseille",
+            maillot_svg: "jersey-plain2",
+            maillot_color_bg: "#FFFFFF",
+            maillot_color_stroke: ""
+          }
+        }
+      }
+    ]
   }
 };
 
@@ -132,30 +152,6 @@ export class TestPage extends Component {
       <div className="react-app-inner">
         <main>
           <article id="home-main">
-            {/* 
-           <CurrentMerkatoBid merkato={MERKATO} />
-            <SortableList
-              items={[<PlayerPicker key="pp1" />, <PlayerPicker key="pp2" />]}
-            /> */}
-            <PlayerPicker
-              initialPickedPlayer={{
-                id: 341,
-                url: "http://127.0.0.1:8001/game/home/stat/joueur/341/",
-                prenom: "Vitorino",
-                nom: "Hilton",
-                surnom: "",
-                display_name: "Vitorino Hilton",
-                poste: "D",
-                club: {
-                  id: 12,
-                  nom: "Montpellier",
-                  maillot_svg: "jersey-shoulders2",
-                  maillot_color_bg: "#004080",
-                  maillot_color_stroke: "#ff8000"
-                }
-              }}
-              playersResource="playersformerkato"
-            />
             <CurrentMerkatoDraftSession draftSession={DRAFT} />
           </article>
         </main>

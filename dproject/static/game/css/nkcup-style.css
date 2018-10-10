@@ -883,6 +883,12 @@ dl.kvgroup {
     margin-right: 0.5em;
 }
 
+.draft-choice {
+    display: flex;
+    align-items: center;
+}
+
+
 div.opensales-container {
     display: flex;
     padding: 5px;

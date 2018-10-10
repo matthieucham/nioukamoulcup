@@ -41,7 +41,6 @@ class PlayersListDialog extends React.Component {
 class PlayerPicker extends React.Component {
   constructor(props) {
     super(props);
-    console.log(props.initialPickedPlayer);
     this.state = {
       open: false,
       picked: props.initialPickedPlayer
