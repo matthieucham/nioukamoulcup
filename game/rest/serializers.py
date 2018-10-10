@@ -697,13 +697,30 @@ class OpenMerkatoSessionSerializer(MerkatoSessionSummarySerializer):
         fields = MerkatoSessionSummarySerializer.Meta.fields + ('sales',)
 
 
+class DraftPickSerializer(serializers.ModelSerializer):
+    player = PlayerHdrSerializer(read_only=True)
+
+    class Meta:
+        model = transfer_models.DraftPick
+        fields = ('pick_order', 'player',)
+
+
+class DraftSessionRankSerializer(serializers.ModelSerializer):
+    picks = DraftPickSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = transfer_models.DraftSessionRank
+        fields = ('rank', 'picks',)
+
+
 class OpenDraftSessionSerializer(serializers.HyperlinkedModelSerializer):
     my_rank = serializers.SerializerMethodField()
 
     def get_my_rank(self, obj):
         if 'team' in self.context:
             try:
-                return obj.draftsessionrank_set.get(team=self.context['team']).rank
+                return DraftSessionRankSerializer(obj.draftsessionrank_set.get(team=self.context['team']), many=False,
+                                                  read_only=True).data
             except transfer_models.DraftSessionRank.DoesNotExist:
                 return None
         return None

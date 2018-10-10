@@ -41,10 +41,10 @@ class PlayersListDialog extends React.Component {
 class PlayerPicker extends React.Component {
   constructor(props) {
     super(props);
-
+    console.log(props.initialPickedPlayer);
     this.state = {
       open: false,
-      picked: null
+      picked: props.initialPickedPlayer
     };
   }
 
@@ -56,6 +56,9 @@ class PlayerPicker extends React.Component {
 
   handleClose = value => {
     this.setState({ picked: value, open: false });
+    if (this.props.onPlayerPicked && this.props.pickedOrder >= 0) {
+      this.props.onPlayerPicked(value, this.props.pickedOrder);
+    }
   };
 
   getDisplayedValue() {
