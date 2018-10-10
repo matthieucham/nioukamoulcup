@@ -2,14 +2,14 @@ from django.views.generic import DetailView, FormView
 from django.shortcuts import reverse
 from rules.contrib.views import PermissionRequiredMixin
 from game.models import League, LeagueInstance, LeagueInstancePhase, LeagueInstancePhaseDay, LeagueMembership, Team, \
-    MerkatoSession, Merkato, Sale, Auction
+    MerkatoSession, Merkato, Sale, Auction, DraftSession, DraftSessionRank, DraftPick
 from ligue1.models import Joueur
 from django.utils.timezone import localtime, now
 from django.db.models import Count
 from game.rest.redux_state import StateInitializerMixin
 from game.rest import serializers
-from game.forms import RegisterPaForm, RegisterMvForm, RegisterOffersForm
-from decimal import Decimal
+from game.forms import RegisterPaForm, RegisterMvForm, RegisterOffersForm, RegisterDraftChoicesForm
+from django.http import HttpResponseRedirect
 
 
 class BaseLeagueView(PermissionRequiredMixin, DetailView):
@@ -218,3 +218,39 @@ class LeagueRegisterMVView(FormView, BaseLeagueView):
             type='MV'
         )
         return super(LeagueRegisterMVView, self).form_valid(form)
+
+
+class LeagueRegisterDraftView(FormView, BaseLeagueView):
+    template_name = 'game/league/merkato.html'
+    form_class = RegisterDraftChoicesForm
+
+    def get_draft_session(self):
+        return DraftSession.objects.get(pk=self.kwargs['draftsession_pk'])
+
+    def get_form_kwargs(self):
+        kw = super(LeagueRegisterDraftView, self).get_form_kwargs()
+        kw['team'] = self.get_my_team()
+        kw['draft_session'] = self.get_draft_session()
+        return kw
+
+    def get_success_url(self):
+        return reverse('league_merkato', kwargs={'pk': self.get_object().pk})
+
+    def form_valid(self, form):
+        # delete and recreate choices
+        DraftPick.objects.filter(draft_session_rank__team=self.get_my_team(),
+                                 draft_session_rank__signing__isnull=True).delete()
+        for field, val in form.cleaned_data.items():
+            if field.startswith('_pick_for_rank__'):
+                rank = int(field[len('_pick_for_rank__'):])
+                DraftPick.objects.create(
+                    pick_order=rank,
+                    player=Joueur.objects.get(pk=val),
+                    draft_session_rank=DraftSessionRank.objects.get(draft_session=self.get_draft_session(),
+                                                                    team=self.get_my_team())
+                )
+        return super(LeagueRegisterDraftView, self).form_valid(form)
+
+    def form_invalid(self, form):
+        """If the form is invalid, redirect to the supplied URL. (hack parce que les erreurs ne sont pas visible de toute façon)"""
+        return HttpResponseRedirect(self.get_success_url())

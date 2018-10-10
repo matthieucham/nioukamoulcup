@@ -1,8 +1,9 @@
 from django import forms
+from django.utils import timezone
 from game.services import auctions
 from decimal import Decimal
 from ligue1.models import Joueur
-from game.models import BankAccount, Sale, Auction
+from game.models import BankAccount, Sale, Auction, DraftPick
 
 
 class PickedPlayerValidationMixin:
@@ -98,7 +99,7 @@ class RegisterOffersForm(forms.Form):
             except Auction.DoesNotExist:
                 init_val = None
             self.fields['_offer_for_sale__%s' % s.pk] = forms.FloatField(
-                min_value=(s.min_price + Decimal(0.1)),
+                min_value=(s.min_price + Decimal(0.1) if s.type == 'PA' else s.min_price),
                 required=False,
                 initial=init_val
             )
@@ -112,3 +113,40 @@ class RegisterOffersForm(forms.Form):
         spks = [int(field[len('_offer_for_sale__'):]) for field, v in self.cleaned_data.items() if v is not None]
         if Sale.objects.filter(pk__in=spks, type='MV', team=self.team).count() > 0:
             raise forms.ValidationError('Interdit d''enchérir sur sa propre MV')
+
+
+class RegisterDraftChoicesForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        self.team = kwargs.pop('team')
+        self.draft_session = kwargs.pop('draft_session')
+        super(RegisterDraftChoicesForm, self).__init__(*args, **kwargs)
+        for rk in range(self.draft_session.draftsessionrank_set.get(team=self.team).rank):
+            self.fields['_pick_for_rank__%s' % (rk + 1)] = forms.IntegerField(
+                required=True
+            )
+
+    def clean(self):
+        # Règles à vérifier:
+        # - c'est pas trop tard !
+        # - que des choix différents
+        # - que des joueurs libres
+        # - autant de choix que son rang
+        try:
+            assert self.draft_session.closing >= timezone.now()
+        except AssertionError:
+            raise forms.ValidationError('Draft terminée, trop tard.')
+        jpk = [val for field, val in self.cleaned_data.items() if field.startswith('_pick_for_rank__')]
+        try:
+            assert len(jpk) == len(set(jpk))
+        except AssertionError:
+            raise forms.ValidationError('Interdit de choixisr plusieurs fois le même joueur')
+        try:
+            assert len(jpk) == self.draft_session.draftsessionrank_set.get(team=self.team).rank
+        except AssertionError:
+            raise forms.ValidationError('Il faut enregistrer autant de choix que son rang à la draft')
+        for pk in jpk:
+            try:
+                assert auctions.available_for_pa(Joueur.objects.get(pk=pk), self.team.division,
+                                                 self.draft_session.merkato.league_instance)
+            except AssertionError:
+                raise forms.ValidationError('Ce joueur ne peut plus être sélectionné', code="invalid")

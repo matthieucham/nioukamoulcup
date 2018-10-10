@@ -720,7 +720,7 @@ class OpenDraftSessionSerializer(serializers.HyperlinkedModelSerializer):
         if 'team' in self.context:
             try:
                 return DraftSessionRankSerializer(obj.draftsessionrank_set.get(team=self.context['team']), many=False,
-                                                  read_only=True).data
+                                                  read_only=True, context={'request': self.context['request']}).data
             except transfer_models.DraftSessionRank.DoesNotExist:
                 return None
         return None
