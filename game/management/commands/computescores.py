@@ -25,7 +25,7 @@ class Command(BaseCommand):
         if options['force']:
             jjs_list = gamemodels.JourneeScoring.objects.select_related('journee').filter(
                 saison_scoring=current_saisonscoring)
-        self.stdout.write('%d journees updated to compute' % len(jjs_list))
+            self.stdout.write('%d journees updated to compute' % len(jjs_list))
         # now compute TDS for updated JJS
         licount = 0
         for li in gamemodels.LeagueInstance.objects.filter(saison=current_saisonscoring.saison,

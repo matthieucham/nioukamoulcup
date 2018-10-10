@@ -153,11 +153,11 @@ class LeagueInvitationInline(InlineActionsMixin, admin.TabularInline):
 
     def accept(self, request, obj, parent_obj):
         obj.accept()
-        return HttpResponseRedirect(reverse('admin:game_league_change', args=[parent_obj.pk]))
+        return HttpResponseRedirect(reverse('import_statnuts:game_league_change', args=[parent_obj.pk]))
 
     def reject(self, request, obj, parent_obj):
         obj.reject()
-        return HttpResponseRedirect(reverse('admin:game_league_change', args=[parent_obj.pk]))
+        return HttpResponseRedirect(reverse('import_statnuts:game_league_change', args=[parent_obj.pk]))
 
 
 class TeamInline(admin.TabularInline):
