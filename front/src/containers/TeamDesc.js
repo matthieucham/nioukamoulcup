@@ -208,17 +208,20 @@ export class TeamHeader extends Component {
         };
       }
     )(KeyValueBox);
+    var FormationKVB;
+    var scores;
     const hasLatestScores =
       Array.isArray(team.latest_scores) && team.latest_scores.length;
     if (hasLatestScores) {
+      console.log(team.latest_scores);
       let formation = team.latest_scores[0]["formation"];
-      const FormationKVB = connect(state => {
+      FormationKVB = connect(state => {
         return {
           value: formation["D"] + "-" + formation["M"] + "-" + formation["A"],
           label: "Formation"
         };
       })(KeyValueBox);
-      const scores = team.latest_scores.map(ls => (
+      scores = team.latest_scores.map(ls => (
         <KeyValueBox
           label={ls.day.phase}
           value={ls.score + " Pts"}
