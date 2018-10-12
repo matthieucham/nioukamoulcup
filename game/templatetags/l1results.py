@@ -67,8 +67,9 @@ def joueurs_club(club):
     if club is not None:
         joueurs = l1models.Joueur.objects.filter(club=club).order_by('nom')
     else:
-        joueurs = l1models.Joueur.objects.filter(
-            performances__rencontre__journee__saison__est_courante__isnull=False).distinct().order_by('nom')
+        joueurs = l1models.Joueur.objects.filter(club__isnull=True,
+                                                 performances__rencontre__journee__saison__est_courante__isnull=False).distinct().order_by(
+            'nom')
     return {'team': 'Hors L1' if club is None else club, 'players': sorted(joueurs, key=sort_position_function)}
 
 
