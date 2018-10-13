@@ -246,6 +246,6 @@ class CurrentMerkatoView(CurrentLeagueInstanceMixin, generics.ListAPIView):
     def get_queryset(self):
         instance = self._get_current_league_instance(self.kwargs['league_pk'])
         league_models.LeagueMembership.objects.get(user=self.request.user, league=instance.league).team
-        return transfer_models.Merkato.objects.filter(league_instance=instance, begin__lt=localtime(now()),
+        return transfer_models.Merkato.objects.filter(league_instance=instance, begin__lte=localtime(now()),
                                                       end__gt=localtime(now())).order_by(
             'begin')
