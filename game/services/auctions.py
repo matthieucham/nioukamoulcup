@@ -184,18 +184,20 @@ def can_register_auction(team, merkato):
     :return: True |False
     """
     expired_sessions = merkato.merkatosession_set.filter(solving__lt=timezone.now()).count()
-    if expired_sessions < 16:
-        return True, 'BEGINNING'
     current_pa = transfer_models.Sale.objects.filter(merkato_session__merkato=merkato,
                                                      merkato_session__solving__gt=timezone.now(),
                                                      type='PA',
                                                      team=team).count()
-    if current_pa > 0:
-        return True, 'CURRENT_PA'
     previous_pas = transfer_models.Sale.objects.filter(merkato_session__merkato=merkato,
                                                        merkato_session__solving__lt=timezone.now(),
                                                        type='PA',
                                                        team=team).count()
+    if merkato.configuration.get('pa_mandatory', False):
+        return current_pa + previous_pas > 0, 'NOT_ENOUGH_PA'
+    if current_pa > 0:
+        return True, 'CURRENT_PA'
+    if expired_sessions < 16:
+        return True, 'BEGINNING'
     if (expired_sessions // 8) - 1 <= previous_pas:
         return True, 'ENOUGH_PA'
     else:
