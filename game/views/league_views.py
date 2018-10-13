@@ -41,7 +41,7 @@ class LeagueWallView(StateInitializerMixin, BaseLeagueView):
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get a context
         context = super(LeagueWallView, self).get_context_data(**kwargs)
-        #context['PRELOADED_STATE'] = self.init_common(self.request, self.object.pk)
+        # context['PRELOADED_STATE'] = self.init_common(self.request, self.object.pk)
         return context
 
 
@@ -75,7 +75,6 @@ class LeagueRankingView(StateInitializerMixin, BaseLeagueView):
 
 
 class BaseMerkatoSessionsListView(StateInitializerMixin, BaseLeagueView):
-
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get a context
         context = super(BaseMerkatoSessionsListView, self).get_context_data(**kwargs)
@@ -127,7 +126,8 @@ class LeagueMerkatoView(FormView, BaseMerkatoSessionsListView):
 
     def get_context_data(self, **kwargs):
         context = super(LeagueMerkatoView, self).get_context_data(**kwargs)
-        merkatos = Merkato.objects.filter(league_instance=context['instance'], end__gt=localtime(now())).order_by(
+        merkatos = Merkato.objects.filter(league_instance=context['instance'], begin__lte=localtime(now()),
+                                          end__gt=localtime(now())).order_by(
             'begin')
         context['PRELOADED_STATE'] = self.init_current_merkatos(self.request, context['team'], merkatos)
         return context
