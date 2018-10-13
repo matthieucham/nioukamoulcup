@@ -1,10 +1,47 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description"
+          content="Le jeu de fantasy football basé sur la Ligue 1 qui va vous faire apprécier les 0-0"/>
     <title>Kamoulcup</title>
+    <link rel="stylesheet" href="{% static 'game/css/landing.css' %}">
+
+
+    <!-- Matomo -->
+    <script type="text/javascript">
+  var _paq = _paq || [];
+  /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
+  _paq.push(["setDocumentTitle", document.domain + "/" + document.title]);
+  _paq.push(["setDomains", ["*.www.kamoulcup.com"]]);
+  _paq.push(['trackPageView']);
+  _paq.push(['enableLinkTracking']);
+  (function() {
+    var u="//analytics.kamoulcup.com/";
+    _paq.push(['setTrackerUrl', u+'piwik.php']);
+    _paq.push(['setSiteId', '1']);
+    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+    g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
+  })();
+
+    </script>
+    <!-- End Matomo Code -->
 </head>
 <body>
-<p><a href="{% url 'home_info' %}">Entrez</a></p>
+
+<div class="bgimg-1">
+  <div class="caption">
+    <span class="border">KAMOULCUP</span><br>
+    <span class="border">MAKE 0-0 GREAT AGAIN</span>
+  </div>
+</div>
+<div class="cover-bottom">
+    <div class="link-container">
+        <a href="{% url 'home_info' %}" class="button">Par ici</a>
+    </div>
+</div>
+
 </body>
 </html>
