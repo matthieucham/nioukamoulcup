@@ -170,8 +170,8 @@ class PlayersForMerkatoView(CurrentLeagueInstanceMixin, generics.ListAPIView):
         # order by club then name
         instance = self._get_current_league_instance(self.kwargs['league_pk'])
         qs = (
-                l1models.Joueur.objects.filter(club__participations=instance.saison) |
-                l1models.Joueur.objects.filter(performances__rencontre__journee__saison=instance.saison)
+            l1models.Joueur.objects.filter(club__participations=instance.saison) |
+            l1models.Joueur.objects.filter(performances__rencontre__journee__saison=instance.saison)
         ).distinct().order_by('club__nom', 'nom')
         return qs
 
@@ -246,5 +246,6 @@ class CurrentMerkatoView(CurrentLeagueInstanceMixin, generics.ListAPIView):
     def get_queryset(self):
         instance = self._get_current_league_instance(self.kwargs['league_pk'])
         league_models.LeagueMembership.objects.get(user=self.request.user, league=instance.league).team
-        return transfer_models.Merkato.objects.filter(league_instance=instance, end__gt=localtime(now())).order_by(
+        return transfer_models.Merkato.objects.filter(league_instance=instance, begin__lt=localtime(now()),
+                                                      end__gt=localtime(now())).order_by(
             'begin')
