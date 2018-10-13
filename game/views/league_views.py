@@ -42,6 +42,12 @@ class LeagueWallView(StateInitializerMixin, BaseLeagueView):
         # Call the base implementation first to get a context
         context = super(LeagueWallView, self).get_context_data(**kwargs)
         # context['PRELOADED_STATE'] = self.init_common(self.request, self.object.pk)
+        context['next_merkato'] = Merkato.objects.filter(league_instance=context['instance'],
+                                                         type='BID',
+                                                         end__gt=localtime(now())).order_by('begin').first()
+        context['next_draft'] = Merkato.objects.filter(league_instance=context['instance'],
+                                                       type='DRFT',
+                                                       end__gt=localtime(now())).order_by('begin').first()
         return context
 
 

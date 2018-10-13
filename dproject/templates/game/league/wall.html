@@ -1,9 +1,26 @@
 {% extends "game/league/league_base.html" %}
+{% load humanize %}
 
 {% block undercover %}
 <p>Ici dans le futur il y aura un espace de discussion interne à la ligue</p>
 {% endblock %}
 
 {% block col-right %}<aside class="hg__right">{% block content-right %}
+    <section>
+    <h1>Prochaine draft</h1>
+    {% if next_draft %}
+    <p>Du {{ next_draft.begin|date:"SHORT_DATETIME_FORMAT" }} au {{ next_draft.end|date:"SHORT_DATETIME_FORMAT" }}</p>
+    {% else %}
+    <p>Pas de draft programmée</p>
+    {% endif %}
+    </section>
+    <section>
+    <h1>Prochain merkato</h1>
+    {% if next_merkato %}
+    <p>Du {{ next_merkato.begin|date:"SHORT_DATETIME_FORMAT" }} au {{ next_merkato.end|date:"SHORT_DATETIME_FORMAT" }}</p>
+    {% else %}
+    <p>Pas de merkato programmé</p>
+    {% endif %}
+    </section>
     <p>Ici à l'avenir, des infos sur le merkato en cours et sur les derniers résultats</p>
     {% endblock content-right %}</aside>{% endblock col-right %}
