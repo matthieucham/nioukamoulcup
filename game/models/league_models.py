@@ -49,7 +49,7 @@ class LeagueDivision(models.Model):
 
 
 class TeamManager(models.Manager):
-    @transaction.atomic()
+    @transaction.atomic
     def setup_formation(self, team, g=1, d=2, m=2, a=2):
         t = self.select_for_update().get(pk=team.pk)
         team_config = t.attributes
@@ -57,7 +57,7 @@ class TeamManager(models.Manager):
         t.attributes = team_config
         t.save()  # todo update score
 
-    @transaction.atomic()
+    @transaction.atomic
     def setup_joker(self, team, joueur):
         assert Signing.objects.filter(player=joueur, team=team, end__isnull=True,
                                       league_instance=LeagueInstance.objects.get_current(team.league)) is not None
@@ -66,7 +66,7 @@ class TeamManager(models.Manager):
         t.attributes = team_config
         t.save()
 
-    @transaction.atomic()
+    @transaction.atomic
     def create_for_user(self, *args, user, **kwargs):
         assert user is not None
         t = self.create(*args, **kwargs)
@@ -102,18 +102,20 @@ class Team(models.Model):
 
 
 class BankAccountManager(models.Manager):
-    @transaction.atomic()
-    def init_account(self, date, team, init_balance):
+    @transaction.atomic
+    def init_account(self, date, team, init_balance, merkato):
         account, created = self.get_or_create(team=team, defaults={'balance': init_balance, 'blocked': 0})
         if not created:
             account.balance = init_balance
             account.blocked = 0
             account.save()
-        account.bankaccounthistory_set.add(
-            BankAccountHistory.objects.create(date=date, amount=init_balance, new_balance=init_balance,
-                                              info=BankAccountHistory.make_info_init()))
+        if BankAccountHistory.objects.filter(bank_account=account, info__type='INIT',
+                                             info__merkato_id=merkato.pk).count() == 0:
+            account.bankaccounthistory_set.add(
+                BankAccountHistory.objects.create(date=date, amount=init_balance, new_balance=init_balance,
+                                                  info=BankAccountHistory.make_info_init(merkato)))
 
-    @transaction.atomic()
+    @transaction.atomic
     def buy(self, sale):
         if sale.winning_auction is not None:
             buyer = sale.winning_auction.team
@@ -129,7 +131,7 @@ class BankAccountManager(models.Manager):
                                                                                     seller=sale.team if sale.type == 'MV' else None)))
         account.save()
 
-    @transaction.atomic()
+    @transaction.atomic
     def release(self, release_item):
         account = self.select_for_update().get(team=release_item.signing.team)
         account.balance += release_item.amount
@@ -138,7 +140,7 @@ class BankAccountManager(models.Manager):
                                               info=BankAccountHistory.make_info_release(release_item.signing.player)))
         account.save()
 
-    @transaction.atomic()
+    @transaction.atomic
     def sell(self, sale):
         assert (sale.type == 'MV')
         assert (sale.winning_auction is not None)
@@ -170,8 +172,8 @@ class BankAccountHistory(models.Model):
     info = JSONField()
 
     @staticmethod
-    def make_info_init():
-        return {'type': 'INIT'}
+    def make_info_init(merkato):
+        return {'type': 'INIT', 'merkato_id': merkato.pk}
 
     @staticmethod
     def make_info_buy(player, seller=None):

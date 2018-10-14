@@ -1,4 +1,5 @@
 from django.core.management.base import BaseCommand, CommandError
+from django.db import transaction
 from game import models as gamemodels
 import decimal
 
@@ -9,6 +10,7 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('league_id', nargs='+', type=int)
 
+    @transaction.atomic
     def handle(self, *args, **options):
         for league_id in options['league_id']:
             try:
@@ -28,7 +30,7 @@ class Command(BaseCommand):
             for mkt in gamemodels.Merkato.objects.filter(league_instance=instance):
                 if 'init_balance' in mkt.configuration:
                     for t in gamemodels.Team.objects.filter(league=league):
-                        events.append({'date': mkt.begin, 'balance': decimal.Decimal(mkt.configuration['init_balance']),
+                        events.append({'date': mkt.begin, 'merkato': mkt,
                                        'team': t})
             for sales_pa in gamemodels.Sale.objects.filter(type='PA',
                                                            merkato_session__merkato__league_instance=instance).select_related(
@@ -59,13 +61,17 @@ class Command(BaseCommand):
                                'credit': re.amount,
                                'release': re})
             for ev in sorted(sorted(events, key=lambda e: 0 if 'release' in e else 1), key=lambda e: e['date']):
-                account, _ = gamemodels.BankAccount.objects.get_or_create(team=ev['team'], defaults={'blocked': 0})
-                if 'balance' in ev:
-                    account.balance = ev['balance']
+                account, _ = gamemodels.BankAccount.objects.get_or_create(team=ev['team'],
+                                                                          defaults={'balance': ev['balance'],
+                                                                                    'blocked': 0})
+                if 'merkato' in ev:
+                    mkt = ev['merkato']
+                    account.balance = decimal.Decimal(mkt.configuration['init_balance'])
                     account.bankaccounthistory_set.add(
                         gamemodels.BankAccountHistory.objects.create(date=ev['date'], amount=ev['balance'],
                                                                      new_balance=account.balance,
-                                                                     info=gamemodels.BankAccountHistory.make_info_init()))
+                                                                     info=gamemodels.BankAccountHistory.make_info_init(
+                                                                         mkt)))
                     account.save()
                 if 'debit' in ev:
                     account.balance += ev['debit']

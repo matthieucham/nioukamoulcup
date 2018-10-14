@@ -1,4 +1,5 @@
 from django.core.management.base import BaseCommand, CommandError
+from django.db import transaction
 from game import models as gamemodels
 
 
@@ -14,6 +15,7 @@ class Command(BaseCommand):
             help='Recompute team scores for all journees of the current saison, not just the updated ones'
         )
 
+    @transaction.atomic
     def handle(self, *args, **options):
         # prerequisite: statnuts import done
         current_saisonscoring = gamemodels.SaisonScoring.objects.select_related('saison').filter(

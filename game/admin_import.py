@@ -87,7 +87,7 @@ class DraftSessionAdmin(admin.ModelAdmin):
 class MerkatoAdmin(admin.ModelAdmin):
     model = models.Merkato
     list_display = ['begin', 'end', 'mode']
-    actions = ['generate_sessions_action']
+    actions = ['generate_sessions_action', 'init_accounts_action']
     inlines = [MerkatoSessionInline, ]
 
     def has_delete_permission(self, request, obj=None):
@@ -102,6 +102,14 @@ class MerkatoAdmin(admin.ModelAdmin):
                 models.MerkatoSession.objects.filter(merkato=m).delete()
                 models.Merkato.objects.create_sessions(m)
         self.message_user(request, "Sessions créées")
+        return HttpResponseRedirect(reverse('import_statnuts:game_merkato_changelist'))
+
+    def init_accounts_action(self, request, queryset):
+        for m in queryset.filter(mode='BID'):
+            if 'init_balance' in m.configuration:
+                for team in models.Team.objects.filter(league=m.league_instance.league):
+                    models.BankAccount.objects.init_account(m.begin.date(), team, m.configuration.get('init_balance'),
+                                                            m)
         return HttpResponseRedirect(reverse('import_statnuts:game_merkato_changelist'))
 
 
