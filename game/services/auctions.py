@@ -13,7 +13,7 @@ class SaleSolvingException(Exception):
     pass
 
 
-@transaction.atomic()
+@transaction.atomic
 def apply_transfers(merkato_session):
     assert merkato_session.is_solved
     for sale in merkato_session.sale_set.all():
@@ -28,7 +28,7 @@ def _unblock_min_price(sale):
         account.save()
 
 
-@transaction.atomic()
+@transaction.atomic
 def _do_transfer(sale):
     if sale.type == 'PA':
         winner, value = sale.get_winner_and_price()  # winner cannot be None (PA)
@@ -58,7 +58,7 @@ def _make_signing_attr(sale):
                            'score_factor'] if 'score_factor' in sale.merkato_session.merkato.configuration else 1.0})
 
 
-@transaction.atomic()
+@transaction.atomic
 def solve_session(merkato_session):
     assert merkato_session.merkato.mode == 'BID'
     if merkato_session.solving > timezone.now():
@@ -82,7 +82,7 @@ def solve_session(merkato_session):
     return merkato_session
 
 
-@transaction.atomic()
+@transaction.atomic
 def solve_sale(sale):
     auctions = sale.auctions.all()
     processed_auctions = [_validate_auction(auc) for auc in auctions]
@@ -119,7 +119,7 @@ def _handle_no_auction(sale):
     sale.save()
 
 
-@transaction.atomic()
+@transaction.atomic
 def _validate_auction(auction):
     try:
         auction.validate()

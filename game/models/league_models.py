@@ -127,6 +127,7 @@ class BankAccountManager(models.Manager):
         account.balance -= amount
         account.bankaccounthistory_set.add(
             BankAccountHistory.objects.create(amount=amount, new_balance=account.balance,
+                                              date=sale.merkato_session.solving.date(),
                                               info=BankAccountHistory.make_info_buy(sale.player,
                                                                                     seller=sale.team if sale.type == 'MV' else None)))
         account.save()
@@ -137,6 +138,7 @@ class BankAccountManager(models.Manager):
         account.balance += release_item.amount
         account.bankaccounthistory_set.add(
             BankAccountHistory.objects.create(amount=release_item.amount, new_balance=account.balance,
+                                              date=release_item.merkato_session.solving.date(),
                                               info=BankAccountHistory.make_info_release(release_item.signing.player)))
         account.save()
 
@@ -151,6 +153,7 @@ class BankAccountManager(models.Manager):
         account.balance -= amount
         account.bankaccounthistory_set.add(
             BankAccountHistory.objects.create(amount=amount, new_balance=account.balance,
+                                              date=sale.merkato_session.solving.date(),
                                               info=BankAccountHistory.make_info_sell(sale.player,
                                                                                      sale.team)))
         account.save()
