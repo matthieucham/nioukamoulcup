@@ -1,4 +1,5 @@
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
+from django.core.management import call_command
 from django.db import transaction
 from game import models as gamemodels
 from game.services import auctions
@@ -12,6 +13,8 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         self._solve_drafts()
         self._solve_merkatos()
+        call_command('computescores')
+        self.stdout.write('computescores completed.')
 
     def _solve_drafts(self):
         for ds in gamemodels.DraftSession.objects.filter(merkato__league_instance__current=True,
