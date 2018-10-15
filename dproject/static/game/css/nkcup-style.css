@@ -901,6 +901,7 @@ dl.kvgroup {
 div.opensales-container {
     display: flex;
     padding: 5px;
+    flex-wrap: wrap;
 }
 
 div.submit-merkato-container {
