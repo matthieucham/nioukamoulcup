@@ -904,6 +904,10 @@ div.opensales-container {
     flex-wrap: wrap;
 }
 
+.opensales-container>div {
+    margin: 3px;
+}
+
 div.submit-merkato-container {
     padding: 1em;
     text-align: center;
