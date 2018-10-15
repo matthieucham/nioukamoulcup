@@ -1,10 +1,9 @@
 from django.db import models
 from django.contrib.postgres.fields import JSONField
-# import decimal
-# import json
 import pytz
 import datetime
 from datetime import timedelta
+from django.utils import timezone
 
 from ..models import league_models
 from ligue1 import models as l1models
@@ -139,7 +138,8 @@ class SaleManager(models.Manager):
             most_recent_merkato = Merkato.objects.filter(
                 league_instance__league=league_models.Team.objects.get(pk=team.pk).league,
                 league_instance__current=True,
-                begin__lte=datetime.date.today()).order_by('-end').first()
+                mode='BID',
+                begin__lte=timezone.now()).order_by('-end').first()
             qs = qs.filter(merkato_session__merkato=most_recent_merkato)
         if just_PA:
             qs = qs.filter(type='PA')

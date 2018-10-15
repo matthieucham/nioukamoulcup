@@ -562,6 +562,7 @@ class SaleSerializer(SaleSummarySerializer):
     winner = serializers.SerializerMethodField()
     amount = serializers.SlugRelatedField(source='winning_auction', slug_field='value', read_only=True)
     auctions = serializers.SerializerMethodField()
+    date = serializers.SlugRelatedField(source='merkato_session', slug_field='closing', read_only=True)
 
     def get_auctions(self, obj):
         return AuctionSerializer(transfer_models.Auction.objects.filter(sale=obj).order_by('value'), read_only=True,
@@ -574,7 +575,8 @@ class SaleSerializer(SaleSummarySerializer):
 
     class Meta:
         model = transfer_models.Sale
-        fields = ('id', 'rank', 'type', 'player', 'author', 'min_price', 'winner', 'amount', 'auctions')
+        fields = (
+        'id', 'rank', 'type', 'player', 'author', 'min_price', 'date', 'winner', 'amount', 'auctions')
 
 
 class MerkatoSessionSummarySerializer(serializers.HyperlinkedModelSerializer):

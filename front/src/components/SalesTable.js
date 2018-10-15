@@ -20,9 +20,9 @@ export const SalesTable = ({ sales, height }) => {
         >
           <Column
             label="Date"
-            dataKey="merkato_session.closing"
+            dataKey="date"
             cellDataGetter={({ rowData }) =>
-              format(rowData.merkato_session.closing, "DD/MM/YYYY")
+              format(rowData.date, "DD/MM/YYYY")
             }
             width={120}
           />
