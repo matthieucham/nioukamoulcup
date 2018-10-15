@@ -10,9 +10,10 @@ from game.rest.redux_state import StateInitializerMixin
 from game.rest import serializers
 from game.forms import RegisterPaForm, RegisterMvForm, RegisterOffersForm, RegisterDraftChoicesForm
 from django.http import HttpResponseRedirect
+from .ensure_csrf_cookie_mixin import EnsureCsrfCookieMixin
 
 
-class BaseLeagueView(PermissionRequiredMixin, DetailView):
+class BaseLeagueView(EnsureCsrfCookieMixin, PermissionRequiredMixin, DetailView):
     model = League
     template_name = 'game/league/league_react_base.html'
     permission_required = 'game.view_league'
