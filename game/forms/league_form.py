@@ -140,10 +140,10 @@ class RegisterDraftChoicesForm(forms.Form):
             assert len(jpk) == len(set(jpk))
         except AssertionError:
             raise forms.ValidationError('Interdit de choixisr plusieurs fois le même joueur')
-        try:
-            assert len(jpk) == self.draft_session.draftsessionrank_set.get(team=self.team).rank
-        except AssertionError:
-            raise forms.ValidationError('Il faut enregistrer autant de choix que son rang à la draft')
+        # try:
+        #     assert len(jpk) == self.draft_session.draftsessionrank_set.get(team=self.team).rank
+        # except AssertionError:
+        #     raise forms.ValidationError('Il faut enregistrer autant de choix que son rang à la draft')
         for pk in jpk:
             try:
                 assert auctions.available_for_pa(Joueur.objects.get(pk=pk), self.team.division,
