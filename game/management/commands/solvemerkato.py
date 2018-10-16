@@ -13,8 +13,6 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         self._solve_drafts()
         self._solve_merkatos()
-        call_command('computescores')
-        self.stdout.write('computescores completed.')
 
     def _solve_drafts(self):
         for ds in gamemodels.DraftSession.objects.filter(merkato__league_instance__current=True,
