@@ -257,7 +257,7 @@ class LeagueRegisterDraftView(FormView, BaseLeagueView):
         DraftPick.objects.filter(draft_session_rank__team=self.get_my_team(),
                                  draft_session_rank__signing__isnull=True).delete()
         for field, val in form.cleaned_data.items():
-            if field.startswith('_pick_for_rank__'):
+            if field.startswith('_pick_for_rank__') and val > 0:
                 rank = int(field[len('_pick_for_rank__'):])
                 DraftPick.objects.create(
                     pick_order=rank,

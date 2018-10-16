@@ -576,7 +576,7 @@ class SaleSerializer(SaleSummarySerializer):
     class Meta:
         model = transfer_models.Sale
         fields = (
-        'id', 'rank', 'type', 'player', 'author', 'min_price', 'date', 'winner', 'amount', 'auctions')
+            'id', 'rank', 'type', 'player', 'author', 'min_price', 'date', 'winner', 'amount', 'auctions')
 
 
 class MerkatoSessionSummarySerializer(serializers.HyperlinkedModelSerializer):
@@ -707,7 +707,7 @@ class DraftPickSerializer(serializers.ModelSerializer):
         fields = ('pick_order', 'player',)
 
 
-class DraftSessionRankSerializer(serializers.ModelSerializer):
+class OpenDraftSessionRankSerializer(serializers.ModelSerializer):
     picks = DraftPickSerializer(many=True, read_only=True)
 
     class Meta:
@@ -721,8 +721,10 @@ class OpenDraftSessionSerializer(serializers.HyperlinkedModelSerializer):
     def get_my_rank(self, obj):
         if 'team' in self.context:
             try:
-                return DraftSessionRankSerializer(obj.draftsessionrank_set.get(team=self.context['team']), many=False,
-                                                  read_only=True, context={'request': self.context['request']}).data
+                return OpenDraftSessionRankSerializer(
+                    transfer_models.DraftSessionRank.objects.get(draft_session=obj, team=self.context['team']),
+                    many=False,
+                    read_only=True, context={'request': self.context['request']}).data
             except transfer_models.DraftSessionRank.DoesNotExist:
                 return None
         return None

@@ -135,7 +135,7 @@ class RegisterDraftChoicesForm(forms.Form):
             assert self.draft_session.closing >= timezone.now()
         except AssertionError:
             raise forms.ValidationError('Draft terminée, trop tard.')
-        jpk = [val for field, val in self.cleaned_data.items() if field.startswith('_pick_for_rank__')]
+        jpk = [val for field, val in self.cleaned_data.items() if field.startswith('_pick_for_rank__') and val > 0]
         try:
             assert len(jpk) == len(set(jpk))
         except AssertionError:
