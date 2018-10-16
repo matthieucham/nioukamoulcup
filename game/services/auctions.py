@@ -149,8 +149,12 @@ def solve_draft_session(draft_session):
 def solve_draft_pick(draft_session_rank, already_picked_players):
     for pick in draft_session_rank.picks.order_by('pick_order').all():
         if pick.player not in already_picked_players:
-            _do_draft_signing(pick)
-            return pick.player
+            if available_for_pa(pick.player, draft_session_rank.team.division,
+                                draft_session_rank.draft_session.merkato.league_instance):
+                _do_draft_signing(pick)
+                return pick.player
+            else:
+                print('Joueur %s plus dispo pour la draft' % pick.player.display_name())
     return None
 
 
