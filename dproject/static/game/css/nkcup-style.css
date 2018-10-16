@@ -897,6 +897,10 @@ dl.kvgroup {
     flex: 1;
 }
 
+.draft-choice > div {
+    flex-grow: 1;
+}
+
 
 div.opensales-container {
     display: flex;

@@ -47,7 +47,7 @@ export class CurrentMerkatoDraftSession extends React.Component {
       picks: [] /* TODO init from props */
     };
     for (let i = 1; i <= props.draftSession.my_rank.rank; i++) {
-      if (my_rank.picks) {
+      if (props.draftSession.my_rank.picks) {
         var choice = props.draftSession.my_rank.picks.find(
           p => p.pick_order == i
         );
