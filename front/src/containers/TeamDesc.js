@@ -20,6 +20,10 @@ import { SigningsTable } from "../components/SigningsTable";
 import { FinancesTable } from "../components/FinancesTable";
 import { ReleasesTable } from "../components/ReleasesTable";
 import { SalesTable } from "../components/SalesTable";
+import IconButton from "@material-ui/core/IconButton";
+import TextField from "@material-ui/core/TextField";
+import { LEAGUE_ID } from "../build";
+import CSRFToken from "../components/csrftoken";
 
 export class TeamCover extends Component {
   constructor(props) {
@@ -37,20 +41,40 @@ export class TeamCover extends Component {
     const coverUrl =
       "perso" in team.attributes && "cover" in team.attributes.perso
         ? team.attributes.perso.cover
-        : null;
+        : "";
     const { mode } = this.state;
     return (
       <div
         className={`team-cover-box`}
         style={{ backgroundImage: "url(" + coverUrl + ")" }}
       >
-        {showName && <h1>{name}</h1>}
-        {editable && (
-          <div onClick={() => this.setState({ mode: "EDIT" })}>
-            <i className="fa fa-pencil-square-o fa-2x" />
-          </div>
+        {showName && mode == "READ" && <h1>{name}</h1>}
+        {editable &&
+          mode == "READ" && (
+            <div id="editCoverButton">
+              <IconButton onClick={() => this.setState({ mode: "EDIT" })}>
+                <i className="fa fa fa-pencil-square-o" />
+              </IconButton>
+            </div>
+          )}
+        {mode == "EDIT" && (
+          <form
+            action={`/game/league/${LEAGUE_ID}/ekyp/${team.id}/cover`}
+            method="POST"
+          >
+            <TextField
+              label="Adresse de l'image"
+              name="cover_url"
+              defaultValue={coverUrl}
+              margin="normal"
+              variant="outlined"
+            />
+            <CSRFToken />
+            <IconButton type="submit">
+              <i className="fa fa fa-floppy-o" />
+            </IconButton>
+          </form>
         )}
-        {mode == "EDIT" && <p>edit me</p>}
       </div>
     );
   }

@@ -1,14 +1,13 @@
 from django.views.generic import DetailView, FormView
 from django.shortcuts import reverse
 from rules.contrib.views import PermissionRequiredMixin
-from game.models import League, LeagueInstance, LeagueInstancePhase, LeagueInstancePhaseDay, LeagueMembership, Team, \
+from game.models import League, LeagueInstance, LeagueMembership, Team, \
     MerkatoSession, Merkato, Sale, Auction, DraftSession, DraftSessionRank, DraftPick
 from ligue1.models import Joueur
 from django.utils.timezone import localtime, now
 from django.db.models import Count
 from game.rest.redux_state import StateInitializerMixin
-from game.rest import serializers
-from game.forms import RegisterPaForm, RegisterMvForm, RegisterOffersForm, RegisterDraftChoicesForm
+from game.forms import RegisterPaForm, RegisterMvForm, RegisterOffersForm, RegisterDraftChoicesForm, RegisterCoverForm
 from django.http import HttpResponseRedirect
 from .ensure_csrf_cookie_mixin import EnsureCsrfCookieMixin
 
@@ -206,6 +205,24 @@ class LeagueRegisterPAView(FormView, BaseLeagueView):
             type='PA'
         )
         return super(LeagueRegisterPAView, self).form_valid(form)
+
+
+class LeagueEkypRegisterCoverView(FormView, BaseLeagueView):
+    template_name = 'game/league/ekyp.html'
+    form_class = RegisterCoverForm
+
+    def get_success_url(self):
+        return reverse('league_ekyp-detail', kwargs={'pk': self.get_object().pk})
+
+    def form_valid(self, form):
+        # update cover of "my_team" with form value
+        team = self.get_my_team()
+        try:
+            team.attributes['perso']['cover'] = form.cleaned_data.get('cover_url')
+        except KeyError:
+            team.attributes['perso'] = {'cover': form.cleaned_data.get('cover_url')}
+        team.save()
+        return super(LeagueEkypRegisterCoverView, self).form_valid(form)
 
 
 class LeagueRegisterMVView(FormView, BaseLeagueView):

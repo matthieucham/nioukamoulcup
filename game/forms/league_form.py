@@ -150,3 +150,7 @@ class RegisterDraftChoicesForm(forms.Form):
                                                  self.draft_session.merkato.league_instance)
             except AssertionError:
                 raise forms.ValidationError('Ce joueur ne peut plus être sélectionné', code="invalid")
+
+
+class RegisterCoverForm(forms.Form):
+    cover_url = forms.CharField()
