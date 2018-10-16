@@ -47,11 +47,15 @@ export class CurrentMerkatoDraftSession extends React.Component {
       picks: [] /* TODO init from props */
     };
     for (let i = 1; i <= props.draftSession.my_rank.rank; i++) {
-      var choice = props.draftSession.my_rank.picks.find(
-        p => p.pick_order == i
-      );
-      if (choice) {
-        this.state.picks.push({ picked: choice.player });
+      if (my_rank.picks) {
+        var choice = props.draftSession.my_rank.picks.find(
+          p => p.pick_order == i
+        );
+        if (choice) {
+          this.state.picks.push({ picked: choice.player });
+        } else {
+          this.state.picks.push({ picked: null });
+        }
       } else {
         this.state.picks.push({ picked: null });
       }

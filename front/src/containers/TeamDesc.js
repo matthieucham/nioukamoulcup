@@ -21,24 +21,44 @@ import { FinancesTable } from "../components/FinancesTable";
 import { ReleasesTable } from "../components/ReleasesTable";
 import { SalesTable } from "../components/SalesTable";
 
-export const TeamCover = ({ team, showName }) => {
-  const name = team.name;
-  const coverUrl =
-    "perso" in team.attributes && "cover" in team.attributes.perso
-      ? team.attributes.perso.cover
-      : null;
-  return (
-    <div
-      className={`team-cover-box`}
-      style={{ backgroundImage: "url(" + coverUrl + ")" }}
-    >
-      {showName && <h1>{name}</h1>}
-    </div>
-  );
-};
+export class TeamCover extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      mode: "READ"
+    };
+  }
+
+  render() {
+    const { team, showName, editable } = this.props;
+
+    const name = team.name;
+    const coverUrl =
+      "perso" in team.attributes && "cover" in team.attributes.perso
+        ? team.attributes.perso.cover
+        : null;
+    const { mode } = this.state;
+    return (
+      <div
+        className={`team-cover-box`}
+        style={{ backgroundImage: "url(" + coverUrl + ")" }}
+      >
+        {showName && <h1>{name}</h1>}
+        {editable && (
+          <div onClick={() => this.setState({ mode: "EDIT" })}>
+            <i className="fa fa-pencil-square-o fa-2x" />
+          </div>
+        )}
+        {mode == "EDIT" && <p>edit me</p>}
+      </div>
+    );
+  }
+}
 
 TeamCover.defaultProps = {
-  showName: true
+  showName: true,
+  editable: false
 };
 
 class TeamDescCollapsibleSection extends Component {

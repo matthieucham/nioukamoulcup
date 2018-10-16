@@ -20,7 +20,7 @@ const Page = ({ team }) => {
 			<TeamDetails team={ team } />
 			</main>
 			<aside className="hg__right">
-			<TeamCover team={ team }/>
+			<TeamCover team={ team } editable />
 			<TeamSignings signings={ team.signings } />
 			</aside>
 			</div>
