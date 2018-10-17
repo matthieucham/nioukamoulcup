@@ -336,6 +336,12 @@ header nav a:hover, nav ul li ul li:hover {
     }
 }
 
+/* Footer */
+.hg__footer a, .hg__footer a:visited {
+    color: #f1f1f1;
+}
+
+/* le reste */
 .cover {
     background-color: #b5b5b5;
     background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(../images/logo_fullres_notitle.png);

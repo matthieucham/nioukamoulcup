@@ -1,0 +1,11 @@
+{% extends "game/game_base.html" %}
+
+{% block content_title %}Contact{% endblock %}
+
+{% block content-center %}
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Envoyer"/>
+</form>
+{% endblock %}

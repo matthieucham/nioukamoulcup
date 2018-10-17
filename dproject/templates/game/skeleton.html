@@ -42,7 +42,9 @@
   <div class="hg__body">
       {% block gamecontent %}{% endblock gamecontent%}
   </div>
-  <footer class="hg__footer">Footer</footer>
+  <footer class="hg__footer">
+      <a href="{% url 'contact_form' %}">Contact</a>
+  </footer>
 {% block bottomscript %}{% endblock bottomscript %}
 </body>
 

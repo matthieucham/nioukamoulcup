@@ -69,6 +69,7 @@ THIRD_PARTY_APPS = (
     'webpack_loader',
     'rest_framework',
     'dry_rest_permissions',
+    'contact_form',
 )
 
 # Apps specific for this project go here.
