@@ -1103,3 +1103,56 @@ aside.entry-widgets {
     color: color: rgba(0, 0, 0, 0.54);
     padding: 5px;
 }
+
+/*****************/
+/* Form feedback */
+/*****************/
+ul.messages li.info, ul.messages li.success, ul.messages li.warning, ul.messages li.danger {
+padding:12px;
+
+}
+ul.messages li.info {
+    color: #00529B;
+    background-color: #BDE5F8;
+}
+ul.messages li.info::before {
+    font-family: FontAwesome;
+    content: "\f05a   ";
+    margin:10px 22px;
+    font-size:2em;
+    vertical-align:middle;
+}
+ul.messages li.success {
+    color: #4F8A10;
+    background-color: #DFF2BF;
+}
+ul.messages li.success::before {
+    font-family: FontAwesome;
+    content: "\f00c   ";
+    margin:10px 22px;
+    font-size:2em;
+    vertical-align:middle;
+}
+ul.messages li.warning {
+    color: #9F6000;
+    background-color: #FEEFB3;
+}
+ul.messages li.warning::before {
+    font-family: FontAwesome;
+    content: "\f071   ";
+    margin:10px 22px;
+    font-size:2em;
+    vertical-align:middle;
+}
+ul.messages li.danger {
+    color: #D8000C;
+    background-color: #FFD2D2;
+}
+ul.messages li.danger::before {
+    font-family: FontAwesome;
+    content: "\f057   ";
+    margin:10px 22px;
+    font-size:2em;
+    vertical-align:middle;
+}
+

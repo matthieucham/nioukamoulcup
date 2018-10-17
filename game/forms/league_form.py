@@ -63,7 +63,8 @@ class RegisterPaForm(BaseRegisterForm):
             assert auctions.available_for_pa(Joueur.objects.get(pk=joueur_pk), self.team.division,
                                              self.merkato.league_instance)
         except AssertionError:
-            raise forms.ValidationError('Ce joueur ne peut plus être sélectionné', code="invalid")
+            raise forms.ValidationError(
+                'Le joueur %s ne peut plus être mis en vente' % Joueur.objects.get(pk=joueur_pk).display_name())
         return joueur_pk
 
 
@@ -83,7 +84,8 @@ class RegisterMvForm(BaseRegisterForm):
             assert auctions.available_for_mv(Joueur.objects.get(pk=joueur_pk), self.team,
                                              self.merkato.league_instance)
         except AssertionError:
-            raise forms.ValidationError('Ce joueur ne peut plus être sélectionné', code="invalid")
+            raise forms.ValidationError(
+                'Le joueur %s ne peut plus être mis en vente' % Joueur.objects.get(pk=joueur_pk).display_name())
         return joueur_pk
 
 
@@ -98,8 +100,9 @@ class RegisterOffersForm(forms.Form):
                 init_val = Auction.objects.get(sale=s.pk, team=self.team).value
             except Auction.DoesNotExist:
                 init_val = None
-            self.fields['_offer_for_sale__%s' % s.pk] = forms.FloatField(
-                min_value=(s.min_price + Decimal(0.1) if s.type == 'PA' else s.min_price),
+            self.fields['_offer_for_sale__%s' % s.pk] = forms.DecimalField(
+                min_value=(Decimal(s.min_price + Decimal('0.1')) if s.type == 'PA' else s.min_price),
+                decimal_places=1,
                 required=False,
                 initial=init_val
             )
@@ -139,7 +142,7 @@ class RegisterDraftChoicesForm(forms.Form):
         try:
             assert len(jpk) == len(set(jpk))
         except AssertionError:
-            raise forms.ValidationError('Interdit de choixisr plusieurs fois le même joueur')
+            raise forms.ValidationError('Certains joueurs sont choisis plusieurs fois')
         # try:
         #     assert len(jpk) == self.draft_session.draftsessionrank_set.get(team=self.team).rank
         # except AssertionError:
@@ -149,7 +152,8 @@ class RegisterDraftChoicesForm(forms.Form):
                 assert auctions.available_for_pa(Joueur.objects.get(pk=pk), self.team.division,
                                                  self.draft_session.merkato.league_instance)
             except AssertionError:
-                raise forms.ValidationError('Ce joueur ne peut plus être sélectionné', code="invalid")
+                raise forms.ValidationError(
+                    'Le joueur %s ne peut plus être sélectionné' % Joueur.objects.get(pk=pk).display_name())
 
 
 class RegisterCoverForm(forms.Form):

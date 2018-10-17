@@ -1,5 +1,6 @@
 from django.views.generic import DetailView, FormView
 from django.shortcuts import reverse
+from django.contrib import messages
 from rules.contrib.views import PermissionRequiredMixin
 from game.models import League, LeagueInstance, LeagueMembership, Team, \
     MerkatoSession, Merkato, Sale, Auction, DraftSession, DraftSessionRank, DraftPick
@@ -32,6 +33,14 @@ class BaseLeagueView(EnsureCsrfCookieMixin, PermissionRequiredMixin, DetailView)
         context['instance'] = self.get_current_league_instance()
         context['component'] = self.component
         return context
+
+    def form_invalid(self, form):
+        """If the form is invalid, redirect to the supplied URL. \
+        (hack parce que les erreurs ne sont pas visible de toute façon)"""
+        for key, errorlist in form.errors.items():
+            for err in errorlist:
+                messages.add_message(self.request, messages.ERROR, err)
+        return HttpResponseRedirect(self.get_success_url())
 
 
 class LeagueWallView(StateInitializerMixin, BaseLeagueView):
@@ -176,6 +185,7 @@ class LeagueMerkatoView(FormView, BaseMerkatoSessionsListView):
                     Auction.objects.filter(
                         sale=Sale.objects.get(pk=spk),
                         team=self.get_my_team()).delete()
+        messages.add_message(self.request, messages.SUCCESS, 'Offres enregistrées')
         return super(LeagueMerkatoView, self).form_valid(form)
 
 
@@ -204,6 +214,7 @@ class LeagueRegisterPAView(FormView, BaseLeagueView):
             min_price=form.cleaned_data.get('amount'),
             type='PA'
         )
+        messages.add_message(self.request, messages.SUCCESS, 'PA enregistrée')
         return super(LeagueRegisterPAView, self).form_valid(form)
 
 
@@ -222,6 +233,7 @@ class LeagueEkypRegisterCoverView(FormView, BaseLeagueView):
         except KeyError:
             team.attributes['perso'] = {'cover': form.cleaned_data.get('cover_url')}
         team.save()
+        messages.add_message(self.request, messages.SUCCESS, 'Image enregistrée')
         return super(LeagueEkypRegisterCoverView, self).form_valid(form)
 
 
@@ -250,6 +262,7 @@ class LeagueRegisterMVView(FormView, BaseLeagueView):
             min_price=form.cleaned_data.get('amount'),
             type='MV'
         )
+        messages.add_message(self.request, messages.SUCCESS, 'MV enregistrée')
         return super(LeagueRegisterMVView, self).form_valid(form)
 
 
@@ -282,8 +295,5 @@ class LeagueRegisterDraftView(FormView, BaseLeagueView):
                     draft_session_rank=DraftSessionRank.objects.get(draft_session=self.get_draft_session(),
                                                                     team=self.get_my_team())
                 )
+        messages.add_message(self.request, messages.SUCCESS, 'Choix de draft enregistrés')
         return super(LeagueRegisterDraftView, self).form_valid(form)
-
-    def form_invalid(self, form):
-        """If the form is invalid, redirect to the supplied URL. (hack parce que les erreurs ne sont pas visible de toute façon)"""
-        return HttpResponseRedirect(self.get_success_url())
