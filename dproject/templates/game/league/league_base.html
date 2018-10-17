@@ -1,5 +1,7 @@
 {% extends "game/game_base.html" %}
 
+{% block title %}{{ object.name }}{% endblock title %}
+
 {% block left-menu %}
     {% include 'game/league/menu.html' %}
 {% endblock left-menu %}
@@ -11,13 +13,33 @@
     </div>
 
     {% if messages %}
+    <div id="snackbar">
     <ul class="messages">
         {% for message in messages %}
         <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
         {% endfor %}
     </ul>
+    </div>
     {% endif %}
 
     {% block undercover %}{% endblock %}
 
 {% endblock content-center %}
+
+{% block bottomscript %}
+<script>
+function showSnackbar() {
+    console.log('hello');
+    // Get the snackbar DIV
+    var x = document.getElementById("snackbar");
+    if (x) {
+        // Add the "show" class to DIV
+        x.className = "show";
+
+        // After 5 seconds, remove the show class from DIV
+        setTimeout(function(){ x.className = x.className.replace("show", ""); }, 5000);
+    }
+}
+window.onload = showSnackbar;
+</script>
+{% endblock bottomscript %}
