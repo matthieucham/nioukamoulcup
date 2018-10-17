@@ -2,6 +2,8 @@
 {% load static %}
 {% load l1results %}
 
+{% block title-page %}{{ rencontre }}{% endblock title-page %}
+
 {% block content-right %}
     {% last_journees 3 %}
 {% endblock content-right %}
