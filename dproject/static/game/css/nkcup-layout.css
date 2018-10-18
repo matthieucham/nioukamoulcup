@@ -83,7 +83,6 @@ body {
 
 .hg__footer .footer-widgets .f-widget{
     flex: 1;
-    /*max-width: 33%;*/
     margin: 0 0.5em 0.5em 0.5em;
 }
 
@@ -128,6 +127,10 @@ body {
 
 #mentions b, #mentions strong {
     font-weight: bolder;
+}
+
+#mentions p {
+    margin: 3px 0;
 }
 
 #react-app {

@@ -1,11 +1,18 @@
-{% extends "game/game_base.html" %}
+{% extends "game/skeleton.html" %}
 
-{% block content_title %}Contact{% endblock %}
+{% block title %}Contact{% endblock title %}
 
-{% block content-center %}
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <input type="submit" value="Envoyer"/>
-</form>
+{% block gamecontent %}
+<div id="mentions-bg">
+    <article id="mentions">
+        <h1>Contact</h1>
+        <p>Utilisez le formulaire ci-dessous si vous avez une question à poser. J'essaierai d'y répondre aussi vite que
+            possible</p>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <p><input type="submit" value="Envoyer"/></p>
+        </form>
+    </article>
+</div>
 {% endblock %}
