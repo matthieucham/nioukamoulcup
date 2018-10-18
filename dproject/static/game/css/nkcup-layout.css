@@ -93,6 +93,43 @@ body {
     }
 }
 
+/***********************/
+/** MENTIONS LEGALES **/
+/***********************/
+
+#mentions-bg {
+    background-color: #f1f1f1;
+    width: 100%;
+}
+
+#mentions {
+    margin: 0 auto;
+    padding: 1em;
+    max-width: 800px;
+}
+
+#mentions h1 {
+    margin: 1em 0;
+    font-size: 1.5em;
+    font-weight: bold;
+}
+
+#mentions h2 {
+    margin: 0.8em 0 0.5em 0.5em;
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+#mentions h3 {
+    margin: 0.5em 0;
+    font-size: 1.1 em;
+    font-weight: bold;
+}
+
+#mentions b, #mentions strong {
+    font-weight: bolder;
+}
+
 #react-app {
     flex: 1;
     display: flex;

@@ -17,13 +17,14 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.conf.urls import url, include
 from django.contrib import admin
-#from wiki.urls import get_pattern as get_wiki_pattern
-#from django_nyt.urls import get_pattern as get_nyt_pattern
+# from wiki.urls import get_pattern as get_wiki_pattern
+# from django_nyt.urls import get_pattern as get_nyt_pattern
 from ligue1.admin_import import admin_import_site
-from game.views import LandingPage
+from game.views import LandingPage, MentionsPage
 
 urlpatterns = [
     url(r'^$', LandingPage.as_view()),
+    url(r'^mentions/', MentionsPage.as_view(), name='mentions'),
     url(r'^game/', include('game.urls')),
     url(r'^admin/', admin.site.urls),
     url(r'^accounts/', include('userena.urls')),
@@ -37,6 +38,7 @@ if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     import debug_toolbar
+
     urlpatterns += [
         url(r'^__debug__/', include(debug_toolbar.urls)),
     ]
