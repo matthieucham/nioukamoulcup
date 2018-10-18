@@ -12,6 +12,10 @@ class LandingPage(TemplateView):
     template_name = 'game/landing.html'
 
 
+class MentionsPage(TemplateView):
+    template_name = 'game/mentions.html'
+
+
 class HomePage(TemplateView):
     template_name = 'game/home/info.html'
 

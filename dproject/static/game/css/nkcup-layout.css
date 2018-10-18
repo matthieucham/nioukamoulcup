@@ -58,8 +58,76 @@ body {
 }
 
 .hg__footer {
-    height: 30px;
+    /*height: 30px;*/
     flex: none; /* 2 */
+}
+
+.hg__footer {
+    color: rgb(204, 204, 204, 0.57);
+    font-size: 0.8em;
+    padding: 0 1em;
+}
+
+.hg__footer h3{
+    color: rgb(204, 204, 204, 1.0);
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-top: 0.3em;
+    margin-bottom: 0.5em;
+}
+
+.hg__footer .footer-widgets {
+    display: flex;
+    justify-content: space-around;
+}
+
+.hg__footer .footer-widgets .f-widget{
+    flex: 1;
+    /*max-width: 33%;*/
+    margin: 0 0.5em 0.5em 0.5em;
+}
+
+@media screen and (max-width: 768px) {
+    .hg__footer .footer-widgets {
+        flex-direction: column;
+    }
+}
+
+/***********************/
+/** MENTIONS LEGALES **/
+/***********************/
+
+#mentions-bg {
+    background-color: #f1f1f1;
+    width: 100%;
+}
+
+#mentions {
+    margin: 0 auto;
+    padding: 1em;
+    max-width: 800px;
+}
+
+#mentions h1 {
+    margin: 1em 0;
+    font-size: 1.5em;
+    font-weight: bold;
+}
+
+#mentions h2 {
+    margin: 0.8em 0 0.5em 0.5em;
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+#mentions h3 {
+    margin: 0.5em 0;
+    font-size: 1.1 em;
+    font-weight: bold;
+}
+
+#mentions b, #mentions strong {
+    font-weight: bolder;
 }
 
 #react-app {
