@@ -32,6 +32,7 @@ urlpatterns = [
     # url(r'^notifications/', get_nyt_pattern()),
     # url(r'^wiki/', get_wiki_pattern()),
     url(r'^import/', admin_import_site.urls, name='import'),
+    url(r'^contact/', include('contact_form.urls')),
 ]
 
 if settings.DEBUG:
