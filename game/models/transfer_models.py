@@ -4,8 +4,7 @@ import pytz
 import datetime
 from datetime import timedelta
 from django.utils import timezone
-
-from ..models import league_models
+from . import league_models
 from ligue1 import models as l1models
 
 
@@ -51,6 +50,21 @@ class MerkatoManager(models.Manager):
             return previous_tick
         return None
 
+    def find_current_open_merkato_for_release(self, team, mode='BID'):
+        for mkt in self.filter(league_instance__league=team.league, mode=mode,
+                               begin__lte=timezone.now(), end__gt=timezone.now()):
+            if mkt.configuration is None:
+                authorized_release_nb = 0
+            else:
+                authorized_release_nb = mkt.configuration.get('re_number') or 0
+            # comptage des merkatos déjà effectués:
+            if authorized_release_nb > 0:
+                release_count = Release.objects.filter(merkato_session__merkato=mkt, signing__team=team,
+                                                       signing__league_instance=mkt.league_instance).count()
+                if release_count < authorized_release_nb:
+                    return mkt
+        return False
+
 
 class Merkato(models.Model):
     MODES = (('DRFT', 'Draft'), ('BID', 'Bid'))
@@ -64,11 +78,12 @@ class Merkato(models.Model):
     objects = MerkatoManager()
 
     @staticmethod
-    def _make_config(roster_size_max=9, sales_per_session=-1, pa_number=1, mv_number=1, mv_tax_rate=0.1,
+    def _make_config(roster_size_max=9, sales_per_session=-1, pa_number=1, re_number=2, mv_number=1, mv_tax_rate=0.1,
                      re_tax_rate=0.5, initial_team_balance=100, closing_times=['10:00', '18:00'], session_duration=48):
         conf = {'roster_size_max': roster_size_max,
                 'sales_per_session': sales_per_session,
                 'pa_number': pa_number,
+                're_number': re_number,
                 'mv_number': mv_number,
                 'mv_tax_rate': mv_tax_rate,
                 're_tax_rate': re_tax_rate,
@@ -86,13 +101,13 @@ class Merkato(models.Model):
 
 
 class MerkatoSessionManager(models.Manager):
-    def get_next_available(self, merkato):
+    def get_next_available(self, merkato, dont_check_sales_count=False):
         now = datetime.datetime.now(pytz.utc)
-        max_sales_in_session = merkato.configuration['sales_per_session']
+        max_sales_in_session = merkato.configuration.get('sales_per_session', -1)
         sess_gen = (s for s in self.filter(merkato=merkato).prefetch_related('sale_set').order_by('closing') if
                     s.closing >= now)
         for sess in sess_gen:
-            if max_sales_in_session < 0:
+            if dont_check_sales_count or (max_sales_in_session < 0):
                 # first found is ok:
                 return sess
             if len(sess.sale_set.all()) < max_sales_in_session:
@@ -306,7 +321,7 @@ class DraftSessionRank(models.Model):
 
     class Meta:
         unique_together = ('draft_session', 'rank', 'team')
-        ordering = ('rank', )
+        ordering = ('rank',)
 
 
 class DraftPick(models.Model):
@@ -316,4 +331,3 @@ class DraftPick(models.Model):
 
     class Meta:
         unique_together = ('pick_order', 'player', 'draft_session_rank')
-

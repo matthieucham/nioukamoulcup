@@ -3,6 +3,6 @@ from .home_views import ResultJourneeView, ResultRencontreView, StatJoueurView, 
 from .zinnia_views import LeagueEntryDetail
 from .league_views import LeagueEkypView, LeagueWallView, LeagueRankingView, LeagueMerkatoResultsView, \
     LeagueMerkatoView, LeagueRegisterPAView, LeagueRegisterMVView, LeagueRegisterDraftView, LeagueDraftResultsView, \
-    LeagueEkypRegisterCoverView
+    LeagueEkypRegisterCoverView, LeagueReleaseSigningView
 from .user_views import TeamListView, TeamCreateView, TeamDeleteView, TeamInvitationView, TeamInvitationAcceptView, \
     TeamInvitationRejectView, TeamJoinLeagueView

@@ -378,7 +378,7 @@ class SigningsAggregationSerializer(serializers.Serializer):
 
 
 class TeamDetailSerializer(serializers.ModelSerializer):
-    permissions = DRYPermissionsField()
+    permissions = DRYPermissionsField(additional_actions=['release'],)
     signings_aggregation = SigningsAggregationSerializer(source='*', read_only=True)
     signings = SigningSerializer(source='signing_set', many=True, read_only=True)
     latest_scores = serializers.SerializerMethodField()

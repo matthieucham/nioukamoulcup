@@ -1,5 +1,7 @@
 import random
 import json
+from math import ceil
+import decimal
 from operator import attrgetter
 from django.db import transaction
 from django.utils import timezone
@@ -53,9 +55,14 @@ def _do_transfer(sale):
 
 
 def _make_signing_attr(sale):
-    return json.dumps({'amount': float(sale.get_buying_price()), 'type': sale.type,
-                       'score_factor': sale.merkato_session.merkato.configuration[
-                           'score_factor'] if 'score_factor' in sale.merkato_session.merkato.configuration else 1.0})
+    return {'amount': float(sale.get_buying_price().quantize(decimal.Decimal('.1'), rounding=decimal.ROUND_HALF_UP)),
+            'type': sale.type,
+            'release_amount': float((sale.get_buying_price() * decimal.Decimal(
+                1.0 - sale.merkato_session.merkato.configuration.get('re_tax_rate'))).quantize(decimal.Decimal('.1'),
+                                                                                               rounding=decimal.ROUND_HALF_UP)),
+            'locked': False,
+            'score_factor': sale.merkato_session.merkato.configuration[
+                'score_factor'] if 'score_factor' in sale.merkato_session.merkato.configuration else 1.0}
 
 
 @transaction.atomic
@@ -66,9 +73,8 @@ def solve_session(merkato_session):
     # first, apply releases
     for release in transfer_models.Release.objects.filter(merkato_session=merkato_session):
         league_models.BankAccount.objects.release(release)
-        release.signing.end = timezone.now()
+        league_models.Signing.objects.end(release.signing, 'RE', date=timezone.now(), amount=release.amount)
         release.done = True
-        release.signing.save()
         release.save()
     with locked_atomic_transaction.LockedAtomicTransaction(
             league_models.BankAccount):  # prevents changes in BankAccount balance during resolution
@@ -174,6 +180,7 @@ def _make_draft_signing_attr(draft_pick):
     return {'rank': draft_pick.draft_session_rank.rank,
             'pick_order': draft_pick.pick_order,
             'type': 'DRFT',
+            'locked': True,
             'score_factor': draft_pick.draft_session_rank.draft_session.merkato.configuration.get('score_factor', 1.0)}
 
 

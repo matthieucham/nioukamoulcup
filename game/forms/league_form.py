@@ -158,3 +158,32 @@ class RegisterDraftChoicesForm(forms.Form):
 
 class RegisterCoverForm(forms.Form):
     cover_url = forms.CharField()
+
+
+class ReleaseSigningForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        self.team = kwargs.pop('team')
+        self.signing = kwargs.pop('signing')
+        self.request = kwargs.pop('request')
+        super(ReleaseSigningForm, self).__init__(*args, **kwargs)
+
+    def clean(self):
+        # Règles :
+        # - write + release permissions
+        # - signing pas déjà released
+        # - signing pas locké
+        try:
+            assert self.team.has_object_write_permission(self.request) and self.team.has_object_release_permission(
+                self.request)
+        except AssertionError:
+            raise forms.ValidationError('Vous n''avez pas la permission')
+        try:
+            assert (not self.signing.attributes.get('ending', False)) and (
+                        self.signing.attributes.get('end', None) is None)
+        except AssertionError:
+            raise forms.ValidationError('Joueur déjà revendu')
+        try:
+            assert not self.signing.attributes.get('locked', False)
+        except AssertionError:
+            raise forms.ValidationError('Impossible de revendre ce joueur')
+

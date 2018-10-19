@@ -2,9 +2,8 @@ import uuid
 from django.db import models, transaction
 from django.contrib.postgres.fields import JSONField
 from django.contrib.auth.models import User
-# import json
+from django.apps import apps
 from collections import defaultdict
-import datetime
 
 from . import scoring_models
 from ligue1 import models as l1models
@@ -95,7 +94,14 @@ class Team(models.Model):
         return request.user in self.league.members.all()
 
     def has_object_write_permission(self, request):
-        return LeagueMembership.objects.filter(user=request.user, team=self, is_team_captain=True).count() > 0
+        return LeagueMembership.objects.filter(user=request.user, team=self).count() > 0
+
+    def has_object_release_permission(self, request):
+        # pour être autorisé à faire une revente à la banque (release) il faut:
+        # - un merkato en cours
+        # - pas encore le nombre max de release effectué par cette équipe
+        merkato_model = apps.get_model('game', 'Merkato')
+        return merkato_model.objects.find_current_open_merkato_for_release(self) is not None
 
     def __str__(self):
         return self.name
@@ -362,6 +368,12 @@ class TeamDayScore(models.Model):
 
 
 class SigningManager(models.Manager):
+    def ending(self, signing):
+        if signing.end:
+            raise ValueError('Cannot end a signing which has a end date already')
+        signing.attributes['ending'] = True
+        signing.save()
+
     def end(self, signing, reason, date=timezone.now(), amount=None):
         if signing.end:
             raise ValueError('Cannot end a signing which has a end date already')
@@ -371,7 +383,8 @@ class SigningManager(models.Manager):
         signing.attributes['end_reason'] = reason
         if amount:
             signing.attributes['end_amount'] = amount
-        self.update(signing)
+        signing.attributes['ending'] = False  # ending done.
+        signing.save()
 
 
 class Signing(models.Model):

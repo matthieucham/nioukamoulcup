@@ -3,14 +3,15 @@ from django.shortcuts import reverse
 from django.contrib import messages
 from rules.contrib.views import PermissionRequiredMixin
 from game.models import League, LeagueInstance, LeagueMembership, Team, \
-    MerkatoSession, Merkato, Sale, Auction, DraftSession, DraftSessionRank, DraftPick
+    MerkatoSession, Merkato, Sale, Auction, DraftSession, DraftSessionRank, DraftPick, Signing, Release
 from ligue1.models import Joueur
 from django.utils.timezone import localtime, now
 from django.db.models import Count
 from game.rest.redux_state import StateInitializerMixin
-from game.forms import RegisterPaForm, RegisterMvForm, RegisterOffersForm, RegisterDraftChoicesForm, RegisterCoverForm
+from game.forms import RegisterPaForm, RegisterMvForm, RegisterOffersForm, RegisterDraftChoicesForm, RegisterCoverForm, ReleaseSigningForm
 from django.http import HttpResponseRedirect
 from .ensure_csrf_cookie_mixin import EnsureCsrfCookieMixin
+from django.db import transaction
 
 
 class BaseLeagueView(EnsureCsrfCookieMixin, PermissionRequiredMixin, DetailView):
@@ -170,6 +171,7 @@ class LeagueMerkatoView(FormView, BaseMerkatoSessionsListView):
     def get_success_url(self):
         return reverse('league_merkato', kwargs={'pk': self.get_object().pk})
 
+    @transaction.atomic
     def form_valid(self, form):
         # create or update Auctions
         for field, val in form.cleaned_data.items():
@@ -282,6 +284,7 @@ class LeagueRegisterDraftView(FormView, BaseLeagueView):
     def get_success_url(self):
         return reverse('league_merkato', kwargs={'pk': self.get_object().pk})
 
+    @transaction.atomic
     def form_valid(self, form):
         # delete and recreate choices
         DraftPick.objects.filter(draft_session_rank__team=self.get_my_team(),
@@ -297,3 +300,33 @@ class LeagueRegisterDraftView(FormView, BaseLeagueView):
                 )
         messages.add_message(self.request, messages.SUCCESS, 'Choix de draft enregistrés')
         return super(LeagueRegisterDraftView, self).form_valid(form)
+
+
+class LeagueReleaseSigningView(FormView, BaseLeagueView):
+    template_name = 'game/league/ekyp.html'
+    form_class = ReleaseSigningForm
+
+    def get_form_kwargs(self):
+        kw = super(LeagueReleaseSigningView, self).get_form_kwargs()
+        kw['team'] = self.get_my_team()
+        kw['signing'] = Signing.objects.get(pk=self.kwargs['signing_pk'])
+        kw['request'] = self.request
+        return kw
+
+    def get_success_url(self):
+        return reverse('league_ekyp-detail', kwargs={'pk': self.get_object().pk})
+
+    @transaction.atomic
+    def form_valid(self, form):
+        signing = Signing.objects.get(pk=self.kwargs['signing_pk'])
+        Signing.objects.ending(signing)
+        merkato = Merkato.objects.find_current_open_merkato_for_release(self.get_my_team())
+        session = MerkatoSession.objects.get_next_available(merkato, dont_check_sales_count=True)
+
+        Release.objects.create(signing=signing,
+                               merkato_session=session,
+                               amount=signing.attributes.get('release_amount'))
+
+        messages.add_message(self.request, messages.SUCCESS, 'Revente enregistrée')
+        return super(LeagueReleaseSigningView, self).form_valid(form)
+

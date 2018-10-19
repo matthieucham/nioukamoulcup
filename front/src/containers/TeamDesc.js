@@ -257,7 +257,6 @@ export class TeamHeader extends Component {
     const hasLatestScores =
       Array.isArray(team.latest_scores) && team.latest_scores.length;
     if (hasLatestScores) {
-      console.log(team.latest_scores);
       let formation = team.latest_scores[0]["formation"];
       FormationKVB = connect(state => {
         return {
