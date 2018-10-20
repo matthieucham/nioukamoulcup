@@ -62,7 +62,7 @@ class JourneeManager(models.Manager):
         if force_import or created or journee.derniere_maj is None or step_update > journee.derniere_maj:
             for meeting in statnuts_step['meetings']:
                 Rencontre.objects.import_from_statnuts(journee, sn_client.get_meeting(meeting['uuid']), sn_client,
-                                                           force_import=force_import)
+                                                       force_import=force_import)
         journee.derniere_maj = step_update
         journee.save()
 
@@ -99,7 +99,6 @@ class Journee(Importe):
 
 
 class ClubManager(models.Manager):
-
     def import_from_statnuts(self, sn_team_with_members):
         club = self.get(sn_team_uuid=sn_team_with_members['uuid'])
         current_members = []
@@ -189,7 +188,6 @@ class Joueur(Importe):
 
 
 class RencontreManager(models.Manager):
-
     @timed
     def import_from_statnuts(self, journee, statnuts_meeting, sn_client, force_import=False):
         rencontre, created = self._get_or_create_from_statnuts(journee, statnuts_meeting)
@@ -231,6 +229,9 @@ class RencontreManager(models.Manager):
                 tps = 0  # TODO ?
             else:
                 tps = ros['stats']['playtime']
+                has_note = len(ros.get('ratings', [])) > 0
+                if tps == 0 and has_note:
+                    tps = 90  # special case for 2009-2010
                 rosperfs.append(Performance(rencontre=rencontre, joueur=joueur, club=club, temps_de_jeu=tps,
                                             details=make_performance_details(ros, dom_or_ext[ros['played_for']])))
         # suppr toutes les performances déjà connues : on repart à 0 pour reimporter

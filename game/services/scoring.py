@@ -73,8 +73,11 @@ def _compute_bonus(perf, best_note_by_position):
         val = perf.details['stats'][j]
         if val:
             earned.update({i: val})
-            base += (BONUS['PERSONAL'][i][poste] * val)
-    if 'note' in perf.details and perf.temps_de_jeu >= PLAYTIME['MAX_LONG']:
+            if poste:
+                base += (BONUS['PERSONAL'][i][poste] * val)
+    if poste is None:
+        return base, earned
+    if 'note' in perf.details and perf.details['note'] is not None and perf.temps_de_jeu >= PLAYTIME['MAX_LONG']:
             if poste == 'G':
                 note_to_beat = max(best_note_by_position['dom']['G'], best_note_by_position['ext']['G'])
             else:
