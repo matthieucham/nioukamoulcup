@@ -40,15 +40,19 @@ def harmonize_notes(statnuts_roster):
                 [conv_func(float(r['rating']), by_src[r['source']]['MEAN'], by_src[r['source']]['STDEV']) for r in
                  pl['ratings'] if r['source'] in by_src])
         except StatisticsError:
-            pl['temp_notes'] = None
+            pl['temp_note'] = None
 
     # calcul du nouveau facteur pour les temp_notes
-    temp_notes = [pl['temp_note'] for pl in statnuts_roster if 'temp_notes' in pl and pl['temp_notes'] is not None]
+    temp_notes = [pl['temp_note'] for pl in statnuts_roster if 'temp_note' in pl and pl['temp_note'] is not None]
     for_hnotes = {'MEAN': mean(temp_notes), 'STDEV': stdev(temp_notes)}
 
     # calcul de la note finale:
     for pl in statnuts_roster:
-        pl['hnote'] = round(conv_func(pl.pop('temp_note'), for_hnotes['MEAN'], for_hnotes['STDEV']), 1)
+        converted = conv_func(pl.pop('temp_note'), for_hnotes['MEAN'], for_hnotes['STDEV'])
+        if converted is not None:
+            pl['hnote'] = round(converted, 1)
+        else:
+            pl['hnote'] = None
 
     return statnuts_roster
 
