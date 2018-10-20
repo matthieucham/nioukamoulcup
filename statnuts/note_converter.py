@@ -1,6 +1,6 @@
 __author__ = 'mgrandrie'
 
-from statistics import mean, stdev, median_low
+from statistics import mean, stdev, median_low, StatisticsError
 
 """
 Utilitaire de conversion et d'agglomération des notes "brutes" importées
@@ -28,17 +28,22 @@ def harmonize_notes(statnuts_roster):
 
     # application de la conversion sur chaque joueur
     def conv_func(n, m, s):
+        if n is None:
+            return None
         target_std = median_low([bs['STDEV'] for s, bs in by_src.items()])
         target_avg = median_low([bs['MEAN'] for s, bs in by_src.items()])
         return (target_std / s) * (n - m) + target_avg
 
     for pl in statnuts_roster:
-        pl['temp_note'] = mean(
-            [conv_func(float(r['rating']), by_src[r['source']]['MEAN'], by_src[r['source']]['STDEV']) for r in
-             pl['ratings'] if r['source'] in by_src])
+        try:
+            pl['temp_note'] = mean(
+                [conv_func(float(r['rating']), by_src[r['source']]['MEAN'], by_src[r['source']]['STDEV']) for r in
+                 pl['ratings'] if r['source'] in by_src])
+        except StatisticsError:
+            pl['temp_notes'] = None
 
     # calcul du nouveau facteur pour les temp_notes
-    temp_notes = [pl['temp_note'] for pl in statnuts_roster]
+    temp_notes = [pl['temp_note'] for pl in statnuts_roster if pl['temp_notes'] is not None]
     for_hnotes = {'MEAN': mean(temp_notes), 'STDEV': stdev(temp_notes)}
 
     # calcul de la note finale:
