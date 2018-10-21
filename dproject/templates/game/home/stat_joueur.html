@@ -5,87 +5,158 @@
 {% load humanize %}
 
 {% block script %}
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.css">
-    <script src="//cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.min.js"></script>
-    {#    <script type="text/javascript" src="https://www.google.com/jsapi"></script>#}
-    {#    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>#}
-    {#    <script type="text/javascript">#}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.min.js"></script>
+{#
+<script type="text/javascript" src="https://www.google.com/jsapi"></script>#}
+{#
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>#}
+{#
+<script type="text/javascript">#}
     {#        google.charts.load('visualization', '1', {packages: ['corechart']});#}
     {#       // google.charts.setOnLoadCallback(drawChart);#}
-    {#    </script>#}
+    {#
+</script>#}
 {% endblock script %}
 
 {% block title-page %}{{ joueur.display_name }}{% endblock title-page %}
 
 {% block content-right %}
-    {% joueurs_club joueur.club %}
+{% joueurs_club joueur.club %}
 {% endblock content-right %}
 
 {% block content-center-home %}
-    <section id="section-title">
-        {% club_logo joueur.club 'medium' %}
-        <h1>{{ joueur.display_name }}</h1>
-    </section>
-    <section id="player-profile">
-        <h2>Profil</h2>
-        <div>
-            {% keyvalue 'Nom' joueur.nom %}
-            {% keyvalue 'Prénom' joueur.prenom %}
-            {% if joueur.surnom %}
-                {% keyvalue 'Surnom' joueur.surnom %}
+<section id="section-title">
+    {% club_logo joueur.club 'medium' %}
+    <h1>{{ joueur.display_name }}</h1>
+</section>
+<section id="player-profile">
+    <h2>Profil</h2>
+    <div>
+        {% keyvalue 'Nom' joueur.nom %}
+        {% keyvalue 'Prénom' joueur.prenom %}
+        {% if joueur.surnom %}
+        {% keyvalue 'Surnom' joueur.surnom %}
+        {% endif %}
+        <dl class='kvgroup'>
+            <dd>Club</dd>
+            <dt>
+                {% if joueur.club %}
+                <a href="{% url 'club-detail' joueur.club.pk %}">{{ joueur.club.nom }}</a></dt>
+            {% else %}
+            -
             {% endif %}
-            <dl class='kvgroup'>
-                <dd>Club</dd>
-                <dt>
-                    {% if joueur.club %}
-                        <a href="{% url 'club-detail' joueur.club.pk %}">{{ joueur.club.nom }}</a></dt>
-                    {% else %}
-                        -
-                    {% endif %}
-            </dl>
-            {% trans joueur.poste as poste %}
-            {% keyvalue 'Poste' poste %}
+        </dl>
+        {% trans joueur.poste as poste %}
+        {% keyvalue 'Poste' poste %}
+    </div>
+</section>
+<section id="player-bilan">
+    <h2>Bilan</h2>
+    <div>
+        {% keyvalue 'Matchs notés' stats.nb_notes 'card' %}
+        {% with stats.avg_note|stringformat:'0.1f' as avgnote %}
+        {% keyvalue 'Note moyenne' avgnote 'card' %}
+        {% endwith %}
+        {% with stats.total_bonuses|stringformat:'0.1f' as totbonus %}
+        {% keyvalue 'Bonus' totbonus 'card' %}
+        {% endwith %}
+        <div id="player-bonuses">
+            {% bonusvalue 'GOAL' joueur.poste 'Buts h.p.' stats.details.GOAL %}
+            {% bonusvalue 'PASS' joueur.poste 'Passes' stats.details.PASS %}
+            {% bonusvalue 'PENALTY' joueur.poste 'Pénos' stats.details.PENALTY %}
+            {% bonusvalue 'HALFPASS' joueur.poste 'Pén obt' stats.details.HALFPASS %}
+            {% bonusvalue 'LEADER' joueur.poste '++' stats.details.LEADER %}
+            {% bonusvalue 'PENALSTOP' joueur.poste 'Pén arr' stats.details.PENALSTOP %}
+            {% bonusvalue 'CLEANSHEET' joueur.poste 'CS' stats.details.CLEANSHEET %}
+            {% bonusvalue 'HALFCLEANSHEET' joueur.poste 'demie CS' stats.details.HALFCLEANSHEET %}
+            {% bonusvalue 'OFFENSIVE' joueur.poste 'Off.' stats.details.OFFENSIVE %}
+            {% bonusvalue 'HALFOFFENSIVE' joueur.poste 'Demi off' stats.details.HALFOFFENSIVE %}
+        </div>
+    </div>
+    <section id="player-performances">
+        <h2>Performances</h2>
+        <div>
+            <div class="header_table">
+                <div class="cell_table center" style="width:5%;">J.</div>
+                <div class="cell_table" style="width:15%;">Date</div>
+                <div class="cell_table center">Match</div>
+                <div class="cell_table center" style="width:10%;">Note</div>
+                <div class="cell_table">Bonus</div>
+            </div>
+            {% for jjs in jjscores %}
+            {% perf_joueur jjs %}
+            {% endfor %}
         </div>
     </section>
-    <section id="player-bilan">
-        <h2>Bilan</h2>
+    <div id='chtcontainer'>{{ chart.as_html }}</div>
+    <section id="player-history">
+        <h2>Historique</h2>
         <div>
-            {% keyvalue 'Matchs notés' stats.nb_notes 'card' %}
-            {% with stats.avg_note|stringformat:'0.1f' as avgnote %}
-                {% keyvalue 'Note moyenne' avgnote 'card' %}
-            {% endwith %}
-            {% with stats.total_bonuses|stringformat:'0.1f' as totbonus %}
-                {% keyvalue 'Bonus' totbonus 'card' %}
-            {% endwith %}
-            <div id="player-bonuses">
-                {% bonusvalue 'GOAL' joueur.poste 'Buts h.p.' stats.details.GOAL %}
-                {% bonusvalue 'PASS' joueur.poste 'Passes' stats.details.PASS %}
-                {% bonusvalue 'PENALTY' joueur.poste 'Pénos' stats.details.PENALTY %}
-                {% bonusvalue 'HALFPASS' joueur.poste 'Pén obt' stats.details.HALFPASS %}
-                {% bonusvalue 'LEADER' joueur.poste '++' stats.details.LEADER %}
-                {% bonusvalue 'PENALSTOP' joueur.poste 'Pén arr' stats.details.PENALSTOP %}
-                {% bonusvalue 'CLEANSHEET' joueur.poste 'CS' stats.details.CLEANSHEET %}
-                {% bonusvalue 'HALFCLEANSHEET' joueur.poste 'demie CS' stats.details.HALFCLEANSHEET %}
-                {% bonusvalue 'OFFENSIVE' joueur.poste 'Off.' stats.details.OFFENSIVE %}
-                {% bonusvalue 'HALFOFFENSIVE' joueur.poste 'Demi off' stats.details.HALFOFFENSIVE %}
+            <div class="header_table">
+                <div class="cell_table">Saison</div>
+                <div class="cell_table center" style="width:10%;">Nb notes</div>
+                <div class="cell_table center" style="width:10">Note moy.</div>
+                <div class="cell_table" style="width:5%;">{% bonus 'GOAL' None %}</div>
+                <div class="cell_table" style="width:5%;">{% bonus 'PASS' None %}</div>
+                <div class="cell_table" style="width:5%;">{% bonus 'PENALTY' None %}</div>
+                <div class="cell_table" style="width:5%;">{% bonus 'HALFPASS' None %}</div>
+                <div class="cell_table" style="width:5%;">{% bonus 'PENALSTOP' None %}</div>
+                <div class="cell_table" style="width:5%;">{% bonus 'LEADER' None %}</div>
+                <div class="cell_table" style="width:5%;">{% bonus 'CLEANSHEET' None %}</div>
+                <div class="cell_table" style="width:5%;">{% bonus 'HALFCLEANSHEET' None %}</div>
+                <div class="cell_table" style="width:5%;">{% bonus 'OFFENSIVE' None %}</div>
+                <div class="cell_table" style="width:5%;">{% bonus 'HALFOFFENSIVE' None %}</div>
             </div>
-        </div>
-        <section id="player-performances">
-            <h2>Performances</h2>
-            <div>
-                <div class="header_table">
-                    <div class="cell_table center" style="width:5%;">J.</div>
-                    <div class="cell_table" style="width:15%;">Date</div>
-                    <div class="cell_table center">Match</div>
-                    <div class="cell_table center" style="width:10%;">Note</div>
-                    <div class="cell_table">Bonus</div>
+            {% for sjs in past_seasons %}
+            <div class="line_table">
+                <div class="cell_table">
+                    {{ sjs.saison_scoring.saison.nom }}
                 </div>
-                {% for jjs in jjscores %}
-                    {% perf_joueur jjs %}
-                {% endfor %}
+                <div class="cell_table center">
+                    {{ sjs.nb_notes }}
+                </div>
+                <div class="cell_table center">
+                    {{ sjs.avg_note|stringformat:'0.1f' }}
+                </div>
+                <div class="cell_table center">
+                    {{ sjs.details.GOAL }}
+                </div>
+                <div class="cell_table center">
+                    {{ sjs.details.PASS }}
+                </div>
+                <div class="cell_table center">
+                    {{ sjs.details.PENALTY }}
+                </div>
+                <div class="cell_table center">
+                    {{ sjs.details.HALFPASS }}
+                </div>
+                <div class="cell_table center">
+                    {{ sjs.details.PENALSTOP }}
+                </div>
+                <div class="cell_table center">
+                    {% if sjs.trust_leader %}
+                        {{ sjs.details.LEADER }}
+                    {% else %}
+                    -
+                    {% endif %}
+                </div>
+                <div class="cell_table center">
+                    {{ sjs.details.CLEANSHEET }}
+                </div>
+                <div class="cell_table center">
+                    {{ sjs.details.HALFCLEANSHEET }}
+                </div>
+                <div class="cell_table center">
+                    {{ sjs.details.OFFENSIVE }}
+                </div>
+                <div class="cell_table center">
+                    {{ sjs.details.HALFOFFENSIVE }}
+                </div>
             </div>
-        </section>
-        <div id='chtcontainer'>{{ chart.as_html }}</div>
-{% endblock content-center-home %}
+            {% endfor %}
+        </div>
+    </section>
+    {% endblock content-center-home %}

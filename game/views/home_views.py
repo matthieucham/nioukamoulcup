@@ -1,5 +1,6 @@
 from django.views.generic import TemplateView, DetailView
-from django.db.models import Q, F
+from django.utils import timezone
+from django.db.models import Q, F, Case, When, NullBooleanField
 from graphos.sources.model import SimpleDataSource
 from graphos.renderers.morris import AreaChart
 # from graphos.renderers.gchart import AreaChart
@@ -96,6 +97,12 @@ class StatJoueurView(DetailView):
                                      #     'pointSize': 5,
                                      # }
                                      )
+        # historique
+        context['past_seasons'] = SJScore.objects.exclude(saison_scoring=saisonscoring).filter(
+            joueur=self.object).annotate(trust_leader=(
+                Case(When(saison_scoring__saison__fin__gt=timezone.datetime(2016, 7, 1), then=True),
+                        output_field=NullBooleanField()))).order_by('-saison_scoring__saison__fin')
+
         return context
 
 

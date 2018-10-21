@@ -34,6 +34,12 @@ class SaisonScoring(models.Model):
         SJScore.objects.create_sjscore_from_ligue1(self)
         return output_js
 
+    def archive(self):
+        # suppr : journees + rencontres + performances (cascade)
+        l1models.Journee.objects.filter(saison=self.saison).delete()
+        # jjscore et jouneescoring: cascade l'a déjà fait.
+        pass
+
 
 class JourneeScoring(models.Model):
     STATUS_CHOICES = (('OPEN', 'Open'), ('LOCKED', 'locked'),)

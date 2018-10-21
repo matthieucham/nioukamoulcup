@@ -136,7 +136,7 @@ def keyvalue(key, val, classname='kvgroup'):
 
 @register.inclusion_tag('game/tags/l1results_bonusvalue.html')
 def bonusvalue(bonuskey, poste, label, val):
-    if (services.BONUS['COLLECTIVE'].get(bonuskey) or services.BONUS['PERSONAL'].get(bonuskey))[poste] > 0:
+    if poste is None or (services.BONUS['COLLECTIVE'].get(bonuskey) or services.BONUS['PERSONAL'].get(bonuskey))[poste] > 0:
         return {'bonuskey': bonuskey, 'poste': poste, 'label': label, 'value': val if val is not None else '-',
                 'masked': False}
     else:
@@ -165,7 +165,7 @@ def bonus(bonuskey, position, bonusval=1):
         'HALFOFFENSIVE': ('fa-thermometer-half', 'Gold'),
         'CSC': ('fa-thumbs-down', 'DarkSlateGrey'),
     }
-    if bonuskey == 'CSC' or (services.BONUS['COLLECTIVE'].get(bonuskey) or services.BONUS['PERSONAL'].get(bonuskey))[
+    if bonuskey == 'CSC' or position is None or (services.BONUS['COLLECTIVE'].get(bonuskey) or services.BONUS['PERSONAL'].get(bonuskey))[
         position] > 0:
         ico, color = icon_dict[bonuskey]
         return {'icon': ico, 'color': color, 'nb': bonusval, 'masked': False}
