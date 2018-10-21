@@ -9,16 +9,12 @@
 <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.css">
 <script src="//cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.min.js"></script>
-{#
-<script type="text/javascript" src="https://www.google.com/jsapi"></script>#}
-{#
-<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>#}
-{#
-<script type="text/javascript">#}
-    {#        google.charts.load('visualization', '1', {packages: ['corechart']});#}
-    {#       // google.charts.setOnLoadCallback(drawChart);#}
-    {#
-</script>#}
+{#<script type="text/javascript" src="https://www.google.com/jsapi"></script>#}
+{#<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>#}
+{#<script type="text/javascript">#}
+{#        google.charts.load('visualization', '1', {packages: ['corechart']});#}
+{#       // google.charts.setOnLoadCallback(drawChart);#}
+{#</script>#}
 {% endblock script %}
 
 {% block title-page %}{{ joueur.display_name }}{% endblock title-page %}
@@ -99,16 +95,16 @@
                 <div class="cell_table">Saison</div>
                 <div class="cell_table center" style="width:10%;">Nb notes</div>
                 <div class="cell_table center" style="width:10">Note moy.</div>
-                <div class="cell_table" style="width:5%;">{% bonus 'GOAL' None %}</div>
-                <div class="cell_table" style="width:5%;">{% bonus 'PASS' None %}</div>
-                <div class="cell_table" style="width:5%;">{% bonus 'PENALTY' None %}</div>
-                <div class="cell_table" style="width:5%;">{% bonus 'HALFPASS' None %}</div>
-                <div class="cell_table" style="width:5%;">{% bonus 'PENALSTOP' None %}</div>
-                <div class="cell_table" style="width:5%;">{% bonus 'LEADER' None %}</div>
-                <div class="cell_table" style="width:5%;">{% bonus 'CLEANSHEET' None %}</div>
-                <div class="cell_table" style="width:5%;">{% bonus 'HALFCLEANSHEET' None %}</div>
-                <div class="cell_table" style="width:5%;">{% bonus 'OFFENSIVE' None %}</div>
-                <div class="cell_table" style="width:5%;">{% bonus 'HALFOFFENSIVE' None %}</div>
+                <div class="cell_table center" style="width:5%;">{% bonus 'GOAL' None %}</div>
+                <div class="cell_table center" style="width:5%;">{% bonus 'PASS' None %}</div>
+                <div class="cell_table center" style="width:5%;">{% bonus 'PENALTY' None %}</div>
+                <div class="cell_table center" style="width:5%;">{% bonus 'HALFPASS' None %}</div>
+                <div class="cell_table center" style="width:5%;">{% bonus 'PENALSTOP' None %}</div>
+                <div class="cell_table center" style="width:5%;">{% bonus 'LEADER' None %}</div>
+                <div class="cell_table center" style="width:5%;">{% bonus 'CLEANSHEET' None %}</div>
+                <div class="cell_table center" style="width:5%;">{% bonus 'HALFCLEANSHEET' None %}</div>
+                <div class="cell_table center" style="width:5%;">{% bonus 'OFFENSIVE' None %}</div>
+                <div class="cell_table center" style="width:5%;">{% bonus 'HALFOFFENSIVE' None %}</div>
             </div>
             {% for sjs in past_seasons %}
             <div class="line_table">
