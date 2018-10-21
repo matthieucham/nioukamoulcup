@@ -13,6 +13,10 @@ class Command(BaseCommand):
 
     @transaction.atomic
     def handle(self, *args, **options):
+        self.stdout.write(
+            "settings for statnuts:"
+        )
+        self.stdout.write("settings.STATNUTS_URL: %s" % settings.STATNUTS_URL)
         client = statnuts.StatnutsClient(settings.STATNUTS_CLIENT_ID, settings.STATNUTS_SECRET, settings.STATNUTS_URL,
                                          settings.STATNUTS_NKCUP_USER, settings.STATNUTS_NKCUP_PWD)
         for saison_id in options['saison_id']:
