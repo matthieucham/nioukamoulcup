@@ -32,7 +32,10 @@ def harmonize_notes(statnuts_roster):
             return None
         target_std = median_low([bs['STDEV'] for s, bs in by_src.items()])
         target_avg = median_low([bs['MEAN'] for s, bs in by_src.items()])
-        return (target_std / s) * (n - m) + target_avg
+        if s == 0:
+            return target_avg
+        else:
+            return (target_std / s) * (n - m) + target_avg
 
     for pl in statnuts_roster:
         try:
