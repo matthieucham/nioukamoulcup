@@ -44,8 +44,12 @@ def harmonize_notes(statnuts_roster):
 
     # calcul du nouveau facteur pour les temp_notes
     temp_notes = [pl['temp_note'] for pl in statnuts_roster if 'temp_note' in pl and pl['temp_note'] is not None]
+    if len(temp_notes) == 0:
+        # pas de notes !
+        for pl in statnuts_roster:
+            pl['hnote'] = None
+        return statnuts_roster
     for_hnotes = {'MEAN': mean(temp_notes), 'STDEV': stdev(temp_notes)}
-
     # calcul de la note finale:
     for pl in statnuts_roster:
         converted = conv_func(pl.pop('temp_note'), for_hnotes['MEAN'], for_hnotes['STDEV'])
