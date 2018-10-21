@@ -146,7 +146,6 @@ class JoueurManager(models.Manager):
                     'nom': statnuts_data['last_name'],
                     'surnom': statnuts_data['usual_name'],
                     'poste': statnuts_data['position']}
-        print(statnuts_data['uuid'])
         return self.update_or_create(sn_person_uuid=statnuts_data['uuid'],
                                      defaults=defaults)
 
