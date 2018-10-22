@@ -382,7 +382,7 @@ class SigningManager(models.Manager):
         signing.end = date
         signing.attributes['end_reason'] = reason
         if amount:
-            signing.attributes['end_amount'] = amount
+            signing.attributes['end_amount'] = float(amount)
         signing.attributes['ending'] = False  # ending done.
         signing.save()
 

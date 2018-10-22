@@ -41,8 +41,14 @@ export const SigningsTable = ({ signings, height }) => {
           <Column
             label="Montant"
             dataKey="amount"
-            cellDataGetter={({ rowData }) => rowData.attributes.amount + " Ka"}
-            width={80}
+            cellDataGetter={({ rowData }) => {
+              if (rowData.attributes.amount) {
+                return rowData.attributes.amount + " Ka";
+              } else {
+                return "Drafté (Choix " + rowData.attributes.pick_order + " )";
+              }
+            }}
+            width={200}
           />
 
           <Column

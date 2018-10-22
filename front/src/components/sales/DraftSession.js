@@ -37,10 +37,20 @@ class DraftTeamResult extends React.Component {
         <Button variant="outlined" onClick={this.handleShowClicked}>
           Voir
         </Button>
-        <DraftRevealResult
-          signing={draftRank.signing}
-          show={forceShow || this.state.show}
-        />
+        {draftRank.signing && (
+          <DraftRevealResult
+            signing={draftRank.signing}
+            show={forceShow || this.state.show}
+          />
+        )}
+        {!draftRank.signing && (
+          <ReactRevealText
+            show={forceShow || this.state.show}
+            className="salecard-winner"
+          >
+            Personne...
+          </ReactRevealText>
+        )}
       </div>
     );
   }
@@ -64,7 +74,7 @@ export class DraftSessionResult extends React.Component {
   render() {
     const { draftSession } = this.props;
     const teamResults = draftSession.draftsessionrank_set.map(dsr => (
-      <li>
+      <li key={`lisession_${dsr.number}`}>
         <DraftTeamResult
           draftRank={dsr}
           forceShow={this.state.showAll}
