@@ -8,7 +8,8 @@ from ligue1.models import Joueur
 from django.utils.timezone import localtime, now
 from django.db.models import Count
 from game.rest.redux_state import StateInitializerMixin
-from game.forms import RegisterPaForm, RegisterMvForm, RegisterOffersForm, RegisterDraftChoicesForm, RegisterCoverForm, ReleaseSigningForm
+from game.forms import RegisterPaForm, RegisterMvForm, RegisterOffersForm, RegisterDraftChoicesForm, RegisterCoverForm, \
+    ReleaseSigningForm
 from django.http import HttpResponseRedirect
 from .ensure_csrf_cookie_mixin import EnsureCsrfCookieMixin
 from django.db import transaction
@@ -143,7 +144,7 @@ class LeagueMerkatoView(FormView, BaseMerkatoSessionsListView):
     def get_context_data(self, **kwargs):
         context = super(LeagueMerkatoView, self).get_context_data(**kwargs)
         merkatos = Merkato.objects.filter(league_instance=context['instance'], begin__lte=localtime(now()),
-                                          end__gt=localtime(now())).order_by(
+                                          last_solving__gte=localtime(now())).order_by(
             'begin')
         context['PRELOADED_STATE'] = self.init_current_merkatos(self.request, context['team'], merkatos)
         return context
@@ -329,4 +330,3 @@ class LeagueReleaseSigningView(FormView, BaseLeagueView):
 
         messages.add_message(self.request, messages.SUCCESS, 'Revente enregistrée')
         return super(LeagueReleaseSigningView, self).form_valid(form)
-

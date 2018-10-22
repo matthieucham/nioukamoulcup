@@ -194,6 +194,8 @@ def can_register_auction(team, merkato):
     - avoir déjà posté (N/2 -1) PA où N est le nombre de sessions écoulées
     :return: True |False
     """
+    if merkato.last_solving < timezone.now():
+        return False, 'TOO_LATE'
     expired_sessions = merkato.merkatosession_set.filter(solving__lt=timezone.now()).count()
     current_pa = transfer_models.Sale.objects.filter(merkato_session__merkato=merkato,
                                                      merkato_session__solving__gt=timezone.now(),
@@ -222,6 +224,8 @@ def can_register_pa(team, merkato):
     - avoir une place dans la team (TODO)
     :return: True |False
     """
+    if merkato.end < timezone.now():
+        return False, 'TOO_LATE'
     current_pa_count = transfer_models.Sale.objects.filter(merkato_session__merkato=merkato,
                                                            merkato_session__solving__gt=timezone.now(),
                                                            type='PA',
@@ -240,6 +244,8 @@ def can_register_mv(team, merkato):
     - pas de MV en cours
     :return: True |False
     """
+    if merkato.end < timezone.now():
+        return False, 'TOO_LATE'
     current_mv_count = transfer_models.Sale.objects.filter(merkato_session__merkato=merkato,
                                                            merkato_session__solving__gt=timezone.now(),
                                                            type='MV',

@@ -803,6 +803,7 @@ class CurrentMerkatoSerializer(serializers.ModelSerializer):
             'id',
             'begin',
             'end',
+            'last_solving',
             'mode',
             'configuration',
             'league_instance',

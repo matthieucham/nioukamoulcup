@@ -1,8 +1,8 @@
 from django.db import models
 from django.contrib.postgres.fields import JSONField
 import pytz
-import datetime
-from datetime import timedelta
+# import datetime
+from datetime import timedelta, time, datetime, date
 from django.utils import timezone
 from . import league_models
 from ligue1 import models as l1models
@@ -21,6 +21,7 @@ class MerkatoManager(models.Manager):
             merkato.merkatosession_set.add(
                 MerkatoSession.objects.create(merkato=merkato, number=nb, closing=closing, solving=solving))
             nb += 1
+        merkato.save()
         return merkato
 
     @staticmethod
@@ -29,9 +30,9 @@ class MerkatoManager(models.Manager):
         delta = end - begin
         for d in range(delta.days + 1):
             for t in closing_times:
-                tickday = begin + timedelta(days=d)
+                tickday = (begin + timedelta(days=d)).date()
                 dm = t.split(':')
-                dt = tickday.replace(hour=int(dm[0]), minute=int(dm[1]), second=0)
+                dt = datetime.combine(tickday, time(int(dm[0]), int(dm[1]), 0))
                 if dt.tzinfo is not None and dt.tzinfo.utcoffset(dt) is not None:
                     yield dt
                 else:
@@ -71,6 +72,7 @@ class Merkato(models.Model):
 
     begin = models.DateTimeField(blank=False)
     end = models.DateTimeField(blank=False)
+    last_solving = models.DateTimeField(blank=True, null=True)
     mode = models.CharField(max_length=4, blank=False, choices=MODES)
     configuration = JSONField(blank=True)
     league_instance = models.ForeignKey(league_models.LeagueInstance, on_delete=models.CASCADE, null=False)
@@ -79,7 +81,7 @@ class Merkato(models.Model):
 
     @staticmethod
     def _make_config(roster_size_max=9, sales_per_session=-1, pa_number=1, re_number=2, mv_number=1, mv_tax_rate=0.1,
-                     re_tax_rate=0.5, initial_team_balance=100, closing_times=['10:00', '18:00'], session_duration=48):
+                     re_tax_rate=0.5, initial_team_balance=100, closing_times=['12:00', '20:00'], session_duration=48):
         conf = {'roster_size_max': roster_size_max,
                 'sales_per_session': sales_per_session,
                 'pa_number': pa_number,
@@ -97,12 +99,21 @@ class Merkato(models.Model):
     def save(self, *args, **kwargs):
         if self.configuration is None:
             self.configuration = self._make_config()
+        if self.mode == 'BID' and self.merkatosession_set:
+            last_session = self.merkatosession_set.order_by('-solving').first()
+            if last_session:
+                self.last_solving = last_session.solving
+        elif self.mode == 'DRFT' and self.draftsession_set:
+            last_session = self.draftsession_set.order_by('-closing').first()
+            if last_session:
+                self.end = last_session.closing
+                self.last_solving = last_session.closing
         return super(Merkato, self).save(*args, **kwargs)
 
 
 class MerkatoSessionManager(models.Manager):
     def get_next_available(self, merkato, dont_check_sales_count=False):
-        now = datetime.datetime.now(pytz.utc)
+        now = datetime.now(pytz.utc)
         max_sales_in_session = merkato.configuration.get('sales_per_session', -1)
         sess_gen = (s for s in self.filter(merkato=merkato).prefetch_related('sale_set').order_by('closing') if
                     s.closing >= now)
@@ -284,7 +295,7 @@ class ReleaseManager(models.Manager):
                 league_instance__league=(
                     team if isinstance(team, league_models.Team) else league_models.Team.objects.get(pk=team)).league,
                 league_instance__current=True,
-                begin__lte=datetime.date.today()).order_by('-end').first()
+                begin__lte=date.today()).order_by('-end').first()
             qs = qs.filter(merkato_session__merkato=most_recent_merkato)
         if just_count:
             return qs.count()
