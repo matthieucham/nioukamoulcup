@@ -158,8 +158,8 @@ class LeagueMerkatoView(FormView, BaseMerkatoSessionsListView):
         kw = super(LeagueMerkatoView, self).get_form_kwargs()
         sessions = MerkatoSession.objects.filter(
             merkato__in=Merkato.objects.filter(league_instance=self.get_current_league_instance(),
-                                               end__gt=localtime(now())), is_solved=False,
-            solving__gt=localtime(now())).annotate(
+                                               last_solving__gte=localtime(now())), is_solved=False,
+            solving__gte=localtime(now())).annotate(
             num_sales=Count('sale')).filter(num_sales__gt=0)
         sales = []
         for ms in sessions:
