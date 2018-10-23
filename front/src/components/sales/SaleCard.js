@@ -136,7 +136,10 @@ class SaleDuring extends React.Component {
     return (
       <div>
         <div className="salecard-content salecard-reveal-content">
-          <div className="past-offers">{pastP}</div>
+          <div className="past-offers-container">
+            <h3>Offres passées</h3>
+            <div className="past-offers">{pastP}</div>
+          </div>
           <div className="current-offer">
             <h1>{allOffers[auctionIndex].value} Ka</h1>
             <p>{this.computeDiffWithCurrent(allOffers, auctionIndex)}</p>
@@ -196,6 +199,25 @@ class SaleAfter extends React.Component {
 
   render() {
     const { sale } = this.props;
+    let allOffers = sale.auctions.slice().reverse();
+    if (sale.type == "PA") {
+      allOffers.push({ value: sale.min_price, is_valid: true, is_mine: false });
+    }
+    allOffers = allOffers.reverse();
+    const pastP = allOffers.map((auction, index) => {
+      var classes = [];
+      if (auction.is_mine) {
+        classes.push("ismine");
+      }
+      if (!auction.is_valid) {
+        classes.push("invalid");
+      }
+      return (
+        <p key={"off" + index} className={classes}>
+          {auction.value}
+        </p>
+      );
+    });
     var hasWinner = false;
     var winnerName;
     var winnerAmount;
@@ -226,6 +248,7 @@ class SaleAfter extends React.Component {
               >
                 {winnerName}
               </ReactRevealText>
+              { pastP }
             </div>
             <div className="current-offer">
               <h1>{winnerAmount + " Ka"}</h1>

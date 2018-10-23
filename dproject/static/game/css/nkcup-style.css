@@ -856,6 +856,11 @@ dl.kvgroup {
     font-size: 1.5em;
 }
 
+.salecard-content .past-offers-container {
+    min-height: inherit;
+    max-height: inherit;
+}
+
 .salecard-content .past-offers {
     display: flex;
     flex-direction: column;

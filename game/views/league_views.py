@@ -6,7 +6,7 @@ from game.models import League, LeagueInstance, LeagueMembership, Team, \
     MerkatoSession, Merkato, Sale, Auction, DraftSession, DraftSessionRank, DraftPick, Signing, Release
 from ligue1.models import Joueur
 from django.utils.timezone import localtime, now
-from django.db.models import Count
+from django.db.models import Count, Q
 from game.rest.redux_state import StateInitializerMixin
 from game.forms import RegisterPaForm, RegisterMvForm, RegisterOffersForm, RegisterDraftChoicesForm, RegisterCoverForm, \
     ReleaseSigningForm
@@ -96,7 +96,9 @@ class BaseMerkatoSessionsListView(StateInitializerMixin, BaseLeagueView):
         # Call the base implementation first to get a context
         context = super(BaseMerkatoSessionsListView, self).get_context_data(**kwargs)
         context['sessions'] = MerkatoSession.objects.filter(
-            merkato__league_instance=self.get_current_league_instance(), is_solved=True).order_by(
+            merkato__league_instance=self.get_current_league_instance(), is_solved=True).annotate(
+            nb_sales=Count('sale')).annotate(nb_rel=Count('release')).filter(
+            Q(nb_sales__gt=0) | Q(nb_rel__gt=0)).order_by(
             '-solving')
         context['draftsessions'] = DraftSession.objects.filter(
             merkato__league_instance=self.get_current_league_instance(), is_solved=True).order_by(
