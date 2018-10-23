@@ -248,7 +248,10 @@ class SaleAfter extends React.Component {
               >
                 {winnerName}
               </ReactRevealText>
-              { pastP }
+              <div className="past-offers-container">
+                <h3>Offres passées</h3>
+                <div className="past-offers">{pastP}</div>
+              </div>
             </div>
             <div className="current-offer">
               <h1>{winnerAmount + " Ka"}</h1>
