@@ -137,7 +137,7 @@ class SaleDuring extends React.Component {
       <div>
         <div className="salecard-content salecard-reveal-content">
           <div className="past-offers-container">
-            <h3>Offres passées</h3>
+            <h3>Enchères</h3>
             <div className="past-offers">{pastP}</div>
           </div>
           <div className="current-offer">
@@ -248,10 +248,6 @@ class SaleAfter extends React.Component {
               >
                 {winnerName}
               </ReactRevealText>
-              <div className="past-offers-container">
-                <h3>Offres passées</h3>
-                <div className="past-offers">{pastP}</div>
-              </div>
             </div>
             <div className="current-offer">
               <h1>{winnerAmount + " Ka"}</h1>
@@ -264,7 +260,10 @@ class SaleAfter extends React.Component {
             <p>Vente annulée</p>
           </div>
         )}
-
+        <div className="all-offers-container">
+          <h3>Enchères</h3>
+          <div className="past-offers">{pastP}</div>
+        </div>
         <div className="salecard-actions">
           <Button onClick={this.handleResetClicked}>Reset</Button>
         </div>

@@ -861,7 +861,13 @@ dl.kvgroup {
     max-height: inherit;
 }
 
-.salecard-content .past-offers {
+.all-offers-container {
+    min-height: 80px;
+    max-height: 80px;
+    padding-bottom: 5px;
+}
+
+.past-offers {
     display: flex;
     flex-direction: column;
     flex-wrap: wrap;
