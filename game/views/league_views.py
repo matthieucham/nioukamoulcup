@@ -181,13 +181,13 @@ class LeagueMerkatoView(FormView, BaseMerkatoSessionsListView):
             if field.startswith('_offer_for_sale__'):
                 spk = int(field[len('_offer_for_sale__'):])
                 if val:
-                    Auction.objects.update_or_create(
+                    Auction.objects.filter(sale__merkato_session__merkato=self.get_merkato()).update_or_create(
                         sale=Sale.objects.get(pk=spk),
                         team=self.get_my_team(),
                         defaults={'value': val}
                     )
                 else:
-                    Auction.objects.filter(
+                    Auction.objects.filter(sale__merkato_session__merkato=self.get_merkato()).filter(
                         sale=Sale.objects.get(pk=spk),
                         team=self.get_my_team()).delete()
         messages.add_message(self.request, messages.SUCCESS, 'Offres enregistrées')
