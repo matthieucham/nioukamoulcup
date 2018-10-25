@@ -197,6 +197,21 @@ class SaleAfter extends React.Component {
     }
   }
 
+  computePercentDiff(sale) {
+    var offers = sale.auctions.filter(off => off.is_valid).reverse();
+    if (sale.type == "PA") {
+      offers.push({ value: sale.min_price });
+    }
+    if (
+      offers.length == 1 ||
+      (offers.length == 2 && sale.author.id == sale.winner.id)
+    ) {
+      return null ;
+    } else {
+      return ((sale.amount / offers[1].value) - 1).toFixed(1);
+    }
+  }
+
   render() {
     const { sale } = this.props;
     let allOffers = sale.auctions.slice().reverse();
@@ -222,11 +237,13 @@ class SaleAfter extends React.Component {
     var winnerName;
     var winnerAmount;
     var winnerDiff;
+    var winnerPercent;
     if (sale.winner != null) {
       hasWinner = true;
       winnerName = sale.winner.name;
       winnerAmount = sale.amount;
       winnerDiff = this.computeDiff(sale);
+      winnerPercent = this.computePercentDiff(sale);
     } else {
       if (sale.type == "PA") {
         hasWinner = true;
@@ -252,6 +269,7 @@ class SaleAfter extends React.Component {
             <div className="current-offer">
               <h1>{winnerAmount + " Ka"}</h1>
               {winnerDiff && <p>{"écart: " + winnerDiff + "Ka"}</p>}
+              {winnerPercent && <p>{"surpaiement: " + winnerPercent + "%"}</p>}
             </div>
           </div>
         ) : (

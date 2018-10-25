@@ -67,7 +67,15 @@ export class PlayersTable extends Component {
 
             <Column label="Notes" dataKey="NOTES_COUNT" width={40} />
 
-            <Column label="Moy." dataKey="NOTES_AVG" width={40} />
+            <Column
+              label="Moy."
+              dataKey="NOTES_AVG"
+              cellDataGetter={({ rowData }) =>
+                rowData.NOTES_AVG ? rowData.NOTES_AVG.toFixed(1) : '-'
+              }
+              width={40}
+              flexShrink={1}
+            />
 
             <Column label="Buts" dataKey="GOAL" width={40} />
 
