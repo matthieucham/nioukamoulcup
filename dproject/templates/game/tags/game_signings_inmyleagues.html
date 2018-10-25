@@ -19,7 +19,11 @@
                 <a href="{% url 'league_team-detail' li.league.pk signing.team.pk %}">{{ signing.team.name }}</a>
             </div>
             <div class="cell_table center">
-                {{ signing.attributes.amount }} Ka
+                {% if signing.attributes.amount is None %}
+                    Drafté
+                {% else %}
+                    {{ signing.attributes.amount }} Ka
+                {% endif %}
             </div>
         </div>
         {% endfor %}
