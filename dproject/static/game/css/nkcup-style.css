@@ -945,6 +945,11 @@ div.submit-merkato-container {
     text-align: center;
 }
 
+#signings-players li.past {
+    text-decoration: line-through;
+}
+
+
 /****************************************************************/
 /*                          ZINNIA                              */
 /****************************************************************/

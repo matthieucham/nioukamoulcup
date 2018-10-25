@@ -1,0 +1,30 @@
+<section id="signings-players">
+    {% if not_logged %}
+    {% else %}
+    <h1>Contrats</h1>
+    {% for li, signinglist in signings.items %}
+    <h2>{{ li.league.name }}</h2>
+    <div>
+        <div class="header_table">
+            <div class="cell_table">Division</div>
+            <div class="cell_table"></div>
+            <div class="cell_table center" style="width:10%;">Montant</div>
+        </div>
+        {% for signing in signinglist %}
+        <div class="line_table">
+            <div class="cell_table">
+                <a href="{% url 'league_ranking-detail' li.league.pk %}">{{ signing.team.division.name }}</a>
+            </div>
+            <div class="cell_table">
+                <a href="{% url 'league_team-detail' li.league.pk signing.team.pk %}">{{ signing.team.name }}</a>
+            </div>
+            <div class="cell_table center">
+                {{ signing.attributes.amount }} Ka
+            </div>
+        </div>
+        {% endfor %}
+
+    </div>
+    {% endfor %}
+    {% endif %}
+</section>
