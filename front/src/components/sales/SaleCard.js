@@ -208,7 +208,7 @@ class SaleAfter extends React.Component {
     ) {
       return null ;
     } else {
-      return ((sale.amount / offers[1].value) - 1).toFixed(1);
+      return (((sale.amount / offers[1].value) - 1)*100).toFixed(1);
     }
   }
 

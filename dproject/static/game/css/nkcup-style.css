@@ -876,7 +876,7 @@ dl.kvgroup {
     max-height: inherit;
 }
 
-.past-offers p {
+.past-offers p, .current-offer p {
     padding: 0 3px;
     font-size: 0.8em;
     color: rgba(0, 0, 0, 0.54);

@@ -21,7 +21,7 @@ const Page = ({ team }) => {
 			</main>
 			<aside className="hg__right">
 			<TeamCover team={ team } editable />
-			<TeamSignings signings={ team.signings } permissions={ team.permissions } />
+			<TeamSignings signings={ team.signings.filter(s => s.end == null) } permissions={ team.permissions } />
 			</aside>
 			</div>
 
