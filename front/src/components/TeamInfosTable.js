@@ -80,14 +80,15 @@ class TeamInfosTable extends Component {
   }
 
   _countMissingRecrues(team) {
-    if (! team["attributes"]["formation"]) {
+    if (!team["attributes"]["formation"]) {
       return "-";
     }
     let miss = 0;
     ["G", "D", "M", "A"].forEach(pos => {
       miss += Math.max(
         0,
-        team["attributes"]["formation"][pos] - team["current_signings"][pos]
+        team["attributes"]["formation"][pos] -
+          (pos in team["current_signings"] ? team["current_signings"][pos] : 0)
       );
     });
     return miss;
