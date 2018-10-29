@@ -40,7 +40,7 @@ def user_teams_invitation_code(team):
 
 @register.inclusion_tag('game/tags/game_signings_inmyleagues.html', takes_context=True)
 def signings_inmyleagues(context, player_id):
-    if context.request.user:
+    if context.request.user and context.request.user.is_authenticated:
         signings = models.Signing.objects.filter(player__pk=player_id,
                                                  end__isnull=True,
                                                  league_instance__league__members=context.request.user,
