@@ -145,6 +145,9 @@ export class TeamRankingTable extends Component {
 
   _defaultSortBy(sortByKey) {
     return function(a, b) {
+      if (! a[sortByKey]) {
+        return 1;
+      }
       if (a[sortByKey] < b[sortByKey])
         //sort string ascending
         return -1;
