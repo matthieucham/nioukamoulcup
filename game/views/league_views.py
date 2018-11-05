@@ -324,7 +324,7 @@ class LeagueReleaseSigningView(FormView, BaseLeagueView):
         signing = Signing.objects.get(pk=self.kwargs['signing_pk'])
         Signing.objects.ending(signing)
         merkato = Merkato.objects.find_current_open_merkato_for_release(self.get_my_team())
-        session = MerkatoSession.objects.get_next_available(merkato, dont_check_sales_count=True)
+        session = MerkatoSession.objects.get_next_available_for_release(merkato)
 
         Release.objects.create(signing=signing,
                                merkato_session=session,

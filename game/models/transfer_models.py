@@ -112,18 +112,22 @@ class Merkato(models.Model):
 
 
 class MerkatoSessionManager(models.Manager):
-    def get_next_available(self, merkato, dont_check_sales_count=False):
+    def get_next_available(self, merkato):
         now = datetime.now(pytz.utc)
         max_sales_in_session = merkato.configuration.get('sales_per_session', -1)
         sess_gen = (s for s in self.filter(merkato=merkato).prefetch_related('sale_set').order_by('closing') if
                     s.closing >= now)
         for sess in sess_gen:
-            if dont_check_sales_count or (max_sales_in_session < 0):
+            if max_sales_in_session < 0:
                 # first found is ok:
                 return sess
             if len(sess.sale_set.all()) < max_sales_in_session:
                 return sess
         return None
+
+    def get_next_available_for_release(self, merkato):
+        now = datetime.now(pytz.utc)
+        return self.filter(merkato=merkato, solving__gte=now).order_by('solving').first()
 
 
 class MerkatoSession(models.Model):
