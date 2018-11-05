@@ -19,58 +19,6 @@ const ByDivisionRanking = ({ divisions }) => {
   return divs;
 };
 
-class PositionFilter extends Component {
-  constructor(props) {
-    super(props);
-  }
-
-  render() {
-    return (
-      <form>
-        <label>
-          Poste:{" "}
-          <select onChange={this.props.handleChange} value={this.props.value}>
-            <option value="" />
-            <option value="G">Gardiens</option>
-            <option value="D">Défenseurs</option>
-            <option value="M">Milieux</option>
-            <option value="A">Attaquants</option>
-          </select>
-        </label>
-      </form>
-    );
-  }
-}
-
-class PlayersFilterTable extends Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      filterPosition: "G"
-    };
-  }
-
-  render() {
-    return (
-      <div>
-        <PositionFilter
-          value={this.state.filterPosition}
-          handleChange={event =>
-            this.setState({ filterPosition: event.target.value })
-          }
-        />
-        <PlayersRankingTable
-          players={PLAYERS}
-          phases={PHASES}
-          filterPosition={this.state.filterPosition}
-          height={700}
-        />
-      </div>
-    );
-  }
-}
-
 export class PhaseRankingsTab extends Component {
   constructor(props) {
     super(props);
@@ -82,8 +30,6 @@ export class PhaseRankingsTab extends Component {
 
   render() {
     const { phases, playersRanking, onPlayersTab } = this.props;
-
-    console.log(playersRanking);
 
     const links = phases.map(ph => {
       const roundIndex = ph.current_ranking.number - ph.journee_first + 1;
@@ -113,6 +59,7 @@ export class PhaseRankingsTab extends Component {
           players={playersRanking}
           phases={phases}
           height={700}
+          onPlayersFilterSubmitted={onPlayersTab}
         />
       </TabContent>
     );

@@ -1,5 +1,6 @@
 from django.http import Http404
 from django.utils.timezone import localtime, now
+from django.db import models
 
 from rest_framework import generics
 from django_filters.rest_framework import DjangoFilterBackend
@@ -117,6 +118,63 @@ class LeaguePlayersRankingView(CurrentLeagueInstanceMixin, generics.RetrieveAPIV
     def get_queryset(self):
         league = self.kwargs['league']
         return league_models.LeagueInstance.objects.filter(league=league, current=True)
+
+
+class NewPlayersRankingView(CurrentLeagueInstanceMixin, generics.ListAPIView):
+    permission_classes = (DRYObjectPermissions,)
+    serializer_class = serializers.NewPlayersRankingSerializer
+    # pagination_class = PageNumberPagination
+    filter_backends = (DjangoFilterBackend, SearchFilter,)
+    filter_fields = {
+        'poste': ['exact'],
+        'club': ['exact', 'isnull']
+    }
+    search_fields = ('nom', 'surnom', '=prenom',)
+
+    @timed
+    def get_queryset(self):
+        # limit to players which :
+        # - are members of participating teams of the season of the current instance
+        # - or have played at least one meeting in the season of the current instance
+        # order by club then name
+        instance = self._get_current_league_instance(self.kwargs['league_pk'])
+        qs = (
+            l1models.Joueur.objects.filter(club__participations=instance.saison) |
+            l1models.Joueur.objects.filter(performances__rencontre__journee__saison=instance.saison)
+        ).distinct().order_by('club__nom', 'nom')
+        return qs
+
+    def get_players_score(self):
+        league_pk = self.kwargs['league_pk']
+        instance = self._get_current_league_instance(league_pk)
+        latest_day_by_phase = league_models.LeagueInstancePhase.objects.filter(league_instance=instance).annotate(
+            latest_day=models.Max('leagueinstancephaseday__journee__numero'))
+        score_by_id = dict()
+        for phase in latest_day_by_phase:
+            for tds in league_models.TeamDayScore.objects.filter(day__league_instance_phase=phase,
+                                                                 day__journee__numero=phase.latest_day).select_related(
+                'day__league_instance_phase'):
+                if tds.attributes and 'composition' in tds.attributes:
+                    for poste in ['G', 'D', 'M', 'A']:
+                        for psco in tds.attributes['composition'][poste]:
+                            if not psco['player']['id'] in score_by_id:
+                                score_by_id.update({psco['player']['id']: dict({'scores': []})})
+                            scoval = float('%.1f' % round(psco['score'] / psco['score_factor'], 1))
+                            score_by_id[psco['player']['id']]['scores'].append(dict({'phase': phase.id,
+                                                                                     'score': scoval}))
+        return score_by_id
+
+    def get_phases(self):
+        league_pk = self.kwargs['league_pk']
+        instance = self._get_current_league_instance(league_pk)
+        return league_models.LeagueInstancePhase.objects.filter(league_instance=instance).values('id', 'name')
+
+    @timed
+    def get_serializer_context(self):
+        base_context = super(NewPlayersRankingView, self).get_serializer_context()
+        base_context['scoring_map'] = self.get_players_score()
+        base_context['phases'] = self.get_phases()
+        return base_context
 
 
 class LeagueTeamInfoListView(generics.ListAPIView):

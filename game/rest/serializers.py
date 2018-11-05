@@ -378,7 +378,7 @@ class SigningsAggregationSerializer(serializers.Serializer):
 
 
 class TeamDetailSerializer(serializers.ModelSerializer):
-    permissions = DRYPermissionsField(additional_actions=['release'],)
+    permissions = DRYPermissionsField(additional_actions=['release'], )
     signings_aggregation = SigningsAggregationSerializer(source='*', read_only=True)
     signings = SigningSerializer(source='signing_set', many=True, read_only=True)
     latest_scores = serializers.SerializerMethodField()
@@ -498,7 +498,7 @@ class PlayersRankingSerializer(serializers.ModelSerializer):
                         for psco in tds.attributes['composition'][poste]:
                             if not psco['player']['id'] in score_by_id:
                                 score_by_id.update({psco['player']['id']: dict({'scores': []})})
-                            scoval = float('%.2f' % round(psco['score'] / psco['score_factor'], 2))
+                            scoval = float('%.1f' % round(psco['score'] / psco['score_factor'], 1))
                             score_by_id[psco['player']['id']]['scores'].append(dict({'phase': phase.id,
                                                                                      'score': scoval}))
         # fetch players
@@ -511,6 +511,33 @@ class PlayersRankingSerializer(serializers.ModelSerializer):
     class Meta:
         model = league_models.LeagueInstance
         fields = ('phases', 'players_ranking',)
+
+
+class NewPlayersRankingSerializer(PlayerHdrSerializer):
+    scores = serializers.SerializerMethodField()
+
+    def get_scores(self, obj):
+        result = dict()
+        for ph in self.context['phases']:
+            try:
+                result.update({ph['id']: self.context['scoring_map'][obj.id]['scores'][ph['id']]})
+            except KeyError:
+                result.update({ph['id']: None})
+        return result
+
+    class Meta:
+        model = l1models.Joueur
+        fields = (
+            'id',
+            'url',
+            'prenom',
+            'nom',
+            'surnom',
+            'display_name',
+            'poste',
+            'club',
+            'scores',
+        )
 
 
 class AuctionSerializer(serializers.ModelSerializer):

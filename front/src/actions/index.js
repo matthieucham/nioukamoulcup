@@ -100,8 +100,11 @@ export const receivePlayersRanking = json => {
   };
 };
 
-export function fetchPlayersRanking() {
+export function fetchPlayersRanking(qp) {
   let url = API_ROOT.concat(`leagues/${LEAGUE_ID}/players?format=json`);
+  if (qp) {
+    url += "&"+qp;
+  }
   return dispatch => {
     dispatch(requestPlayersRanking());
     return fetch(url)

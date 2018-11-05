@@ -104,7 +104,9 @@ export class TeamRankingTable extends Component {
               cellDataGetter={({ rowData }) =>
                 rowData["missing_notes"] == 0
                   ? ""
-                  : "-" + rowData["missing_notes"]
+                  : rowData["missing_notes"]
+                    ? "-" + rowData["missing_notes"]
+                    : "-"
               }
               width={80}
             />

@@ -143,8 +143,9 @@ function players_ranking(state = { phases: [], ranking: [] }, action) {
   switch (action.type) {
     case RECEIVE_PLAYERSRANKING:
       return Object.assign({}, state, {
-        phases: action.ranking.phases,
-        ranking: action.ranking.players_ranking
+        /*phases: action.ranking.phases,*/
+        /*ranking: action.ranking.players_ranking*/
+        ranking: action.ranking
       });
     default:
       return state;
