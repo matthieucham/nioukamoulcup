@@ -521,7 +521,7 @@ class NewPlayersRankingSerializer(PlayerHdrSerializer):
         for ph in self.context['phases']:
             try:
                 for scoph in self.context['scoring_map'][obj.id]['scores']:
-                    if scoph['phase'] == ph:
+                    if scoph['phase'] == ph['id']:
                         result.update({scoph['phase']: scoph['score']})
             except KeyError:
                 result.update({ph['id']: None})
