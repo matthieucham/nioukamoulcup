@@ -520,6 +520,7 @@ class NewPlayersRankingSerializer(PlayerHdrSerializer):
         result = dict()
         for ph in self.context['phases']:
             try:
+                print(self.context['scoring_map'][obj.id])
                 result.update({ph['id']: self.context['scoring_map'][obj.id]['scores'][ph['id']]})
             except KeyError:
                 result.update({ph['id']: None})
