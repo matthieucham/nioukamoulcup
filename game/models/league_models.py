@@ -249,21 +249,43 @@ class LeagueInstancePhaseDayManager(models.Manager):
                 TeamDayScore.objects.filter(day=lipd).delete()  # delete existing and recompute.
             TeamDayScore.objects.bulk_create(team_day_scores)
 
-    def _compute_scores_for_phaseday(self, lipd):
-        return [self._compute_teamdayscore(team, lipd) for team in
+    def _compute_scores_for_phaseday(self, lipd, is_current=False):
+        return [self._compute_teamdayscore(team, lipd, is_current=is_current) for team in
                 Team.objects.filter(league=lipd.league_instance_phase.league_instance.league).prefetch_related(
                     'signing_set')]
 
-    def _compute_teamdayscore(self, team, lipd):
+    @timed
+    def compute_current_results(self, league_instance):
+        assert league_instance.league.mode == 'KCUP', 'only KCUP leagues have current scores'
+        last_journee = l1models.Journee.objects.filter(saison__est_courante__isnull=False).order_by('-numero').first()
+        if last_journee is None:
+            return
+        phases = LeagueInstancePhase.objects.filter(league_instance=league_instance,
+                                                    journee_first__lte=last_journee.numero,
+                                                    journee_last__gte=last_journee.numero)
+        for ph in phases:
+            try:
+                lipd = self.get(league_instance_phase=ph, journee=last_journee)
+                team_day_scores = self._compute_scores_for_phaseday(lipd, is_current=True)
+                TeamDayScore.objects.filter(day__league_instance_phase=ph,
+                                            current=True).delete()  # delete previous "current"
+                TeamDayScore.objects.bulk_create(team_day_scores)
+            except LeagueInstancePhaseDay.DoesNotExist:
+                raise Exception('Call compute_results first to generate LIPD instances')
+
+    def _compute_teamdayscore(self, team, lipd, is_current=False):
         league_mode = lipd.league_instance_phase.league_instance.league.mode
         # filter signings valid at this time
-        signings_at_day = [s for s in team.signing_set.all() if
-                           (s.begin <= lipd.journee.debut) and (s.end is None or s.end > lipd.journee.debut)]
+        if is_current:
+            signings_at_day = [s for s in team.signing_set.all() if s.end is None]
+        else:
+            signings_at_day = [s for s in team.signing_set.all() if
+                               (s.begin <= lipd.journee.debut) and (s.end is None or s.end > lipd.journee.debut)]
         if league_mode == 'KCUP':
             jjscore_max_nb = lipd.league_instance_phase.league_instance.configuration['notes'][
                 lipd.league_instance_phase.type]
             try:
-                existing_tds = TeamDayScore.objects.get(day=lipd, team=team)
+                existing_tds = TeamDayScore.objects.get(day=lipd, team=team, current=is_current)
                 tds_config = existing_tds.attributes
                 joker = tds_config['joker'] if 'joker' in tds_config else None
                 formation = tds_config['formation']
@@ -285,7 +307,7 @@ class LeagueInstancePhaseDayManager(models.Manager):
                     if i < formation[poste]:
                         teamscore += scores_at_poste[i][1]
                     composition[poste].append(scores_at_poste[i])
-            return self._make_teamdayscore(team, lipd, teamscore, composition)
+            return self._make_teamdayscore(team, lipd, teamscore, composition, is_current=is_current)
         else:
             # TODO
             return None
@@ -318,7 +340,7 @@ class LeagueInstancePhaseDayManager(models.Manager):
             score += (float(base) * factor) + float(extra_bonus)
         return score
 
-    def _make_teamdayscore(self, team, lipd, teamscore, composition):
+    def _make_teamdayscore(self, team, lipd, teamscore, composition, is_current=False):
         attrs = dict()
         attrs['composition'] = {}
         for poste, _ in l1models.Joueur.POSTES:
@@ -332,7 +354,7 @@ class LeagueInstancePhaseDayManager(models.Manager):
         if 'joker' in team_config:
             attrs['joker'] = team_config['joker']
         attrs['formation'] = team_config['formation']
-        return TeamDayScore(team=team, day=lipd, score=teamscore, attributes=attrs)
+        return TeamDayScore(team=team, day=lipd, score=teamscore, attributes=attrs, current=is_current)
 
     def get_latest_day_for_phases(self, phases):
         latest_days = []
@@ -361,6 +383,7 @@ class TeamDayScore(models.Model):
     day = models.ForeignKey(LeagueInstancePhaseDay, on_delete=models.CASCADE, null=False)
     team = models.ForeignKey(Team, on_delete=models.CASCADE)
     score = models.DecimalField(decimal_places=3, max_digits=7)
+    current = models.BooleanField(default=False)
     attributes = JSONField()
 
     class Meta:

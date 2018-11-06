@@ -35,5 +35,6 @@ class Command(BaseCommand):
             for j in jjs_list:
                 self.stdout.write('Computing scores of instance %s for journee %s' % (li.name, j.journee))
                 gamemodels.LeagueInstancePhaseDay.objects.compute_results(li, j.journee)
+            gamemodels.LeagueInstancePhaseDay.objects.compute_current_results(li)
             licount += 1
         self.stdout.write('Done. %d league_instances processed' % licount)

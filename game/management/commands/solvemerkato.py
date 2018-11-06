@@ -13,6 +13,10 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         self._solve_drafts()
         self._solve_merkatos()
+        # Recalculer le score courant est nécessaire car les effectifs ont changé
+        for instance in gamemodels.LeagueInstance.objects.filter(current=True):
+            gamemodels.LeagueInstancePhaseDay.objects.compute_current_results(instance)
+            self.stdout.write('current score of %s computed.' % instance)
 
     def _solve_drafts(self):
         for ds in gamemodels.DraftSession.objects.filter(merkato__league_instance__current=True,

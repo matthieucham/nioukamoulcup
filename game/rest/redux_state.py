@@ -38,7 +38,8 @@ class StateInitializerMixin:
     @timed
     def init_from_team(self, request, team):
         self._init_common(request)
-        team_serializer = serializers.TeamDetailSerializer(team, context={'request': request})
+        team_serializer = serializers.TeamDetailSerializer(team, context={'request': request,
+                                                                          'current': True})  # TODO optim pour FSY
         players_serializer = serializers.PlayerScoreSerializer(
             l1models.Joueur.objects.filter(signing__team=team), many=True, context={'request': request})
         self.initial_state['team'] = self._to_json(team_serializer)

@@ -40,7 +40,7 @@ class TeamDetailView(generics.RetrieveAPIView):
     permission_classes = (DRYObjectPermissions,)
 
     def get_serializer_context(self):
-        return {'request': self.request}
+        return {'request': self.request, 'current': True}  # TODO optim pour FSY
 
 
 class ClubListView(CurrentLeagueInstanceMixin, generics.ListAPIView):
@@ -95,35 +95,40 @@ class TeamSalesListView(CurrentLeagueInstanceMixin, generics.ListAPIView):
 
 class LeagueResultsByJourneeListView(CurrentLeagueInstanceMixin, generics.ListAPIView):
     permission_classes = (DRYObjectPermissions,)
-    serializer_class = serializers.TeamDayScoreSerializer
+    serializer_class = serializers.TeamDayCompoAndScoreSerializer
+
+    def get_serializer_context(self):
+        base_context = super(LeagueResultsByJourneeListView, self).get_serializer_context()
+        journee_numero = self.kwargs['journee_numero']
+        if int(journee_numero) == 0:
+            base_context['current'] = True
+        else:
+            base_context['current'] = False
+        return base_context
 
     def get_queryset(self):
         team_pk = self.kwargs['team_pk']
         league_pk = self.kwargs['league_pk']
         journee_numero = self.kwargs['journee_numero']
+        # numero special 0 pour le score "courant"
 
         days = league_models.LeagueInstancePhaseDay.objects.filter(
-            league_instance_phase__league_instance=self._get_current_league_instance(league_pk),
-            journee__numero=journee_numero
-        )
-        return league_models.TeamDayScore.objects.filter(day__in=days, team=team_pk).order_by(
+            league_instance_phase__league_instance=self._get_current_league_instance(league_pk))
+        if int(journee_numero) > 0:
+            days = days.filter(journee__numero=journee_numero)
+
+        qs = league_models.TeamDayScore.objects.filter(day__in=days, team=team_pk).order_by(
             'day__league_instance_phase')
-
-
-class LeaguePlayersRankingView(CurrentLeagueInstanceMixin, generics.RetrieveAPIView):
-    permission_classes = (DRYObjectPermissions,)
-    serializer_class = serializers.PlayersRankingSerializer
-    lookup_field = 'league'
-
-    def get_queryset(self):
-        league = self.kwargs['league']
-        return league_models.LeagueInstance.objects.filter(league=league, current=True)
+        if int(journee_numero) == 0:
+            qs = qs.filter(current=True)
+        else:
+            qs = qs.filter(current=False)
+        return qs.order_by('day__league_instance_phase')
 
 
 class NewPlayersRankingView(CurrentLeagueInstanceMixin, generics.ListAPIView):
     permission_classes = (DRYObjectPermissions,)
     serializer_class = serializers.NewPlayersRankingSerializer
-    # pagination_class = PageNumberPagination
     filter_backends = (DjangoFilterBackend, SearchFilter,)
     filter_fields = {
         'poste': ['exact'],
@@ -139,8 +144,8 @@ class NewPlayersRankingView(CurrentLeagueInstanceMixin, generics.ListAPIView):
         # order by club then name
         instance = self._get_current_league_instance(self.kwargs['league_pk'])
         qs = (
-            l1models.Joueur.objects.filter(club__participations=instance.saison) |
-            l1models.Joueur.objects.filter(performances__rencontre__journee__saison=instance.saison)
+                l1models.Joueur.objects.filter(club__participations=instance.saison) |
+                l1models.Joueur.objects.filter(performances__rencontre__journee__saison=instance.saison)
         ).distinct().order_by('club__nom', 'nom')
         return qs
 
@@ -228,8 +233,8 @@ class PlayersForMerkatoView(CurrentLeagueInstanceMixin, generics.ListAPIView):
         # order by club then name
         instance = self._get_current_league_instance(self.kwargs['league_pk'])
         qs = (
-            l1models.Joueur.objects.filter(club__participations=instance.saison) |
-            l1models.Joueur.objects.filter(performances__rencontre__journee__saison=instance.saison)
+                l1models.Joueur.objects.filter(club__participations=instance.saison) |
+                l1models.Joueur.objects.filter(performances__rencontre__journee__saison=instance.saison)
         ).distinct().order_by('club__nom', 'nom')
         return qs
 

@@ -14,7 +14,13 @@ const JB = ({ team, journee, onPreviousClick, onNextClick }) => {
   const previousClassName =
     journee && journee.is_first ? "navbutton disabled" : "navbutton";
   const nextClassName =
-    journee && journee.is_last ? "navbutton disabled" : "navbutton";
+    journee && journee.is_current ? "navbutton disabled" : "navbutton";
+  const journeeTitle = journee.is_current
+    ? "En cours"
+    : `Journée ${journee.numero} du ${format(
+        journee.debut,
+        "DD/MM/YYYY"
+      )} au ${format(journee.fin, "DD/MM/YYYY")}`;
   return (
     <div>
       <h1>
@@ -25,8 +31,8 @@ const JB = ({ team, journee, onPreviousClick, onNextClick }) => {
         >
           <i className="fa fa-chevron-left" />
         </a>
-        &nbsp;Journée {journee.numero} du {format(journee.debut, "DD/MM/YYYY")}{" "}
-        au {format(journee.fin, "DD/MM/YYYY")}
+        &nbsp;
+        {journeeTitle}
         &nbsp;
         <a href="#" className={nextClassName} onClick={() => onNextClick()}>
           <i className="fa fa-chevron-right" />
@@ -45,10 +51,14 @@ const mapDispatchToProps = (dispatch, ownProps) => {
   } else {
     const previousnum = ownProps.journee.is_first
       ? ownProps.journee.numero
-      : ownProps.journee.numero - 1;
+      : ownProps.journee.is_current
+        ? ownProps.journee.numero
+        : ownProps.journee.numero - 1;
     const nextnum = ownProps.journee.is_last
-      ? ownProps.journee.numero
-      : ownProps.journee.numero + 1;
+      ? 0
+      : ownProps.journee.is_current
+        ? 0
+        : ownProps.journee.numero + 1;
 
     return {
       onPreviousClick: () =>
