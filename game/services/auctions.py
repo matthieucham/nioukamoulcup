@@ -61,8 +61,7 @@ def _make_signing_attr(sale):
                 1.0 - sale.merkato_session.merkato.configuration.get('re_tax_rate'))).quantize(decimal.Decimal('.1'),
                                                                                                rounding=decimal.ROUND_HALF_UP)),
             'locked': False,
-            'score_factor': sale.merkato_session.merkato.configuration[
-                'score_factor'] if 'score_factor' in sale.merkato_session.merkato.configuration else 1.0}
+            'score_factor': sale.merkato_session.configuration.get('score_factor', 1.0)}
 
 
 @transaction.atomic
