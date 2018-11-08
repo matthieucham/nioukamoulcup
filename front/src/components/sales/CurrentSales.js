@@ -128,7 +128,8 @@ export class CurrentMerkatoBid extends React.Component {
             label="Durée enchères"
             value={merkato.configuration.session_duration + "h"}
           />
-          <KeyValueBox label="Solde" value={merkato.account_balance + " Ka"} />
+          <KeyValueBox label="Solde total" value={merkato.account_balance.balance + " Ka"} />
+          <KeyValueBox label="Solde dispo" value={merkato.account_balance.balance - merkato.account_balance.locked + " Ka"} />
         </div>
         <section>
           <h2>Poster une PA</h2>

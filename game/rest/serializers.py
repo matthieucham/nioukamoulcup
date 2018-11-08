@@ -797,7 +797,11 @@ class CurrentMerkatoSerializer(serializers.ModelSerializer):
 
     def get_account_balance(self, obj):
         try:
-            return self.context.get('team').bank_account.balance
+            account = self.context.get('team').bank_account
+            return {
+                'balance': account.balance,
+                'locked': account.blocked
+            }
         except league_models.BankAccount.DoesNotExist:
             return None
 

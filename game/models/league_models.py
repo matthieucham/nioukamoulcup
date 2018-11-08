@@ -108,6 +108,7 @@ class Team(models.Model):
 
 
 class BankAccountManager(models.Manager):
+
     @transaction.atomic
     def init_account(self, date, team, init_balance, merkato):
         account, created = self.get_or_create(team=team, defaults={'balance': init_balance, 'blocked': 0})
@@ -171,6 +172,9 @@ class BankAccount(models.Model):
     blocked = models.DecimalField(max_digits=4, decimal_places=1)
     objects = BankAccountManager()
 
+    def get_available(self):
+        return self.balance - self.blocked
+
 
 class BankAccountHistory(models.Model):
     bank_account = models.ForeignKey(BankAccount, on_delete=models.CASCADE,
@@ -197,6 +201,9 @@ class BankAccountHistory(models.Model):
     @staticmethod
     def make_info_release(player):
         return {'type': 'RELEASE', 'player_id': player.pk, 'player_name': player.display_name()}
+
+    class Meta:
+        ordering = ('-date', 'new_balance')
 
 
 class LeagueInstanceManager(models.Manager):

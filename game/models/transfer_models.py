@@ -1,4 +1,4 @@
-from django.db import models
+from django.db import models, transaction
 from django.contrib.postgres.fields import JSONField
 import pytz
 # import datetime
@@ -192,6 +192,7 @@ class Sale(models.Model):
 
     objects = SaleManager()
 
+    @transaction.atomic
     def save(self, *args, **kwargs):
         """
         Call Sale create operations within LockedAtomicTransaction
@@ -203,6 +204,10 @@ class Sale(models.Model):
                 self.rank = max_rank_sale.rank + 1
             except Sale.DoesNotExist:
                 self.rank = 1
+            # block sale amount from author account
+            if self.type == 'PA':
+                self.team.bank_account.blocked += self.min_price
+                self.team.bank_account.save()
         super(Sale, self).save(*args, **kwargs)
 
     def get_buying_price(self):
@@ -258,9 +263,9 @@ class Auction(models.Model):
             if self.sale.min_price >= self.value:
                 raise Auction.AuctionNotValidException(code='MIN_PRICE')
         # MONEY
-        available = float(self.team.bank_account.balance - self.team.bank_account.blocked)
+        available = float(self.team.bank_account.get_available())
         if self.sale.team.pk == self.team.pk:
-            available += float(self.sale.min_price)
+            available += float(self.sale.min_price)  # auteur = vainqueur : le prix de mise en vente ne compte plus
         current_session_won = Sale.objects.filter(merkato_session=self.sale.merkato_session,
                                                   rank__lt=self.sale.rank).filter(
             models.Q(winning_auction__team=self.team) |

@@ -48,7 +48,7 @@ class RegisterPaForm(BaseRegisterForm):
     def clean_amount(self):
         amount = super(RegisterPaForm, self).clean_amount()
         try:
-            assert self.team.bank_account.balance >= amount
+            assert self.team.bank_account.get_available() >= amount
         except AssertionError:
             raise forms.ValidationError('Montant de PA trop élevé', code='too_high')
         except BankAccount.DoesNotExist:
