@@ -33,6 +33,7 @@ class Command(BaseCommand):
                         events.append({'date': mkt.begin, 'merkato': mkt,
                                        'team': t})
             for sales_pa in gamemodels.Sale.objects.filter(type='PA',
+                                                           merkato_session__is_solved=True,
                                                            merkato_session__merkato__league_instance=instance).select_related(
                 'winning_auction').select_related('merkato_session'):
                 events.append({'date': sales_pa.merkato_session.solving,
@@ -40,6 +41,7 @@ class Command(BaseCommand):
                                'debit': - sales_pa.get_buying_price(),
                                'sale': sales_pa})
             for sales_mv in gamemodels.Sale.objects.filter(type='MV',
+                                                           merkato_session__is_solved=True,
                                                            merkato_session__merkato__league_instance=instance).select_related(
                 'winning_auction').select_related('merkato_session'):
                 if sales_mv.winning_auction:
@@ -55,20 +57,19 @@ class Command(BaseCommand):
                                    'sale': sales_mv})
 
             for re in gamemodels.Release.objects.select_related('signing').select_related('merkato_session').filter(
+                    merkato_session__is_solved=True,
                     merkato_session__merkato__league_instance=instance, done=True):
                 events.append({'date': re.merkato_session.solving,
                                'team': re.signing.team,
                                'credit': re.amount,
                                'release': re})
             for ev in sorted(sorted(events, key=lambda e: 0 if 'release' in e else 1), key=lambda e: e['date']):
-                account, _ = gamemodels.BankAccount.objects.get_or_create(team=ev['team'],
-                                                                          defaults={'balance': ev['balance'],
-                                                                                    'blocked': 0})
+                account = gamemodels.BankAccount.objects.get(team=ev['team'])
                 if 'merkato' in ev:
                     mkt = ev['merkato']
                     account.balance = decimal.Decimal(mkt.configuration['init_balance'])
                     account.bankaccounthistory_set.add(
-                        gamemodels.BankAccountHistory.objects.create(date=ev['date'], amount=ev['balance'],
+                        gamemodels.BankAccountHistory.objects.create(date=ev['date'], amount=account.balance,
                                                                      new_balance=account.balance,
                                                                      info=gamemodels.BankAccountHistory.make_info_init(
                                                                          mkt)))
@@ -96,4 +97,5 @@ class Command(BaseCommand):
                                                                      new_balance=account.balance,
                                                                      info=info))
                     account.save()
+                # TODO block current PA values
             self.stdout.write('League instance %d done.' % league_id)

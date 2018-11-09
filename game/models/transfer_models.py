@@ -231,6 +231,32 @@ class Sale(models.Model):
         else:
             return self.winning_auction.team, self.winning_auction.value
 
+    @transaction.atomic
+    def revert(self):
+        for a in self.auctions.all():
+            a.is_valid = None
+            a.reject_cause = None
+            a.save()
+        # revert signing
+        winner, _ = self.get_winner_and_price()
+        if winner:
+            signing = league_models.Signing.objects.get(league_instance=self.merkato_session.merkato.league_instance,
+                                                        team=winner,
+                                                        player=self.player,
+                                                        begin__gte=self.merkato_session.solving,
+                                                        end__isnull=True)
+            signing.delete()
+            if self.type == 'MV':
+                previous_signing = league_models.Signing.objects.get(
+                    league_instance=self.merkato_session.merkato.league_instance,
+                    team=self.team,
+                    player=self.player,
+                    end__gte=self.merkato_session.solving)
+                previous_signing.end = None
+                previous_signing.save()
+            self.winning_auction=None
+            self.save()
+
     class Meta:
         unique_together = (
             ('merkato_session', 'rank'),
@@ -263,9 +289,9 @@ class Auction(models.Model):
             if self.sale.min_price >= self.value:
                 raise Auction.AuctionNotValidException(code='MIN_PRICE')
         # MONEY
-        available = float(self.team.bank_account.get_available())
+        available = self.team.bank_account.get_available()
         if self.sale.team.pk == self.team.pk:
-            available += float(self.sale.min_price)  # auteur = vainqueur : le prix de mise en vente ne compte plus
+            available += self.sale.min_price  # auteur = vainqueur : le prix de mise en vente ne compte plus
         current_session_won = Sale.objects.filter(merkato_session=self.sale.merkato_session,
                                                   rank__lt=self.sale.rank).filter(
             models.Q(winning_auction__team=self.team) |
@@ -274,7 +300,7 @@ class Auction(models.Model):
         for csw in current_session_won:
             _, val = csw.get_winner_and_price()
             if val:
-                current_spent += float(val)
+                current_spent += val
         available -= current_spent
         if available < self.value:
             raise Auction.AuctionNotValidException(code='MONEY')
@@ -319,6 +345,13 @@ class Release(models.Model):
     done = models.BooleanField(default=False)
 
     objects = ReleaseManager()
+
+    @transaction.atomic
+    def revert(self):
+        self.signing.end = None
+        self.signing.save()
+        self.done = False
+        self.save()
 
 
 class DraftSession(models.Model):
