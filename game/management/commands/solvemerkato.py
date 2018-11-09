@@ -22,7 +22,7 @@ class Command(BaseCommand):
         for ds in gamemodels.DraftSession.objects.filter(merkato__league_instance__current=True,
                                                          merkato__mode='DRFT',
                                                          closing__lt=timezone.now(),
-                                                         is_solved=False):
+                                                         is_solved=False).order_by('number'):
             self.stdout.write('Solving draft session #%s ...' % ds.pk)
             auctions.solve_draft_session(ds)
             self.stdout.write('Done')
@@ -32,7 +32,7 @@ class Command(BaseCommand):
         for ms in gamemodels.MerkatoSession.objects.filter(merkato__league_instance__current=True,
                                                            merkato__mode='BID',
                                                            solving__lt=timezone.now(),
-                                                           is_solved=False):
+                                                           is_solved=False).order_by('number'):
             self.stdout.write('Solving merkato session #%s ...' % ms.pk)
             auctions.solve_session(ms)
             auctions.apply_transfers(ms)
