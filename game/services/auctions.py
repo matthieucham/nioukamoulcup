@@ -46,7 +46,7 @@ def _do_transfer(sale):
             league_models.Signing.objects.end(signing, 'MV', amount=sale.get_selling_price())
             league_models.BankAccount.objects.sell(sale)
             # start new contract:
-            league_models.Signing.objects.create(player=sale.player, team=sale.winning_auction,
+            league_models.Signing.objects.create(player=sale.player, team=sale.winning_auction.team,
                                                  league_instance=sale.merkato_session.merkato.league_instance,
                                                  attributes=_make_signing_attr(sale))
             league_models.BankAccount.objects.buy(sale)
