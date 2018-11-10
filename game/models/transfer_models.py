@@ -6,6 +6,7 @@ from datetime import timedelta, time, datetime, date
 from django.utils import timezone
 from . import league_models
 from ligue1 import models as l1models
+from decimal import Decimal
 
 
 class MerkatoManager(models.Manager):
@@ -221,7 +222,7 @@ class Sale(models.Model):
         assert self.type == 'MV'
         assert self.winning_auction is not None
         return self.winning_auction.value * (
-                1.0 - self.merkato_session.merkato.configuration['mv_tax_rate'])
+                Decimal(1.0) - Decimal(self.merkato_session.merkato.configuration['mv_tax_rate']))
 
     def get_winner_and_price(self):
         if self.winning_auction is None and self.type == 'PA':

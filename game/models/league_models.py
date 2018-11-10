@@ -154,10 +154,8 @@ class BankAccountManager(models.Manager):
         assert (sale.type == 'MV')
         assert (sale.winning_auction is not None)
         amount = sale.get_selling_price()
-        assert (amount >= sale.min_price)
         account = self.select_for_update().get(team=sale.winning_auction.team)
-        assert (account.balance - amount >= 0)
-        account.balance -= amount
+        account.balance += amount
         account.bankaccounthistory_set.add(
             BankAccountHistory.objects.create(amount=amount, new_balance=account.balance,
                                               date=sale.merkato_session.solving.date(),
