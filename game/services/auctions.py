@@ -43,7 +43,7 @@ def _do_transfer(sale):
             # end contract with selling team:
             signing = league_models.Signing.objects.get(player=sale.player, team=sale.team, end__isnull=True,
                                                         league_instance=sale.merkato_session.merkato.league_instance)
-            league_models.Signing.objects.end(signing, 'MV', sale.get_selling_price())
+            league_models.Signing.objects.end(signing, 'MV', amount=sale.get_selling_price())
             league_models.BankAccount.objects.sell(sale)
             # start new contract:
             league_models.Signing.objects.create(player=sale.player, team=sale.winning_auction,
