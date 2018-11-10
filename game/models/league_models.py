@@ -133,7 +133,7 @@ class BankAccountManager(models.Manager):
         assert (account.balance - amount >= 0)
         account.balance -= amount
         account.bankaccounthistory_set.add(
-            BankAccountHistory.objects.create(amount=amount, new_balance=account.balance,
+            BankAccountHistory.objects.create(amount=-amount, new_balance=account.balance,
                                               date=sale.merkato_session.solving.date(),
                                               info=BankAccountHistory.make_info_buy(sale.player,
                                                                                     seller=sale.team if sale.type == 'MV' else None)))
@@ -154,13 +154,13 @@ class BankAccountManager(models.Manager):
         assert (sale.type == 'MV')
         assert (sale.winning_auction is not None)
         amount = sale.get_selling_price()
-        account = self.select_for_update().get(team=sale.winning_auction.team)
+        account = self.select_for_update().get(team=sale.team)
         account.balance += amount
         account.bankaccounthistory_set.add(
             BankAccountHistory.objects.create(amount=amount, new_balance=account.balance,
                                               date=sale.merkato_session.solving.date(),
                                               info=BankAccountHistory.make_info_sell(sale.player,
-                                                                                     sale.team)))
+                                                                                     sale.winning_auction.team)))
         account.save()
 
 
