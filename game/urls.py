@@ -5,7 +5,7 @@ from .views import ResultRencontreView, ClubView, StatView, StatJoueurView, Resu
     LeagueEntryDetail, LeagueWallView, LeagueEkypView, LeagueRankingView, LeagueMerkatoResultsView, LeagueMerkatoView, \
     LeagueRegisterPAView, TeamListView, TeamCreateView, TeamDeleteView, TeamInvitationView, TeamInvitationAcceptView, \
     TeamInvitationRejectView, TeamJoinLeagueView, LeagueRegisterMVView, LeagueRegisterDraftView, LeagueDraftResultsView, \
-    LeagueEkypRegisterCoverView, LeagueReleaseSigningView
+    LeagueEkypRegisterCoverView, LeagueReleaseSigningView, StatMerkatoView
 
 home_urls = [
     url(r'^info/$', LeagueEntryDetail.as_view(), name="home_info"),
@@ -30,6 +30,7 @@ league_urls = [
     url(r'^draftsession/(?P<draftsession_pk>[0-9]+)/$', LeagueRegisterDraftView.as_view()),
     url(r'^merkato/(?P<merkato_pk>[0-9]+)/pa$', LeagueRegisterPAView.as_view()),
     url(r'^merkato/(?P<merkato_pk>[0-9]+)/mv$', LeagueRegisterMVView.as_view()),
+    url(r'^merkato/(?P<merkato_pk>[0-9]+)/stats$', StatMerkatoView.as_view(), name="league_statmerkato-detail"),
     url(r'^merkatoresults/latest$', LeagueMerkatoResultsView.as_view(), name="league_merkatoresults-latest"),
     url(r'^merkatoresults/(?P<session_pk>[0-9]+)$', LeagueMerkatoResultsView.as_view(),
         name="league_merkatoresults-session"),

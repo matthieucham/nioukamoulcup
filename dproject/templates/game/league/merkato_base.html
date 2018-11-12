@@ -5,6 +5,16 @@
 {% block title-page %} - Merkato{% endblock title-page %}
 
 {% block content-right %}
+ <section id="stats-merkatos">
+     <h1>Statistiques</h1>
+    <ul>
+        {% for mkt in merkatos %}
+            <li>
+                <a href="{% url 'league_statmerkato-detail' object.pk mkt.pk %}">Bilan du {{ mkt.begin|date:"SHORT_DATE_FORMAT" }} au {{ mkt.end|date:"SHORT_DATE_FORMAT" }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+ </section>
  <section id="draft-sessions">
      <h1>Draft passées</h1>
     <ul>
