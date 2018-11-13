@@ -5,6 +5,10 @@
 {% block title-page %} - Merkato{% endblock title-page %}
 
 {% block content-right %}
+ <section id="all-sales">
+     <h1>Bilan</h1>
+     <a href="{% url 'league_sales-list' object.pk %}">Tous les transferts **SPOILER ALERT**</a>
+ </section>
  <section id="draft-sessions">
      <h1>Draft passées</h1>
     <ul>

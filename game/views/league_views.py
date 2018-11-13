@@ -13,6 +13,10 @@ from game.forms import RegisterPaForm, RegisterMvForm, RegisterOffersForm, Regis
 from django.http import HttpResponseRedirect
 from .ensure_csrf_cookie_mixin import EnsureCsrfCookieMixin
 from django.db import transaction
+from collections import defaultdict
+from statistics import mean, StatisticsError
+from graphos.sources.model import SimpleDataSource
+from graphos.renderers.morris import LineChart
 
 
 class BaseLeagueView(EnsureCsrfCookieMixin, PermissionRequiredMixin, DetailView):
@@ -103,6 +107,9 @@ class BaseMerkatoSessionsListView(StateInitializerMixin, BaseLeagueView):
         context['draftsessions'] = DraftSession.objects.filter(
             merkato__league_instance=self.get_current_league_instance(), is_solved=True).order_by(
             '-closing')
+        context['merkatos'] = Merkato.objects.filter(
+            league_instance=self.get_current_league_instance(), begin__lt=now(), mode='BID').order_by(
+            'begin')
         return context
 
 
@@ -332,3 +339,36 @@ class LeagueReleaseSigningView(FormView, BaseLeagueView):
 
         messages.add_message(self.request, messages.SUCCESS, 'Revente enregistrée')
         return super(LeagueReleaseSigningView, self).form_valid(form)
+
+
+def sales_per_session_fty():
+    def_dict = dict()
+    def_dict['by_poste'] = defaultdict(list)
+    return def_dict
+
+
+class StatMerkatoView(BaseMerkatoSessionsListView):
+    template_name = 'game/league/merkato_stat.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(StatMerkatoView, self).get_context_data(**kwargs)
+        sales = Sale.objects.select_related('player').filter(
+            merkato_session__merkato__league_instance=self.get_current_league_instance(),
+            merkato_session__is_solved=True).order_by(
+            '-merkato_session__solving', '-rank')
+        context['sales'] = sales
+        releases = Release.objects.filter(
+            merkato_session__merkato__league_instance=self.get_current_league_instance(),
+            merkato_session__is_solved=True,
+            done=True
+        ).order_by(
+            '-merkato_session__solving')
+        context['releases'] = releases
+        draftes = DraftSessionRank.objects.filter(
+            draft_session__merkato__league_instance=self.get_current_league_instance(),
+            draft_session__is_solved=True,
+            signing__isnull=False
+        ).order_by(
+            '-draft_session__closing', 'rank')
+        context['draftes'] = draftes
+        return context

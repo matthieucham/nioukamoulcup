@@ -1,0 +1,135 @@
+{% extends "game/league/merkato_base.html" %}
+
+{% block script %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.min.js"></script>
+{% endblock script %}
+
+{% block title-page %} - Merkato{% endblock title-page %}
+
+{% block undercover %}
+
+<article id="home-main">
+    <section id="section-title">
+        <h1>Bilan</h1>
+    </section>
+
+    <section id="releases">
+        <h2>Reventes</h2>
+        <div>
+            <div class="header_table">
+                <div class="cell_table" style="width:10%;">Date</div>
+                <div class="cell_table">Joueur</div>
+                <div class="cell_table center" style="width:10%;">Position</div>
+                <div class="cell_table center" style="width:10%;">Montant</div>
+                <div class="cell_table" style="width:30%;">Revendeur</div>
+                <div class="cell_table center" style="width:8%;">Session</div>
+            </div>
+            {% for s in releases %}
+                <div class="line_table">
+                    <div class="cell_table">
+                        {{ s.merkato_session.solving|date:"SHORT_DATE_FORMAT" }}
+                    </div>
+                    <div class="cell_table">
+                        <a href="{% url 'stat_joueur-detail' s.player.pk %}">{{ s.signing.player.display_name }}</a>
+                    </div>
+                    <div class="cell_table center">
+                        {{ s.signing.player.poste }}
+                    </div>
+                    <div class="cell_table center">
+                        {{ s.amount }} Ka
+                    </div>
+                    <div class="cell_table">
+                        <a href="{% url 'league_team-detail' object.pk s.signing.team.pk %}">{{ s.signing.team.name }}</a>
+                    </div>
+                    <div class="cell_table center">
+                        <a href="{% url 'league_merkatoresults-session' object.pk s.merkato_session.pk %}">{{ s.merkato_session.number }}</a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section id="transferts">
+        <h2>Transferts</h2>
+        <div>
+            <div class="header_table">
+                <div class="cell_table" style="width:10%;">Date</div>
+                <div class="cell_table">Joueur</div>
+                <div class="cell_table center" style="width:10%;">Position</div>
+                <div class="cell_table center" style="width:5%;">Type</div>
+                <div class="cell_table center" style="width:10%;">Montant</div>
+                <div class="cell_table" style="width:30%;">Acheteur</div>
+                <div class="cell_table center" style="width:8%;">Session</div>
+            </div>
+            {% for s in sales %}
+                <div class="line_table">
+                    <div class="cell_table">
+                        {{ s.merkato_session.solving|date:"SHORT_DATE_FORMAT" }}
+                    </div>
+                    <div class="cell_table">
+                        <a href="{% url 'stat_joueur-detail' s.player.pk %}">{{ s.player.display_name }}</a>
+                    </div>
+                    <div class="cell_table center">
+                        {{ s.player.poste }}
+                    </div>
+                    <div class="cell_table center">
+                        {{ s.type }}
+                    </div>
+                    {% with winner=s.get_winner %}
+                    {% with price=s.get_price %}
+                        <div class="cell_table center">
+                            {{ price }} Ka
+                        </div>
+                        <div class="cell_table">
+                            <a href="{% url 'league_team-detail' object.pk winner.pk %}">{{ winner.name }}</a>
+                        </div>
+                        <div class="cell_table center">
+                            <a href="{% url 'league_merkatoresults-session' object.pk s.merkato_session.pk %}">{{ s.merkato_session.number }}</a>
+                        </div>
+                    {% endwith %}
+                    {% endwith %}
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section id="draftes">
+        <h2>Joueurs Draftés</h2>
+        <div>
+            <div class="header_table">
+                <div class="cell_table" style="width:10%;">Date</div>
+                <div class="cell_table">Joueur</div>
+                <div class="cell_table center" style="width:10%;">Position</div>
+                <div class="cell_table center" style="width:5%;">Rang</div>
+                <div class="cell_table" style="width:30%;">Acheteur</div>
+                <div class="cell_table center" style="width:8%;">Session</div>
+            </div>
+            {% for s in draftes %}
+                <div class="line_table">
+                    <div class="cell_table">
+                        {{ s.draft_session.closing|date:"SHORT_DATE_FORMAT" }}
+                    </div>
+                    <div class="cell_table">
+                        <a href="{% url 'stat_joueur-detail' s.signing.player.pk %}">{{ s.signing.player.display_name }}</a>
+                    </div>
+                    <div class="cell_table center">
+                        {{ s.signing.player.poste }}
+                    </div>
+                    <div class="cell_table center">
+                        {{ s.rank }}
+                    </div>
+                    <div class="cell_table">
+                        <a href="{% url 'league_team-detail' object.pk s.team.pk %}">{{ s.team.name }}</a>
+                    </div>
+                    <div class="cell_table center">
+                        <a href="{% url 'league_draftresults-session' object.pk s.draft_session.pk %}">{{ s.draft_session.number }}</a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+</article>
+{% endblock undercover %}
