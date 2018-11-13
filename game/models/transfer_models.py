@@ -231,6 +231,14 @@ class Sale(models.Model):
         else:
             return self.winning_auction.team, self.winning_auction.value
 
+    def get_winner(self):
+        w, _ = self.get_winner_and_price()
+        return w
+
+    def get_price(self):
+        _, p = self.get_winner_and_price()
+        return p
+
     @transaction.atomic
     def revert(self):
         for a in self.auctions.all():
