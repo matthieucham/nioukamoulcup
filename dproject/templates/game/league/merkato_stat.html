@@ -33,7 +33,7 @@
                         {{ s.merkato_session.solving|date:"SHORT_DATE_FORMAT" }}
                     </div>
                     <div class="cell_table">
-                        <a href="{% url 'stat_joueur-detail' s.player.pk %}">{{ s.signing.player.display_name }}</a>
+                        <a href="{% url 'stat_joueur-detail' s.signing.player.pk %}">{{ s.signing.player.display_name }}</a>
                     </div>
                     <div class="cell_table center">
                         {{ s.signing.player.poste }}
