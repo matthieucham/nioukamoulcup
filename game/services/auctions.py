@@ -210,7 +210,7 @@ def can_register_auction(team, merkato):
         return True, 'CURRENT_PA'
     if expired_sessions < 16:
         return True, 'BEGINNING'
-    if (expired_sessions // 8) - 1 <= previous_pas:
+    if expired_sessions // 8 <= previous_pas:
         return True, 'ENOUGH_PA'
     else:
         return False, 'NOT_ENOUGH_PA'
