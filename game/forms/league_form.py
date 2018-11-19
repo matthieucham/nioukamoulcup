@@ -27,11 +27,11 @@ class BaseRegisterForm(forms.Form):
 
     def clean_amount(self):
         try:
-            assert Decimal(self.cleaned_data.get('amount')) > 0
-            assert Decimal(self.cleaned_data.get('amount')) <= 100.0
+            assert Decimal('%f' % self.cleaned_data.get('amount')) > 0
+            assert Decimal('%f' % self.cleaned_data.get('amount')) <= 100.0
         except AssertionError:
             raise forms.ValidationError('Montant invalide', code='invalid')
-        return Decimal(self.cleaned_data.get('amount'))
+        return Decimal('%f' % self.cleaned_data.get('amount'))
 
     def clean_picked_id(self):
         try:
