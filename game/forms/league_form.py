@@ -3,7 +3,7 @@ from django.utils import timezone
 from game.services import auctions
 from decimal import Decimal
 from ligue1.models import Joueur
-from game.models import BankAccount, Sale, Auction, DraftPick
+from game.models import BankAccount, Sale, Auction, Merkato
 
 
 class PickedPlayerValidationMixin:
@@ -186,4 +186,8 @@ class ReleaseSigningForm(forms.Form):
             assert not self.signing.attributes.get('locked', False)
         except AssertionError:
             raise forms.ValidationError('Impossible de revendre ce joueur')
+        try:
+            assert Merkato.objects.find_current_open_merkato_for_release(self.team)
+        except AssertionError:
+            raise forms.ValidationError('Plus de revente possible')
 
