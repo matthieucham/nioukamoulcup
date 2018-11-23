@@ -81,10 +81,18 @@
                     {% with winner=s.get_winner %}
                     {% with price=s.get_price %}
                         <div class="cell_table center">
-                            {{ price }} Ka
+                            {% if winner %}
+                                {{ price }} Ka
+                            {% else %}
+                                -
+                            {% endif %}
                         </div>
                         <div class="cell_table">
-                            <a href="{% url 'league_team-detail' object.pk winner.pk %}">{{ winner.name }}</a>
+                            {% if winner %}
+                                <a href="{% url 'league_team-detail' object.pk winner.pk %}">{{ winner.name }}</a>
+                            {% else %}
+                                -
+                            {% endif %}
                         </div>
                         <div class="cell_table center">
                             <a href="{% url 'league_merkatoresults-session' object.pk s.merkato_session.pk %}">{{ s.merkato_session.number }}</a>
