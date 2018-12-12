@@ -123,9 +123,25 @@ class MerkatoAdmin(admin.ModelAdmin):
         return HttpResponseRedirect(reverse('import_statnuts:game_merkato_changelist'))
 
 
+class TransitionSessionAdmin(admin.ModelAdmin):
+    model = models.TransitionSession
+    list_display = ['merkato', 'closing', 'is_solved']
+    actions = ['solve_transition_action', ]
+
+    def solve_transition_action(self, request, queryset):
+        for ds in queryset:
+            if ds.closing > timezone.now():
+                self.message_user(request, "C'est trop tôt !",
+                                  level=messages.ERROR)
+            else:
+                auctions.solve_transition_session(ds)
+        return HttpResponseRedirect(reverse('import_statnuts:game_transitionsession_changelist'))
+
+
 admin_import_site.register(models.SaisonScoring, SaisonScoringAdmin)
 admin_import_site.register(models.Merkato, MerkatoAdmin)
 admin_import_site.register(models.DraftSession, DraftSessionAdmin)
+admin_import_site.register(models.TransitionSession, TransitionSessionAdmin)
 
 
 class EntryLeagueAdmin(EntryAdminCKEditor):

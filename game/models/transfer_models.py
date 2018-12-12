@@ -70,7 +70,7 @@ class MerkatoManager(models.Manager):
 
 
 class Merkato(models.Model):
-    MODES = (('DRFT', 'Draft'), ('BID', 'Bid'))
+    MODES = (('DRFT', 'Draft'), ('BID', 'Bid'), ('TRS', 'Transition'))
 
     begin = models.DateTimeField(blank=False)
     end = models.DateTimeField(blank=False)
@@ -207,7 +207,7 @@ class Sale(models.Model):
             except Sale.DoesNotExist:
                 self.rank = 1
             # block sale amount from author account
-            if self.type == 'PA':
+            if self.type == 'PA' and self.team.bank_account is not None:
                 self.team.bank_account.blocked += self.min_price
                 self.team.bank_account.save()
         super(Sale, self).save(*args, **kwargs)
@@ -411,12 +411,13 @@ class TransitionSession(models.Model):
         attrs['formations'].append(constants.FORMATION_433)
         attrs['formations'].append(constants.FORMATION_352)
         attrs['formations'].append(constants.FORMATION_343)
+        attrs['default_formation'] = constants.FORMATION_442
         return attrs
 
     def save(self, *args, **kwargs):
         if self.attributes is None:
             self.attributes = self._make_attributes()
-        return super(MerkatoSession, self).save(*args, **kwargs)
+        return super(TransitionSession, self).save(*args, **kwargs)
 
 
 class TransitionTeamChoice(models.Model):

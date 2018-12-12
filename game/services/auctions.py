@@ -4,6 +4,7 @@ from math import ceil
 import decimal
 from operator import attrgetter
 from django.db import transaction
+from django.db.models import FilteredRelation, Q
 from django.utils import timezone
 
 from utils import locked_atomic_transaction
@@ -268,3 +269,54 @@ def available_for_pa(joueur, division, instance):
 def available_for_mv(joueur, team, instance):
     return Joueur.objects.filter(signing__team=team, signing__begin__lt=timezone.now(), signing__end__isnull=True,
                                  signing__league_instance=instance).filter(pk=joueur.pk).count() == 1
+
+
+@transaction.atomic
+def solve_transition_session(transition_session):
+    ntk = int(transition_session.attributes.get('to_keep'))
+    li = transition_session.merkato.league_instance
+    day = league_models.LeagueInstancePhaseDay.objects.get_latest_day_for_phases(
+        league_models.LeagueInstancePhase.objects.filter(league_instance=li, type='FULLSEASON'))[0]
+    latest_tds = league_models.TeamDayScore.objects.filter(day=day)
+    for team in league_models.Team.objects.filter(league=li.league):
+        choice = team.transitionteamchoice_set.filter(transition_session=transition_session).first()
+        if choice is None:
+            team.attributes['formation'] = dict(transition_session.attributes.get('default_formation'))
+        else:
+            team.attributes['formation'] = dict(choice.formation_to_choose)
+            for sg in choice.signings_to_free.all():
+                league_models.SigningManager.objects.end(sg, 'FR')
+        _fix_signings(team, ntk, latest_tds.get(team=team), li)
+
+
+def _fix_signings(team, nb_to_keep, team_tds, instance):
+    if nb_to_keep < team.signing_set.filter(league_instance=instance, end__isnull=True).count():
+        nb_to_free = team.signing_set.filter(league_instance=instance, end__isnull=True).count() - nb_to_keep
+        # il faut virer les joueurs qui ont le score le plus faible parmi ceux qui restent
+        pl_list = []
+        if team_tds is not None:
+            compo = team_tds.attributes.get('composition')
+            for _, pls in compo.items():
+                for pl in pls:
+                    pl_list.append((pl['player']['id'], pl['score']))
+        sorted(pl_list, key=lambda tup: float(tup[1])).reverse()
+        # virer d'abord ceux qui ne sont même pas dans la liste
+        in_list = [plid for plid, score in pl_list]
+        signings_not_in_list = league_models.Signing.objects.filter(team=team, league_instance=instance,
+                                                                    end__isnull=True).exclude(
+            player__id__in=in_list).all()
+        to_free = signings_not_in_list[:nb_to_free]
+        for sg in to_free:
+            league_models.Signing.objects.end(sg, 'FR')
+        nb_to_free -= len(to_free)
+        if nb_to_free > 0:
+            # il en reste !
+            # ici les premiers éléments de la liste sont ceux à virer
+            to_free = [plid for plid, score in pl_list[:nb_to_free]]
+            for sg in league_models.Signing.objects.filter(team=team, league_instance=instance,
+                                                           end__isnull=True).filter(player__id__in=to_free):
+                league_models.Signing.objects.end(sg, 'FR')
+    # Verrouiller les signatures qu'il reste
+    for sg in league_models.Signing.objects.filter(team=team, league_instance=instance, end__isnull=True):
+        sg.attributes['locked'] = True
+        sg.save()
