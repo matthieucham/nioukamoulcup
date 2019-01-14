@@ -172,8 +172,14 @@ class TeamDayScoreSerializer(serializers.ModelSerializer):
         """
         if not self.get_is_complete(tds):
             return None
-        unfiltered = league_models.TeamDayScore.objects.filter(day=tds.day, team__division=tds.team.division,
-                                                               current=current).order_by('-score').all()
+        if league_models.TeamDayScore.objects.filter(day=tds.day, team__division=tds.team.division,
+                                                     current=current).count() > 0:
+            unfiltered = league_models.TeamDayScore.objects.filter(day=tds.day, team__division=tds.team.division,
+                                                                   current=current).order_by('-score').all()
+        else:
+            unfiltered = league_models.TeamDayScore.objects.filter(day=tds.day,
+                                                                   team__division=tds.team.division).order_by(
+                '-score').all()
         ordered_ids = [item.id for item in unfiltered if self.get_is_complete(item)]
         # ordered_ids = list(
         #     league_models.TeamDayScore.objects.filter(day=tds.day, team__division=tds.team.division, current=current).order_by(
@@ -215,9 +221,13 @@ class LeagueInstancePhaseDaySerializer(serializers.ModelSerializer):
     def get_results(self, obj):
         # show_current = obj.league_instance_phase.league_instance.league.mode == 'KCUP'
         show_current = True  # TODO à optimiser pour le futur mode FSY
-        return TeamDayScoreSerializer(context={'request': self.context['request']}, many=True,
-                                      read_only=True).to_representation(
-            obj.teamdayscore_set.filter(current=show_current))
+        if obj.teamdayscore_set.filter(current=show_current).count() > 0:
+            return TeamDayScoreSerializer(context={'request': self.context['request']}, many=True,
+                                          read_only=True).to_representation(
+                obj.teamdayscore_set.filter(current=show_current))
+        else:
+            return TeamDayScoreSerializer(context={'request': self.context['request']}, many=True,
+                                          read_only=True).to_representation(obj.teamdayscore_set.all())
 
     class Meta:
         model = league_models.LeagueInstancePhaseDay
