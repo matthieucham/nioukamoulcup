@@ -372,3 +372,14 @@ class StatMerkatoView(BaseMerkatoSessionsListView):
             '-draft_session__closing', 'rank')
         context['draftes'] = draftes
         return context
+
+
+class LeagueTestView(StateInitializerMixin, BaseLeagueView):
+    template_name = 'game/league/test.html'
+    component = 'test'
+
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get a context
+        context = super(LeagueTestView, self).get_context_data(**kwargs)
+        context['PRELOADED_STATE'] = self.init_common(self.request, self.object.pk)
+        return context

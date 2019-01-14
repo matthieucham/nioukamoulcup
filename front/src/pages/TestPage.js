@@ -1,5 +1,40 @@
 import React, { Component } from "react";
 import { DraftSessionResult } from "../components/sales/DraftSession";
+import { SigningCard } from "../components/sales/SigningCard";
+
+const SIGNING = {
+  "id": 847,
+  "player": {
+      "id": 225,
+      "url": "http://127.0.0.1:8000/game/home/stat/joueur/225/",
+      "prenom": "Marcos",
+      "nom": "Correa",
+      "surnom": "Marquinhos",
+      "display_name": "Marquinhos",
+      "poste": "D",
+      "club": {
+          "id": 17,
+          "nom": "Paris SG",
+          "maillot_svg": "jersey-stripe-center2",
+          "maillot_color_bg": "#004080",
+          "maillot_color_stroke": "#f20000"
+      }
+  },
+  "team": {
+      "id": 42,
+      "url": "http://127.0.0.1:8000/game/league/2/ekyp/42",
+      "name": "Chamystador"
+  },
+  "begin": "2018-10-22T09:01:01.940518+02:00",
+  "end": null,
+  "attributes": {
+      "rank": 17,
+      "score_factor": 1.0,
+      "locked": true,
+      "type": "DRFT",
+      "pick_order": 3
+  }
+}
 
 const DRAFT = {
   number: 1,
@@ -96,7 +131,7 @@ export class TestPage extends Component {
       <div className="react-app-inner">
         <main>
           <article id="home-main">
-            <DraftSessionResult draftSession={DRAFT} />
+            <SigningCard signing={SIGNING} />
           </article>
         </main>
         <aside className="hg__right" />
