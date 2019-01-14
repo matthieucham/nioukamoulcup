@@ -273,10 +273,16 @@ class PhaseDayRankingSerializer(serializers.ModelSerializer):
     def get_ranking_ekyps(self, obj):
         # show_current = obj.league_instance_phase.league_instance.league.mode == 'KCUP'
         show_current = True  # TODO à optimiser pour le futur mode FSY
-        return TeamDayScoreSerializer(context={'request': self.context['request'], 'show_current': show_current},
-                                      many=True,
-                                      read_only=True).to_representation(
-            obj.teamdayscore_set.filter(current=show_current))
+        if obj.teamdayscore_set.filter(current=show_current).count() > 0:
+            return TeamDayScoreSerializer(context={'request': self.context['request'], 'show_current': show_current},
+                                          many=True,
+                                          read_only=True).to_representation(
+                obj.teamdayscore_set.filter(current=show_current))
+        else:
+            return TeamDayScoreSerializer(context={'request': self.context['request'], 'show_current': show_current},
+                                          many=True,
+                                          read_only=True).to_representation(
+                obj.teamdayscore_set.all())
 
     class Meta:
         model = league_models.LeagueInstancePhaseDay
