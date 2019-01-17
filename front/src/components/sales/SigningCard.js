@@ -42,7 +42,7 @@ class SigningCard extends React.Component {
   }
 }
 
-export class SigningsList extends React.Component {
+class SigningsList extends React.Component {
   constructor(props) {
     super(props);
   }
@@ -51,6 +51,7 @@ export class SigningsList extends React.Component {
     const { signings, keptOrFreed, onSigningSelected } = this.props;
     const cards = signings.map((sig, index) => (
       <SigningCard
+        key={"sgcd_" + keptOrFreed + index}
         signing={sig}
         keptOrFreed={keptOrFreed}
         onSelected={s => onSigningSelected(s)}
@@ -61,8 +62,74 @@ export class SigningsList extends React.Component {
         <h2>
           {keptOrFreed == "kept" && "Joueurs conservés"}
           {keptOrFreed == "freed" && "Joueurs libérés"}
+          &nbsp;(Total: {signings.length})
         </h2>
         <div>{cards}</div>
+      </div>
+    );
+  }
+}
+
+export class KeepOrFreeSignings extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      keptList: props.kept,
+      freedList: props.freed
+    };
+  }
+
+  handleKeptSelected = signing => {
+    var keptCopy = [...this.state.keptList];
+    var freedCopy = [...this.state.freedList];
+    var index = keptCopy.indexOf(signing);
+    if (index !== -1) {
+      keptCopy.splice(index, 1);
+      freedCopy.push(signing);
+    }
+    this.setState({
+      keptList: keptCopy,
+      freedList: freedCopy
+    });
+  };
+
+  handleFreedSelected = signing => {
+    var keptCopy = [...this.state.keptList];
+    var freedCopy = [...this.state.freedList];
+    var index = freedCopy.indexOf(signing);
+    if (index !== -1) {
+      freedCopy.splice(index, 1);
+      keptCopy.push(signing);
+    }
+    this.setState({
+      keptList: keptCopy,
+      freedList: freedCopy
+    });
+  };
+
+  render() {
+    const { keptList, freedList } = this.state;
+    const freedSignings = freedList.map(signing => (
+      <input
+        type="hidden"
+        key={`_free_signing__${signing.id}`}
+        name={`_free_signing__${signing.id}`}
+      />
+    ));
+    return (
+      <div className="keeporfree-container">
+        <SigningsList
+          signings={keptList}
+          keptOrFreed="kept"
+          onSigningSelected={this.handleKeptSelected}
+        />
+        <SigningsList
+          signings={freedList}
+          keptOrFreed="freed"
+          onSigningSelected={this.handleFreedSelected}
+        />
+        {freedSignings}
       </div>
     );
   }

@@ -1,6 +1,6 @@
 import React, { Component } from "react";
-import { DraftSessionResult } from "../components/sales/DraftSession";
-import { SigningsList } from "../components/sales/SigningCard";
+import { TransitionSession } from "../components/sales/TransitionSession";
+import { KeepOrFreeSignings } from "../components/sales/SigningCard";
 
 const SIGNINGS = [
   {
@@ -271,24 +271,66 @@ const SIGNINGS = [
   }
 ];
 
+const TRANSITION_SESSION = {
+  closing: "2019-03-22T17:03:21+01:00",
+  is_solved: false,
+  attributes: {
+    default_formation: {
+      M: 4,
+      D: 4,
+      A: 2,
+      G: 1
+    },
+    formations: [
+      {
+        M: 3,
+        D: 5,
+        A: 2,
+        G: 1
+      },
+      {
+        M: 4,
+        D: 4,
+        A: 2,
+        G: 1
+      },
+      {
+        M: 3,
+        D: 4,
+        A: 3,
+        G: 1
+      },
+      {
+        M: 5,
+        D: 3,
+        A: 2,
+        G: 1
+      },
+      {
+        M: 4,
+        D: 3,
+        A: 3,
+        G: 1
+      }
+    ],
+    to_keep: 5
+  },
+  my_choice: null
+};
+
+const MERKATO = 10;
+
 export class TestPage extends Component {
   render() {
     return (
       <div className="react-app-inner">
         <main>
           <article id="home-main">
-            <div style={{ display: 'flex' }}>
-              <SigningsList
-                keptOrFreed="kept"
-                signings={SIGNINGS}
-                onSigningSelected={s => console.log(s)}
-              />
-              <SigningsList
-                keptOrFreed="freed"
-                signings={SIGNINGS}
-                onSigningSelected={s => console.log(s)}
-              />
-            </div>
+            <TransitionSession
+              merkato={MERKATO}
+              signings={SIGNINGS}
+              transition={TRANSITION_SESSION}
+            />
           </article>
         </main>
         <aside className="hg__right" />
