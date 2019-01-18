@@ -19,8 +19,9 @@ export class TransitionSession extends React.Component {
     var keptList = [...props.signings];
     var freedList = [];
     var formation = "";
-    if (props.my_choice) {
-      formation = JSON.stringify(props.my_choice.formation_to_choose);
+    if (props.transition.my_choice) {
+      console.log(props.transition.my_choice);
+      formation = JSON.stringify(props.transition.my_choice.formation_to_choose);
       if (props.transition.my_choice.signings_to_free) {
         var toRemove = [];
         props.transition.my_choice.signings_to_free.forEach(stf => {
@@ -34,7 +35,7 @@ export class TransitionSession extends React.Component {
           var index = keptList.indexOf(tr);
           if (index !== -1) {
             keptList.splice(index, 1);
-            freedList.push(signing);
+            freedList.push(tr);
           }
         });
       }
