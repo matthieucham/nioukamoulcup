@@ -805,9 +805,38 @@ class DraftSessionSerializer(serializers.ModelSerializer):
             'number', 'closing', 'is_solved', 'attributes', 'draftsessionrank_set',)
 
 
+class TransitionTeamChoiceSerializer(serializers.ModelSerializer):
+    signings_to_free = SigningSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = transfer_models.TransitionTeamChoice
+        fields = ('formation_to_choose', 'signings_to_free',)
+
+
+class TransitionSessionSerializer(serializers.ModelSerializer):
+    my_choice = serializers.SerializerMethodField()
+
+    def get_my_choice(self, obj):
+        if 'team' in self.context:
+            try:
+                return TransitionTeamChoiceSerializer(
+                    transfer_models.TransitionTeamChoice.objects.get(transition_session=obj, team=self.context['team']),
+                    many=False,
+                    read_only=True, context={'request': self.context['request']}
+                ).data
+            except transfer_models.TransitionTeamChoice.DoesNotExist:
+                return None
+        return None
+
+    class Meta:
+        model = transfer_models.TransitionSession
+        fields = ('closing', 'is_solved', 'attributes', 'my_choice',)
+
+
 class CurrentMerkatoSerializer(serializers.ModelSerializer):
     sessions = serializers.SerializerMethodField()
     draft_sessions = serializers.SerializerMethodField()
+    transition_sessions = serializers.SerializerMethodField()
     permissions = serializers.SerializerMethodField()
     account_balance = serializers.SerializerMethodField()
 
@@ -831,6 +860,11 @@ class CurrentMerkatoSerializer(serializers.ModelSerializer):
         ordered_sessions = transfer_models.DraftSession.objects.filter(merkato=obj, is_solved=False,
                                                                        closing__gt=localtime(now())).order_by('number')
         return OpenDraftSessionSerializer(ordered_sessions, many=True, read_only=True, context=self.context).data
+
+    def get_transition_sessions(self, obj):
+        ordered_sessions = transfer_models.TransitionSession.objects.filter(merkato=obj, is_solved=False,
+                                                                            closing__gt=localtime(now()))
+        return TransitionSessionSerializer(ordered_sessions, many=True, read_only=True, context=self.context).data
 
     def get_permissions(self, obj):
         auc, auc_reason = auctions.can_register_auction(self.context.get('team'), obj)
@@ -867,4 +901,5 @@ class CurrentMerkatoSerializer(serializers.ModelSerializer):
             'account_balance',
             'sessions',
             'draft_sessions',
+            'transition_sessions',
             'permissions',)

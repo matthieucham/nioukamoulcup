@@ -3,13 +3,14 @@ from django.shortcuts import reverse
 from django.contrib import messages
 from rules.contrib.views import PermissionRequiredMixin
 from game.models import League, LeagueInstance, LeagueMembership, Team, \
-    MerkatoSession, Merkato, Sale, Auction, DraftSession, DraftSessionRank, DraftPick, Signing, Release
+    MerkatoSession, Merkato, Sale, Auction, DraftSession, DraftSessionRank, DraftPick, Signing, Release, \
+    TransitionTeamChoice
 from ligue1.models import Joueur
 from django.utils.timezone import localtime, now
 from django.db.models import Count, Q
 from game.rest.redux_state import StateInitializerMixin
 from game.forms import RegisterPaForm, RegisterMvForm, RegisterOffersForm, RegisterDraftChoicesForm, RegisterCoverForm, \
-    ReleaseSigningForm
+    ReleaseSigningForm, RegisterTransitionForm
 from django.http import HttpResponseRedirect
 from .ensure_csrf_cookie_mixin import EnsureCsrfCookieMixin
 from django.db import transaction
@@ -230,6 +231,40 @@ class LeagueRegisterPAView(FormView, BaseLeagueView):
         return super(LeagueRegisterPAView, self).form_valid(form)
 
 
+class LeagueRegisterTransitionView(FormView, BaseLeagueView):
+    template_name = 'game/league/merkato.html'
+    form_class = RegisterTransitionForm
+
+    def get_merkato(self):
+        return Merkato.objects.get(pk=self.kwargs['merkato_pk'])
+
+    def get_form_kwargs(self):
+        kw = super(LeagueRegisterTransitionView, self).get_form_kwargs()
+        kw['team'] = self.get_my_team()
+        kw['transition_session'] = self.get_merkato().transitionsession_set.filter(closing__gt=now()).first()
+        return kw
+
+    def get_success_url(self):
+        return reverse('league_merkato', kwargs={'pk': self.get_object().pk})
+
+    def form_valid(self, form):
+        # Register TransitionTeamChoice
+        ttc, _ = TransitionTeamChoice.objects.get_or_create(
+            transition_session=self.get_merkato().transitionsession_set.filter(closing__gt=now()).first(),
+            team=self.get_my_team(),
+            defaults={'formation_to_choose': form.cleaned_data.get('formation')}
+        )
+        ttc.formation_to_choose = form.cleaned_data.get('formation')
+        ttc.signings_to_free.clear()
+        sigpks = [int(field[len('_free_signing__'):]) for field, val in form.cleaned_data.items() if
+                  field.startswith('_free_signing__') and val]
+        for sig in Signing.objects.filter(pk__in=sigpks):
+            ttc.signings_to_free.add(sig)
+        ttc.save()
+        messages.add_message(self.request, messages.SUCCESS, 'Choix enregistrés')
+        return super(LeagueRegisterTransitionView, self).form_valid(form)
+
+
 class LeagueEkypRegisterCoverView(FormView, BaseLeagueView):
     template_name = 'game/league/ekyp.html'
     form_class = RegisterCoverForm
@@ -371,4 +406,15 @@ class StatMerkatoView(BaseMerkatoSessionsListView):
         ).order_by(
             '-draft_session__closing', 'rank')
         context['draftes'] = draftes
+        return context
+
+
+class LeagueTestView(StateInitializerMixin, BaseLeagueView):
+    template_name = 'game/league/test.html'
+    component = 'test'
+
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get a context
+        context = super(LeagueTestView, self).get_context_data(**kwargs)
+        context['PRELOADED_STATE'] = self.init_common(self.request, self.object.pk)
         return context

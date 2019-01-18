@@ -81,5 +81,8 @@ class StateInitializerMixin:
         self.initial_state.update({'league_id': team.league.pk})
         merkato_serializer = serializers.CurrentMerkatoSerializer(merkatos, many=True,
                                                                   context={'request': request, 'team': team})
+        team_serializer = serializers.TeamDetailSerializer(team, context={'request': request,
+                                                                          'current': True})
         self.initial_state.update({'merkatos': self._to_json(merkato_serializer)})
+        self.initial_state.update({'team': self._to_json(team_serializer)})
         return self.initial_state

@@ -7,6 +7,7 @@ from django.utils import timezone
 from . import league_models
 from ligue1 import models as l1models
 from decimal import Decimal
+from . import constants
 
 
 class MerkatoManager(models.Manager):
@@ -69,7 +70,7 @@ class MerkatoManager(models.Manager):
 
 
 class Merkato(models.Model):
-    MODES = (('DRFT', 'Draft'), ('BID', 'Bid'))
+    MODES = (('DRFT', 'Draft'), ('BID', 'Bid'), ('TRS', 'Transition'))
 
     begin = models.DateTimeField(blank=False)
     end = models.DateTimeField(blank=False)
@@ -206,7 +207,7 @@ class Sale(models.Model):
             except Sale.DoesNotExist:
                 self.rank = 1
             # block sale amount from author account
-            if self.type == 'PA':
+            if self.type == 'PA' and self.team.bank_account is not None:
                 self.team.bank_account.blocked += self.min_price
                 self.team.bank_account.save()
         super(Sale, self).save(*args, **kwargs)
@@ -393,3 +394,34 @@ class DraftPick(models.Model):
 
     class Meta:
         unique_together = ('pick_order', 'player', 'draft_session_rank')
+
+
+class TransitionSession(models.Model):
+    merkato = models.ForeignKey(Merkato, on_delete=models.CASCADE)
+    closing = models.DateTimeField(blank=False)
+    is_solved = models.BooleanField(default=False)
+    attributes = JSONField(null=True, blank=True)
+
+    def _make_attributes(self, nb_to_keep=5):
+        attrs = dict()
+        attrs['to_keep'] = nb_to_keep
+        attrs['formations'] = list()
+        attrs['formations'].append(constants.FORMATION_532)
+        attrs['formations'].append(constants.FORMATION_442)
+        attrs['formations'].append(constants.FORMATION_433)
+        attrs['formations'].append(constants.FORMATION_352)
+        attrs['formations'].append(constants.FORMATION_343)
+        attrs['default_formation'] = constants.FORMATION_442
+        return attrs
+
+    def save(self, *args, **kwargs):
+        if self.attributes is None:
+            self.attributes = self._make_attributes()
+        return super(TransitionSession, self).save(*args, **kwargs)
+
+
+class TransitionTeamChoice(models.Model):
+    transition_session = models.ForeignKey(TransitionSession, on_delete=models.CASCADE)
+    team = models.ForeignKey(league_models.Team, on_delete=models.CASCADE)
+    signings_to_free = models.ManyToManyField(league_models.Signing)
+    formation_to_choose = JSONField()
