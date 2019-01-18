@@ -115,6 +115,7 @@ export class KeepOrFreeSignings extends React.Component {
         type="hidden"
         key={`_free_signing__${signing.id}`}
         name={`_free_signing__${signing.id}`}
+        value={true}
       />
     ));
     return (

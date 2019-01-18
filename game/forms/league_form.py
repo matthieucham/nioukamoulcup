@@ -3,7 +3,8 @@ from django.utils import timezone
 from game.services import auctions
 from decimal import Decimal
 from ligue1.models import Joueur
-from game.models import BankAccount, Sale, Auction, Merkato
+from game.models import BankAccount, Sale, Auction, Merkato, Signing
+import json
 
 
 class PickedPlayerValidationMixin:
@@ -156,6 +157,45 @@ class RegisterDraftChoicesForm(forms.Form):
                     'Le joueur %s ne peut plus être sélectionné' % Joueur.objects.get(pk=pk).display_name())
 
 
+class RegisterTransitionForm(forms.Form):
+    formation = forms.CharField(required=True)
+
+    def __init__(self, *args, **kwargs):
+        self.team = kwargs.pop('team')
+        self.transition_session = kwargs.pop('transition_session')
+        super(RegisterTransitionForm, self).__init__(*args, **kwargs)
+        for sig in self.team.signing_set.filter(league_instance=self.transition_session.merkato.league_instance).filter(
+                end__isnull=True):
+            self.fields['_free_signing__%s' % sig.pk] = forms.BooleanField(
+                required=False
+            )
+
+    def clean_formation(self):
+        formation_val = self.cleaned_data.get('formation')
+        fvjs = json.loads(formation_val)
+        for validformation in self.transition_session.attributes['formations']:
+            if fvjs['G'] == validformation['G'] and fvjs['D'] == validformation['D'] and fvjs['M'] == validformation[
+                'M'] and fvjs['A'] == validformation['A']:
+                return fvjs
+        raise forms.ValidationError('La formation choisie n''est pas valide')
+
+    def clean(self):
+        # Règle pour chaque signing: signing toujours en cours et appartient bien à mon ékyp
+        # Règle pour le total: 5 signings conservés
+        sigpks = [int(field[len('_free_signing__'):]) for field, val in self.cleaned_data.items() if
+                  field.startswith('_free_signing__') and val]
+        sig_ids = Signing.objects.filter(league_instance=self.transition_session.merkato.league_instance).filter(
+            team=self.team, end__isnull=True).values_list('id', flat=True)
+        for pk in sigpks:
+            if pk not in sig_ids:
+                raise forms.ValidationError('Joueur non reconnu')
+        nb_to_keep = self.transition_session.attributes['to_keep']
+        try:
+            assert len(sig_ids) - len(sigpks) == nb_to_keep
+        except AssertionError:
+            raise forms.ValidationError('Il faut conserver exactement %d joueurs' % nb_to_keep)
+
+
 class RegisterCoverForm(forms.Form):
     cover_url = forms.CharField()
 
@@ -179,7 +219,7 @@ class ReleaseSigningForm(forms.Form):
             raise forms.ValidationError('Vous n''avez pas la permission')
         try:
             assert (not self.signing.attributes.get('ending', False)) and (
-                        self.signing.attributes.get('end', None) is None)
+                    self.signing.attributes.get('end', None) is None)
         except AssertionError:
             raise forms.ValidationError('Joueur déjà revendu')
         try:
@@ -190,4 +230,3 @@ class ReleaseSigningForm(forms.Form):
             assert Merkato.objects.find_current_open_merkato_for_release(self.team)
         except AssertionError:
             raise forms.ValidationError('Plus de revente possible')
-
