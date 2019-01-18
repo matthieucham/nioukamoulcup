@@ -1,7 +1,15 @@
 import React from "react";
+import { format } from "date-fns";
 import CSRFToken from "../csrftoken";
-import { FormControl, InputLabel, MenuItem, Select } from "@material-ui/core";
+import {
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  Button
+} from "@material-ui/core";
 import { KeepOrFreeSignings } from "./SigningCard";
+import KeyValueBox from "../KeyValueBox";
 import { LEAGUE_ID } from "../../build";
 
 export class TransitionSession extends React.Component {
@@ -10,9 +18,9 @@ export class TransitionSession extends React.Component {
 
     var keptList = [...props.signings];
     var freedList = [];
-    var formation = null;
+    var formation = "";
     if (props.my_choice) {
-      formation = props.my_choice.formation_to_choose;
+      formation = JSON.stringify(props.my_choice.formation_to_choose);
       if (props.transition.my_choice.signings_to_free) {
         var toRemove = [];
         props.transition.my_choice.signings_to_free.forEach(stf => {
@@ -39,38 +47,77 @@ export class TransitionSession extends React.Component {
     };
   }
 
+  handleChange = event => {
+    this.setState({ formation: event.target.value });
+  };
+
+
   render() {
+    const { transition } = this.props;
+    const items = transition.attributes.formations.map(f => (
+      <MenuItem value={JSON.stringify(f)} key={"_"+f.D+"_"+f.M+"_"+f.A}>
+        {f.D}
+        {f.M}
+        {f.A}
+      </MenuItem>
+    ));
     return (
-      <div>
-        <form
-          action={`/game/league/${LEAGUE_ID}/transition/${this.props.merkato}/`}
-          method="POST"
-        >
-          <FormControl>
-            <InputLabel htmlFor="formation">Formation</InputLabel>
-            <Select
-              value={this.state.formation}
-              onChange={this.handleChange}
-              inputProps={{
-                name: "formation",
-                id: "formation"
-              }}
-            >
-              <MenuItem value={{ G: 1, D: 5, M: 3, A: 2 }}>532</MenuItem>
-              <MenuItem value={{ G: 1, D: 4, M: 4, A: 2 }}>442</MenuItem>
-              <MenuItem value={{ G: 1, D: 4, M: 3, A: 3 }}>433</MenuItem>
-              <MenuItem value={{ G: 1, D: 3, M: 5, A: 2 }}>352</MenuItem>
-              <MenuItem value={{ G: 1, D: 3, M: 4, A: 3 }}>343</MenuItem>
-            </Select>
-          </FormControl>
-          <FormControl>
-            <KeepOrFreeSignings
-              kept={this.state.kept}
-              freed={this.state.freed}
-            />
-          </FormControl>
-        </form>
-      </div>
+      <section>
+        <h1>Transition en cours</h1>
+        <div>
+          <p>Indiquez ici vos choix pour la prochaine phase de jeu</p>
+          <p>Vos choix restent modifiables jusqu'à la date de fin indiquée</p>
+          <KeyValueBox
+            label="Fin"
+            value={format(transition.closing, "DD/MM HH:mm")}
+          />
+          <KeyValueBox
+            label="Nb à conserver"
+            value={transition.attributes.to_keep}
+          />
+        </div>
+        <div>
+          <form
+            action={`/game/league/${LEAGUE_ID}/transition/${
+              this.props.merkato
+            }/`}
+            method="POST"
+          >
+            <CSRFToken />
+            <div>
+              <FormControl className="transitionform-input">
+                <KeepOrFreeSignings
+                  kept={this.state.kept}
+                  freed={this.state.freed}
+                />
+              </FormControl>
+            </div>
+            <div>
+              <FormControl>
+                <InputLabel htmlFor="formation">Formation</InputLabel>
+                <Select
+                  value={this.state.formation}
+                  onChange={this.handleChange}
+                  inputProps={{
+                    name: "formation",
+                    id: "formation"
+                  }}
+                  style={{ width: 120,  marginBottom: "24px" }}
+                >
+                  {items}
+                </Select>
+              </FormControl>
+            </div>
+            <div>
+              <FormControl>
+                <Button type="submit" color="primary" variant="contained">
+                  Enregistrer
+                </Button>
+              </FormControl>
+            </div>
+          </form>
+        </div>
+      </section>
     );
   }
 }

@@ -1172,6 +1172,20 @@ ul.messages li.danger::before {
     vertical-align:middle;
 }
 
+div.transitionform-input {
+    width: 100%;
+}
+
+div.keeporfree-container {
+    display: flex;
+    width: 100%;
+}
+
+div.keeporfree-container>div {
+    width: 100%;
+}
+
+
 /* The snackbar - position it at the bottom and in the middle of the screen */
 #snackbar {
     visibility: hidden; /* Hidden by default. Visible on click */
