@@ -16,7 +16,7 @@ export class TransitionSession extends React.Component {
   constructor(props) {
     super(props);
 
-    var keptList = [...props.signings];
+    var keptList = [...props.signings.filter(s => s.end == null)];
     var freedList = [];
     var formation = "";
     if (props.transition.my_choice) {
