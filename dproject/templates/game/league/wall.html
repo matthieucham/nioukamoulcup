@@ -12,23 +12,19 @@
     {% if next_draft %}
     <section>
         <h1>Prochaine draft</h1>
-        <p>Du {{ next_draft.begin|date:"SHORT_DATETIME_FORMAT" }} au {{ next_draft.end|date:"SHORT_DATETIME_FORMAT"
-            }}</p>
+        <p><a href="{% url 'league_merkato' %}">Du {{ next_draft.begin|date:"SHORT_DATETIME_FORMAT" }} au {{ next_draft.end|date:"SHORT_DATETIME_FORMAT" }}</a></p>
     </section>
     {% endif %}
     {% if next_merkato %}
     <section>
         <h1>Prochain merkato</h1>
-        <p>Du {{ next_merkato.begin|date:"SHORT_DATETIME_FORMAT" }} au {{ next_merkato.end|date:"SHORT_DATETIME_FORMAT"
-            }}</p>
+        <p><a href="{% url 'league_merkato' %}">Du {{ next_merkato.begin|date:"SHORT_DATETIME_FORMAT" }} au {{ next_merkato.end|date:"SHORT_DATETIME_FORMAT" }}</a></p>
     </section>
     {% endif %}
     {% if next_transition %}
     <section>
         <h1>Prochaine transition</h1>
-        <p>Du {{ next_transition.begin|date:"SHORT_DATETIME_FORMAT" }} au {{
-            next_transition.end|date:"SHORT_DATETIME_FORMAT"
-            }}</p>
+        <p><a href="{% url 'league_merkato' %}">Du {{ next_transition.begin|date:"SHORT_DATETIME_FORMAT" }} au {{ next_transition.end|date:"SHORT_DATETIME_FORMAT" }}</a></p>
     </section>
     {% endif %}
     <p>Ici à l'avenir, des infos sur le merkato en cours et sur les derniers résultats</p>
