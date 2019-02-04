@@ -284,6 +284,7 @@ def solve_transition_session(transition_session):
             team.attributes['formation'] = dict(transition_session.attributes.get('default_formation'))
         else:
             team.attributes['formation'] = dict(choice.formation_to_choose)
+            team.save()
             for sg in choice.signings_to_free.all():
                 league_models.Signing.objects.end(sg, 'FR')
         _fix_signings(team, ntk, latest_tds.get(team=team), li)
