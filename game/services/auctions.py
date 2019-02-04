@@ -302,7 +302,7 @@ def _fix_signings(team, nb_to_keep, team_tds, instance):
             for _, pls in compo.items():
                 for pl in pls:
                     pl_list.append((pl['player']['id'], pl['score']))
-        sorted(pl_list, key=lambda tup: float(tup[1])).reverse()
+        sorted(pl_list, key=lambda tup: float(tup[1]))
         # virer d'abord ceux qui ne sont même pas dans la liste
         in_list = [plid for plid, score in pl_list]
         signings_not_in_list = league_models.Signing.objects.filter(team=team, league_instance=instance,
