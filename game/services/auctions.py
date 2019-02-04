@@ -288,6 +288,8 @@ def solve_transition_session(transition_session):
             for sg in choice.signings_to_free.all():
                 league_models.Signing.objects.end(sg, 'FR')
         _fix_signings(team, ntk, latest_tds.get(team=team), li)
+    transition_session.is_solved = True
+    transition_session.save()
 
 
 def _fix_signings(team, nb_to_keep, team_tds, instance):
