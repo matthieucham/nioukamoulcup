@@ -277,7 +277,7 @@ def solve_transition_session(transition_session):
     li = transition_session.merkato.league_instance
     day = league_models.LeagueInstancePhaseDay.objects.get_latest_day_for_phases(
         league_models.LeagueInstancePhase.objects.filter(league_instance=li, type='FULLSEASON'))[0]
-    latest_tds = league_models.TeamDayScore.objects.filter(day=day)
+    latest_tds = league_models.TeamDayScore.objects.filter(day=day, current=False)
     for team in league_models.Team.objects.filter(league=li.league):
         choice = team.transitionteamchoice_set.filter(transition_session=transition_session).first()
         if choice is None:
