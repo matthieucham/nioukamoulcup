@@ -237,6 +237,7 @@ class LeagueInstancePhase(models.Model):
     type = models.CharField(choices=TYPES, max_length=10)
     journee_first = models.PositiveIntegerField(blank=False, db_index=True)
     journee_last = models.PositiveIntegerField(blank=False, db_index=True)
+    attributes = JSONField(null=True)
 
 
 class LeagueInstancePhaseDayManager(models.Manager):
@@ -293,11 +294,19 @@ class LeagueInstancePhaseDayManager(models.Manager):
                 existing_tds = TeamDayScore.objects.get(day=lipd, team=team, current=is_current)
                 tds_config = existing_tds.attributes
                 joker = tds_config['joker'] if 'joker' in tds_config else None
-                formation = tds_config['formation']
+                if lipd.league_instance_phase.attributes:
+                    formation = lipd.league_instance_phase.attributes.get('mandatory_formation',
+                                                                          tds_config['formation'])
+                else:
+                    formation = tds_config['formation']
             except TeamDayScore.DoesNotExist:  # joker and formation mustn't be modified afterwards
                 team_config = team.attributes
                 joker = team_config['joker'] if 'joker' in team_config else None
-                formation = team_config['formation']
+                if lipd.league_instance_phase.attributes:
+                    formation = lipd.league_instance_phase.attributes.get('mandatory_formation',
+                                                                          team_config['formation'])
+                else:
+                    formation = team_config['formation']
             signings_scores = [
                 (signing, self._compute_score_signing_KCUP(lipd, signing, formation, jjscore_max_nb, joker))
                 for signing in signings_at_day]
