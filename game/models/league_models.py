@@ -321,7 +321,7 @@ class LeagueInstancePhaseDayManager(models.Manager):
                     if i < formation[poste]:
                         teamscore += scores_at_poste[i][1]
                     composition[poste].append(scores_at_poste[i])
-            return self._make_teamdayscore(team, lipd, teamscore, composition, is_current=is_current)
+            return self._make_teamdayscore(team, lipd, teamscore, composition, formation, is_current=is_current)
         else:
             # TODO
             return None
@@ -354,7 +354,7 @@ class LeagueInstancePhaseDayManager(models.Manager):
             score += (float(base) * factor) + float(extra_bonus)
         return score
 
-    def _make_teamdayscore(self, team, lipd, teamscore, composition, is_current=False):
+    def _make_teamdayscore(self, team, lipd, teamscore, composition, formation, is_current=False):
         attrs = dict()
         attrs['composition'] = {}
         for poste, _ in l1models.Joueur.POSTES:
@@ -367,7 +367,7 @@ class LeagueInstancePhaseDayManager(models.Manager):
         team_config = team.attributes
         if 'joker' in team_config:
             attrs['joker'] = team_config['joker']
-        attrs['formation'] = team_config['formation']
+        attrs['formation'] = formation
         return TeamDayScore(team=team, day=lipd, score=teamscore, attributes=attrs, current=is_current)
 
     def get_latest_day_for_phases(self, phases):
