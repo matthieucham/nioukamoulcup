@@ -544,9 +544,13 @@ class NewPlayersRankingSerializer(PlayerHdrSerializer):
         result = dict()
         for ph in self.context['phases']:
             try:
+                phase_found = False
                 for scoph in self.context['scoring_map'][obj.id]['scores']:
                     if scoph['phase'] == ph['id']:
                         result.update({scoph['phase']: scoph['score']})
+                        phase_found = True
+                if not phase_found:
+                    result.update({ph['id']: None})
             except KeyError:
                 result.update({ph['id']: None})
         return result
