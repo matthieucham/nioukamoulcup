@@ -17,14 +17,18 @@ class SaisonScoring(models.Model):
         journees = l1models.Journee.objects.filter(saison=self.saison).order_by('numero')
         journees_to_recompute = []
         # delete obsolete journeescorings
+        # si une journée antérieure est mise à jour tardivement, on se force à tout recalculer à partir de là
+        # pour garder des progressions cohérentes
+        recompute_all_from_there = False
         for j in journees:
             js = JourneeScoring.objects.filter(saison_scoring=self, journee=j).first()
             if js:
-                # if js.computed_at < j.derniere_maj:
-                #     journees_to_recompute.append(j)
-                #     js.delete()
-                journees_to_recompute.append(j)
-                js.delete()
+                if recompute_all_from_there or js.computed_at < j.derniere_maj:
+                    journees_to_recompute.append(j)
+                    js.delete()
+                    recompute_all_from_there = True
+                else:
+                    print('Scores de J%s déjà calculés' % j.numero)
             else:
                 journees_to_recompute.append(j)
         output_js = []
