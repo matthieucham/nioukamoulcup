@@ -129,6 +129,12 @@ class TeamDayScoreSerializer(serializers.ModelSerializer):
     missing_notes = serializers.SerializerMethodField()
     previous_score = serializers.SerializerMethodField()
 
+    def __init__(self, *args, **kwargs):
+        super(TeamDayScoreSerializer, self).__init__(*args, **kwargs)
+        expand_attributes = self.context['request'].data.get('expand_attributes', False)
+        if not expand_attributes:
+            self.fields.pop('attributes')
+
     def get_is_complete(self, obj):
         if not obj:
             return False
@@ -209,7 +215,7 @@ class TeamDayScoreSerializer(serializers.ModelSerializer):
     class Meta:
         model = league_models.TeamDayScore
         fields = (
-            'team', 'score', 'previous_score', 'is_complete', 'rank', 'previous_rank', 'missing_notes', 'current',)
+            'team', 'score', 'previous_score', 'is_complete', 'rank', 'previous_rank', 'missing_notes', 'current', 'attributes')
         list_serializer_class = TeamDayScoreByDivisionSerializer
 
 

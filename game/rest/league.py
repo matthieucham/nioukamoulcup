@@ -29,9 +29,15 @@ class CurrentLeagueInstanceMixin:
 class LeagueInstanceRankingView(generics.RetrieveAPIView):
     permission_classes = (DRYObjectPermissions,)
     serializer_class = serializers.LeagueInstanceRankingSerializer
+    lookup_field = 'league__pk'
 
     def get_queryset(self):
         return league_models.LeagueInstance.objects.filter(current=True)
+
+    def get_serializer_context(self):
+        ctxt = super(LeagueInstanceRankingView, self).get_serializer_context()
+        ctxt['request'].data['expand_attributes'] = True
+        return ctxt
 
 
 class TeamDetailView(generics.RetrieveAPIView):
