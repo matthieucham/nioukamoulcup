@@ -36,7 +36,7 @@ class LeagueInstanceRankingView(generics.RetrieveAPIView):
 
     def get_serializer_context(self):
         ctxt = super(LeagueInstanceRankingView, self).get_serializer_context()
-        ctxt['request'].data['expand_attributes'] = True
+        #ctxt['expand_attributes'] = True
         return ctxt
 
 

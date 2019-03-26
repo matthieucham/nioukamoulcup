@@ -441,6 +441,7 @@ class Palmares(models.Model):
     league_instance_slogan = models.CharField(max_length=255, null=True)
     league_instance_end = models.DateTimeField()
     final_ranking = JSONField()
+    players_ranking = JSONField()
     signings_history = JSONField()
 
 

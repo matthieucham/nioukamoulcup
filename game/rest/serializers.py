@@ -131,7 +131,7 @@ class TeamDayScoreSerializer(serializers.ModelSerializer):
 
     def __init__(self, *args, **kwargs):
         super(TeamDayScoreSerializer, self).__init__(*args, **kwargs)
-        expand_attributes = self.context['request'].data.get('expand_attributes', False)
+        expand_attributes = self.context.get('expand_attributes', False)
         if not expand_attributes:
             self.fields.pop('attributes')
 
