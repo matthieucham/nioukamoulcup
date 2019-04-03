@@ -437,6 +437,7 @@ class Signing(models.Model):
 
 
 class Palmares(models.Model):
+    league = models.ForeignKey(League, on_delete=models.SET_NULL, null=True)
     league_instance_name = models.CharField(max_length=100)
     league_instance_slogan = models.CharField(max_length=255, null=True)
     league_instance_end = models.DateTimeField()

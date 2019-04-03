@@ -32,6 +32,7 @@ class Command(BaseCommand):
                     if plid not in score_by_id:
                         score_by_id.update({plid: dict({'scores': []})})
                         score_by_id[plid]['scores'].append(dict({'phase': phid, 'score': score}))
+            # Classement des joueurs
             players_qs = (
                     l1models.Joueur.objects.filter(club__participations=instance.saison) |
                     l1models.Joueur.objects.filter(performances__rencontre__journee__saison=instance.saison)
@@ -39,9 +40,24 @@ class Command(BaseCommand):
             players_ranking = serializers.NewPlayersRankingSerializer(
                 context={'scoring_map': score_by_id, 'phases': [{'id': phid for phid, _ in store_phases}],
                          'request': None}, many=True).to_representation(players_qs)
-            players_ranking_json = simplejson.dumps(players_ranking)
-            full_ranking_json = simplejson.dumps(store_phases, iterable_as_array=True)
-            pass
+            # Signings et Releases
+            signings = serializers.SigningSerializer(context={'request': None}, many=True).to_representation(
+                gamemodels.Signing.objects.filter(league_instance=instance).order_by('begin'))
+
+            # Store in DB
+            plm, _ = gamemodels.Palmares.objects.update_or_create(league=instance.league,
+                                                                  league_instance_name=instance.name,
+                                                                  defaults={'league_instance_slogan': instance.slogan,
+                                                                            'league_instance_end': instance.end,
+                                                                            'final_ranking': simplejson.dumps(
+                                                                                store_phases, iterable_as_array=True),
+                                                                            'players_ranking': simplejson.dumps(
+                                                                                players_ranking,
+                                                                                iterable_as_array=True),
+                                                                            'signings_history': simplejson.dumps(
+                                                                                signings, iterable_as_array=True)
+                                                                            })
+            pass  # TODO TeamPalmaresRanking
 
     def _compute_players_score_for_phase(self, phid, journee_number):
         score_by_id = dict()
