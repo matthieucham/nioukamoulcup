@@ -215,7 +215,8 @@ class TeamDayScoreSerializer(serializers.ModelSerializer):
     class Meta:
         model = league_models.TeamDayScore
         fields = (
-            'team', 'score', 'previous_score', 'is_complete', 'rank', 'previous_rank', 'missing_notes', 'current', 'attributes')
+            'team', 'score', 'previous_score', 'is_complete', 'rank', 'previous_rank', 'missing_notes', 'current',
+            'attributes')
         list_serializer_class = TeamDayScoreByDivisionSerializer
 
 
@@ -290,12 +291,14 @@ class PhaseDayRankingSerializer(serializers.ModelSerializer):
         # show_current = obj.league_instance_phase.league_instance.league.mode == 'KCUP'
         show_current = True  # TODO à optimiser pour le futur mode FSY
         if obj.teamdayscore_set.filter(current=show_current).count() > 0:
-            return TeamDayScoreSerializer(context={'request': self.context['request'], 'show_current': show_current},
+            return TeamDayScoreSerializer(context={'request': self.context['request'], 'show_current': show_current,
+                                                   'expand_attributes': self.context['expand_attributes']},
                                           many=True,
                                           read_only=True).to_representation(
                 obj.teamdayscore_set.filter(current=show_current))
         else:
-            return TeamDayScoreSerializer(context={'request': self.context['request'], 'show_current': show_current},
+            return TeamDayScoreSerializer(context={'request': self.context['request'], 'show_current': show_current,
+                                                   'expand_attributes': self.context['expand_attributes']},
                                           many=True,
                                           read_only=True).to_representation(
                 obj.teamdayscore_set.all())
@@ -315,7 +318,8 @@ class PhaseRankingSerializer(serializers.ModelSerializer):
 
     @timed
     def get_current_ranking(self, obj):
-        return PhaseDayRankingSerializer(context={'request': self.context['request']}).to_representation(
+        return PhaseDayRankingSerializer(context={'request': self.context['request'], 'expand_attributes': self.context[
+            'expand_attributes']}).to_representation(
             self._get_latest_day(obj))
 
     class Meta:
