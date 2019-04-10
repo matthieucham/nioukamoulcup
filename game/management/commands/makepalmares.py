@@ -57,7 +57,22 @@ class Command(BaseCommand):
                                                                             'signings_history': simplejson.dumps(
                                                                                 signings, iterable_as_array=True)
                                                                             })
-            pass  # TODO TeamPalmaresRanking
+            # TeamPalmaresRanking
+            for phid, phranking in store_phases:
+                for rk_div in phranking['current_ranking']['ranking_ekyps']:
+                    rkpos = 1
+                    division = gamemodels.LeagueDivision.objects.get(pk=rk_div['id'])
+                    for tds in rk_div['ranking']:
+                        if tds['is_complete']:
+                            gamemodels.TeamPalmaresRanking.objects.create(
+                                team=gamemodels.Team.objects.get(pk=tds['team']['id']),
+                                palmares=plm,
+                                division=division,
+                                phase_name=phranking['name'],
+                                phase_type=phranking['type'],
+                                rank=rkpos
+                            )
+                            rkpos += 1
 
     def _compute_players_score_for_phase(self, phid, journee_number):
         score_by_id = dict()

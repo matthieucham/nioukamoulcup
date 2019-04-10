@@ -113,12 +113,14 @@ class TeamDayScoreByDivisionSerializer(serializers.ListSerializer):
         if not iterable:
             return super().to_representation(instance)
         one_tds = iterable[0]
+        divs = list()
         for div in league_models.LeagueDivision.objects.filter(
                 league=one_tds.day.league_instance_phase.league_instance.league).order_by('level'):
             div_ranking = super().to_representation(
                 league_models.TeamDayScore.objects.filter(day=one_tds.day, team__division=div,
                                                           current=one_tds.current).order_by('-score'))
-            yield {'id': div.id, 'name': div.name, 'ranking': div_ranking}
+            divs.append({'id': div.id, 'name': div.name, 'level': div.level, 'ranking': div_ranking})
+        return divs
 
 
 class TeamDayScoreSerializer(serializers.ModelSerializer):

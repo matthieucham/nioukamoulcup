@@ -452,3 +452,4 @@ class TeamPalmaresRanking(models.Model):
     phase_name = models.CharField(max_length=100)
     phase_type = models.CharField(max_length=10)
     rank = models.PositiveIntegerField()
+    division = models.ForeignKey(LeagueDivision, on_delete=models.SET_NULL, null=True)
