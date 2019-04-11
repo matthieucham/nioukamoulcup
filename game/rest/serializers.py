@@ -113,14 +113,15 @@ class TeamDayScoreByDivisionSerializer(serializers.ListSerializer):
         if not iterable:
             return super().to_representation(instance)
         one_tds = iterable[0]
-        divs = list()
+        # divs = list()
         for div in league_models.LeagueDivision.objects.filter(
                 league=one_tds.day.league_instance_phase.league_instance.league).order_by('level'):
             div_ranking = super().to_representation(
                 league_models.TeamDayScore.objects.filter(day=one_tds.day, team__division=div,
                                                           current=one_tds.current).order_by('-score'))
-            divs.append({'id': div.id, 'name': div.name, 'level': div.level, 'ranking': div_ranking})
-        return divs
+            # divs.append({'id': div.id, 'name': div.name, 'level': div.level, 'ranking': div_ranking})
+            yield {'id': div.id, 'name': div.name, 'level': div.level, 'ranking': div_ranking}
+        # return divs
 
 
 class TeamDayScoreSerializer(serializers.ModelSerializer):
@@ -294,13 +295,13 @@ class PhaseDayRankingSerializer(serializers.ModelSerializer):
         show_current = True  # TODO à optimiser pour le futur mode FSY
         if obj.teamdayscore_set.filter(current=show_current).count() > 0:
             return TeamDayScoreSerializer(context={'request': self.context['request'], 'show_current': show_current,
-                                                   'expand_attributes': self.context['expand_attributes']},
+                                                   'expand_attributes': self.context.get('expand_attributes', False)},
                                           many=True,
                                           read_only=True).to_representation(
                 obj.teamdayscore_set.filter(current=show_current))
         else:
             return TeamDayScoreSerializer(context={'request': self.context['request'], 'show_current': show_current,
-                                                   'expand_attributes': self.context['expand_attributes']},
+                                                   'expand_attributes': self.context.get('expand_attributes', False)},
                                           many=True,
                                           read_only=True).to_representation(
                 obj.teamdayscore_set.all())
@@ -320,8 +321,9 @@ class PhaseRankingSerializer(serializers.ModelSerializer):
 
     @timed
     def get_current_ranking(self, obj):
-        return PhaseDayRankingSerializer(context={'request': self.context['request'], 'expand_attributes': self.context[
-            'expand_attributes']}).to_representation(
+        return PhaseDayRankingSerializer(context={'request': self.context['request'],
+                                                  'expand_attributes': self.context.get('expand_attributes',
+                                                                                        False)}).to_representation(
             self._get_latest_day(obj))
 
     class Meta:

@@ -24,21 +24,22 @@ class Command(BaseCommand):
                 ph_rest = serializers.PhaseRankingSerializer(
                     context={'expand_attributes': True, 'request': None}).to_representation(ph)
                 if ph_rest["current_ranking"]["number"] == ph_rest["journee_last"]:
-                    store_phases.append((ph.pk, ph_rest))
+                    store_phases.append(simplejson.loads(
+                        simplejson.dumps(ph_rest, iterable_as_array=True)))  # loads / dumps sert à consommer le yield
             score_by_id = dict()
-            for phid, phranking in store_phases:
-                for plid, score in self._compute_players_score_for_phase(phid, phranking["current_ranking"][
+            for phranking in store_phases:
+                for plid, score in self._compute_players_score_for_phase(phranking["id"], phranking["current_ranking"][
                     "number"]).items():
                     if plid not in score_by_id:
                         score_by_id.update({plid: dict({'scores': []})})
-                        score_by_id[plid]['scores'].append(dict({'phase': phid, 'score': score}))
+                        score_by_id[plid]['scores'].append(dict({'phase': phranking["id"], 'score': score}))
             # Classement des joueurs
             players_qs = (
                     l1models.Joueur.objects.filter(club__participations=instance.saison) |
                     l1models.Joueur.objects.filter(performances__rencontre__journee__saison=instance.saison)
             ).distinct().order_by('club__nom', 'nom')
             players_ranking = serializers.NewPlayersRankingSerializer(
-                context={'scoring_map': score_by_id, 'phases': [{'id': phid for phid, _ in store_phases}],
+                context={'scoring_map': score_by_id, 'phases': [{'id': ph['id'] for ph in store_phases}],
                          'request': None}, many=True).to_representation(players_qs)
             # Signings et Releases
             signings = serializers.SigningSerializer(context={'request': None}, many=True).to_representation(
@@ -58,7 +59,7 @@ class Command(BaseCommand):
                                                                                 signings, iterable_as_array=True)
                                                                             })
             # TeamPalmaresRanking
-            for phid, phranking in store_phases:
+            for phranking in store_phases:
                 for rk_div in phranking['current_ranking']['ranking_ekyps']:
                     rkpos = 1
                     division = gamemodels.LeagueDivision.objects.get(pk=rk_div['id'])
