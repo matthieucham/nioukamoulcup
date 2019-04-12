@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { AutoSizer, Column, Table, SortDirection } from "react-virtualized";
 import { format } from "date-fns";
 
-export const SigningsTable = ({ signings, height }) => {
+export const SigningsTable = ({ signings, height, showTeam }) => {
   return (
     <AutoSizer disableHeight>
       {({ width }) => (
@@ -27,6 +27,16 @@ export const SigningsTable = ({ signings, height }) => {
             width={120}
           />
 
+          {showTeam && (
+            <Column
+              label="Ekyp"
+              dataKey="team.name"
+              cellDataGetter={({ rowData }) => rowData.team.name}
+              width={200}
+              flexGrow={1}
+            />
+          )}
+
           <Column
             label="Joueur"
             dataKey="player.display_name"
@@ -36,6 +46,13 @@ export const SigningsTable = ({ signings, height }) => {
             )}
             width={200}
             flexGrow={1}
+          />
+
+          <Column
+            label="Pos."
+            dataKey="player.poste"
+            cellDataGetter={({ rowData }) => rowData.player.poste }
+            width={20}
           />
 
           <Column
