@@ -79,6 +79,7 @@ class Team(models.Model):
     league = models.ForeignKey(League, on_delete=models.PROTECT, null=True)
     division = models.ForeignKey(LeagueDivision, on_delete=models.PROTECT, null=True)
     attributes = JSONField(default=dict, blank=True)
+    palmares = models.ManyToManyField('Palmares', through='TeamPalmaresRanking')
 
     objects = TeamManager()
 
@@ -211,8 +212,8 @@ class LeagueInstanceManager(models.Manager):
 
 class LeagueInstance(models.Model):
     name = models.CharField(max_length=100, blank=False)
-    slogan = models.CharField(max_length=255)
-    league = models.ForeignKey(League, on_delete=models.CASCADE, null=False)
+    slogan = models.CharField(max_length=255, null=True)
+    league = models.ForeignKey(League, on_delete=models.CASCADE)
     current = models.BooleanField(default=False)
     begin = models.DateTimeField(blank=False)
     end = models.DateTimeField(blank=False)
@@ -425,11 +426,30 @@ class SigningManager(models.Manager):
 
 
 class Signing(models.Model):
-    player = models.ForeignKey(l1models.Joueur, on_delete=models.CASCADE, null=False)
-    team = models.ForeignKey(Team, on_delete=models.CASCADE, null=False)
-    league_instance = models.ForeignKey(LeagueInstance, on_delete=models.CASCADE, null=False)
+    player = models.ForeignKey(l1models.Joueur, on_delete=models.CASCADE, )
+    team = models.ForeignKey(Team, on_delete=models.CASCADE)
+    league_instance = models.ForeignKey(LeagueInstance, on_delete=models.CASCADE)
     begin = models.DateTimeField(auto_now_add=True, db_index=True)
     end = models.DateTimeField(null=True, db_index=True)
     attributes = JSONField(default=dict({'score_factor': 1.0}))
 
     objects = SigningManager()
+
+
+class Palmares(models.Model):
+    league = models.ForeignKey(League, on_delete=models.SET_NULL, null=True)
+    league_instance_name = models.CharField(max_length=100)
+    league_instance_slogan = models.CharField(max_length=255, null=True)
+    league_instance_end = models.DateTimeField()
+    final_ranking = JSONField()
+    players_ranking = JSONField()
+    signings_history = JSONField()
+
+
+class TeamPalmaresRanking(models.Model):
+    team = models.ForeignKey(Team, on_delete=models.CASCADE)
+    palmares = models.ForeignKey(Palmares, on_delete=models.CASCADE)
+    phase_name = models.CharField(max_length=100)
+    phase_type = models.CharField(max_length=10)
+    rank = models.PositiveIntegerField()
+    division = models.ForeignKey(LeagueDivision, on_delete=models.SET_NULL, null=True)

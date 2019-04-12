@@ -29,7 +29,7 @@ export class PhaseRankingsTab extends Component {
   }
 
   render() {
-    const { phases, playersRanking, onPlayersTab } = this.props;
+    const { phases, playersRanking, onPlayersTab, showFilter } = this.props;
 
     const links = phases.map(ph => {
       const roundIndex = ph.current_ranking.number - ph.journee_first + 1;
@@ -60,6 +60,7 @@ export class PhaseRankingsTab extends Component {
           phases={phases}
           height={700}
           onPlayersFilterSubmitted={onPlayersTab}
+          showFilter={showFilter}
         />
       </TabContent>
     );

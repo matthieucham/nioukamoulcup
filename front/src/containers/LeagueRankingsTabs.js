@@ -7,6 +7,7 @@ import { PhaseRankingsTab } from '../components/PhaseRankingsTab'
 const mapStateToProps = ( state ) => {
 	return {
 		playersRanking: state.data.rankings.players_ranking.ranking,
+		showFilter: true
   	}
 }
 

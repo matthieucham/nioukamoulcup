@@ -4,7 +4,7 @@ from django.contrib import messages
 from rules.contrib.views import PermissionRequiredMixin
 from game.models import League, LeagueInstance, LeagueMembership, Team, \
     MerkatoSession, Merkato, Sale, Auction, DraftSession, DraftSessionRank, DraftPick, Signing, Release, \
-    TransitionTeamChoice
+    TransitionTeamChoice, Palmares
 from ligue1.models import Joueur
 from django.utils.timezone import localtime, now
 from django.db.models import Count, Q
@@ -420,4 +420,17 @@ class LeagueTestView(StateInitializerMixin, BaseLeagueView):
         # Call the base implementation first to get a context
         context = super(LeagueTestView, self).get_context_data(**kwargs)
         context['PRELOADED_STATE'] = self.init_common(self.request, self.object.pk)
+        return context
+
+
+class LeaguePalmaresView(StateInitializerMixin, BaseLeagueView):
+    template_name = 'game/league/palmares.html'
+    component = 'palmares'
+
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get a context
+        context = super(LeaguePalmaresView, self).get_context_data(**kwargs)
+        context['PRELOADED_STATE'] = self.init_from_palmares(self.request, self.object,
+                                                             palmares_pk=self.kwargs.get('palmares_pk', None))
+        context['palmares'] = Palmares.objects.filter(league=self.get_object()).order_by('-league_instance_end')
         return context

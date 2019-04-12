@@ -14,6 +14,7 @@ import { TeamPage } from './pages/TeamPage'
 import { MerkatoPage } from './pages/MerkatoPage'
 import { MerkatoResultsPage } from './pages/MerkatoResultsPage'
 import { DraftResultsPage } from './pages/DraftResultsPage'
+import { PalmaresPage } from './pages/PalmaresPage';
 
 // ========================================
 
@@ -34,6 +35,7 @@ const pages = {
 	'merkato': MerkatoPage,
 	'merkatoresults': MerkatoResultsPage,
 	'draftresults': DraftResultsPage,
+	'palmares': PalmaresPage
 };
 
 const preloadedStateSchema = { players: Schemas.PLAYER_ARRAY, clubs: Schemas.CLUB_ARRAY };
@@ -51,6 +53,7 @@ const initialState = {
 		},
 		team: {
 			initial: normalizedData.result.team,
+			palmares: normalizedData.result.palmares,
 			compoScores: {
 				scores: normalizedData.result.team ? normalizedData.result.team.latest_scores : null,
 				journee: normalizedData.result.team && normalizedData.result.team.latest_scores.length>0 ? normalizedData.result.team.latest_scores[0].day.journee: null,
@@ -68,6 +71,9 @@ const initialState = {
 		},
 		merkatos: {
 			initial: normalizedData.result.merkatos
+		},
+		palmares: {
+			initial: normalizedData.result.palmares
 		}
 	},
 };

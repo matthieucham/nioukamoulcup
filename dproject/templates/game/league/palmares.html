@@ -1,0 +1,16 @@
+{% extends "game/league/league_central_reactapp.html" %}
+
+{% block title-page %} - Palmarès{% endblock title-page %}
+
+{% block content-right %}
+ <section id="pasts">
+     <h1>Pour l'éternité</h1>
+     <ul>
+        {% for competition in palmares %}
+            <li>
+                <a href="{% url 'league_palmares-palmares' object.pk competition.pk %}">{{ competition.league_instance_name }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+ </section>
+{% endblock content-right %}

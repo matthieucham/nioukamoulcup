@@ -21,7 +21,8 @@ export class PlayersRankingTable extends Component {
       sortBy: "scores." + props.phases[0]["id"],
       sortDirection: SortDirection.DESC,
       players: orderedPlayers,
-      dico: { G: "Gardien", D: "Défenseur", M: "Milieu", A: "Attaquant" }
+      dico: { G: "Gardien", D: "Défenseur", M: "Milieu", A: "Attaquant" },
+      showFilter: props.showFilter
     };
 
     this._sort = this._sort.bind(this);
@@ -41,7 +42,7 @@ export class PlayersRankingTable extends Component {
   }
 
   render() {
-    const { phases, players, sortBy, sortDirection, dico } = this.state;
+    const { phases, players, sortBy, sortDirection, dico, showFilter } = this.state;
 
     var scoresCol = phases.map(ph => (
       <Column
@@ -70,7 +71,7 @@ export class PlayersRankingTable extends Component {
 
     return (
       <div>
-        <ConnectedPlayerFilter />
+        { showFilter && <ConnectedPlayerFilter /> }
         <AutoSizer disableHeight>
           {({ width }) => (
             <Table

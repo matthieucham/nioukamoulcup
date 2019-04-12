@@ -42,8 +42,13 @@ class StateInitializerMixin:
                                                                           'current': True})  # TODO optim pour FSY
         players_serializer = serializers.PlayerScoreSerializer(
             l1models.Joueur.objects.filter(signing__team=team), many=True, context={'request': request})
+        palmares_serializer = serializers.TeamPalmaresSerializer(
+            models.TeamPalmaresRanking.objects.filter(team=team).filter(rank__lt=4).order_by(
+                '-palmares__league_instance_end'), many=True
+        )
         self.initial_state['team'] = self._to_json(team_serializer)
         self.initial_state['players'] += self._to_json(players_serializer)
+        self.initial_state['palmares'] = self._to_json(palmares_serializer)
         self.initial_state['league_id'] = team.league.id
         return self.initial_state
 
@@ -85,4 +90,18 @@ class StateInitializerMixin:
                                                                           'current': True})
         self.initial_state.update({'merkatos': self._to_json(merkato_serializer)})
         self.initial_state.update({'team': self._to_json(team_serializer)})
+        return self.initial_state
+
+    @timed
+    def init_from_palmares(self, request, league, palmares_pk=None):
+        self._init_common(request)
+        if palmares_pk:
+            palmares_serializer = serializers.PalmaresSerializer(
+                models.Palmares.objects.filter(league=league).get(pk=palmares_pk), context={'request': request})
+        else:
+            palmares_serializer = serializers.PalmaresSerializer(
+                models.Palmares.objects.filter(league=league).order_by('-league_instance_end').first(),
+                context={'request': request})
+        self.initial_state.update({'palmares': self._to_json(palmares_serializer)})
+        self.initial_state.update({'league_id': league.id})
         return self.initial_state

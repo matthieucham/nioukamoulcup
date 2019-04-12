@@ -9,6 +9,7 @@ from game.models import league_models, transfer_models, scoring_models
 from ligue1 import models as l1models
 from game.services import auctions
 from utils.timer import timed
+import simplejson as json
 
 
 class ClubSerializer(serializers.ModelSerializer):
@@ -113,12 +114,15 @@ class TeamDayScoreByDivisionSerializer(serializers.ListSerializer):
         if not iterable:
             return super().to_representation(instance)
         one_tds = iterable[0]
+        # divs = list()
         for div in league_models.LeagueDivision.objects.filter(
                 league=one_tds.day.league_instance_phase.league_instance.league).order_by('level'):
             div_ranking = super().to_representation(
                 league_models.TeamDayScore.objects.filter(day=one_tds.day, team__division=div,
                                                           current=one_tds.current).order_by('-score'))
-            yield {'id': div.id, 'name': div.name, 'ranking': div_ranking}
+            # divs.append({'id': div.id, 'name': div.name, 'level': div.level, 'ranking': div_ranking})
+            yield {'id': div.id, 'name': div.name, 'level': div.level, 'ranking': div_ranking}
+        # return divs
 
 
 class TeamDayScoreSerializer(serializers.ModelSerializer):
@@ -128,6 +132,12 @@ class TeamDayScoreSerializer(serializers.ModelSerializer):
     previous_rank = serializers.SerializerMethodField()
     missing_notes = serializers.SerializerMethodField()
     previous_score = serializers.SerializerMethodField()
+
+    def __init__(self, *args, **kwargs):
+        super(TeamDayScoreSerializer, self).__init__(*args, **kwargs)
+        expand_attributes = self.context.get('expand_attributes', False)
+        if not expand_attributes:
+            self.fields.pop('attributes')
 
     def get_is_complete(self, obj):
         if not obj:
@@ -209,7 +219,8 @@ class TeamDayScoreSerializer(serializers.ModelSerializer):
     class Meta:
         model = league_models.TeamDayScore
         fields = (
-            'team', 'score', 'previous_score', 'is_complete', 'rank', 'previous_rank', 'missing_notes', 'current',)
+            'team', 'score', 'previous_score', 'is_complete', 'rank', 'previous_rank', 'missing_notes', 'current',
+            'attributes')
         list_serializer_class = TeamDayScoreByDivisionSerializer
 
 
@@ -284,12 +295,14 @@ class PhaseDayRankingSerializer(serializers.ModelSerializer):
         # show_current = obj.league_instance_phase.league_instance.league.mode == 'KCUP'
         show_current = True  # TODO à optimiser pour le futur mode FSY
         if obj.teamdayscore_set.filter(current=show_current).count() > 0:
-            return TeamDayScoreSerializer(context={'request': self.context['request'], 'show_current': show_current},
+            return TeamDayScoreSerializer(context={'request': self.context['request'], 'show_current': show_current,
+                                                   'expand_attributes': self.context.get('expand_attributes', False)},
                                           many=True,
                                           read_only=True).to_representation(
                 obj.teamdayscore_set.filter(current=show_current))
         else:
-            return TeamDayScoreSerializer(context={'request': self.context['request'], 'show_current': show_current},
+            return TeamDayScoreSerializer(context={'request': self.context['request'], 'show_current': show_current,
+                                                   'expand_attributes': self.context.get('expand_attributes', False)},
                                           many=True,
                                           read_only=True).to_representation(
                 obj.teamdayscore_set.all())
@@ -309,7 +322,9 @@ class PhaseRankingSerializer(serializers.ModelSerializer):
 
     @timed
     def get_current_ranking(self, obj):
-        return PhaseDayRankingSerializer(context={'request': self.context['request']}).to_representation(
+        return PhaseDayRankingSerializer(context={'request': self.context['request'],
+                                                  'expand_attributes': self.context.get('expand_attributes',
+                                                                                        False)}).to_representation(
             self._get_latest_day(obj))
 
     class Meta:
@@ -375,7 +390,7 @@ class DayHdrSerializer(serializers.ModelSerializer):
 class TeamDayCompoAndScoreSerializer(serializers.ModelSerializer):
     team = TeamHdrSerializer()
     day = serializers.SerializerMethodField()
-    compo = serializers.SerializerMethodField()
+    composition = serializers.SerializerMethodField()
     formation = serializers.SerializerMethodField()
 
     def get_day(self, obj):
@@ -386,12 +401,12 @@ class TeamDayCompoAndScoreSerializer(serializers.ModelSerializer):
     def get_formation(self, obj):
         return obj.attributes['formation']
 
-    def get_compo(self, obj):
+    def get_composition(self, obj):
         return obj.attributes['composition']
 
     class Meta:
         model = league_models.TeamDayScore
-        fields = ('team', 'score', 'day', 'formation', 'compo')
+        fields = ('team', 'score', 'day', 'formation', 'composition')
 
 
 class TotalPASaleField(serializers.Field):
@@ -907,3 +922,38 @@ class CurrentMerkatoSerializer(serializers.ModelSerializer):
             'draft_sessions',
             'transition_sessions',
             'permissions',)
+
+
+class PalmaresSerializer(serializers.ModelSerializer):
+    final_ranking = serializers.SerializerMethodField()
+    players_ranking = serializers.SerializerMethodField()
+    signings_history = serializers.SerializerMethodField()
+
+    def get_final_ranking(self, obj):
+        return json.loads(obj.final_ranking)
+
+    def get_players_ranking(self, obj):
+        return json.loads(obj.players_ranking)
+
+    def get_signings_history(self, obj):
+        return json.loads(obj.signings_history)
+
+    class Meta:
+        model = league_models.Palmares
+        fields = '__all__'
+
+
+class TeamPalmaresSerializer(serializers.ModelSerializer):
+    division = serializers.StringRelatedField(read_only=True)
+    level = serializers.SlugRelatedField(source='division', read_only=True, slug_field='level')
+
+    class Meta:
+        model = league_models.TeamPalmaresRanking
+        fields = (
+            'palmares',
+            'phase_name',
+            'phase_type',
+            'rank',
+            'division',
+            'level'
+        )

@@ -22,22 +22,19 @@ const PlayersLine = ({ expected, players }) => {
   );
 };
 
-const Composition = ({ phaseResult }) => {
+export const Composition = ({ composition, formation, score }) => {
   const positionOrder = ["G", "D", "M", "A"];
   const lines = positionOrder.map(pos => (
     <PlayersLine
       key={pos}
-      players={phaseResult["compo"][pos].slice(
-        0,
-        phaseResult["formation"][pos]
-      )}
-      expected={phaseResult["formation"][pos]}
+      players={composition[pos].slice(0, formation[pos])}
+      expected={formation[pos]}
     />
   ));
   return (
     <div className="composition">
       {lines}
-      <h1>Total: {phaseResult["score"]}</h1>
+      <h1>Total: {score}</h1>
     </div>
   );
 };
@@ -51,7 +48,11 @@ export const CompoTabs = ({ latestScores }) => {
 
   const compositions = latestScores.map((lsc, index) => (
     <TabContent for={"ttab_" + index} key={lsc["day"]["id"]}>
-      <Composition phaseResult={lsc} />
+      <Composition
+        composition={lsc["composition"]}
+        formation={lsc["formation"]}
+        score={lsc["score"]}
+      />
     </TabContent>
   ));
   return (
