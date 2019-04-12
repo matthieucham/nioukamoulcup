@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { AutoSizer, Column, Table, SortDirection } from "react-virtualized";
 import "react-virtualized/styles.css"; // only needs to be imported once
+import { CompoDialog } from "./CompoDialog";
 
 export class TeamRankingTable extends Component {
   constructor(props) {
@@ -33,8 +34,8 @@ export class TeamRankingTable extends Component {
               index < 0
                 ? ""
                 : index % 2 == 0
-                  ? "bigtable__even"
-                  : "bigtable__odd"
+                ? "bigtable__even"
+                : "bigtable__odd"
             }
             sort={this._sort}
             sortBy={sortBy}
@@ -99,14 +100,29 @@ export class TeamRankingTable extends Component {
             />
 
             <Column
+              label=""
+              dataKey="is_complete"
+              cellRenderer={({ rowData }) =>
+                rowData["attributes"] &&
+                rowData["attributes"]["composition"] ? (
+                  <CompoDialog team={rowData} />
+                ) : (
+                  ""
+                )
+              }
+              width={50}
+              disableSort
+            />
+
+            <Column
               label="Notes"
               dataKey="missing_notes"
               cellDataGetter={({ rowData }) =>
                 rowData["missing_notes"] == 0
                   ? ""
                   : rowData["missing_notes"]
-                    ? "-" + rowData["missing_notes"]
-                    : "-"
+                  ? "-" + rowData["missing_notes"]
+                  : "-"
               }
               width={80}
             />
@@ -145,7 +161,7 @@ export class TeamRankingTable extends Component {
 
   _defaultSortBy(sortByKey) {
     return function(a, b) {
-      if (! a[sortByKey]) {
+      if (!a[sortByKey]) {
         return 1;
       }
       if (a[sortByKey] < b[sortByKey])

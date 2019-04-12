@@ -390,7 +390,7 @@ class DayHdrSerializer(serializers.ModelSerializer):
 class TeamDayCompoAndScoreSerializer(serializers.ModelSerializer):
     team = TeamHdrSerializer()
     day = serializers.SerializerMethodField()
-    compo = serializers.SerializerMethodField()
+    composition = serializers.SerializerMethodField()
     formation = serializers.SerializerMethodField()
 
     def get_day(self, obj):
@@ -401,12 +401,12 @@ class TeamDayCompoAndScoreSerializer(serializers.ModelSerializer):
     def get_formation(self, obj):
         return obj.attributes['formation']
 
-    def get_compo(self, obj):
+    def get_composition(self, obj):
         return obj.attributes['composition']
 
     class Meta:
         model = league_models.TeamDayScore
-        fields = ('team', 'score', 'day', 'formation', 'compo')
+        fields = ('team', 'score', 'day', 'formation', 'composition')
 
 
 class TotalPASaleField(serializers.Field):
