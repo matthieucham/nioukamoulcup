@@ -31,6 +31,7 @@ export const PalmaresPage = () => {
     <div className="react-app-inner">
       <main>
         <PhaseRankings />
+		<h1 className="page-title">Historique des transferts</h1>
         <Signings />
       </main>
     </div>

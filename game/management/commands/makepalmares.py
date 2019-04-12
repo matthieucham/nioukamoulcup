@@ -68,6 +68,7 @@ class Command(BaseCommand):
                                                                                 signings, iterable_as_array=True)
                                                                             })
             # TeamPalmaresRanking
+            gamemodels.TeamPalmaresRanking.objects.filter(palmares=plm).delete()
             for phranking in store_phases:
                 for rk_div in phranking['current_ranking']['ranking_ekyps']:
                     rkpos = 1

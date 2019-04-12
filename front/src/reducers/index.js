@@ -122,13 +122,18 @@ const initial = (state = {}, action) => {
   return state;
 };
 
+const palmares = (state = {}, action) => {
+  return state;
+};
+
 const team = combineReducers({
   initial,
   compoScores,
   signings,
   finances,
   releases,
-  sales
+  sales,
+  palmares
 });
 
 const phases_ranking = (state = {}, action) => {
@@ -167,10 +172,6 @@ const draftsession = combineReducers({
 });
 
 const merkatos = combineReducers({
-  initial
-});
-
-const palmares = combineReducers({
   initial
 });
 

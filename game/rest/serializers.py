@@ -941,3 +941,19 @@ class PalmaresSerializer(serializers.ModelSerializer):
     class Meta:
         model = league_models.Palmares
         fields = '__all__'
+
+
+class TeamPalmaresSerializer(serializers.ModelSerializer):
+    division = serializers.StringRelatedField(read_only=True)
+    level = serializers.SlugRelatedField(source='division', read_only=True, slug_field='level')
+
+    class Meta:
+        model = league_models.TeamPalmaresRanking
+        fields = (
+            'palmares',
+            'phase_name',
+            'phase_type',
+            'rank',
+            'division',
+            'level'
+        )

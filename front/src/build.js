@@ -53,6 +53,7 @@ const initialState = {
 		},
 		team: {
 			initial: normalizedData.result.team,
+			palmares: normalizedData.result.palmares,
 			compoScores: {
 				scores: normalizedData.result.team ? normalizedData.result.team.latest_scores : null,
 				journee: normalizedData.result.team && normalizedData.result.team.latest_scores.length>0 ? normalizedData.result.team.latest_scores[0].day.journee: null,

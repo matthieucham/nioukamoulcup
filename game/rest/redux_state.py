@@ -42,8 +42,13 @@ class StateInitializerMixin:
                                                                           'current': True})  # TODO optim pour FSY
         players_serializer = serializers.PlayerScoreSerializer(
             l1models.Joueur.objects.filter(signing__team=team), many=True, context={'request': request})
+        palmares_serializer = serializers.TeamPalmaresSerializer(
+            models.TeamPalmaresRanking.objects.filter(team=team).filter(rank__lt=4).order_by(
+                '-palmares__league_instance_end'), many=True
+        )
         self.initial_state['team'] = self._to_json(team_serializer)
         self.initial_state['players'] += self._to_json(players_serializer)
+        self.initial_state['palmares'] = self._to_json(palmares_serializer)
         self.initial_state['league_id'] = team.league.id
         return self.initial_state
 
