@@ -35,12 +35,21 @@ class Command(BaseCommand):
                         score_by_id[plid]['scores'].append(dict({'phase': phranking["id"], 'score': score}))
             # Classement des joueurs
             players_qs = (
-                    l1models.Joueur.objects.filter(club__participations=instance.saison) |
-                    l1models.Joueur.objects.filter(performances__rencontre__journee__saison=instance.saison)
+                l1models.Joueur.objects.filter(performances__rencontre__journee__saison=instance.saison)
             ).distinct().order_by('club__nom', 'nom')
-            players_ranking = serializers.NewPlayersRankingSerializer(
+            full_players_ranking = serializers.NewPlayersRankingSerializer(
                 context={'scoring_map': score_by_id, 'phases': [{'id': ph['id'] for ph in store_phases}],
                          'request': None}, many=True).to_representation(players_qs)
+
+            # ne conserver que ceux qui ont au moins un score:
+
+            def filter_player_func(player):
+                for phid, phscore in player['scores'].items():
+                    if phscore is not None:
+                        return True
+                return False
+
+            players_ranking = filter(filter_player_func, full_players_ranking)
             # Signings et Releases
             signings = serializers.SigningSerializer(context={'request': None}, many=True).to_representation(
                 gamemodels.Signing.objects.filter(league_instance=instance).order_by('begin'))

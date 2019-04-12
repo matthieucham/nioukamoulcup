@@ -170,6 +170,10 @@ const merkatos = combineReducers({
   initial
 });
 
+const palmares = combineReducers({
+  initial
+});
+
 const data = combineReducers({
   players,
   clubs,
@@ -177,7 +181,8 @@ const data = combineReducers({
   rankings,
   merkatosession,
   draftsession,
-  merkatos
+  merkatos,
+  palmares
 });
 
 const rootReducer = combineReducers({

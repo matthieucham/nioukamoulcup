@@ -9,6 +9,7 @@ from game.models import league_models, transfer_models, scoring_models
 from ligue1 import models as l1models
 from game.services import auctions
 from utils.timer import timed
+import simplejson as json
 
 
 class ClubSerializer(serializers.ModelSerializer):
@@ -921,3 +922,22 @@ class CurrentMerkatoSerializer(serializers.ModelSerializer):
             'draft_sessions',
             'transition_sessions',
             'permissions',)
+
+
+class PalmaresSerializer(serializers.ModelSerializer):
+    final_ranking = serializers.SerializerMethodField()
+    players_ranking = serializers.SerializerMethodField()
+    signings_history = serializers.SerializerMethodField()
+
+    def get_final_ranking(self, obj):
+        return json.loads(obj.final_ranking)
+
+    def get_players_ranking(self, obj):
+        return json.loads(obj.players_ranking)
+
+    def get_signings_history(self, obj):
+        return json.loads(obj.signings_history)
+
+    class Meta:
+        model = league_models.Palmares
+        fields = '__all__'

@@ -86,3 +86,17 @@ class StateInitializerMixin:
         self.initial_state.update({'merkatos': self._to_json(merkato_serializer)})
         self.initial_state.update({'team': self._to_json(team_serializer)})
         return self.initial_state
+
+    @timed
+    def init_from_palmares(self, request, league, palmares_pk=None):
+        self._init_common(request)
+        if palmares_pk:
+            palmares_serializer = serializers.PalmaresSerializer(
+                models.Palmares.objects.filter(league=league).get(pk=palmares_pk), context={'request': request})
+        else:
+            palmares_serializer = serializers.PalmaresSerializer(
+                models.Palmares.objects.filter(league=league).order_by('-league_instance_end').first(),
+                context={'request': request})
+        self.initial_state.update({'palmares': self._to_json(palmares_serializer)})
+        self.initial_state.update({'league_id': league.id})
+        return self.initial_state
