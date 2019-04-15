@@ -10,14 +10,15 @@ export class TeamRankingTable extends Component {
     this.state = {
       sortBy: "rank",
       sortDirection: SortDirection.ASC,
-      teams: props.teams.sort(this._defaultSortBy("rank"))
+      teams: props.teams.sort(this._defaultSortBy("rank")),
+      hyperlinks: props.hyperlinks
     };
 
     this._sort = this._sort.bind(this);
   }
 
   render() {
-    const { teams, sortBy, sortDirection } = this.state;
+    const { teams, sortBy, sortDirection, hyperlinks } = this.state;
 
     return (
       <AutoSizer disableHeight>
@@ -91,9 +92,13 @@ export class TeamRankingTable extends Component {
             <Column
               label="Nom"
               dataKey="team.name"
-              cellRenderer={({ rowData }) => (
-                <a href={rowData["team"]["url"]}>{rowData["team"]["name"]}</a>
-              )}
+              cellRenderer={({ rowData }) =>
+                hyperlinks ? (
+                  <a href={rowData["team"]["url"]}>{rowData["team"]["name"]}</a>
+                ) : (
+                  rowData["team"]["name"]
+                )
+              }
               width={100}
               flexGrow={1}
               disableSort

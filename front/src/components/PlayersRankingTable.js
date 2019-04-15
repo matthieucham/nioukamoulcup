@@ -22,7 +22,8 @@ export class PlayersRankingTable extends Component {
       sortDirection: SortDirection.DESC,
       players: orderedPlayers,
       dico: { G: "Gardien", D: "Défenseur", M: "Milieu", A: "Attaquant" },
-      showFilter: props.showFilter
+      showFilter: props.showFilter,
+      hyperlinks: props.hyperlinks
     };
 
     this._sort = this._sort.bind(this);
@@ -42,7 +43,14 @@ export class PlayersRankingTable extends Component {
   }
 
   render() {
-    const { phases, players, sortBy, sortDirection, dico, showFilter } = this.state;
+    const {
+      phases,
+      players,
+      sortBy,
+      sortDirection,
+      dico,
+      showFilter
+    } = this.state;
 
     var scoresCol = phases.map(ph => (
       <Column
@@ -64,14 +72,14 @@ export class PlayersRankingTable extends Component {
       },
       dispatch => {
         return {
-          performSearch: (qp) => dispatch(fetchPlayersRanking(qp))
+          performSearch: qp => dispatch(fetchPlayersRanking(qp))
         };
       }
     )(StyledPlayerFilter);
 
     return (
       <div>
-        { showFilter && <ConnectedPlayerFilter /> }
+        {showFilter && <ConnectedPlayerFilter />}
         <AutoSizer disableHeight>
           {({ width }) => (
             <Table
@@ -89,8 +97,8 @@ export class PlayersRankingTable extends Component {
                 index < 0
                   ? ""
                   : index % 2 == 0
-                    ? "bigtable__even"
-                    : "bigtable__odd"
+                  ? "bigtable__even"
+                  : "bigtable__odd"
               }
             >
               <Column
@@ -103,9 +111,13 @@ export class PlayersRankingTable extends Component {
               <Column
                 label="Joueur"
                 dataKey="display_name"
-                cellRenderer={({ rowData }) => (
-                  <a href={rowData["url"]}>{rowData["display_name"]}</a>
-                )}
+                cellRenderer={({ rowData }) =>
+                  this.state.hyperlinks ? (
+                    <a href={rowData["url"]}>{rowData["display_name"]}</a>
+                  ) : (
+                    rowData["display_name"]
+                  )
+                }
                 width={100}
                 flexGrow={1}
                 disableSort
@@ -148,8 +160,8 @@ export class PlayersRankingTable extends Component {
       sortBy == "poste"
         ? this._sortByPoste()
         : sortBy.startsWith("scores.")
-          ? this._sortByScore(sortBy)
-          : this._defaultSortBy(sortBy)
+        ? this._sortByScore(sortBy)
+        : this._defaultSortBy(sortBy)
     );
     if (sortDirection === SortDirection.DESC) return sortedList.reverse();
     return sortedList;

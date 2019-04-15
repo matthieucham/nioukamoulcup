@@ -10,7 +10,8 @@ const mapStateToProps = state => {
   return {
     phases: state.data.palmares.initial.final_ranking,
     playersRanking: state.data.palmares.initial.players_ranking,
-    onPlayersTab: idle
+    onPlayersTab: idle,
+    hyperlinks: false,
   };
 };
 
@@ -20,7 +21,8 @@ const mapStateToProps2 = state => {
   return {
     signings: state.data.palmares.initial.signings_history,
     height: 600,
-    showTeam: true
+    showTeam: true,
+    hyperlinks: false,
   };
 };
 

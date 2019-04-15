@@ -9,11 +9,11 @@ const RankingHeader = ({ phase }) => (
   </h1>
 );
 
-const ByDivisionRanking = ({ divisions }) => {
+const ByDivisionRanking = ({ divisions, hyperlinks }) => {
   const divs = divisions.map(dv => (
     <div key={"rankingdiv_" + dv["id"]}>
       <h2 className="division-title">{dv["name"]}</h2>
-      <TeamRankingTable teams={dv["ranking"]} height={700} />
+      <TeamRankingTable teams={dv["ranking"]} height={700} hyperlinks={hyperlinks}/>
     </div>
   ));
   return divs;
@@ -29,7 +29,7 @@ export class PhaseRankingsTab extends Component {
   }
 
   render() {
-    const { phases, playersRanking, onPlayersTab, showFilter } = this.props;
+    const { phases, playersRanking, onPlayersTab, showFilter, hyperlinks } = this.props;
 
     const links = phases.map(ph => {
       const roundIndex = ph.current_ranking.number - ph.journee_first + 1;
@@ -49,7 +49,7 @@ export class PhaseRankingsTab extends Component {
 
     const rankings = phases.map(ph => (
       <TabContent for={"ttab" + ph["id"]} key={"tabcontent_" + ph["id"]}>
-        <ByDivisionRanking divisions={ph["current_ranking"]["ranking_ekyps"]} />
+        <ByDivisionRanking divisions={ph["current_ranking"]["ranking_ekyps"]} hyperlinks={hyperlinks} />
       </TabContent>
     ));
 
@@ -61,6 +61,7 @@ export class PhaseRankingsTab extends Component {
           height={700}
           onPlayersFilterSubmitted={onPlayersTab}
           showFilter={showFilter}
+          hyperlinks={hyperlinks}
         />
       </TabContent>
     );
@@ -91,3 +92,6 @@ export class PhaseRankingsTab extends Component {
     );
   }
 }
+PhaseRankingsTab.defaultProps = {
+  hyperlinks: true
+};

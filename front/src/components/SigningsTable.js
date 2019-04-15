@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { AutoSizer, Column, Table, SortDirection } from "react-virtualized";
 import { format } from "date-fns";
 
-export const SigningsTable = ({ signings, height, showTeam }) => {
+export const SigningsTable = ({ signings, height, showTeam, hyperlinks }) => {
   return (
     <AutoSizer disableHeight>
       {({ width }) => (
@@ -41,9 +41,13 @@ export const SigningsTable = ({ signings, height, showTeam }) => {
             label="Joueur"
             dataKey="player.display_name"
             cellDataGetter={({ rowData }) => rowData.player.display_name}
-            cellRenderer={({ rowData }) => (
-              <a href={rowData.player.url}>{rowData.player.display_name}</a>
-            )}
+            cellRenderer={({ rowData }) =>
+              hyperlinks ? (
+                <a href={rowData.player.url}>{rowData.player.display_name}</a>
+              ) : (
+                rowData.player.display_name
+              )
+            }
             width={200}
             flexGrow={1}
           />
@@ -51,7 +55,7 @@ export const SigningsTable = ({ signings, height, showTeam }) => {
           <Column
             label="Pos."
             dataKey="player.poste"
-            cellDataGetter={({ rowData }) => rowData.player.poste }
+            cellDataGetter={({ rowData }) => rowData.player.poste}
             width={20}
           />
 
@@ -80,4 +84,8 @@ export const SigningsTable = ({ signings, height, showTeam }) => {
       )}
     </AutoSizer>
   );
+};
+
+SigningsTable.defaultProps = {
+  hyperlinks: true
 };
