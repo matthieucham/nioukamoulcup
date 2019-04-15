@@ -14,8 +14,7 @@ const mapStateToProps = state => {
 }
 
 
-const Page = ({ team }) => {
-
+const Page = ({ team, palmares }) => {
 		return (
 			<div className="react-app-inner">
 			<main>
