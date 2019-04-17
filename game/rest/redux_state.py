@@ -25,7 +25,7 @@ class StateInitializerMixin:
             'apiroot': reverse('api-root', request=request),
         }
         clubs_serializer = serializers.ClubSerializer(
-            l1models.Club.objects.filter(participations__est_courante__isnull=False), many=True,
+            l1models.Club.objects.all(), many=True,
             context={'request': request})
         self.initial_state['clubs'] += self._to_json(clubs_serializer)
 

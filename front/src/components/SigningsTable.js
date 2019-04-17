@@ -63,10 +63,10 @@ export const SigningsTable = ({ signings, height, showTeam, hyperlinks }) => {
             label="Montant"
             dataKey="amount"
             cellDataGetter={({ rowData }) => {
-              if (rowData.attributes.amount) {
-                return rowData.attributes.amount + " Ka";
-              } else {
+              if (rowData.attributes.pick_order) {
                 return "Drafté (Choix " + rowData.attributes.pick_order + " )";
+              } else {
+                return rowData.attributes.amount + " Ka";
               }
             }}
             width={200}

@@ -138,7 +138,9 @@ export class TeamRankingTable extends Component {
               label="Prog."
               dataKey="previous_score"
               cellDataGetter={({ rowData }) =>
+              rowData["previous_score"] ?
                 "+" + (rowData["score"] - rowData["previous_score"]).toFixed(1)
+                : ""
               }
               width={80}
             />

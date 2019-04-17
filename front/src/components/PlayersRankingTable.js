@@ -8,7 +8,7 @@ import { StyledPlayerFilter } from "./common/PlayerFilter";
 export class PlayersRankingTable extends Component {
   constructor(props) {
     super(props);
-
+    
     const orderedPlayers = props.players
       .sort(this._sortByScore("scores." + props.phases[0]["id"]))
       .reverse()

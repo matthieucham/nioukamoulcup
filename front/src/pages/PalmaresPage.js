@@ -12,6 +12,7 @@ const mapStateToProps = state => {
     playersRanking: state.data.palmares.initial.players_ranking,
     onPlayersTab: idle,
     hyperlinks: false,
+    title: `${state.data.palmares.initial.league_instance_name} : ${state.data.palmares.initial.league_instance_slogan}`
   };
 };
 
