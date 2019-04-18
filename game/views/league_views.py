@@ -15,6 +15,7 @@ from django.http import HttpResponseRedirect
 from .ensure_csrf_cookie_mixin import EnsureCsrfCookieMixin
 from django.db import transaction
 from collections import defaultdict
+from utils.timer import timed
 from statistics import mean, StatisticsError
 from graphos.sources.model import SimpleDataSource
 from graphos.renderers.morris import LineChart

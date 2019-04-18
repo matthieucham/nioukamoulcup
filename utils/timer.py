@@ -1,5 +1,9 @@
 import time
+import logging
 from django.conf import settings
+
+# Get an instance of a logger
+logger = logging.getLogger('django')
 
 
 def timed(func):
@@ -11,7 +15,6 @@ def timed(func):
             end = time.time()
             secs = end - start
             msecs = secs * 1000  # millisecs
-            if settings.DEBUG:
-                print('elapsed time for %s: %f ms' % (func.__name__, msecs))
+            logger.info('elapsed time for %s: %f ms' % (func.__name__, msecs))
 
     return func_wrapper
