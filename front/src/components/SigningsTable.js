@@ -5,8 +5,10 @@ import { format } from "date-fns";
 export class SigningsTable extends React.Component {
   constructor(props) {
     super(props);
-
-    const orderedSignings = props.signings.sort(this._defaultSortBy("begin"));
+    let orderedSignings = props.signings
+    if (props.signings) {
+      orderedSignings = props.signings.sort(this._defaultSortBy("begin"));
+    }
     this.state = {
       phases: props.phases,
       sortBy: "begin",
@@ -18,6 +20,13 @@ export class SigningsTable extends React.Component {
     };
 
     this._sort = this._sort.bind(this);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const orderedSignings = nextProps.signings.sort(this._defaultSortBy("begin"));
+    this.setState({
+      signings: orderedSignings
+    });
   }
 
   _sort({ sortBy, sortDirection }) {

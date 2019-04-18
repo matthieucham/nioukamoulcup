@@ -205,7 +205,7 @@ export class TeamHeader extends Component {
                 "signings",
                 REQUEST_SIGNINGS,
                 RECEIVE_SIGNINGS,
-                "-begin"
+                "begin"
               )
             )
         };
