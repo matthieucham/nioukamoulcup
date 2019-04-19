@@ -11,7 +11,6 @@ class StateInitializerMixin:
     Separate entities collected as is from associations between them
     """
 
-    @timed
     def _to_json(self, serializer):
         # return json.loads(str(JSONRenderer().render(serializer.data), 'utf-8'))
         return serializer.data
@@ -55,16 +54,24 @@ class StateInitializerMixin:
     @timed
     def init_from_league(self, request, league):
         self._init_common(request)
+        self.initial_state.update({'ranking': self._init_get_ranking(request, league)})
+        self.initial_state.update({'teams': self._init_get_teaminfo(request, league)})
+        self.initial_state.update({'league_id': league.id})
+        return self.initial_state
+
+    @timed
+    def _init_get_ranking(self, request, league):
         ranking_serializer = serializers.LeagueInstanceRankingSerializer(
             models.LeagueInstance.objects.get(league=league, current=True), context={'request': request})
+        return self._to_json(ranking_serializer)
+
+    @timed
+    def _init_get_teaminfo(self, request, league):
         teaminfo_serializer = serializers.TeamInfoSerializer(
             models.Team.objects.select_related('bank_account').select_related('division').filter(league=league),
             many=True,
             context={'request': request})
-        self.initial_state.update({'ranking': self._to_json(ranking_serializer)})
-        self.initial_state.update({'teams': self._to_json(teaminfo_serializer)})
-        self.initial_state.update({'league_id': league.id})
-        return self.initial_state
+        return self._to_json(teaminfo_serializer)
 
     @timed
     def init_from_merkatosession(self, request, session):

@@ -15,6 +15,6 @@ def timed(func):
             end = time.time()
             secs = end - start
             msecs = secs * 1000  # millisecs
-            logger.debug('elapsed time for %s: %f ms' % (func.__name__, msecs))
+            logger.info('elapsed time for %s: %f ms' % (func.__name__, msecs))
 
     return func_wrapper

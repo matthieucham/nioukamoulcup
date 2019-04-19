@@ -93,6 +93,7 @@ class LeagueEkypView(StateInitializerMixin, BaseLeagueView):
 class LeagueRankingView(StateInitializerMixin, BaseLeagueView):
     component = 'league'
 
+    @timed
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get a context
         context = super(LeagueRankingView, self).get_context_data(**kwargs)
