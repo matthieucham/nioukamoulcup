@@ -373,14 +373,14 @@ class PhaseRankingSerializer(serializers.ModelSerializer):
 
 
 class LeagueInstanceRankingSerializer(serializers.ModelSerializer):
-    # leagueinstancephase_set = PhaseRankingSerializer(many=True, read_only=True)
+    leagueinstancephase_set = PhaseRankingSerializer(many=True, read_only=True)
 
-    leagueinstancephase_set = serializers.SerializerMethodField()
-
-    # pour faciliter le travail d'optim
-    def get_leagueinstancephase_set(self, obj):
-        return PhaseRankingSerializer(obj.leagueinstancephase_set.filter(pk=6), many=True, read_only=True,
-                                      context=self.context).data
+    # leagueinstancephase_set = serializers.SerializerMethodField()
+    #
+    # # pour faciliter le travail d'optim
+    # def get_leagueinstancephase_set(self, obj):
+    #     return PhaseRankingSerializer(obj.leagueinstancephase_set.filter(pk=6), many=True, read_only=True,
+    #                                   context=self.context).data
 
     class Meta:
         model = league_models.LeagueInstance
