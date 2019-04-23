@@ -55,7 +55,7 @@ TEMPLATES[0]['OPTIONS']['loaders'] = [
 
 # CACHING
 # ------------------------------------------------------------------------------
-"""
+
 REDIS_LOCATION = '{0}/{1}'.format(env('REDIS_URL'), 0)
 CACHES = {
     'default': {
@@ -64,11 +64,20 @@ CACHES = {
         'OPTIONS': {
             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
             'IGNORE_EXCEPTIONS': True,  # mimics memcache behavior.
-                                        # http://niwinz.github.io/django-redis/latest/#_memcached_exceptions_behavior
+            # http://niwinz.github.io/django-redis/latest/#_memcached_exceptions_behavior
+        }
+    },
+    'expensive': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': REDIS_LOCATION,
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+            'IGNORE_EXCEPTIONS': True,  # mimics memcache behavior.
+            # http://niwinz.github.io/django-redis/latest/#_memcached_exceptions_behavior
+            'KEY_PREFIX': 'EXPENSIVE'
         }
     }
 }
-"""
 
 # LOGGING
 # ------------------------------------------------------------------------------

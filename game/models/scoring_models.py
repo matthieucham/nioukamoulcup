@@ -7,6 +7,7 @@ from ligue1 import models as l1models
 # from game import models as gamemodels
 from game.services import scoring
 from utils.timer import timed
+from utils.cache_expensive_functions import vary_on_leaguedata
 
 
 class SaisonScoring(models.Model):
@@ -107,6 +108,7 @@ class JJScoreManager(models.Manager):
         return self.filter(joueur=joueur, journee_scoring__saison_scoring=saison_scoring).order_by(
             'journee_scoring__journee__numero')
 
+    @vary_on_leaguedata
     def count_notes(self, saison, joueur_ids, max_by_joueur, journee_first=None, journee_last=None):
         notes_notnull = models.Count('note')
         queryset = self.filter(joueur__in=joueur_ids, journee_scoring__saison_scoring__saison=saison,
@@ -116,7 +118,8 @@ class JJScoreManager(models.Manager):
         if journee_last:
             queryset = queryset.filter(journee_scoring__journee__numero__lte=journee_last)
         queryset = queryset.values('joueur').annotate(notes_notnull=notes_notnull)
-        return sum([min(n, max_by_joueur) for n in queryset.values_list('notes_notnull', flat=True)])
+        result = sum([min(n, max_by_joueur) for n in queryset.values_list('notes_notnull', flat=True)])
+        return result
 
     def get_n_best_or_worst(self, numberof, saison, journee=None, poste=None, best=True):
         ofjournee = self.filter(journee_scoring__saison_scoring__saison=saison, note__isnull=False).filter(note__gt=0)

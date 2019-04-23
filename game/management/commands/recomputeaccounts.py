@@ -2,6 +2,7 @@ from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 from game import models as gamemodels
 import decimal
+from utils.cache_expensive_functions import flush_cache
 
 
 class Command(BaseCommand):
@@ -98,4 +99,5 @@ class Command(BaseCommand):
                                                                      info=info))
                     account.save()
                 # TODO block current PA values
+            flush_cache()
             self.stdout.write('League instance %d done.' % league_id)

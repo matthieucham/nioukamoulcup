@@ -1,6 +1,7 @@
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 from game import models as gamemodels
+from utils.cache_expensive_functions import flush_cache
 
 
 class Command(BaseCommand):
@@ -34,6 +35,7 @@ class Command(BaseCommand):
                                                            current=True):  # "current" means the game is still on
             for j in jjs_list:
                 self.stdout.write('Computing scores of instance %s for journee %s' % (li.name, j.journee))
+                flush_cache()
                 gamemodels.LeagueInstancePhaseDay.objects.compute_results(li, j.journee)
             gamemodels.LeagueInstancePhaseDay.objects.compute_current_results(li)
             licount += 1

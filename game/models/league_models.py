@@ -9,6 +9,7 @@ from . import scoring_models
 from ligue1 import models as l1models
 from utils.timer import timed
 from django.utils import timezone
+from utils.cache_expensive_functions import vary_on_leaguedata
 
 
 class League(models.Model):
@@ -206,6 +207,8 @@ class BankAccountHistory(models.Model):
 
 
 class LeagueInstanceManager(models.Manager):
+
+    @vary_on_leaguedata
     def get_current(self, league):
         return self.filter(league=league, current=True).first()
 
@@ -423,6 +426,18 @@ class SigningManager(models.Manager):
             signing.attributes['end_amount'] = float(amount)
         signing.attributes['ending'] = False  # ending done.
         signing.save()
+
+    @vary_on_leaguedata
+    def count_current_signings_for_team(self, team, instance):
+        total = 0
+        output = dict()
+        for spcount in self.select_related('joueur').filter(team=team, end__isnull=True,
+                                                            league_instance=instance).values(
+                'player__poste').annotate(models.Count('player')):
+            total += spcount['player__count']
+            output.update({spcount['player__poste']: spcount['player__count']})
+        output.update({'total': total})
+        return output
 
 
 class Signing(models.Model):

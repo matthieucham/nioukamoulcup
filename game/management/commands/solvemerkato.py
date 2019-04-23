@@ -4,6 +4,7 @@ from django.db import transaction
 from game import models as gamemodels
 from game.services import auctions
 from django.utils import timezone
+from utils.cache_expensive_functions import flush_cache
 
 
 class Command(BaseCommand):
@@ -26,6 +27,7 @@ class Command(BaseCommand):
             self.stdout.write('Solving draft session #%s ...' % ds.pk)
             auctions.solve_draft_session(ds)
             self.stdout.write('Done')
+            flush_cache()
         self.stdout.write('_solve_drafts completed.')
 
     def _solve_merkatos(self):
@@ -37,4 +39,5 @@ class Command(BaseCommand):
             auctions.solve_session(ms)
             auctions.apply_transfers(ms)
             self.stdout.write('Done')
+            flush_cache()
         self.stdout.write('_solve_merkatos completed.')

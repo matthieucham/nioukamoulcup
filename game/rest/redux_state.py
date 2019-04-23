@@ -68,7 +68,9 @@ class StateInitializerMixin:
     @timed
     def _init_get_teaminfo(self, request, league):
         teaminfo_serializer = serializers.TeamInfoSerializer(
-            models.Team.objects.select_related('bank_account').select_related('division').filter(league=league),
+            models.Team.objects.select_related('bank_account').select_related('league').select_related(
+                'division').filter(
+                league=league),
             many=True,
             context={'request': request})
         return self._to_json(teaminfo_serializer)

@@ -10,6 +10,7 @@ from ligue1 import models as l1models
 from game.services import auctions
 from utils.timer import timed
 import simplejson as json
+from utils.cache_expensive_functions import vary_on_leaguedata
 
 
 class ClubSerializer(serializers.ModelSerializer):
@@ -475,16 +476,9 @@ class TotalSignings(serializers.Field):
 
 class CurrentSignings(serializers.Field):
     def to_representation(self, value):
-        total = 0
-        output = dict()
-        for spcount in league_models.Signing.objects.filter(team=value, end__isnull=True,
-                                                            league_instance=league_models.LeagueInstance.objects.get_current(
-                                                                value.league)).values(
-            'player__poste').annotate(models.Count('player')):
-            total += spcount['player__count']
-            output.update({spcount['player__poste']: spcount['player__count']})
-        output.update({'total': total})
-        return output
+        return league_models.Signing.objects.count_current_signings_for_team(value,
+                                                                             league_models.LeagueInstance.objects.get_current(
+                                                                                 value.league))
 
 
 class SigningsAggregationSerializer(serializers.Serializer):
@@ -567,11 +561,15 @@ class TeamInfoByDivisionSerializer(serializers.ListSerializer):
         if not iterable:
             return super().to_representation(instance)
         one_team = iterable[0]
+        divs = list()
         for div in league_models.LeagueDivision.objects.filter(
                 league=one_team.league).order_by('level'):
             div_teams = super().to_representation(
-                league_models.Team.objects.filter(division=div).order_by('name'))
-            yield {'id': div.id, 'name': div.name, 'teams': div_teams}
+                league_models.Team.objects.select_related('league').select_related('division').select_related(
+                    'bank_account').filter(division=div).order_by('name'))
+            # yield {'id': div.id, 'name': div.name, 'teams': div_teams}
+            divs.append({'id': div.id, 'name': div.name, 'teams': div_teams})
+        return divs
 
 
 class TeamInfoSerializer(TeamHdrSerializer):
