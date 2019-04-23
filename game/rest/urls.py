@@ -1,4 +1,5 @@
 from django.conf.urls import url, include
+from django.views.decorators.cache import cache_page
 from rest_framework.urlpatterns import format_suffix_patterns
 from game.rest import league, apiroot_view
 
@@ -15,7 +16,7 @@ urlpatterns = format_suffix_patterns([
         league.LeagueResultsByJourneeListView.as_view(),
         name='league-journeeteam'),
     url(r'^leagues/(?P<league_pk>[0-9]+)/players$',
-        league.NewPlayersRankingView.as_view()),
+        cache_page(60 * 15)(league.NewPlayersRankingView.as_view())),
     url(r'^leagues/(?P<league_pk>[0-9]+)/merkatos$',
         league.LeagueMerkatosListView.as_view(),
         name='league_merkatos-list'),
