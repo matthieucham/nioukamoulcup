@@ -27,7 +27,7 @@
 {% endblock content-right %}
 
 {% block content-center-home %}
-{% cache 900 statsjoueur %}
+{% cache 900 statsjoueur joueur.pk %}
 <section id="section-title">
     {% club_logo joueur.club 'medium' %}
     <h1>{{ joueur.display_name }}</h1>
