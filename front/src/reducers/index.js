@@ -175,6 +175,10 @@ const merkatos = combineReducers({
   initial
 });
 
+const all_clubs = (state = {}, action) => {
+  return state;
+};
+
 const data = combineReducers({
   players,
   clubs,
@@ -183,7 +187,8 @@ const data = combineReducers({
   merkatosession,
   draftsession,
   merkatos,
-  palmares
+  palmares,
+  all_clubs
 });
 
 const rootReducer = combineReducers({

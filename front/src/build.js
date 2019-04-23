@@ -38,7 +38,9 @@ const pages = {
 	'palmares': PalmaresPage
 };
 
-const preloadedStateSchema = { players: Schemas.PLAYER_ARRAY, clubs: Schemas.CLUB_ARRAY };
+console.log(preloadedState);
+
+const preloadedStateSchema = { players: Schemas.PLAYER_ARRAY, clubs: Schemas.CLUB_ARRAY, all_clubs: Schemas.CLUB_ARRAY };
 const normalizedData = normalize(preloadedState, preloadedStateSchema);
 const initialState = {
 	data: {
@@ -74,6 +76,11 @@ const initialState = {
 		},
 		palmares: {
 			initial: normalizedData.result.palmares
+		},
+		all_clubs: {
+			allIds: normalizedData.result.all_clubs,
+			byId: normalizedData.entities.all_clubs,
+			flat: preloadedState.all_clubs
 		}
 	},
 };

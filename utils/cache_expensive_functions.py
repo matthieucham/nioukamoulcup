@@ -26,8 +26,10 @@ def make_key(key, key_prefix, version):
 
 
 def vary_on_leaguedata(func):
+    key_prefix = 'LEAGUEDATA'
+
     def func_wrapper(*args, **kwargs):
-        key = make_key(_build_cachekey(func.__qualname__, args, kwargs), '', 1)
+        key = make_key(_build_cachekey(func.__qualname__, args, kwargs), key_prefix, 1)
         cached = cache.get(key)
         if cached is None:
             cached = func(*args, **kwargs)

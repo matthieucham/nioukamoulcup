@@ -72,9 +72,8 @@ CACHES = {
         'LOCATION': REDIS_LOCATION,
         'OPTIONS': {
             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
-            'IGNORE_EXCEPTIONS': True,  # mimics memcache behavior.
+            'IGNORE_EXCEPTIONS': True  # mimics memcache behavior.
             # http://niwinz.github.io/django-redis/latest/#_memcached_exceptions_behavior
-            'KEY_PREFIX': 'EXPENSIVE'
         }
     }
 }
