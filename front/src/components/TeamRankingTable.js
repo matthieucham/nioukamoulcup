@@ -42,6 +42,15 @@ export class TeamRankingTable extends Component {
             sortBy={sortBy}
             sortDirection={sortDirection}
           >
+            <Column 
+              label="" 
+              dataKey="index" 
+              cellDataGetter={({rowData}) => this.state.teams.indexOf(rowData)+1}
+              className="rowIndex"
+              width={20} 
+              disableSort
+            />
+
             <Column label="Rang" dataKey="rank" width={60} />
 
             <Column

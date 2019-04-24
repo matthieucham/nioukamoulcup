@@ -155,6 +155,11 @@ table.ktable-class .ktable-heading-class {
     background-color: #f1f1f1;
 }
 
+.rowIndex {
+    font-size: 0.7em;
+    color: #cccccc;
+}
+
 .team-header section {
     width: 100%;
     padding: 0 10px;

@@ -101,6 +101,16 @@ export class PlayersRankingTable extends Component {
                   : "bigtable__odd"
               }
             >
+
+            <Column 
+              label="" 
+              dataKey="index" 
+              cellDataGetter={({rowData}) => this.state.players.indexOf(rowData)+1}
+              className="rowIndex"
+              width={20} 
+              disableSort
+            />
+
               <Column
                 label="Rang"
                 cellDataGetter={({ rowData }) => rowData.index}
