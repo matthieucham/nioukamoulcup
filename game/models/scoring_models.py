@@ -151,7 +151,7 @@ class JJScore(models.Model):
     note = models.DecimalField(max_digits=5, decimal_places=3, blank=True, null=True)
     bonus = models.DecimalField(max_digits=5, decimal_places=3, blank=False, null=False, default=0)
     compensation = models.DecimalField(max_digits=5, decimal_places=3, blank=True, null=True)
-    details = JSONField(default=dict())
+    details = JSONField(default=dict)
 
     objects = JJScoreManager()
 
@@ -219,7 +219,7 @@ class SJScore(models.Model):
     nb_notes = models.PositiveIntegerField(null=False, default=0)
     total_bonuses = models.DecimalField(max_digits=6, decimal_places=3, blank=False, null=False, default=0)
     sum_compensations = models.DecimalField(max_digits=6, decimal_places=3, blank=True, null=True)
-    details = JSONField(default=dict())
+    details = JSONField(default=dict)
 
     objects = SJScoreManager()
 

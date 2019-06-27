@@ -31,7 +31,10 @@ class BaseLeagueView(EnsureCsrfCookieMixin, PermissionRequiredMixin, DetailView)
         return LeagueInstance.objects.get_current(league=self.get_object())
 
     def get_my_team(self):
-        return LeagueMembership.objects.get(user=self.request.user, league=self.get_object()).team
+        try:
+            return LeagueMembership.objects.get(user=self.request.user, league=self.get_object()).team
+        except LeagueMembership.DoesNotExist:
+            return None
 
     def get_context_data(self, **kwargs):
         self.object = self.get_object()
