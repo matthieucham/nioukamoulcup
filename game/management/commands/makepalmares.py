@@ -32,13 +32,13 @@ class Command(BaseCommand):
                     "number"]).items():
                     if plid not in score_by_id:
                         score_by_id.update({plid: dict({'scores': []})})
-                        score_by_id[plid]['scores'].append(dict({'phase': phranking["id"], 'score': score}))
+                    score_by_id[plid]['scores'].append(dict({'phase': phranking["id"], 'score': score}))
             # Classement des joueurs
             players_qs = (
                 l1models.Joueur.objects.filter(performances__rencontre__journee__saison=instance.saison)
             ).distinct().order_by('club__nom', 'nom')
             full_players_ranking = serializers.NewPlayersRankingSerializer(
-                context={'scoring_map': score_by_id, 'phases': [{'id': ph['id'] for ph in store_phases}],
+                context={'scoring_map': score_by_id, 'phases': [{'id': ph['id']} for ph in store_phases],
                          'request': None}, many=True).to_representation(players_qs)
 
             # ne conserver que ceux qui ont au moins un score:
