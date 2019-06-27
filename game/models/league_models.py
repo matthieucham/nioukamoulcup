@@ -222,7 +222,7 @@ class LeagueInstance(models.Model):
     end = models.DateTimeField(blank=False)
     saison = models.ForeignKey(l1models.Saison, on_delete=models.CASCADE)
     configuration = JSONField(
-        default=dict({'notes': {'HALFSEASON': 13, 'FULLSEASON': 26, 'TOURNAMENT': 3}}))
+        default=lambda: dict({'notes': {'HALFSEASON': 13, 'FULLSEASON': 26, 'TOURNAMENT': 3}}))
 
     objects = LeagueInstanceManager()
 
@@ -433,7 +433,7 @@ class SigningManager(models.Manager):
         output = dict()
         for spcount in self.select_related('joueur').filter(team=team, end__isnull=True,
                                                             league_instance=instance).values(
-                'player__poste').annotate(models.Count('player')):
+            'player__poste').annotate(models.Count('player')):
             total += spcount['player__count']
             output.update({spcount['player__poste']: spcount['player__count']})
         output.update({'total': total})
@@ -446,7 +446,7 @@ class Signing(models.Model):
     league_instance = models.ForeignKey(LeagueInstance, on_delete=models.CASCADE)
     begin = models.DateTimeField(auto_now_add=True, db_index=True)
     end = models.DateTimeField(null=True, db_index=True)
-    attributes = JSONField(default=dict({'score_factor': 1.0}))
+    attributes = JSONField(default=lambda: dict({'score_factor': 1.0}))
 
     objects = SigningManager()
 
