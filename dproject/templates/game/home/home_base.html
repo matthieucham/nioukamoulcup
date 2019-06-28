@@ -1,14 +1,27 @@
 {% extends "game/game_base.html" %}
 {% load static %}
+{% load cache %}
 
+
+{% cache 900 leftmenu %}
 {% block left-menu %}
     {% include 'game/home/menu.html' %}
 {% endblock left-menu %}
+{% endcache %}
 
+{% cache 900 homemain %}
 {{% block content-center %}
     <article id="home-main">
         {% block content-center-home %}{% endblock content-center-home %}
     </article>
-{% endblock content-center %}
 
-{% block col-right %}<aside class="hg__right">{% block content-right %}{% endblock content-right %}</aside>{% endblock col-right %}
+{% endblock content-center %}
+{% endcache %}
+
+{% cache 900 colright request.user.username %}
+{% block col-right %}
+    <aside class="hg__right">
+        {% block content-right %}{% endblock content-right %}
+    </aside>
+{% endblock col-right %}
+{% endcache %}
