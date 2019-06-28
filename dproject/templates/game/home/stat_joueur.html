@@ -1,6 +1,5 @@
 {% extends "game/home/home_base.html" %}
 {% load static %}
-{% load cache %}
 {% load l1results %}
 {% load game %}
 {% load i18n %}
@@ -27,7 +26,6 @@
 {% endblock content-right %}
 
 {% block content-center-home %}
-{% cache 900 statsjoueur joueur.pk %}
 <section id="section-title">
     {% club_logo joueur.club 'medium' %}
     <h1>{{ joueur.display_name }}</h1>
@@ -159,6 +157,5 @@
             {% endfor %}
         </div>
     </section>
-    {% endcache %}
 
     {% endblock content-center-home %}

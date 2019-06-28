@@ -10,15 +10,15 @@ from .views import ResultRencontreView, ClubView, StatView, StatJoueurView, Resu
     LeagueRegisterTransitionView, LeaguePalmaresView
 
 home_urls = [
-    url(r'^info/$', cache_page(60 * 15)(LeagueEntryDetail.as_view()), name="home_info"),
+    url(r'^info/$', LeagueEntryDetail.as_view(), name="home_info"),
     url(r'^info/', include('zinnia.urls')),
-    url(r'^result/rencontre/(?P<pk>[0-9]+)/$', cache_page(60 * 15)(ResultRencontreView.as_view()),
+    url(r'^result/rencontre/(?P<pk>[0-9]+)/$', ResultRencontreView.as_view(),
         name="result_rencontre-detail"),
-    url(r'^result/club/(?P<pk>[0-9]+)/$', cache_page(60 * 15)(ClubView.as_view()), name="club-detail"),
-    url(r'^stat/$', cache_page(60 * 15)(StatView.as_view()), name="stat-detail"),
+    url(r'^result/club/(?P<pk>[0-9]+)/$', ClubView.as_view(), name="club-detail"),
+    url(r'^stat/$', StatView.as_view(), name="stat-detail"),
     url(r'^stat/joueur/(?P<pk>[0-9]+)/$', StatJoueurView.as_view(), name="stat_joueur-detail"),
-    url(r'^result/journee/latest/$', cache_page(60 * 15)(ResultJourneeView.as_view()), name="result_journee-latest"),
-    url(r'^result/journee/(?P<pk>[0-9]+)/$', cache_page(60 * 15)(ResultJourneeView.as_view()),
+    url(r'^result/journee/latest/$', ResultJourneeView.as_view(), name="result_journee-latest"),
+    url(r'^result/journee/(?P<pk>[0-9]+)/$', ResultJourneeView.as_view(),
         name="result_journee-detail"),
 ]
 

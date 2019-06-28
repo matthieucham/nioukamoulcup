@@ -15,7 +15,7 @@
             {% leagues_navbar_content %}
         </li>
         {% endif %}
-        <li class="{% is_navbar_active request 'wiki' %}"><a href="#">Wiki</a></li>
+        <li class="{% is_navbar_active request 'wiki' %}"><a href="{% url 'wiki:root' %}">Wiki</a></li>
         {% if user.is_authenticated %}
         <li class="{% is_navbar_active request 'accounts' %}">
             <label for="drop-2" class="toggle">{{ user.get_username }}&nbsp;<i class="fa fa fa-gear"></i></label>
