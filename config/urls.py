@@ -16,6 +16,7 @@ Including another URLconf
 from django.conf import settings
 from django.conf.urls.static import static
 from django.conf.urls import url, include
+from django.urls import path
 from django.contrib import admin
 # from wiki.urls import get_pattern as get_wiki_pattern
 # from django_nyt.urls import get_pattern as get_nyt_pattern
@@ -29,8 +30,8 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^accounts/', include('userena.urls')),
     url(r'^comments/', include('django_comments.urls')),
-    # url(r'^notifications/', get_nyt_pattern()),
-    # url(r'^wiki/', get_wiki_pattern()),
+    path('notifications/', include('django_nyt.urls')),
+    path('wiki/', include('wiki.urls')),
     url(r'^import/', admin_import_site.urls, name='import'),
     url(r'^contact/', include('contact_form.urls')),
 ]

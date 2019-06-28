@@ -47,21 +47,13 @@ THIRD_PARTY_APPS = (
     'userena',
     'guardian',
     'easy_thumbnails',
+    'django_nyt.apps.DjangoNytConfig',
     'mptt',
     'tagging',
     'ckeditor',
     'zinnia',
     'zinnia_ckeditor',
     'django_comments',
-    # dj-wiki
-    # 'django_nyt',
-    # 'sekizai',
-    # 'sorl.thumbnail',
-    # 'wiki',
-    # 'wiki.plugins.attachments',
-    # 'wiki.plugins.notifications',
-    # 'wiki.plugins.images',
-    # 'wiki.plugins.macros',
     'graphos',
     'colorful',
     'svg',
@@ -70,6 +62,13 @@ THIRD_PARTY_APPS = (
     'rest_framework',
     'dry_rest_permissions',
     'contact_form',
+    'sekizai',
+    'sorl.thumbnail',
+    'wiki.apps.WikiConfig',
+    'wiki.plugins.attachments.apps.AttachmentsConfig',
+    'wiki.plugins.notifications.apps.NotificationsConfig',
+    'wiki.plugins.images.apps.ImagesConfig',
+    'wiki.plugins.macros.apps.MacrosConfig',
 )
 
 # Apps specific for this project go here.
@@ -319,7 +318,7 @@ REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': (
         'django_filters.rest_framework.DjangoFilterBackend',
     ),
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 40,
     'COERCE_DECIMAL_TO_STRING': False,
 }
@@ -364,3 +363,6 @@ STATNUTS_NKCUP_PWD = 'nioukamoulcupimport'
 TEMPLATE_STRING_IF_INVALID = ''
 
 ZINNIA_ENTRY_BASE_MODEL = 'game.models.EntryLeague'
+
+# Wiki
+WIKI_ACCOUNT_HANDLING = False
