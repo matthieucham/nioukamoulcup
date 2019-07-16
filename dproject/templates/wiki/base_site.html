@@ -1,0 +1,70 @@
+{% load sekizai_tags i18n wiki_tags static %}<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>{% block wiki_pagetitle %}{% endblock %}{% block wiki_site_title %} - django-\/\/  i K |{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="icon" type="image/png" href="{% static 'game/images/favicon-32x32.png' %}" sizes="32x32" />
+    <link rel="icon" type="image/png" href="{% static 'game/images/favicon-16x16.png' %}" sizes="16x16" />
+
+    <!-- Le styles -->
+    <link href="{% static "wiki/bootstrap/css/wiki-bootstrap.min.css" %}" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="{% static 'game/css/nkcup-layout.css' %}">
+    <link rel="stylesheet" href="{% static 'game/css/nkcup-style.css' %}">
+
+    {% render_block "css" %}
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+          <!-- Hotjar Tracking Code for www.kamoulcup.com -->
+<script>
+    (function(h,o,t,j,a,r){
+        h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
+        h._hjSettings={hjid:1393820,hjsv:6};
+        a=o.getElementsByTagName('head')[0];
+        r=o.createElement('script');r.async=1;
+        r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
+        a.appendChild(r);
+    })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
+</script>
+  </head>
+
+  <body class="hg">
+
+    {% block wiki_body %}
+
+    {% block wiki_navbar %}
+    {% endblock %}
+
+    <div class="hg__body">
+        {% block col-center %}<main class="hg__main">
+            {% block content-center %}
+            <!-- Reserved for breadcrumbs -->
+            {% block wiki_breadcrumbs %}{% endblock %}
+
+            <!-- Main page contents go here -->
+            {% block wiki_contents %}{% endblock %}{% endblock content-center %}
+        </main>{% endblock col-center %}
+        {% block col-right %}{% wiki_messages %}{% endblock col-right %}
+    </div>
+
+    <footer class="hg__footer">
+      <div>{% include '../game/footer.html' %}</div>
+    </footer>
+
+    {% endblock %}
+
+    <script src="{% static "wiki/js/jquery-3.3.1.min.js" %}"></script>
+    <script src="{% static "wiki/js/core.js" %}"></script>
+    <script src="{% static "wiki/bootstrap/js/bootstrap.min.js" %}"></script>
+    <!-- Optionally enable responsive features in IE8 -->
+    <script src="{% static "wiki/js/respond.min.js" %}"></script>
+    {% render_block "js" %}
+
+  </body>
+</html>

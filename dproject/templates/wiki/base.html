@@ -2,6 +2,12 @@
 
 {% block wiki_site_title %} - Kamoulcup Wiki{% endblock %}
 
+{% block wiki_navbar %}
+  <header class="hg__header">
+    {% block navbar %}{% include '../game/navbar.html' %}{% endblock navbar %}
+  </header>
+{% endblock%}
+
 {% block wiki_header_branding %}
 <a href="{% url 'home_info' %}" class="navbar-left navbar-brand">Kamoulcup</a>
 {% endblock %}
