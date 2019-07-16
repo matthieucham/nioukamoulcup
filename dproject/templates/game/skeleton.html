@@ -7,7 +7,9 @@
     <title>{% block title %}{% endblock title %}{% block title-page %}{% endblock title-page %} - Kamoulcup</title>
     <meta name="robots" content="follow, all"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <link rel="shortcut icon" type="image/png" href="{% static 'game/images/favicon.png' %}"/>
+    <link rel="icon" type="image/png" href="{% static 'game/images/favicon-32x32.png' %}" sizes="32x32" />
+    <link rel="icon" type="image/png" href="{% static 'game/images/favicon-16x16.png' %}" sizes="16x16" />
+
     <meta name="description" content="{% block meta-description %}{% trans "Le jeu de fantasy football basé sur la Ligue 1 qui va vous faire apprécier les 0-0" %}{% endblock meta-description %}{% block meta-description-page %}{% endblock meta-description-page %}" />
     <meta name="keywords"
           content="{% block meta-keywords %}Fantasy, football, ligue 1, game, roto, rotisserie, Jean-Jacques Gosso{% endblock meta-keywords %}"/>
