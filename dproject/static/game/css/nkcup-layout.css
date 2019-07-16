@@ -163,6 +163,10 @@ div.react-app-inner > main {
     }
 }
 
+div.wiki-wrapper-div {
+    padding: 2em;
+}
+
 
 /* MENU NAVBAR */
 .toggle,[id^=drop] {

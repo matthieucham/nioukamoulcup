@@ -43,12 +43,14 @@
 
     <div class="hg__body">
         {% block col-center %}<main class="hg__main">
+        <div class="wiki-wrapper-div">
             {% block content-center %}
             <!-- Reserved for breadcrumbs -->
             {% block wiki_breadcrumbs %}{% endblock %}
 
             <!-- Main page contents go here -->
             {% block wiki_contents %}{% endblock %}{% endblock content-center %}
+          </div>
         </main>{% endblock col-center %}
         {% block col-right %}{% wiki_messages %}{% endblock col-right %}
     </div>
