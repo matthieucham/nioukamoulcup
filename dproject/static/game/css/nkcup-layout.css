@@ -167,6 +167,15 @@ div.wiki-wrapper-div {
     padding: 2em;
 }
 
+div.wiki-article {
+    max-width: 60em;
+}
+
+@media screen and (max-width: 768px) {
+    div.wiki-article {
+        max-width: 40em;
+    }
+}
 
 /* MENU NAVBAR */
 .toggle,[id^=drop] {
