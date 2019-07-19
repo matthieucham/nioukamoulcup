@@ -1,12 +1,12 @@
 {% load game %}
 {% block left-menu %}
     <header><h1>{{ league.name }}</h1></header>
-    <a href="{% url 'league_wall-detail' object.id %}" class="button {% is_navbar_active request 'wall' %}">Mur</a>
+    <a href="{% url 'league_wall-detail' object.id %}" class="{% is_navbar_active request 'wall' %}">Mur</a>
     <a href="{% url 'league_ekyp-detail' object.id %}"
-       class="button {% is_navbar_active request 'ekyp' %}">{{ team.name }}</a>
-    <a href="{% url 'league_ranking-detail' object.id %}" class="button {% is_navbar_active request 'ranking' %}">Classement</a>
+       class="{% is_navbar_active request 'ekyp' %}">{{ team.name }}</a>
+    <a href="{% url 'league_ranking-detail' object.id %}" class="{% is_navbar_active request 'ranking' %}">Classement</a>
     <a href="{% url 'league_merkato' object.id %}"
-       class="button {% is_navbar_active request 'merkato' %}">Merkato</a>
+       class="{% is_navbar_active request 'merkato' %}">Merkato</a>
     <a href="{% url 'league_palmares-latest' object.id %}"
-       class="button {% is_navbar_active request 'palmares' %}">Palmarès</a>
+       class="{% is_navbar_active request 'palmares' %}">Palmarès</a>
 {% endblock left-menu %}
