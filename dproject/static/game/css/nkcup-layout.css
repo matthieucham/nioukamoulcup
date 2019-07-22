@@ -171,6 +171,24 @@ div.wiki-article {
     max-width: 60em;
 }
 
+div.wiki-article p{
+    margin: 0 0 1em;
+}
+
+div.wiki-article ul {
+    list-style: disc;
+    margin: 0 0 1em;
+}
+
+div.wiki-article ul ul{
+    list-style: circle;
+}
+
+div.wiki-article li{
+    margin: 0 1em 0;
+    list-style: inherit;
+}
+
 @media screen and (max-width: 768px) {
     div.wiki-article {
         max-width: 40em;
