@@ -32,7 +32,7 @@ class ClubView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(ClubView, self).get_context_data(**kwargs)
-        saisonscoring = SaisonScoring.objects.filter(saison__est_courante__isnull=False).first()
+        saisonscoring = SaisonScoring.objects.get_current()
         context['players'] = []
         deco_joueurs = self.object.joueurs.filter(sjscore__saison_scoring=saisonscoring).annotate(
             nb_notes=F('sjscore__nb_notes')).annotate(avg_note=F('sjscore__avg_note')).annotate(
@@ -60,7 +60,7 @@ class StatJoueurView(DetailView):
         # Call the base implementation first to get a context
         context = super(StatJoueurView, self).get_context_data(**kwargs)
         # Step 1: Create a DataPool with the data we want to retrieve.
-        saisonscoring = SaisonScoring.objects.filter(saison__est_courante__isnull=False).first()
+        saisonscoring = SaisonScoring.objects.get_current()
         jjscores = JJScore.objects.list_scores_for_joueur(joueur=self.object,
                                                           saison_scoring=saisonscoring) \
             .select_related('rencontre__club_domicile') \
@@ -141,7 +141,8 @@ class ResultJourneeView(DetailView):
         pk = self.kwargs.get(self.pk_url_kwarg)
         if pk is None:
             # retrieve latest journee
-            return l1models.Journee.objects.filter(saison__est_courante__isnull=False).order_by('-fin').first()
+            ss = SaisonScoring.objects.get_current()
+            return l1models.Journee.objects.filter(saison=ss.saison).order_by('-fin').first()
         else:
             return super(ResultJourneeView, self).get_object(queryset)
 

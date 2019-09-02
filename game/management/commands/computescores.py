@@ -19,8 +19,7 @@ class Command(BaseCommand):
     @transaction.atomic
     def handle(self, *args, **options):
         # prerequisite: statnuts import done
-        current_saisonscoring = gamemodels.SaisonScoring.objects.select_related('saison').filter(
-            saison__est_courante__isnull=False).first()
+        current_saisonscoring = gamemodels.SaisonScoring.objects.get_current()
         if not current_saisonscoring:
             raise CommandError('No saison marked as current')
         # update JJScores (ponctual scores of players)

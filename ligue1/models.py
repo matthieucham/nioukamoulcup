@@ -38,6 +38,10 @@ class Saison(Importe):
     def __str__(self):
         return self.nom
 
+    def est_courante(self):
+        scfound = self.saisoncourante_set.filter(saison__pk=self.pk).first()
+        return scfound is not None
+
 
 class SaisonCourante(models.Model):
     saison = models.ForeignKey(Saison, on_delete=models.CASCADE, related_name='est_courante')

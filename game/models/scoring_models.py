@@ -10,6 +10,17 @@ from utils.timer import timed
 from utils.cache_expensive_functions import vary_on_leaguedata
 
 
+class SaisonScoringManager(models.Manager):
+
+    def get_current(self):
+        currsc = l1models.SaisonCourante.objects.first()
+        if currsc is None:
+            return None
+        if currsc.saison is None:
+            return None
+        return self.filter(saison=currsc.saison).first()
+
+
 class SaisonScoring(models.Model):
     saison = models.ForeignKey(l1models.Saison, on_delete=models.CASCADE, null=False)
     computed_at = models.DateTimeField(auto_now=True)
@@ -44,6 +55,8 @@ class SaisonScoring(models.Model):
         l1models.Journee.objects.filter(saison=self.saison).delete()
         # jjscore et jouneescoring: cascade l'a déjà fait.
         pass
+
+    objects = SaisonScoringManager()
 
 
 class JourneeScoring(models.Model):
