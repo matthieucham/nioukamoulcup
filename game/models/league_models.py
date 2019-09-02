@@ -77,8 +77,8 @@ class TeamManager(models.Manager):
 
 class Team(models.Model):
     name = models.CharField(max_length=100, blank=False)
-    league = models.ForeignKey(League, on_delete=models.PROTECT, null=True)
-    division = models.ForeignKey(LeagueDivision, on_delete=models.PROTECT, null=True)
+    league = models.ForeignKey(League, on_delete=models.PROTECT, null=True, blank=True)
+    division = models.ForeignKey(LeagueDivision, on_delete=models.PROTECT, null=True, blank=True)
     attributes = JSONField(default=dict, blank=True)
     palmares = models.ManyToManyField('Palmares', through='TeamPalmaresRanking')
 

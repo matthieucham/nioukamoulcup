@@ -42,7 +42,9 @@ class JourneeScoringInline(InlineActionsMixin, admin.TabularInline):
 class SaisonScoringAdmin(InlineActionsModelAdminMixin, admin.ModelAdmin):
     list_display = ['saison', 'computed_at']
     model = models.SaisonScoring
-    actions = ['compute_scores_action', 'archive_saison_action']
+    actions = ['compute_scores_action',
+               # 'archive_saison_action'
+               ]
     inlines = [JourneeScoringInline]
 
     def has_delete_permission(self, request, obj=None):
@@ -53,17 +55,17 @@ class SaisonScoringAdmin(InlineActionsModelAdminMixin, admin.ModelAdmin):
             ss.compute()
         self.message_user(request, "Calcul effectué")
 
-    def archive_saison_action(self, request, queryset):
-        for ss in queryset:
-            if ss.saison.est_la_saison_courante():
-                self.message_user(request, "Impossible d'archiver la saison courante",
-                                  level=messages.ERROR)
-                continue
-            ss.archive()
-        self.message_user(request, "Saison archivée")
+    # def archive_saison_action(self, request, queryset):
+    #     for ss in queryset:
+    #         if ss.saison.est_la_saison_courante():
+    #             self.message_user(request, "Impossible d'archiver la saison courante",
+    #                               level=messages.ERROR)
+    #             continue
+    #         ss.archive()
+    #     self.message_user(request, "Saison archivée")
 
     compute_scores_action.short_description = "Recalculer les scores"
-    archive_saison_action.short_description = "Archiver"
+    # archive_saison_action.short_description = "Archiver"
 
 
 class MerkatoSessionInline(admin.TabularInline):
