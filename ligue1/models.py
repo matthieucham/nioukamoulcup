@@ -38,8 +38,8 @@ class Saison(Importe):
     def __str__(self):
         return self.nom
 
-    def est_courante(self):
-        scfound = self.saisoncourante_set.filter(saison__pk=self.pk).first()
+    def est_la_saison_courante(self):
+        scfound = self.est_courante.filter(saison__pk=self.pk).first()
         return scfound is not None
 
 

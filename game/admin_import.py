@@ -55,7 +55,7 @@ class SaisonScoringAdmin(InlineActionsModelAdminMixin, admin.ModelAdmin):
 
     def archive_saison_action(self, request, queryset):
         for ss in queryset:
-            if ss.saison.est_courante():
+            if ss.saison.est_la_saison_courante():
                 self.message_user(request, "Impossible d'archiver la saison courante",
                                   level=messages.ERROR)
                 continue
