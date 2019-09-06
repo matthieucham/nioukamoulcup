@@ -20,3 +20,9 @@ def getattribute(value, arg):
         return value[int(arg)]
     else:
         return settings.TEMPLATE_STRING_IF_INVALID
+
+
+# settings value
+@register.simple_tag
+def settings_value(name):
+    return getattr(settings, name, "")

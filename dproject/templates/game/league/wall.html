@@ -1,6 +1,7 @@
 {% extends "game/league/league_base.html" %}
 {% load humanize %}
 {% load tz %}
+{% load getattribute %}
 
 {% block title-page %} - Mur{% endblock title-page %}
 
@@ -10,22 +11,24 @@
 
 {% block col-right %}
 <aside class="hg__right">{% block content-right %}
+    {% settings_value "TIME_ZONE" %}
+    {% settings_value "USE_TZ" %}
     {% if next_draft %}
     <section>
         <h1>Prochaine draft</h1>
-        <p><a href="{% url 'league_merkato' object.pk %}">Du {{ next_draft.begin|date:"SHORT_DATETIME_FORMAT" }} au {{ next_draft.end|localtime }}</a></p>
+        <p><a href="{% url 'league_merkato' object.pk %}">Du {{ next_draft.begin|localtime }} au {{ next_draft.end|localtime }}</a></p>
     </section>
     {% endif %}
     {% if next_merkato %}
     <section>
         <h1>Prochain merkato</h1>
-        <p><a href="{% url 'league_merkato' object.pk %}">Du {{ next_merkato.begin|date:"SHORT_DATETIME_FORMAT" }} au {{ next_merkato.end|localtime }}</a></p>
+        <p><a href="{% url 'league_merkato' object.pk %}">Du {{ next_merkato.begin|localtime }} au {{ next_merkato.end|localtime }}</a></p>
     </section>
     {% endif %}
     {% if next_transition %}
     <section>
         <h1>Prochaine transition</h1>
-        <p><a href="{% url 'league_merkato' object.pk %}">Du {{ next_transition.begin|date:"SHORT_DATETIME_FORMAT" }} au {{ next_transition.end|localtime }}</a></p>
+        <p><a href="{% url 'league_merkato' object.pk %}">Du {{ next_transition.begin|localtime }} au {{ next_transition.end|localtime }}</a></p>
     </section>
     {% endif %}
     <p>Ici à l'avenir, des infos sur le merkato en cours et sur les derniers résultats</p>
