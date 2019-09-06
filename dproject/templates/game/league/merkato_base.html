@@ -15,7 +15,7 @@
     <ul>
         {% for session in draftsessions %}
             <li>
-                <a href="{% url 'league_draftresults-session' object.pk session.pk %}">Draft #{{ session.number }} du {{ session.closing|date:"SHORT_DATETIME_FORMAT" }}</a>
+                <a href="{% url 'league_draftresults-session' object.pk session.pk %}">Draft #{{ session.number }} du {{ session.closing|localtime }}</a>
             </li>
         {% endfor %}
     </ul>
@@ -25,7 +25,7 @@
     <ul>
         {% for session in sessions %}
             <li>
-                <a href="{% url 'league_merkatoresults-session' object.pk session.pk %}">Session #{{ session.number }} du {{ session.solving|date:"SHORT_DATETIME_FORMAT" }}</a>
+                <a href="{% url 'league_merkatoresults-session' object.pk session.pk %}">Session #{{ session.number }} du {{ session.solving|localtime }}</a>
             </li>
         {% endfor %}
     </ul>
