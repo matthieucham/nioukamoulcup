@@ -36,4 +36,5 @@ class PostViewSet(mixins.CreateModelMixin,
     #     return super(PostViewSet, self).create(request, *args, **kwargs)
 
     def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
+        group = get_object_or_404(Group.objects.all(), pk=self.kwargs['group'])
+        serializer.save(author=self.request.user, group=group)

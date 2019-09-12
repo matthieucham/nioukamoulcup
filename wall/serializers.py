@@ -6,6 +6,8 @@ from wall.models import Post
 class PostSerializer(serializers.ModelSerializer):
     replies = serializers.SerializerMethodField(read_only=True)
     author = serializers.SlugRelatedField('username', read_only=True)
+    edited = serializers.BooleanField(read_only=True)
+    hotlinked_picture = serializers.CharField(read_only=True)
 
     def get_replies(self, obj):
         reps = list()
@@ -15,5 +17,14 @@ class PostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Post
-        fields = '__all__'
+        fields = (
+            'created_at',
+            'updated_at',
+            'author',
+            'message',
+            'hotlinked_picture',
+            'in_reply_to',
+            'replies',
+            'edited',
+        )
 

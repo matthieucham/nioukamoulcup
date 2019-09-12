@@ -5,7 +5,7 @@ from wall.models import Group
 # Register your models here.
 class GroupAdmin(admin.ModelAdmin):
     model = Group
-    readonly_fields = ('id', )
+    list_display = ('name', 'id',)
 
 
 admin.site.register(Group, GroupAdmin)
