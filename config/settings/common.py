@@ -76,6 +76,7 @@ LOCAL_APPS = (
     'game',
     'accounts',
     'ligue1',
+    'wall'
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
