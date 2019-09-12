@@ -3,7 +3,6 @@ from django.db import models
 from django.contrib.auth.models import User
 import re
 import requests
-import imghdr
 from PIL import Image
 from io import BytesIO
 
@@ -15,20 +14,19 @@ def _find_urls_in_text(content):
     return urls
 
 
-def _is_url_of_picture(url):
+def _is_url_of_picture(url, min_size=150):
     try:
         img = requests.get(url)
         # check status code
         if img.status_code != 200:
             return False  # url invalide
-        whattype = imghdr.what(None, h=img.content)
-        if whattype is not None:
-            return True
         # Test with PIL because imghdr misses some formats
         try:
-            img = Image.open(BytesIO(requests.get(url).content))
-            img.verify()
-            return True  # valid image
+            im = Image.open(BytesIO(requests.get(url).content))
+            w, h = im.size
+            if w > min_size and h > min_size:
+                return True  # valid image
+            return False  # too small image
         except Exception:
             return False  # invalid image
 
@@ -36,29 +34,38 @@ def _is_url_of_picture(url):
         return False
 
 
-def _extract_hotlinked_picture(urls):
-    if not urls:
-        return None
-    for url in urls:
-        if _is_url_of_picture(url):
-            return url
-    # Aucune image trouvée: on repart pour un tour en scraping cette fois
+def _extract_hotlinked_title_and_pic(url):
     from bs4 import BeautifulSoup as BS
-    min_size = 50  # min pour une bonne image ?
-    for url in urls:
-        try:
-            page = requests.get(url)
-            soup = BS(page.text)
-            for imgtag in soup.find_all('img'):
-                imgsrc = imgtag['src']
-                if _is_url_of_picture(imgsrc):
-                    im = Image.open(BytesIO(requests.get(imgsrc).content))
-                    w, h = im.size
-                    if w > min_size and h > min_size:
-                        return imgsrc
-        except Exception as e:
-            continue  # on passe au lien suivant si celui ci ne fonctionne pas
-    return None
+    page = requests.get(url)
+    soup = BS(page.text)
+    title = None
+    for htag in soup.find_all('h1'):
+        if htag.text and len(htag.text.strip()) > 0:
+            title = htag.text.strip()
+            break
+    for imgtag in soup.find_all('img'):
+        imgsrc = imgtag.get('src')
+        if imgsrc and _is_url_of_picture(imgsrc):
+            return title, imgsrc
+    return title, None
+
+
+def _extract_hotlink_data(content):
+    # Are there any url in content ?
+    urls = _find_urls_in_text(content)
+    if not urls:
+        return None, None, None, content.strip()
+    c = content.strip()
+    # strip urls from code
+    for u in urls:
+        c = c.replace(u, '')
+    url = urls[0]
+    # extract data from url
+    if _is_url_of_picture(url):
+        return url, None, None, c
+
+    t, p = _extract_hotlinked_title_and_pic(url)
+    return url, p, t, c
 
 
 # Create your models here.
@@ -72,12 +79,16 @@ class Post(models.Model):
     message = models.TextField(null=False, blank=False, max_length=2000)
     message_blueprint = models.UUIDField(blank=True)  # protect against multi_submit
     hotlinked_picture = models.URLField(max_length=2000, null=True, blank=True)
+    hotlinked_url = models.URLField(max_length=2000, null=True, blank=True)
+    hotlinked_title = models.CharField(max_length=200, null=True, blank=True)
     edited = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
-        hl_urls = _find_urls_in_text(self.message)
-        if hl_urls:
-            self.hotlinked_picture = _extract_hotlinked_picture(hl_urls)
+        hl_url, hl_pic, hl_tit, clean_msg = _extract_hotlink_data(self.message)
+        self.hotlinked_url = hl_url
+        self.hotlinked_picture = hl_pic
+        self.hotlinked_title = hl_tit
+        self.message = clean_msg.strip()
         if self.in_reply_to:
             if self.in_reply_to.in_reply_to:
                 self.in_reply_to = self.in_reply_to.in_reply_to

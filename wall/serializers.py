@@ -8,6 +8,8 @@ class PostSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField('username', read_only=True)
     edited = serializers.BooleanField(read_only=True)
     hotlinked_picture = serializers.CharField(read_only=True)
+    hotlinked_url = serializers.CharField(read_only=True)
+    hotlinked_title = serializers.CharField(read_only=True)
 
     def get_replies(self, obj):
         reps = list()
@@ -22,7 +24,9 @@ class PostSerializer(serializers.ModelSerializer):
             'updated_at',
             'author',
             'message',
+            'hotlinked_url',
             'hotlinked_picture',
+            'hotlinked_title',
             'in_reply_to',
             'replies',
             'edited',
