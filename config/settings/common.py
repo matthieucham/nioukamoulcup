@@ -368,3 +368,10 @@ ZINNIA_ENTRY_BASE_MODEL = 'game.models.EntryLeague'
 
 # Wiki
 WIKI_ACCOUNT_HANDLING = False
+
+# Wall
+WALL = {
+    'CUSTOM_PERMISSION_CLASSES': [
+        'game.views.permissions.IsLeagueMemberOrAdmin',
+    ]
+}

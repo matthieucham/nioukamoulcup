@@ -208,7 +208,7 @@ class TeamInline(admin.TabularInline):
 
 class LeagueAdmin(InlineActionsModelAdminMixin, admin.ModelAdmin):
     model = models.League
-    readonly_fields = ('code',)
+    readonly_fields = ('code', 'wall_group',)
     inlines = [LeagueDivisionInline, TeamInline, LeagueInvitationInline, ]
 
 
