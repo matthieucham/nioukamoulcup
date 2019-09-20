@@ -1,6 +1,7 @@
 import uuid
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils.html import strip_tags
 import re
 import requests
 from PIL import Image
@@ -62,7 +63,7 @@ def _extract_hotlink_data(content):
     url = urls[0]
     # extract data from url
     if _is_url_of_picture(url):
-        return url, None, None, c
+        return None, url, None, c
 
     t, p = _extract_hotlinked_title_and_pic(url)
     return url, p, t, c
@@ -84,7 +85,8 @@ class Post(models.Model):
     edited = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
-        hl_url, hl_pic, hl_tit, clean_msg = _extract_hotlink_data(self.message)
+        safe_msg = strip_tags(self.message)
+        hl_url, hl_pic, hl_tit, clean_msg = _extract_hotlink_data(safe_msg)
         self.hotlinked_url = hl_url
         self.hotlinked_picture = hl_pic
         self.hotlinked_title = hl_tit
@@ -92,12 +94,15 @@ class Post(models.Model):
         if self.in_reply_to:
             if self.in_reply_to.in_reply_to:
                 self.in_reply_to = self.in_reply_to.in_reply_to
-        self.edited = self.pk is not None
-        self.message_blueprint = uuid.uuid3(uuid.NAMESPACE_URL, self.message)
+        self.edited = not self._state.adding
+        self.message_blueprint = uuid.uuid3(uuid.NAMESPACE_URL, safe_msg)
         return super(Post, self).save(*args, **kwargs)
 
     class Meta:
         unique_together = [['author', 'message_blueprint']]
+        indexes = [
+            models.Index(fields=['-created_at'])
+        ]
 
 
 class Group(models.Model):

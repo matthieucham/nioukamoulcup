@@ -11,6 +11,7 @@ from game.services import auctions
 from utils.timer import timed
 import simplejson as json
 from utils.cache_expensive_functions import vary_on_leaguedata
+from wall.serializers import PostSerializer
 
 
 class ClubSerializer(serializers.ModelSerializer):

@@ -1,11 +1,15 @@
 from django.apps import apps
 from django.conf import settings
 from django.shortcuts import get_object_or_404
-from rest_framework import viewsets, permissions, mixins, filters
+from rest_framework import viewsets, permissions, mixins, filters, pagination
 from pydoc import locate
 
 from wall.serializers import PostSerializer
 from wall.models import Post, Group
+
+
+class PostsPagination(pagination.CursorPagination):
+    page_size = 5
 
 
 # Create your views here.
@@ -16,7 +20,7 @@ class PostViewSet(mixins.CreateModelMixin,
     ordering_fields = ['created_at', 'updated_at']
     ordering = ['-created_at']  # most recent first
     filter_backends = [filters.OrderingFilter]
-    page_size = 5
+    pagination_class = PostsPagination
     _perms = None
 
     def get_permissions(self):

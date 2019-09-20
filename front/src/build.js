@@ -15,6 +15,7 @@ import { MerkatoPage } from './pages/MerkatoPage'
 import { MerkatoResultsPage } from './pages/MerkatoResultsPage'
 import { DraftResultsPage } from './pages/DraftResultsPage'
 import { PalmaresPage } from './pages/PalmaresPage';
+import { WallPage } from './pages/WallPage';
 
 // ========================================
 
@@ -35,13 +36,17 @@ const pages = {
 	'merkato': MerkatoPage,
 	'merkatoresults': MerkatoResultsPage,
 	'draftresults': DraftResultsPage,
-	'palmares': PalmaresPage
+	'palmares': PalmaresPage,
+	'wall': WallPage
 };
 
-console.log(preloadedState);
+//console.log(preloadedState);
 
 const preloadedStateSchema = { players: Schemas.PLAYER_ARRAY, clubs: Schemas.CLUB_ARRAY, all_clubs: Schemas.CLUB_ARRAY };
 const normalizedData = normalize(preloadedState, preloadedStateSchema);
+
+//console.log(normalizedData);
+
 const initialState = {
 	data: {
 		players: {
@@ -81,6 +86,10 @@ const initialState = {
 			allIds: normalizedData.result.all_clubs,
 			byId: normalizedData.entities.all_clubs,
 			flat: preloadedState.all_clubs
+		},
+		wallposts: {
+			posts: normalizedData.result.wallposts.results,
+			next: normalizedData.result.wallposts.next
 		}
 	},
 };
@@ -88,6 +97,7 @@ console.log(initialState);
 
 export const API_ROOT = normalizedData.result.apiroot;
 export const LEAGUE_ID = normalizedData.result.league_id;
+export const WALL_POSTS_ENDPOINT = preloadedState.posts_endpoint;
 
 // Create Redux store with initial state
 const store = configureStore(initialState)

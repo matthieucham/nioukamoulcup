@@ -6,7 +6,7 @@ urlpatterns = [
     path('group/<uuid:group>/posts', views.PostViewSet.as_view({
         'get': 'list',
         'post': 'create',
-    })),
+    }), name="wall-posts"),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

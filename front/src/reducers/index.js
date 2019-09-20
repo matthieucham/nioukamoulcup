@@ -10,7 +10,8 @@ import {
   REQUEST_SALES,
   RECEIVE_SALES,
   RECEIVE_COMPOSCORE,
-  RECEIVE_PLAYERSRANKING
+  RECEIVE_PLAYERSRANKING,
+  RECEIVE_MOREPOSTS
 } from "../actions";
 
 function signings(state = { signings: [] }, action) {
@@ -175,6 +176,18 @@ const merkatos = combineReducers({
   initial
 });
 
+function wallposts(state = { posts: [], next: null }, action) {
+  switch (action.type) {
+    case RECEIVE_MOREPOSTS:
+      return Object.assign({}, state, {
+        next: action.next,
+        posts: state.posts.concat(action.posts)
+      });
+    default:
+      return state;
+  }
+}
+
 const all_clubs = (state = {}, action) => {
   return state;
 };
@@ -188,7 +201,8 @@ const data = combineReducers({
   draftsession,
   merkatos,
   palmares,
-  all_clubs
+  all_clubs,
+  wallposts
 });
 
 const rootReducer = combineReducers({

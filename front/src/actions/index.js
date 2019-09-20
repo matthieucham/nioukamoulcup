@@ -16,6 +16,8 @@ export const REQUEST_COMPOSCORE = "REQUEST_COMPOSCORE";
 export const RECEIVE_COMPOSCORE = "RECEIVE_COMPOSCORE";
 export const REQUEST_PLAYERSRANKING = "REQUEST_PLAYERSRANKING";
 export const RECEIVE_PLAYERSRANKING = "RECEIVE_PLAYERSRANKING";
+export const REQUEST_MOREPOSTS = "REQUEST_MOREPOSTS";
+export const RECEIVE_MOREPOSTS = "RECEIVE_MOREPOSTS";
 
 export const requestTeamSthg = (team, actionType) => {
   return {
@@ -110,5 +112,29 @@ export function fetchPlayersRanking(qp) {
     return fetch(url)
       .then(response => response.json())
       .then(json => dispatch(receivePlayersRanking(json)));
+  };
+}
+
+
+const requestMorePosts = () => {
+  return {
+    type: REQUEST_MOREPOSTS
+  };
+};
+
+const receiveMorePosts = (json) => {
+  return {
+    type: RECEIVE_MOREPOSTS,
+    posts: json.results,
+    next: json.next
+  };
+};
+
+export function fetchMorePosts(moreUrl) {
+  return dispatch => {
+    dispatch(requestMorePosts());
+    return fetch(moreUrl)
+      .then(response => response.json())
+      .then(json => dispatch(receiveMorePosts(json)));
   };
 }

@@ -10,5 +10,5 @@ export const Schemas = {
   CLUB: clubSchema,
   CLUB_ARRAY: [clubSchema],
   SIGNING: signingSchema,
-  SIGNING_ARRAY: [signingSchema]
+  SIGNING_ARRAY: [signingSchema],
 };
