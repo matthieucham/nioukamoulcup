@@ -1,10 +1,6 @@
 import React from "react";
 import TextareaAutosize from "react-autosize-textarea";
 import Button from "@material-ui/core/Button";
-import CSRFToken from "../csrftoken";
-import { LEAGUE_ID } from "../../build";
-
-
 
 export class PostWriter extends React.Component {
   constructor(props) {
@@ -17,7 +13,8 @@ export class PostWriter extends React.Component {
           : props.editedPost.message +
             (props.editedPost.hotlinked_url
               ? " " + props.editedPost.hotlinked_url
-              : "")
+              : ""),
+      replyTo: props.replyTo
     };
 
     this.handleClick = this.handleClick.bind(this);
@@ -25,15 +22,15 @@ export class PostWriter extends React.Component {
 
   handleClick(e) {
     e.preventDefault();
+    this.props.onSend(this.state.value, this.state.replyTo);
   }
 
   render() {
-
-    const { replyTo, editedPost } = this.props;
+    const { replyTo, editedPost, sendDisabled, onSend } = this.props;
     const minRows = replyTo == null ? 3 : 1;
     const maxRows = replyTo == null ? 30 : 5;
     //const maxHeight = replyTo == null ? 300 : 100;
-    const placeholder = replyTo == null ? "Exprimez-vous" : "Réponse";
+    const placeholder = replyTo == null ? "Exprimez-vous" : "Un commentaire ?";
     return (
       <div className="wall-post-writer">
         <TextareaAutosize
@@ -44,9 +41,16 @@ export class PostWriter extends React.Component {
           value={this.state.value}
           onChange={e => this.setState({ value: e.target.value })}
         />
-        <Button color="primary" onClick={this.handleClick}>
-          Envoyer
-        </Button>
+        {!sendDisabled && (
+          <Button color="primary" variant="outlined" onClick={this.handleClick}>
+            Envoyer
+          </Button>
+        )}
+        {sendDisabled && (
+          <Button color="primary" variant="outlined" disabled>
+            Envoi en cours...
+          </Button>
+        )}
       </div>
     );
   }

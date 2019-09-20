@@ -73,7 +73,7 @@ class ResponseReader extends React.Component {
 
 export class PostReader extends React.Component {
   render() {
-    const { post } = this.props;
+    const { post, sendDisabled, onSend } = this.props;
     const pdate = format(post.created_at, "DD/MM/YYYY HH:mm");
     const replies = post.replies.map((reply, index) => (
       <ResponseReader key={post.id + "_" + index} post={reply} />
@@ -103,7 +103,7 @@ export class PostReader extends React.Component {
         </div>
         <div className="wall-post-responses">
           {replies}
-          <PostWriter replyTo={post.id} />
+          <PostWriter replyTo={post.id} sendDisabled={sendDisabled} onSend={onSend}/>
         </div>
       </div>
     );

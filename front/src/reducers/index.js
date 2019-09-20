@@ -11,7 +11,11 @@ import {
   RECEIVE_SALES,
   RECEIVE_COMPOSCORE,
   RECEIVE_PLAYERSRANKING,
-  RECEIVE_MOREPOSTS
+  RECEIVE_MOREPOSTS,
+  REQUEST_SENDPOST,
+  RECEIVE_LATESTPOSTS,
+  REQUEST_MOREPOSTS,
+  FETCHFAILURE
 } from "../actions";
 
 function signings(state = { signings: [] }, action) {
@@ -106,6 +110,16 @@ const ui = (state = { isFetching: false, expandTeamDesc: false }, action) => {
       return Object.assign({}, state, { isFetching: false });
     case CLOSE_TEAMDESC:
       return Object.assign({}, state, { expandTeamDesc: false });
+    case REQUEST_SENDPOST:
+      return Object.assign({}, state, { isFetching: true });
+    case RECEIVE_LATESTPOSTS:
+        return Object.assign({}, state, { isFetching: false });
+    case REQUEST_MOREPOSTS:
+      return Object.assign({}, state, { isFetching: true });
+    case RECEIVE_MOREPOSTS:
+        return Object.assign({}, state, { isFetching: false });
+    case FETCHFAILURE:
+          return Object.assign({}, state, { isFetching: false });
     default:
       return state;
   }
@@ -183,6 +197,11 @@ function wallposts(state = { posts: [], next: null }, action) {
         next: action.next,
         posts: state.posts.concat(action.posts)
       });
+      case RECEIVE_LATESTPOSTS:
+        return Object.assign({}, state, {
+          next: action.next,
+          posts: action.posts
+        });
     default:
       return state;
   }

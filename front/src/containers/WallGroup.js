@@ -1,8 +1,9 @@
 import React from "react";
 import { PostReader } from "../components/wall/PostReader";
 import { connect } from "react-redux";
-import { fetchMorePosts } from "../actions";
+import { fetchMorePosts, sendPost } from "../actions";
 import { PostWriter } from "../components/wall/PostWriter";
+import Cookies from "js-cookie";
 
 class FetchMoreLink extends React.Component {
   constructor(props) {
@@ -30,16 +31,46 @@ class NewMessageForm extends React.Component {
   }
 
   render() {
-    return <PostWriter />;
+    const { sendDisabled, onPostMessage } = this.props;
+    return <PostWriter sendDisabled={sendDisabled} onSend={onPostMessage} />;
+  }
+}
+
+class MessagesList extends React.Component {
+  render() {
+    const { posts, sendDisabled, onPostMessage } = this.props;
+    const postsReaders = posts.map(p => (
+      <PostReader
+        post={p}
+        key={p.id}
+        sendDisabled={sendDisabled}
+        onSend={onPostMessage}
+      />
+    ));
+    return <div className="wall-group-posts">{postsReaders}</div>;
   }
 }
 
 export class WallGroup extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      csrftoken: Cookies.get("csrftoken")
+    };
+  }
+
   render() {
-    const { posts, next } = this.props;
-    const postsReaders = posts.map((p, index) => (
-      <PostReader post={p} key={p.id} />
-    ));
+    const { posts, next, isFetching } = this.props;
+
+    const ConnectedMessagesList = connect(
+      state => ({ posts: posts, sendDisabled: isFetching }),
+      dispatch => {
+        return {
+          onPostMessage: (content, replyTo) =>
+            dispatch(sendPost(content, replyTo, this.state.csrftoken))
+        };
+      }
+    )(MessagesList);
 
     const ConnectedFetchMore = connect(
       state => ({ nextUrl: next }),
@@ -51,19 +82,20 @@ export class WallGroup extends React.Component {
     )(FetchMoreLink);
 
     const ConnectedNewPostForm = connect(
-        state => ({}),
-        dispatch => {
-            return {
-                onPostMessage: (content, replyTo) => dispatch(postMessage(content,replyTo))
-            };
-        }
-    )(NewMessageForm)
+      state => ({ sendDisabled: isFetching }),
+      dispatch => {
+        return {
+          onPostMessage: (content, replyTo) =>
+            dispatch(sendPost(content, replyTo, this.state.csrftoken))
+        };
+      }
+    )(NewMessageForm);
 
     return (
       <div>
         <h1>Tu veux qu'on en parle ?</h1>
-        <ConnectedNewPostForm />
-        <div className="wall-group-posts">{postsReaders}</div>
+        {<ConnectedNewPostForm />}
+        {<ConnectedMessagesList />}
         {next && <ConnectedFetchMore />}
       </div>
     );

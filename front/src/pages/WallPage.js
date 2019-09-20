@@ -5,16 +5,17 @@ import { WallGroup } from "../containers/WallGroup";
 const mapStateToProps = state => {
   return {
     wallposts: state.data.wallposts.posts,
-    next: state.data.wallposts.next
+    next: state.data.wallposts.next,
+    isFetching: state.ui.isFetching
   };
 };
 
-const Page = ({ wallposts, next }) => {
+const Page = ({ wallposts, next, isFetching }) => {
   return (
     <div className="react-app-inner">
       <main>
         <article id="home-main">
-          <WallGroup posts={wallposts} next={next} />
+          <WallGroup posts={wallposts} next={next} isFetching={isFetching} />
         </article>
       </main>
     </div>

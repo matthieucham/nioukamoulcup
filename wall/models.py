@@ -94,6 +94,7 @@ class Post(models.Model):
         if self.in_reply_to:
             if self.in_reply_to.in_reply_to:
                 self.in_reply_to = self.in_reply_to.in_reply_to
+            self.in_reply_to.save()  # for updated_at update.
         self.edited = not self._state.adding
         self.message_blueprint = uuid.uuid3(uuid.NAMESPACE_URL, safe_msg)
         return super(Post, self).save(*args, **kwargs)
@@ -101,7 +102,8 @@ class Post(models.Model):
     class Meta:
         unique_together = [['author', 'message_blueprint']]
         indexes = [
-            models.Index(fields=['-created_at'])
+            models.Index(fields=['-created_at']),
+            models.Index(fields=['-updated_at'])
         ]
 
 
