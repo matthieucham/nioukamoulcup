@@ -211,7 +211,10 @@ class TeamDayScoreSerializer(serializers.ModelSerializer):
             previous_tds = self.context['previous_tds'][obj.team.id]
             ranking = self.context['previous_ranking'][obj.team.division.id]
             if previous_tds:
-                return ranking.index(previous_tds.id) + 1
+                if previous_tds.id in ranking:
+                    return ranking.index(previous_tds.id) + 1
+                else:
+                    return None
             else:
                 return None
 
