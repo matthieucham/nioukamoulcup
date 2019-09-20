@@ -88,8 +88,8 @@ const initialState = {
 			flat: preloadedState.all_clubs
 		},
 		wallposts: {
-			posts: normalizedData.result.wallposts.results,
-			next: normalizedData.result.wallposts.next
+			posts: normalizedData.result.wallposts ? normalizedData.result.wallposts.results: [],
+			next: normalizedData.result.wallposts ? normalizedData.result.wallposts.next: null
 		}
 	},
 };

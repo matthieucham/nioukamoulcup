@@ -26,9 +26,9 @@ const Trophy = ({ rank, level, type }) => {
 };
 
 export const TeamPalmares = ({ palmaresLines }) => {
-  const lines = palmaresLines.map(pl => (
-    <li>
-      <Trophy rank={pl.rank} level={pl.level} type={pl.phase_type} />
+  const lines = palmaresLines.map((pl, index) => (
+    <li key={"troph_"+index}>
+      <Trophy rank={pl.rank} level={pl.level} type={pl.phase_type}/>
       {pl.phase_name}: {pl.rank}
     </li>
   ));

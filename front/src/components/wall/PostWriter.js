@@ -27,7 +27,7 @@ export class PostWriter extends React.Component {
 
   render() {
     const { replyTo, editedPost, sendDisabled, onSend } = this.props;
-    const minRows = replyTo == null ? 3 : 1;
+    const minRows = replyTo == null ? 5 : 1;
     const maxRows = replyTo == null ? 30 : 5;
     //const maxHeight = replyTo == null ? 300 : 100;
     const placeholder = replyTo == null ? "Exprimez-vous" : "Un commentaire ?";

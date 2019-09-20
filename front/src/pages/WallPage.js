@@ -14,9 +14,9 @@ const Page = ({ wallposts, next, isFetching }) => {
   return (
     <div className="react-app-inner">
       <main>
-        <article id="home-main">
+        <div className="wall">
           <WallGroup posts={wallposts} next={next} isFetching={isFetching} />
-        </article>
+        </div>
       </main>
     </div>
   );

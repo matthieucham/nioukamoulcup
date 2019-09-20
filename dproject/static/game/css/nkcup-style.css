@@ -1241,6 +1241,8 @@ div.keeporfree-container>div {
 /* WALL */
 .wall {
     white-space: pre-line;
+    max-width: 450px;
+    padding: 0 0.7em;
 }
 
 .wall .wall-message-caption {
@@ -1269,4 +1271,19 @@ div.keeporfree-container>div {
     max-height: 350px;
     margin-left: auto;
     margin-right: auto;
+}
+
+.wall .wall-post {
+    margin: 1.1em 0;
+}
+
+.wall .wall-post-writer {
+    display: flex;
+    flex: 1;
+    justify-content: space-around;
+}
+
+.wall .wall-post-writer textarea {
+    width: 100%;
+    margin-right: 0.3em;
 }
