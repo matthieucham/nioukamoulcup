@@ -24,6 +24,7 @@ home_urls = [
 
 league_urls = [
     url(r'^wall/$', LeagueWallView.as_view(), name="league_wall-detail"),
+    url(r'^wall/rest/', include('wall.urls')),
     url(r'^test/$', LeagueTestView.as_view(), name="league_test-detail"),
     url(r'^ekyp/$', LeagueEkypView.as_view(), name="league_ekyp-detail"),
     url(r'^ekyp/(?P<team_pk>[0-9]+)$', cache_page(60 * 15)(LeagueEkypView.as_view()), name="league_team-detail"),

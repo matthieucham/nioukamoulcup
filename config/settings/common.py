@@ -76,6 +76,7 @@ LOCAL_APPS = (
     'game',
     'accounts',
     'ligue1',
+    'wall'
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
@@ -367,3 +368,10 @@ ZINNIA_ENTRY_BASE_MODEL = 'game.models.EntryLeague'
 
 # Wiki
 WIKI_ACCOUNT_HANDLING = False
+
+# Wall
+WALL = {
+    'CUSTOM_PERMISSION_CLASSES': [
+        'game.views.permissions.IsLeagueMemberOrAdmin',
+    ]
+}

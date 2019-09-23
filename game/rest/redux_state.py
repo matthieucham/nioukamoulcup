@@ -1,7 +1,10 @@
 from rest_framework.reverse import reverse
+import requests
+import simplejson as json
 from . import serializers
 from ligue1 import models as l1models
 from game import models
+from wall.models import Group
 from utils.timer import timed
 
 
@@ -61,6 +64,24 @@ class StateInitializerMixin:
         self.initial_state.update({'ranking': self._init_get_ranking(request, league)})
         self.initial_state.update({'teams': self._init_get_teaminfo(request, league)})
         self.initial_state.update({'league_id': league.id})
+        return self.initial_state
+
+    @timed
+    def init_wall(self, request, league):
+        self._init_common(request)
+        self.initial_state.update({'league_id': league.id})
+        try:
+            # self.initial_state.update({'group_id': league.wall_group.id})
+            self.initial_state.update(
+                {'posts_endpoint': reverse("wall-posts", request=request,
+                                           kwargs={"pk": league.id, "group": league.wall_group.id})})
+            resp = requests.get(self.initial_state['posts_endpoint'])
+            if resp.status_code == requests.codes['ok']:
+                self.initial_state.update(
+                    {'wallposts': json.loads(resp.content)}
+                )
+        except Group.DoesNotExist:
+            self.initial_state.update({'posts_endpoint': None})
         return self.initial_state
 
     @timed

@@ -1,7 +1,5 @@
 import fetch from "cross-fetch";
-import { normalize } from "normalizr";
-import { Schemas } from "../middleware/api";
-import { API_ROOT, LEAGUE_ID } from "../build";
+import { API_ROOT, LEAGUE_ID, WALL_POSTS_ENDPOINT } from "../build";
 
 export const REQUEST_SIGNINGS = "REQUEST_SIGNINGS";
 export const RECEIVE_SIGNINGS = "RECEIVE_SIGNINGS";
@@ -16,6 +14,11 @@ export const REQUEST_COMPOSCORE = "REQUEST_COMPOSCORE";
 export const RECEIVE_COMPOSCORE = "RECEIVE_COMPOSCORE";
 export const REQUEST_PLAYERSRANKING = "REQUEST_PLAYERSRANKING";
 export const RECEIVE_PLAYERSRANKING = "RECEIVE_PLAYERSRANKING";
+export const REQUEST_MOREPOSTS = "REQUEST_MOREPOSTS";
+export const RECEIVE_MOREPOSTS = "RECEIVE_MOREPOSTS";
+export const REQUEST_SENDPOST = "REQUEST_SENDPOST";
+export const RECEIVE_LATESTPOSTS = "RECEIVE_LATESTPOSTS";
+export const FETCHFAILURE = "FETCHFAILURE";
 
 export const requestTeamSthg = (team, actionType) => {
   return {
@@ -110,5 +113,70 @@ export function fetchPlayersRanking(qp) {
     return fetch(url)
       .then(response => response.json())
       .then(json => dispatch(receivePlayersRanking(json)));
+  };
+}
+
+
+const requestMorePosts = () => {
+  return {
+    type: REQUEST_MOREPOSTS
+  };
+};
+
+const receiveMorePosts = (json) => {
+  return {
+    type: RECEIVE_MOREPOSTS,
+    posts: json.results,
+    next: json.next
+  };
+};
+
+const requestSendPost = () => {
+  return {
+    type: REQUEST_SENDPOST
+  };
+};
+
+const fetchFailure = () => {
+  return {
+    type: FETCHFAILURE
+  };
+};
+
+const receiveLatestsPosts = (json) => {
+  return {
+    type: RECEIVE_LATESTPOSTS,
+    posts: json.results,
+    next: json.next
+  };
+};
+
+export function fetchMorePosts(moreUrl) {
+  return dispatch => {
+    dispatch(requestMorePosts());
+    return fetch(moreUrl)
+      .then(response => response.json())
+      .then(json => dispatch(receiveMorePosts(json)));
+  };
+}
+
+export function sendPost(content, replyTo, csrf) {
+  return dispatch => {
+    dispatch(requestSendPost());
+    return fetch(WALL_POSTS_ENDPOINT, {
+      method: 'post',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrf
+      },
+      body: JSON.stringify({
+        'message': content,
+        'in_reply_to': replyTo
+      })
+    })
+      .then(response => response.json())
+      .then(json => dispatch(receiveLatestsPosts(json)))
+      .catch(error => dispatch(fetchFailure()))
+      ;
   };
 }

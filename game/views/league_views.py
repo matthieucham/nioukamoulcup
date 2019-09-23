@@ -56,11 +56,12 @@ class BaseLeagueView(EnsureCsrfCookieMixin, PermissionRequiredMixin, DetailView)
 
 class LeagueWallView(StateInitializerMixin, BaseLeagueView):
     template_name = 'game/league/wall.html'
-    component = 'test'
+    component = 'wall'
 
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get a context
         context = super(LeagueWallView, self).get_context_data(**kwargs)
+
         context['next_merkato'] = Merkato.objects.filter(league_instance=context['instance'],
                                                          mode='BID',
                                                          end__gt=localtime(now())).order_by('begin').first()
@@ -71,6 +72,7 @@ class LeagueWallView(StateInitializerMixin, BaseLeagueView):
         context['next_transition'] = Merkato.objects.filter(league_instance=context['instance'],
                                                             mode='TRS',
                                                             end__gt=localtime(now())).order_by('begin').first()
+        context['PRELOADED_STATE'] = self.init_wall(self.request, self.object)
         return context
 
 

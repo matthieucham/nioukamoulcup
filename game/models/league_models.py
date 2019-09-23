@@ -5,6 +5,8 @@ from django.contrib.auth.models import User
 from django.apps import apps
 from collections import defaultdict
 
+from wall.models import Group
+
 from . import scoring_models
 from ligue1 import models as l1models
 from utils.timer import timed
@@ -19,12 +21,22 @@ class League(models.Model):
     mode = models.CharField(max_length=4, choices=MODES)
     members = models.ManyToManyField(User, through='LeagueMembership', related_name='leagues')
     code = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    wall_group = models.OneToOneField(Group, on_delete=models.SET_NULL, null=True, blank=True)
 
     def has_object_read_permission(self, request):
         return request.user in self.members.all()
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        if self.wall_group is None:
+            # creer un nouveau groupe de discussion
+            wg = Group(name=self.name)
+            wg.save()
+            wg.refresh_from_db()
+            self.wall_group = wg
+        super(League, self).save(*args, **kwargs)
 
 
 class LeagueMembership(models.Model):
@@ -213,6 +225,10 @@ class LeagueInstanceManager(models.Manager):
         return self.filter(league=league, current=True).first()
 
 
+def default_leagueinstance_configuration():
+    return dict({'notes': {'HALFSEASON': 13, 'FULLSEASON': 26, 'TOURNAMENT': 3}})
+
+
 class LeagueInstance(models.Model):
     name = models.CharField(max_length=100, blank=False)
     slogan = models.CharField(max_length=255, null=True)
@@ -222,7 +238,7 @@ class LeagueInstance(models.Model):
     end = models.DateTimeField(blank=False)
     saison = models.ForeignKey(l1models.Saison, on_delete=models.CASCADE)
     configuration = JSONField(
-        default=lambda: dict({'notes': {'HALFSEASON': 13, 'FULLSEASON': 26, 'TOURNAMENT': 3}}))
+        default=default_leagueinstance_configuration )
 
     objects = LeagueInstanceManager()
 
@@ -440,13 +456,17 @@ class SigningManager(models.Manager):
         return output
 
 
+def default_signing_attributes():
+    return dict({'score_factor': 1.0})
+
+
 class Signing(models.Model):
     player = models.ForeignKey(l1models.Joueur, on_delete=models.CASCADE, )
     team = models.ForeignKey(Team, on_delete=models.CASCADE)
     league_instance = models.ForeignKey(LeagueInstance, on_delete=models.CASCADE)
     begin = models.DateTimeField(auto_now_add=True, db_index=True)
     end = models.DateTimeField(null=True, db_index=True)
-    attributes = JSONField(default=lambda: dict({'score_factor': 1.0}))
+    attributes = JSONField(default=default_signing_attributes)
 
     objects = SigningManager()
 
