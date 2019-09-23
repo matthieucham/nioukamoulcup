@@ -1241,10 +1241,12 @@ div.keeporfree-container>div {
 /* WALL */
 .wall {
     white-space: pre-line;
-    max-width: 450px;
-    padding: 0 0.7em;
+    max-width: 600px;
 }
 
+.wall .wall-post-message {
+    padding: 0.5em;
+}
 .wall .wall-message-caption {
     font-size: 1.3em;
     font-weight: bolder;
@@ -1257,6 +1259,14 @@ div.keeporfree-container>div {
 
 .wall .wall-message-std {
     font-size: 1em;
+}
+
+.wall .wall-post-hotlinked a {
+    text-align: center;
+}
+
+.wall .wall-post-hotlinked {
+    background-color: #f1f1f1;
 }
 
 .wall .wall-picture-container {
@@ -1274,13 +1284,42 @@ div.keeporfree-container>div {
 }
 
 .wall .wall-post {
-    margin: 1.1em 0;
+    margin: 0.7em 0;
+    border: 1px solid #f1f1f1;
+}
+
+.wall .wall-post-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5em;
+    background-color: #f1f1f1;
+}
+
+.wall .wall-post-responses {
+    margin-left: 2em;
+}
+
+.wall .wall-response {
+    border-left: 3px solid #f1f1f1;
+    padding-left: 0.3em;
+    margin: 0.7em 0;
+}
+
+.wall .wall-response-header {
+    max-width: 120px;
+    flex-basis: auto;
+    flex-grow: 1;
+    font-size: small;
 }
 
 .wall .wall-post-writer {
+    padding: 0.5em;
     display: flex;
     flex: 1;
-    justify-content: space-around;
+    justify-content: space-between;
+    align-items: end;
+    font-size: small;
 }
 
 .wall .wall-post-writer textarea {

@@ -1,4 +1,5 @@
 import uuid
+import datetime
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils.html import strip_tags
@@ -84,7 +85,9 @@ class Post(models.Model):
     hotlinked_title = models.CharField(max_length=200, null=True, blank=True)
     edited = models.BooleanField(default=False)
 
-    def save(self, *args, **kwargs):
+    def save(self, updatedat_only=False, *args, **kwargs):
+        if updatedat_only:  # shorcut
+            return super(Post, self).save(*args, **kwargs)
         safe_msg = strip_tags(self.message)
         hl_url, hl_pic, hl_tit, clean_msg = _extract_hotlink_data(safe_msg)
         self.hotlinked_url = hl_url
@@ -94,16 +97,21 @@ class Post(models.Model):
         if self.in_reply_to:
             if self.in_reply_to.in_reply_to:
                 self.in_reply_to = self.in_reply_to.in_reply_to
-            self.in_reply_to.save()  # for updated_at update.
+            self.in_reply_to.save(updatedat_only=True)  # for updated_at update.
         self.edited = not self._state.adding
-        self.message_blueprint = uuid.uuid3(uuid.NAMESPACE_URL, safe_msg)
+        self.message_blueprint = uuid.uuid3(uuid.NAMESPACE_URL, "%s__%s" % (self.author.pk, safe_msg))
+        # Check duplicate
+        autorized_time_diff = 1 * 60  # une minute
+        max_time = datetime.datetime.now() + datetime.timedelta(0, -autorized_time_diff)
+        if Post.objects.filter(message_blueprint=self.message_blueprint, updated_at__gt=max_time).first():
+            raise ValueError("Double submission of the same message")
         return super(Post, self).save(*args, **kwargs)
 
     class Meta:
-        unique_together = [['author', 'message_blueprint']]
         indexes = [
             models.Index(fields=['-created_at']),
-            models.Index(fields=['-updated_at'])
+            models.Index(fields=['-updated_at']),
+            models.Index(fields=['message_blueprint'])
         ]
 
 

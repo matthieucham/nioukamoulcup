@@ -58,7 +58,7 @@ class ResponseReader extends React.Component {
       <div className="wall-response">
         <div className="wall-response-header">
           <div className="wall-response-author">{post.author}</div>
-          <div className="wall-response-date">{pdate}</div>
+          {/*<div className="wall-response-date">{pdate}</div>*/}
         </div>
         <div className="wall-response-content">
           <TextMessageFormatter
@@ -85,10 +85,12 @@ export class PostReader extends React.Component {
           <div className="wall-post-date">{pdate}</div>
         </div>
         <div className="wall-post-content">
-          <TextMessageFormatter
-            message={post.message}
-            in_reply_to={post.in_reply_to}
-          />
+          <div className="wall-post-message">
+            <TextMessageFormatter
+              message={post.message}
+              in_reply_to={post.in_reply_to}
+            />
+          </div>
           <div className="wall-post-hotlinked">
             {post.hotlinked_picture && (
               <PictureMessageDisplayer pictureUrl={post.hotlinked_picture} />
@@ -103,7 +105,11 @@ export class PostReader extends React.Component {
         </div>
         <div className="wall-post-responses">
           {replies}
-          <PostWriter replyTo={post.id} sendDisabled={sendDisabled} onSend={onSend}/>
+          <PostWriter
+            replyTo={post.id}
+            sendDisabled={sendDisabled}
+            onSend={onSend}
+          />
         </div>
       </div>
     );

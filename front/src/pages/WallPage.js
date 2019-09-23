@@ -13,11 +13,9 @@ const mapStateToProps = state => {
 const Page = ({ wallposts, next, isFetching }) => {
   return (
     <div className="react-app-inner">
-      <main>
         <div className="wall">
           <WallGroup posts={wallposts} next={next} isFetching={isFetching} />
         </div>
-      </main>
     </div>
   );
 };

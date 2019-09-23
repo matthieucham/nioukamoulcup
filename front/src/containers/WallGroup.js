@@ -93,7 +93,6 @@ export class WallGroup extends React.Component {
 
     return (
       <div>
-        <h1>Tu veux qu'on en parle ?</h1>
         {<ConnectedNewPostForm />}
         {<ConnectedMessagesList />}
         {next && <ConnectedFetchMore />}

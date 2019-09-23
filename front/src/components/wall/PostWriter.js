@@ -41,16 +41,15 @@ export class PostWriter extends React.Component {
           value={this.state.value}
           onChange={e => this.setState({ value: e.target.value })}
         />
-        {!sendDisabled && (
-          <Button color="primary" variant="outlined" onClick={this.handleClick}>
-            Envoyer
-          </Button>
-        )}
-        {sendDisabled && (
-          <Button color="primary" variant="outlined" disabled>
-            Envoi en cours...
-          </Button>
-        )}
+
+        <Button
+          color="primary"
+          variant="outlined"
+          onClick={this.handleClick}
+          disabled={sendDisabled || this.state.value.length == 0}
+        >
+          Envoyer
+        </Button>
       </div>
     );
   }
