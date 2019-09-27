@@ -319,7 +319,7 @@ class Auction(models.Model):
                                                                    league_instance=league_models.LeagueInstance.objects.get_current(
                                                                        self.team.league),
                                                                    end__isnull=True).count()
-        future_pa_locked = Sale.objects.filter(team=self.team).filter(
+        future_pa_locked = Sale.objects.filter(team=self.team, type='PA').filter(
             models.Q(merkato_session__solving__gt=self.sale.merkato_session.solving) | models.Q(
                 merkato_session=self.sale.merkato_session, rank__gt=self.sale.rank)).count()
         merkato_config = self.sale.merkato_session.merkato.configuration
