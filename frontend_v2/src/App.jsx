@@ -1,11 +1,10 @@
 import { Component } from 'react';
-import { hot } from 'react-hot-loader';
 
 import './App.css';
 
 class App extends Component {
   state = {
-    name: 'Maurice',
+    name: 'Grommet',
   };
 
   render() {
@@ -18,4 +17,4 @@ class App extends Component {
   }
 }
 
-export default hot(module)(App);
+export default App;
