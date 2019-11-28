@@ -14,7 +14,14 @@ module.exports = {
         hot: false,
         html: {
           links: [
-            'https://fonts.googleapis.com/css?family=Roboto:300,400,500'
+            'https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap',
+            'https://fonts.googleapis.com/icon?family=Material+Icons'
+          ],
+          meta: [
+            {
+              name: 'viewport',
+              content: 'minimum-scale=1, initial-scale=1, width=device-width, shrink-to-fit=no'
+            }
           ],
           title: 'frontend_v2'
         }
