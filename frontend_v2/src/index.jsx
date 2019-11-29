@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import CssBaseline from '@material-ui/core/CssBaseline';
 
 import PageTemplate from './views/PageTemplate';
-import Home from './views/Home';
+import Home from './views/Home/Home';
 
 function App() {
   return (
