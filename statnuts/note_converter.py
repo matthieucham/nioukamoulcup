@@ -85,4 +85,4 @@ def _conv_ws(raw):
     return y
 
 
-CONVERSION_FUNCTIONS = {'KICK': _conv_kicker}
+CONVERSION_FUNCTIONS = {'KICK': _conv_kicker, 'WHOSC': _conv_ws}
