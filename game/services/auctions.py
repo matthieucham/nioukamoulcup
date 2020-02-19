@@ -1,10 +1,7 @@
 import random
-import json
-from math import ceil
 import decimal
 from operator import attrgetter
 from django.db import transaction
-from django.db.models import FilteredRelation, Q
 from django.utils import timezone
 
 from utils import locked_atomic_transaction
@@ -194,6 +191,8 @@ def can_register_auction(team, merkato):
     - avoir déjà posté (N/2 -1) PA où N est le nombre de sessions écoulées
     :return: True |False
     """
+    if not team.status == 'PLAY':
+        return False, 'NOT_PLAYING'
     if merkato.last_solving < timezone.now():
         return False, 'TOO_LATE'
     expired_sessions = merkato.merkatosession_set.filter(solving__lt=timezone.now()).count()
@@ -221,9 +220,11 @@ def can_register_pa(team, merkato):
     """
     Vérifie que cette ékyp est autorisée à envoyer une PA. La règle:
     - pas de PA en cours
-    - avoir une place dans la team (TODO)
+    - avoir une place dans la team
     :return: True |False
     """
+    if not team.status == 'PLAY':
+        return False, 'NOT_PLAYING'
     if merkato.end < timezone.now():
         return False, 'TOO_LATE'
     current_pa_count = transfer_models.Sale.objects.filter(merkato_session__merkato=merkato,
@@ -244,6 +245,8 @@ def can_register_mv(team, merkato):
     - pas de MV en cours
     :return: True |False
     """
+    if not team.status == 'PLAY':
+        return False, 'NOT_PLAYING'
     if merkato.end < timezone.now():
         return False, 'TOO_LATE'
     current_mv_count = transfer_models.Sale.objects.filter(merkato_session__merkato=merkato,

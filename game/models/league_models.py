@@ -88,11 +88,13 @@ class TeamManager(models.Manager):
 
 
 class Team(models.Model):
+    STATUSES = (('PLAY', 'En jeu'), ('EXCL', 'Exclu'), ('DISM', 'Abandon'))
     name = models.CharField(max_length=100, blank=False)
     league = models.ForeignKey(League, on_delete=models.PROTECT, null=True, blank=True)
     division = models.ForeignKey(LeagueDivision, on_delete=models.PROTECT, null=True, blank=True)
     attributes = JSONField(default=dict, blank=True)
     palmares = models.ManyToManyField('Palmares', through='TeamPalmaresRanking')
+    status = models.CharField(max_length=4, choices=STATUSES, blank=False, null=False, default='PLAY')
 
     objects = TeamManager()
 
@@ -108,14 +110,14 @@ class Team(models.Model):
         return request.user in self.league.members.all()
 
     def has_object_write_permission(self, request):
-        return LeagueMembership.objects.filter(user=request.user, team=self).count() > 0
+        return self.status == 'PLAY' and LeagueMembership.objects.filter(user=request.user, team=self).count() > 0
 
     def has_object_release_permission(self, request):
         # pour être autorisé à faire une revente à la banque (release) il faut:
         # - un merkato en cours
         # - pas encore le nombre max de release effectué par cette équipe
         merkato_model = apps.get_model('game', 'Merkato')
-        return merkato_model.objects.find_current_open_merkato_for_release(self) is not None
+        return self.status == 'PLAY' and merkato_model.objects.find_current_open_merkato_for_release(self) is not None
 
     def __str__(self):
         return self.name

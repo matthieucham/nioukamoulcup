@@ -105,7 +105,8 @@ export class CurrentMerkatoBid extends React.Component {
       NOT_ENOUGH_PA: "Pas assez de PA",
       ROSTER_FULL: "Plus de place dans l'effectif",
       CURRENT_MV: "MV en cours",
-      TOO_LATE: "Marché fermé"
+      TOO_LATE: "Marché fermé",
+      NOT_PLAYING: "Votre ékyp est actuellement suspendue"
     };
   }
 

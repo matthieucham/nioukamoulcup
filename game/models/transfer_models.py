@@ -60,7 +60,7 @@ class MerkatoManager(models.Manager):
                 authorized_release_nb = 0
             else:
                 authorized_release_nb = mkt.configuration.get('re_number') or 0
-            # comptage des merkatos déjà effectués:
+            # comptage des reventes déjà effectuées:
             if authorized_release_nb > 0:
                 release_count = Release.objects.filter(merkato_session__merkato=mkt, signing__team=team,
                                                        signing__league_instance=mkt.league_instance).count()
@@ -277,7 +277,11 @@ class Sale(models.Model):
 
 class Auction(models.Model):
     REJECT_MOTIVES = (
-        ('MONEY', 'Solde insuffisant'), ('MIN_PRICE', 'Enchère trop basse'), ('FULL', 'Plus de place dans l\'effectif'))
+        ('MONEY', 'Solde insuffisant'),
+        ('MIN_PRICE', 'Enchère trop basse'),
+        ('FULL', 'Plus de place dans l\'effectif'),
+        ('BAD_TEAM', 'Ekyp suspendue'),
+    )
 
     sale = models.ForeignKey(Sale, on_delete=models.CASCADE, null=False, related_name='auctions')
     team = models.ForeignKey(league_models.Team, on_delete=models.CASCADE, null=False)
@@ -291,6 +295,9 @@ class Auction(models.Model):
             self.code = code
 
     def validate(self):
+        # BAD_TEAM
+        if not self.team.status == 'PLAY':
+            raise Auction.AuctionNotValidException(code='BAD_TEAM')
         # MIN_PRICE
         if self.sale.type == 'MV':
             if self.sale.min_price > self.value:

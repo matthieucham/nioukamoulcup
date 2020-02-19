@@ -39,12 +39,19 @@ class TeamInfosTable extends Component {
             rowHeight={30}
             rowCount={teams.length}
             rowGetter={({ index }) => teams[index]}
-            rowClassName={({ index }) =>
-              index < 0
-                ? ""
-                : index % 2 == 0
-                  ? "bigtable__even"
-                  : "bigtable__odd"
+            rowClassName={({ index }) => {
+               let rcn = (
+                  index < 0
+                    ? ""
+                    : index % 2 == 0
+                    ? "bigtable__even"
+                    : "bigtable__odd"
+               )
+               if (index >=0 && teams[index].status != 'PLAY') {
+                 rcn += " suspended"
+               }
+               return rcn;
+               }
             }
             sort={this._sort}
             sortBy={sortBy}

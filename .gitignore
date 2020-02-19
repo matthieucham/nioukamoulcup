@@ -94,3 +94,5 @@ webpack-stats.json
 assets/bundles/*
 **/yarn.lock
 dproject/staticfiles/
+
+.virtualenv

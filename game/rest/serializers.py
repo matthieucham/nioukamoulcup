@@ -104,7 +104,7 @@ class TeamHdrSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = league_models.Team
-        fields = ('id', 'url', 'name',)
+        fields = ('id', 'url', 'name', 'status',)
 
 
 class TeamDayScoreByDivisionSerializer(serializers.ListSerializer):
@@ -523,7 +523,7 @@ class TeamDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = league_models.Team
         fields = ('id', 'name', 'attributes', 'managers', 'permissions', 'account_balance', 'signings_aggregation',
-                  'signings', 'latest_scores',)
+                  'signings', 'latest_scores','status',)
 
 
 class BankAccountHistorySerializer(serializers.ModelSerializer):
@@ -592,7 +592,7 @@ class TeamInfoSerializer(TeamHdrSerializer):
     class Meta:
         model = league_models.Team
         fields = ('id', 'url', 'name', 'attributes', 'division', 'balance',
-                  'current_signings',
+                  'current_signings', 'status',
                   )
         list_serializer_class = TeamInfoByDivisionSerializer
 

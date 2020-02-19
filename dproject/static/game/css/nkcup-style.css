@@ -160,6 +160,10 @@ table.ktable-class .ktable-heading-class {
     color: #cccccc;
 }
 
+.suspended {
+    text-decoration: line-through;
+}
+
 .team-header section {
     width: 100%;
     padding: 0 10px;

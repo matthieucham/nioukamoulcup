@@ -187,6 +187,7 @@ class LeagueMerkatoView(FormView, BaseMerkatoSessionsListView):
         kw['sales'] = sales
         kw['team'] = self.get_my_team()
         kw['merkato'] = self.get_merkato()
+        kw['request'] = self.request
         return kw
 
     def get_success_url(self):
@@ -223,6 +224,7 @@ class LeagueRegisterPAView(FormView, BaseLeagueView):
         kw = super(LeagueRegisterPAView, self).get_form_kwargs()
         kw['team'] = self.get_my_team()
         kw['merkato'] = self.get_merkato()
+        kw['request'] = self.request
         return kw
 
     def get_success_url(self):
@@ -252,6 +254,7 @@ class LeagueRegisterTransitionView(FormView, BaseLeagueView):
         kw = super(LeagueRegisterTransitionView, self).get_form_kwargs()
         kw['team'] = self.get_my_team()
         kw['transition_session'] = self.get_merkato().transitionsession_set.filter(closing__gt=now()).first()
+        kw['request'] = self.request
         return kw
 
     def get_success_url(self):
@@ -305,6 +308,7 @@ class LeagueRegisterMVView(FormView, BaseLeagueView):
         kw = super(LeagueRegisterMVView, self).get_form_kwargs()
         kw['team'] = self.get_my_team()
         kw['merkato'] = self.get_merkato()
+        kw['request'] = self.request
         return kw
 
     def get_success_url(self):
@@ -334,6 +338,7 @@ class LeagueRegisterDraftView(FormView, BaseLeagueView):
         kw = super(LeagueRegisterDraftView, self).get_form_kwargs()
         kw['team'] = self.get_my_team()
         kw['draft_session'] = self.get_draft_session()
+        kw['request'] = self.request
         return kw
 
     def get_success_url(self):

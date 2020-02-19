@@ -214,7 +214,7 @@ class LeagueAdmin(InlineActionsModelAdminMixin, admin.ModelAdmin):
 
 class TeamAdmin(admin.ModelAdmin):
     model = models.Team
-    list_display = ('name', 'league', 'division', 'get_managers_names')
+    list_display = ('name', 'league', 'division', 'status', 'get_managers_names')
 
 
 admin.site.register(Entry, EntryLeagueAdmin)

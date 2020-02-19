@@ -163,6 +163,8 @@ export class TeamHeader extends Component {
 
   render() {
     const team = this.props.team;
+    const suspended = this.props.team.status != 'PLAY'
+    console.log(suspended)
     const mgrs = team.managers.map(m => (
       <li key={m.user} className="manager">
         {m.user}
@@ -277,6 +279,9 @@ export class TeamHeader extends Component {
         <div className="team-title">
           <h1 className="page-title">{team.name}</h1>
           <ul>{mgrs}</ul>
+          {suspended &&
+            <ul className="messages"><li className="warning">Ekyp suspendue</li></ul>
+          }
         </div>
         <TeamCover team={team} showName={false} />
         <div>

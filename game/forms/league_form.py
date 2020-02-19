@@ -11,9 +11,7 @@ class PickedPlayerValidationMixin:
 
     def clean_picked_id(self):
         joueur = Joueur.objects.get(pk=self.cleaned_data.get('picked_id'))
-        try:
-            assert auctions.available_for_pa(joueur, self.get_division(), self.get_league_instance())
-        except AssertionError:
+        if not auctions.available_for_pa(joueur, self.get_division(), self.get_league_instance()):
             raise forms.ValidationError('Ce joueur ne peut plus être sélectionné', code="invalid")
         return joueur.pk
 
@@ -24,13 +22,11 @@ class BaseRegisterForm(forms.Form):
         # important to "pop" added kwarg before call to parent's constructor
         self.team = kwargs.pop('team')
         self.merkato = kwargs.pop('merkato')
+        self.request = kwargs.pop('request')
         super(BaseRegisterForm, self).__init__(*args, **kwargs)
 
     def clean_amount(self):
-        try:
-            assert Decimal('%f' % self.cleaned_data.get('amount')) > 0
-            assert Decimal('%f' % self.cleaned_data.get('amount')) <= 100.0
-        except AssertionError:
+        if not (100.0 >= Decimal('%f' % self.cleaned_data.get('amount')) > 0):
             raise forms.ValidationError('Montant invalide', code='invalid')
         return Decimal('%f' % self.cleaned_data.get('amount'))
 
@@ -48,22 +44,18 @@ class RegisterPaForm(BaseRegisterForm):
 
     def clean_amount(self):
         amount = super(RegisterPaForm, self).clean_amount()
-        try:
-            assert self.team.bank_account.get_available() >= amount
-        except AssertionError:
+        if not self.team.has_object_write_permission(self.request):
+            raise forms.ValidationError('Vous n''avez pas la permission')
+        if not self.team.bank_account.get_available() >= amount:
             raise forms.ValidationError('Montant de PA trop élevé', code='too_high')
-        except BankAccount.DoesNotExist:
-            pass  # TODO just for testing during dev
         if not auctions.can_register_pa(self.team, self.merkato):
             raise forms.ValidationError('Impossible de déposer une PA', code='forbidden')
         return amount
 
     def clean_picked_id(self):
         joueur_pk = super(RegisterPaForm, self).clean_picked_id()
-        try:
-            assert auctions.available_for_pa(Joueur.objects.get(pk=joueur_pk), self.team.division,
-                                             self.merkato.league_instance)
-        except AssertionError:
+        if not auctions.available_for_pa(Joueur.objects.get(pk=joueur_pk), self.team.division,
+                                             self.merkato.league_instance):
             raise forms.ValidationError(
                 'Le joueur %s ne peut plus être mis en vente' % Joueur.objects.get(pk=joueur_pk).display_name())
         return joueur_pk
@@ -75,16 +67,16 @@ class RegisterMvForm(BaseRegisterForm):
 
     def clean_amount(self):
         amount = super(RegisterMvForm, self).clean_amount()
+        if not self.team.has_object_write_permission(self.request):
+            raise forms.ValidationError('Vous n''avez pas la permission')
         if not auctions.can_register_mv(self.team, self.merkato):
             raise forms.ValidationError('Impossible de déposer une MV', code='forbidden')
         return amount
 
     def clean_picked_id(self):
         joueur_pk = super(RegisterMvForm, self).clean_picked_id()
-        try:
-            assert auctions.available_for_mv(Joueur.objects.get(pk=joueur_pk), self.team,
-                                             self.merkato.league_instance)
-        except AssertionError:
+        if not auctions.available_for_mv(Joueur.objects.get(pk=joueur_pk), self.team,
+                                             self.merkato.league_instance):
             raise forms.ValidationError(
                 'Le joueur %s ne peut plus être mis en vente' % Joueur.objects.get(pk=joueur_pk).display_name())
         return joueur_pk
@@ -94,6 +86,7 @@ class RegisterOffersForm(forms.Form):
     def __init__(self, *args, **kwargs):
         self.team = kwargs.pop('team')
         self.merkato = kwargs.pop('merkato')
+        self.request = kwargs.pop('request')
         sales = kwargs.pop('sales')
         super(RegisterOffersForm, self).__init__(*args, **kwargs)
         for s in sales:
@@ -109,10 +102,10 @@ class RegisterOffersForm(forms.Form):
             )
 
     def clean(self):
-        try:
-            can, _ = auctions.can_register_auction(self.team, self.merkato)
-            assert can
-        except AssertionError:
+        if not self.team.has_object_write_permission(self.request):
+            raise forms.ValidationError('Vous n''avez pas la permission')
+        can, _ = auctions.can_register_auction(self.team, self.merkato)
+        if not can:
             raise forms.ValidationError('Impossible d''enregistrer des enchères')
         spks = [int(field[len('_offer_for_sale__'):]) for field, v in self.cleaned_data.items() if v is not None]
         if Sale.objects.filter(pk__in=spks, type='MV', team=self.team).count() > 0:
@@ -135,24 +128,20 @@ class RegisterDraftChoicesForm(forms.Form):
         # - que des choix différents
         # - que des joueurs libres
         # - autant de choix que son rang
-        try:
-            assert self.draft_session.closing >= timezone.now()
-        except AssertionError:
+        if not self.team.has_object_write_permission(self.request):
+            raise forms.ValidationError('Vous n''avez pas la permission')
+        if not self.draft_session.closing >= timezone.now():
             raise forms.ValidationError('Draft terminée, trop tard.')
         jpk = [val for field, val in self.cleaned_data.items() if field.startswith('_pick_for_rank__') and val > 0]
-        try:
-            assert len(jpk) == len(set(jpk))
-        except AssertionError:
+        if not len(jpk) == len(set(jpk)):
             raise forms.ValidationError('Certains joueurs sont choisis plusieurs fois')
         # try:
         #     assert len(jpk) == self.draft_session.draftsessionrank_set.get(team=self.team).rank
         # except AssertionError:
         #     raise forms.ValidationError('Il faut enregistrer autant de choix que son rang à la draft')
         for pk in jpk:
-            try:
-                assert auctions.available_for_pa(Joueur.objects.get(pk=pk), self.team.division,
-                                                 self.draft_session.merkato.league_instance)
-            except AssertionError:
+            if not auctions.available_for_pa(Joueur.objects.get(pk=pk), self.team.division,
+                                                 self.draft_session.merkato.league_instance):
                 raise forms.ValidationError(
                     'Le joueur %s ne peut plus être sélectionné' % Joueur.objects.get(pk=pk).display_name())
 
@@ -182,6 +171,8 @@ class RegisterTransitionForm(forms.Form):
     def clean(self):
         # Règle pour chaque signing: signing toujours en cours et appartient bien à mon ékyp
         # Règle pour le total: 5 signings conservés
+        if not self.team.has_object_write_permission(self.request):
+            raise forms.ValidationError('Vous n''avez pas la permission')
         sigpks = [int(field[len('_free_signing__'):]) for field, val in self.cleaned_data.items() if
                   field.startswith('_free_signing__') and val]
         sig_ids = Signing.objects.filter(league_instance=self.transition_session.merkato.league_instance).filter(
@@ -190,9 +181,7 @@ class RegisterTransitionForm(forms.Form):
             if pk not in sig_ids:
                 raise forms.ValidationError('Joueur non reconnu')
         nb_to_keep = self.transition_session.attributes['to_keep']
-        try:
-            assert len(sig_ids) - len(sigpks) == nb_to_keep
-        except AssertionError:
+        if not len(sig_ids) - len(sigpks) == nb_to_keep:
             raise forms.ValidationError('Il faut conserver exactement %d joueurs' % nb_to_keep)
 
 
@@ -212,21 +201,13 @@ class ReleaseSigningForm(forms.Form):
         # - write + release permissions
         # - signing pas déjà released
         # - signing pas locké
-        try:
-            assert self.team.has_object_write_permission(self.request) and self.team.has_object_release_permission(
-                self.request)
-        except AssertionError:
+        if not self.team.has_object_write_permission(self.request):
             raise forms.ValidationError('Vous n''avez pas la permission')
-        try:
-            assert (not self.signing.attributes.get('ending', False)) and (
-                    self.signing.attributes.get('end', None) is None)
-        except AssertionError:
+        if not self.team.has_object_release_permission(self.request):
+            raise forms.ValidationError('Vous n''avez pas la permission')
+        if self.signing.attributes.get('ending', False) or self.signing.attributes.get('end', None) is not None:
             raise forms.ValidationError('Joueur déjà revendu')
-        try:
-            assert not self.signing.attributes.get('locked', False)
-        except AssertionError:
+        if self.signing.attributes.get('locked', True):
             raise forms.ValidationError('Impossible de revendre ce joueur')
-        try:
-            assert Merkato.objects.find_current_open_merkato_for_release(self.team)
-        except AssertionError:
+        if not Merkato.objects.find_current_open_merkato_for_release(self.team):
             raise forms.ValidationError('Plus de revente possible')
