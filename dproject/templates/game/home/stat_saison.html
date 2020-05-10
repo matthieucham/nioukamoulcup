@@ -6,81 +6,75 @@
 {% block title-page %}Statistiques {{ object }}{% endblock title-page %}
 
 {% block content-right %}
-    <section>
+<section>
 
-        <h1>Tops et flops</h1>
+    <h2>Meilleures perfs</h2>
+    <ol>
+        {% for jjs in bestofall %}
+        <li class="bestofentry">
+            <div class="bestofplayer">
+                <p class="smalltext center">{{ jjs.rencontre.date }}</p>
+                <h2>{{ jjs.joueur.display_name }}: <strong>{{ jjs.note|stringformat:'0.1f' }}</strong></h2>
+                {% rencontre_score jjs.rencontre %}
+            </div>
+        </li>
+        {% endfor %}
+    </ol>
 
-        <form id="topFlopForm" action="{% url 'stat-detail' %}" method="get">
-            {% csrf_token %}
-            {{ position_form }}
-            <input type="submit" value="Tops et flops"/>
-        </form>
-        <h2>Top 3</h2>
-        <ul>
-            {% for jjs in bestofall %}
-                <li class="bestofentry">
-                    <div class="bestofindex"><h1>{{ forloop.counter }}</h1></div>
-                    <div class="bestofplayer">
-                        <p class="smalltext center">{{ jjs.rencontre.date }}</p>
-                        <h2>{{ jjs.joueur.display_name }}: <strong>{{ jjs.note|stringformat:'0.1f' }}</strong></h2>
-                        {% rencontre_score jjs.rencontre %}
-                    </div>
-                </li>
-            {% endfor %}
-        </ul>
-
-        <h2>Flop 3</h2>
-        <ul>
-            {% for jjs in worstofall %}
-                <li class="bestofentry">
-                    <div class="bestofindex"><h1>{{ forloop.counter }}</h1></div>
-                    <div class="bestofplayer">
-                        <p class="smalltext center">{{ jjs.rencontre.date }}</p>
-                        <h2>{{ jjs.joueur.display_name }}: <strong>{{ jjs.note|stringformat:'0.1f' }}</strong></h2>
-                        {% rencontre_score jjs.rencontre %}
-                    </div>
-                </li>
-            {% endfor %}
-        </ul>
-    </section>
-    <section>
-        <h1>Journées</h1>
-        <ul>
-            {% for j in object.journees.all %}
-                <li><a href="{% url 'result_journee-detail' j.pk %}">{{ j }}</a></li>
-            {% endfor %}
-        </ul>
-    </section>
+    <h2>Pires perfs</h2>
+    <ol>
+        {% for jjs in worstofall %}
+        <li class="bestofentry">
+            <div class="bestofplayer">
+                <p class="smalltext center">{{ jjs.rencontre.date }}</p>
+                <h2>{{ jjs.joueur.display_name }}: <strong>{{ jjs.note|stringformat:'0.1f' }}</strong></h2>
+                {% rencontre_score jjs.rencontre %}
+            </div>
+        </li>
+        {% endfor %}
+    </ol>
+</section>
+<section>
+    <h1>Journées</h1>
+    <ul>
+        {% for j in object.journees.all %}
+        <li><a href="{% url 'result_journee-detail' j.pk %}">{{ j }}</a></li>
+        {% endfor %}
+    </ul>
+</section>
 {% endblock content-right %}
 
 {% block content-center %}
-    <article id="home-main">
-        <section id="section-title">
-            <h1 class="center">Statistiques {{ object }}</h1>
-        </section>
-        <section id="saison_stat">
-            <form action="{% url 'stat-detail' %}" method="get">
-                {% csrf_token %}
-                {{ stats_form }}
-                <input type="submit" value="Mettre à jour"/>
-            </form>
-            <div>
-                <h2>Equipe-type de la saison</h2>
-                {% include 'game/home/composition.html' with selection=best %}
-            </div>
-            <div>
-                <h2>Equipe-type des bonus</h2>
-                {% include 'game/home/composition.html' with selection=bonuses %}
-            </div>
-            <div>
-                <h2>Equipe-pitres de la saison</h2>
-                {% include 'game/home/composition.html' with selection=worst %}
-            </div>
-            <form action="{% url 'stat-detail' %}" method="get">
-                {% csrf_token %}
-                {{ stats_form }}
-                <input type="submit" value="Mettre à jour"/>
-            </form>
-        </section>
-    </article>
+<article id="home-main">
+    <section id="section-title">
+        <h1 class="center">Statistiques {{ object }}</h1>
+    </section>
+    <section id="saison_stat">
+        <div>
+            <h2>Equipe-type de la saison</h2>
+            {% include 'game/home/composition.html' with selection=best %}
+        </div>
+        <div>
+            <h2>Equipe-pitres de la saison</h2>
+            {% include 'game/home/composition.html' with selection=worst %}
+        </div>
+    </section>
+    <section id="classements">
+        {% bests_at_position annotated_g 'Meilleurs gardiens' extra_g %}
+        {% bests_at_position annotated_d 'Meilleurs défenseurs' extra_d %}
+        {% bests_at_position annotated_m 'Meilleurs milieux' extra_m %}
+        {% bests_at_position annotated_a 'Meilleurs attaquants' extra_a %}
+    </section>
+    <section id="special">
+        {% special_ranking players_CSC 'CSC' 'Prix Barbados-Granada' 'Meilleurs marqueurs de CSC' %}
+        {% special_ranking players_LEADER 'LEADER' 'Trophée Eric Moussambani' 'Ils surnagent dans leur club' %}
+        {% special_ranking players_HALFPASS 'HALFPASS' 'Prix PENALTYPOURLYON' 'Ils ont obtenu le plus de pénaltys' %}
+        {% special_ranking players_CLEANSHEET 'CLEANSHEET' 'Prix Thuram-Blanc-Desailly-Lizarazu' 'Classement des clean sheets' %}
+        {% special_ranking players_PENALTY 'PENALTY' 'Lacazette-ranking' 'Classement des pénaltys marqués' %}
+        {% special_ranking players_GOAL 'GOAL' 'Giroud-ranking' 'Classement des vrais buts marqués' %}
+        {% special_ranking players_PENALSTOP 'PENALSTOP' 'Coupe Jean-François Bédénik' 'Ils ont arrêté le plus de pénaltys' %}
+        {% special_ranking players_OFFENSIVE 'OFFENSIVE' 'Avalanche de buts' 'Nombre de bonus offensifs glânés' %}
+        {% special_ranking players_PASS 'PASS' 'Trophée Zahia' 'Le plus de passes...' %}
+    </section>
+</article>
 {% endblock content-center %}

@@ -1,0 +1,52 @@
+{% load l1results %}
+{% load getattribute %}
+
+<div>
+<h2>{{ title }}</h2>
+    <div class="header_table">
+        <div class="cell_table" style="width:5%;"></div>
+        <div class="cell_table"></div>
+        <div class="cell_table center">Club</div>
+        <div class="cell_table center" style="width:15%;">Note moyenne</div>
+        <div class="cell_table center" style="width:15%;">Nombre de notes</div>
+        <div class="cell_table center" style="width:15%;">Total bonus</div>
+        {% for ec in extra_cols %}
+            <div class="cell_table center" style="width:5%;">{% bonus ec None %}</div>
+        {% endfor %}
+    </div>
+    {% for joueur in players %}
+        <div class="line_table">
+             <div class="cell_table">
+             {{forloop.counter}}.
+             </div>
+            <div class="cell_table">
+                <a href="{% url 'stat_joueur-detail' joueur.pk %}">{{ joueur.display_name }}</a>
+            </div>
+            <div class="cell_table center">
+                {% if joueur.club %}
+                    <a href="{% url 'club-detail' joueur.club.pk %}">{{ joueur.display_club }}</a>
+                {% else %}
+                    -
+                {% endif %}
+            </div>
+            <div class="cell_table center">
+                {% if joueur.avg_note > 0 %}
+                    <span class="note">{{ joueur.avg_note|stringformat:'0.1f' }}</span>
+                {% else %}
+                    -
+                {% endif %}
+            </div>
+            <div class="cell_table center">
+                {{ joueur.nb_notes }}
+            </div>
+            <div class="cell_table center">
+                {{ joueur.total_bonuses|stringformat:'0.1f' }}
+            </div>
+            {% for ec in extra_cols %}
+                <div class="cell_table center">
+                    {{ joueur.bonuses|getattribute:ec|add:"0" }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endfor %}
+</div>

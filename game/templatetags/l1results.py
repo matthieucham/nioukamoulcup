@@ -40,7 +40,8 @@ def last_journees(nb=1):
     :param nb:
     :return:
     """
-    journees = l1models.Journee.objects.filter(saison__est_courante__isnull=False).order_by('-fin')[:nb]
+    journees = l1models.Journee.objects.filter(
+        saison__est_courante__isnull=False).order_by('-fin')[:nb]
     return {'journees': sorted(journees, key=operator.attrgetter('fin'))}
 
 
@@ -92,7 +93,8 @@ def rencontre_summary(rencontre):
             if perf.details['stats'][key] > 0:
                 if key not in agglo:
                     agglo[key] = {'dom': {}, 'ext': {}}
-                agglo[key][perf.details['equipe']][perf.joueur] = perf.details['stats'][key]
+                agglo[key][perf.details['equipe']
+                           ][perf.joueur] = perf.details['stats'][key]
     return \
         {
             'summary': agglo,
@@ -108,7 +110,8 @@ def rencontre_summary(rencontre):
 @register.inclusion_tag('game/tags/l1results_rencontre_team.html')
 def rencontre_team(rencontre, equipe):
     out = {'G': [], 'D': [], 'M': [], 'A': []}
-    jjs_dict = dict(JJScore.objects.filter(rencontre=rencontre).values_list('joueur', 'details'))
+    jjs_dict = dict(JJScore.objects.filter(
+        rencontre=rencontre).values_list('joueur', 'details'))
     for perf in rencontre.performances.filter(details__equipe=equipe):
         base_stats = {'time': perf.temps_de_jeu,
                       'rating': perf.details['note'] if ('note' in perf.details
@@ -166,7 +169,7 @@ def bonus(bonuskey, position, bonusval=1):
         'CSC': ('fa-thumbs-down', 'DarkSlateGrey'),
     }
     if bonuskey == 'CSC' or position is None or (services.BONUS['COLLECTIVE'].get(bonuskey) or services.BONUS['PERSONAL'].get(bonuskey))[
-        position] > 0:
+            position] > 0:
         ico, color = icon_dict[bonuskey]
         return {'icon': ico, 'color': color, 'nb': bonusval, 'masked': False}
     else:
@@ -182,7 +185,8 @@ def compo_player(jjs):
         else:
             note = '-'
     else:
-        note = '%0.1f [%dn]' % (jjs.avg_note, jjs.nb_notes)
+        # note = '%0.1f [%dn]' % (jjs.avg_note, jjs.nb_notes)
+        note = '%0.1f' % jjs.avg_note
     if hasattr(jjs, 'total_bonuses'):
         tb = '%0.1f' % jjs.total_bonuses
     else:
@@ -193,4 +197,23 @@ def compo_player(jjs):
         'note': note,
         'total_bonuses': tb,
         'bonus': jjs.details['bonuses'] if 'bonuses' in jjs.details else None
+    }
+
+
+@register.inclusion_tag('game/tags/l1results_bests_at_position.html')
+def bests_at_position(players, title, extra_cols):
+    return {
+        'players': players,
+        'title': title,
+        'extra_cols': extra_cols
+    }
+
+
+@register.inclusion_tag('game/tags/l1results_special_ranking.html')
+def special_ranking(players, col, title, subtitle=''):
+    return {
+        'players': players,
+        'title': title,
+        'col': col,
+        'subtitle': subtitle
     }

@@ -19,11 +19,14 @@ class Importe(models.Model):
 
 class SaisonManager(models.Manager):
     def import_from_statnuts(self, statnuts_instance, sn_client, force_import=False):
-        saison = self.get(sn_instance_uuid=statnuts_instance['uuid'])  # leve une exception si pas trouvé => normal
-        instance_update = dateutil.parser.parse(statnuts_instance['updated_at'])
+        # leve une exception si pas trouvé => normal
+        saison = self.get(sn_instance_uuid=statnuts_instance['uuid'])
+        instance_update = dateutil.parser.parse(
+            statnuts_instance['updated_at'])
         if force_import or saison.derniere_maj is None or instance_update > saison.derniere_maj:
             for step in statnuts_instance['steps']:
-                Journee.objects.import_from_statnuts(saison, sn_client.get_step(step['uuid']), sn_client)
+                Journee.objects.import_from_statnuts(
+                    saison, sn_client.get_step(step['uuid']), sn_client)
         saison.derniere_maj = instance_update
         saison.save()
 
@@ -42,9 +45,13 @@ class Saison(Importe):
         scfound = self.est_courante.filter(saison__pk=self.pk).first()
         return scfound is not None
 
+    def nb_journees_ecoulees(self):
+        return self.journees.filter(fin__lte=timezone.now()).count()
+
 
 class SaisonCourante(models.Model):
-    saison = models.ForeignKey(Saison, on_delete=models.CASCADE, related_name='est_courante')
+    saison = models.ForeignKey(
+        Saison, on_delete=models.CASCADE, related_name='est_courante')
 
     def __str__(self):
         return self.saison.__str__()
@@ -77,7 +84,8 @@ class Journee(Importe):
     debut = models.DateTimeField(null=True)
     fin = models.DateTimeField(null=True)
     name = models.CharField(max_length=100, null=True, blank=True)
-    saison = models.ForeignKey(Saison, on_delete=models.CASCADE, related_name='journees')
+    saison = models.ForeignKey(
+        Saison, on_delete=models.CASCADE, related_name='journees')
     objects = JourneeManager()
 
     class Meta:
@@ -93,8 +101,8 @@ class Journee(Importe):
         if self.pk is not None:
             debut, fin = timezone.make_aware(datetime.datetime(2100, 1, 1),
                                              timezone.get_default_timezone()), \
-                         timezone.make_aware(datetime.datetime(1998,
-                                                               1, 1), timezone.get_default_timezone())
+                timezone.make_aware(datetime.datetime(1998,
+                                                      1, 1), timezone.get_default_timezone())
             for x in (rencontre.date for rencontre in Rencontre.objects.filter(journee=self)):
                 debut, fin = min(x, debut), max(x, fin)
             self.debut = debut
@@ -124,15 +132,18 @@ class Club(Importe):
                      ('jersey-sleeves2', 'manches'),
                      ('jersey-diag-half-white2.svg', 'moitié diagonale blanche'),
                      ('jersey-scap2', 'scapulaire'), ('jersey-shoulders2', 'épaules'),
-                     ('jersey-halfdark2', 'moitié assombrie'), ('jersey-stripe-center2', 'bande centrale'),
+                     ('jersey-halfdark2',
+                      'moitié assombrie'), ('jersey-stripe-center2', 'bande centrale'),
                      ('jersey-stripe-h-bicolor2', 'bande horizontale bicolore'),
                      ('jersey-stripe-h2', 'bande horizontale unie'),
                      )
 
     nom = models.CharField(max_length=100)
     sn_team_uuid = models.UUIDField(null=False)
-    participations = models.ManyToManyField(Saison, related_name='participants')
-    maillot_svg = models.CharField(max_length=50, choices=SVG_TEMPLATES, blank=False, default='jersey-plain2')
+    participations = models.ManyToManyField(
+        Saison, related_name='participants')
+    maillot_svg = models.CharField(
+        max_length=50, choices=SVG_TEMPLATES, blank=False, default='jersey-plain2')
     maillot_color_bg = RGBColorField(blank=False, default='#FFFFFF')
     maillot_color_stroke = RGBColorField(blank=True)
 
@@ -157,7 +168,8 @@ class JoueurManager(models.Manager):
         for t in statnuts_data_teams:
             # select the first found team with a participation in the current instance
             try:
-                club = Club.objects.filter(participations=saison).get(sn_team_uuid=t['uuid'])
+                club = Club.objects.filter(
+                    participations=saison).get(sn_team_uuid=t['uuid'])
                 joueur.club = club
             except Club.DoesNotExist:
                 pass
@@ -170,12 +182,14 @@ class JoueurManager(models.Manager):
 
 
 class Joueur(Importe):
-    POSTES = (('G', 'Gardien'), ('D', 'Défenseur'), ('M', 'Milieu'), ('A', 'Attaquant'))
+    POSTES = (('G', 'Gardien'), ('D', 'Défenseur'),
+              ('M', 'Milieu'), ('A', 'Attaquant'))
     prenom = models.CharField(max_length=50, blank=True)
     nom = models.CharField(max_length=50)
     surnom = models.CharField(max_length=50, blank=True)
     sn_person_uuid = models.UUIDField(null=False)
-    club = models.ForeignKey(Club, on_delete=models.SET_NULL, related_name='joueurs', null=True, blank=True)
+    club = models.ForeignKey(
+        Club, on_delete=models.SET_NULL, related_name='joueurs', null=True, blank=True)
     poste = models.CharField(max_length=1, choices=POSTES, null=True)
 
     objects = JoueurManager()
@@ -187,6 +201,11 @@ class Joueur(Importe):
             return '%s %s' % (self.prenom, self.nom)
         return self.nom
 
+    def display_club(self):
+        if self.club:
+            return self.club
+        return '-'
+
     def __str__(self):
         return '%s %s%s' % (self.prenom, self.nom, (' (%s)' % self.surnom if self.surnom else ''))
 
@@ -194,10 +213,12 @@ class Joueur(Importe):
 class RencontreManager(models.Manager):
     @timed
     def import_from_statnuts(self, journee, statnuts_meeting, sn_client, force_import=False):
-        rencontre, created = self._get_or_create_from_statnuts(journee, statnuts_meeting)
+        rencontre, created = self._get_or_create_from_statnuts(
+            journee, statnuts_meeting)
         meeting_update = dateutil.parser.parse(statnuts_meeting['updated_at'])
         if force_import or created or rencontre.derniere_maj is None or meeting_update > rencontre.derniere_maj:
-            self._delete_and_recreate_performances(rencontre, statnuts_meeting, sn_client)
+            self._delete_and_recreate_performances(
+                rencontre, statnuts_meeting, sn_client)
 
     def _get_or_create_from_statnuts(self, journee, statnuts_data):
         ht_uuid = statnuts_data['home_team']['uuid']
@@ -219,13 +240,17 @@ class RencontreManager(models.Manager):
             defaults=defaults)
 
     def _delete_and_recreate_performances(self, rencontre, statnuts_meeting, sn_client):
-        dom_or_ext = {statnuts_meeting['home_team']['uuid']: 'dom', statnuts_meeting['away_team']['uuid']: 'ext'}
+        dom_or_ext = {statnuts_meeting['home_team']['uuid']                      : 'dom', statnuts_meeting['away_team']['uuid']: 'ext'}
         rosperfs = []
-        harmonized_roster = note_converter.harmonize_notes(statnuts_meeting['roster'])
+        harmonized_roster = note_converter.harmonize_notes(
+            statnuts_meeting['roster'])
         for ros in harmonized_roster:
-            joueur, created = Joueur.objects.get_or_create_from_statnuts(ros['player'])
-            joueur_updated_at = dateutil.parser.parse(ros['player']['updated_at'])
-            if created or joueur.derniere_maj is None or joueur.derniere_maj < joueur_updated_at:  # or date de la rencontre > dernier maj du joueur !
+            joueur, created = Joueur.objects.get_or_create_from_statnuts(
+                ros['player'])
+            joueur_updated_at = dateutil.parser.parse(
+                ros['player']['updated_at'])
+            # or date de la rencontre > dernier maj du joueur !
+            if created or joueur.derniere_maj is None or joueur.derniere_maj < joueur_updated_at:
                 Joueur.objects.set_club_from_statnuts(joueur, sn_client.get_person_teams(ros['player']['uuid']),
                                                       joueur_updated_at, saison=rencontre.journee.saison)
             club = Club.objects.get(sn_team_uuid=ros['played_for'])
@@ -242,17 +267,21 @@ class RencontreManager(models.Manager):
         Performance.objects.filter(rencontre=rencontre).delete()
         Performance.objects.bulk_create(rosperfs)
         rencontre.resultat = make_rencontre_resultat(statnuts_meeting)
-        rencontre.derniere_maj = dateutil.parser.parse(statnuts_meeting['updated_at'])
+        rencontre.derniere_maj = dateutil.parser.parse(
+            statnuts_meeting['updated_at'])
         rencontre.save()
 
 
 class Rencontre(Importe):
     sn_meeting_uuid = models.UUIDField(null=False)
-    club_domicile = models.ForeignKey(Club, on_delete=models.PROTECT, null=False, related_name='recoit')
-    club_exterieur = models.ForeignKey(Club, on_delete=models.PROTECT, null=False, related_name='visite')
+    club_domicile = models.ForeignKey(
+        Club, on_delete=models.PROTECT, null=False, related_name='recoit')
+    club_exterieur = models.ForeignKey(
+        Club, on_delete=models.PROTECT, null=False, related_name='visite')
     date = models.DateTimeField()
     resultat = JSONField(null=True)
-    journee = models.ForeignKey(Journee, on_delete=models.CASCADE, null=False, related_name='rencontres')
+    journee = models.ForeignKey(
+        Journee, on_delete=models.CASCADE, null=False, related_name='rencontres')
     objects = RencontreManager()
 
     def __str__(self):
@@ -274,8 +303,10 @@ class Rencontre(Importe):
 
 
 class Performance(models.Model):
-    rencontre = models.ForeignKey(Rencontre, on_delete=models.CASCADE, null=False, related_name='performances')
-    joueur = models.ForeignKey(Joueur, on_delete=models.CASCADE, null=False, related_name='performances')
+    rencontre = models.ForeignKey(
+        Rencontre, on_delete=models.CASCADE, null=False, related_name='performances')
+    joueur = models.ForeignKey(
+        Joueur, on_delete=models.CASCADE, null=False, related_name='performances')
     club = models.ForeignKey(Club, on_delete=models.PROTECT, null=False)
     temps_de_jeu = models.PositiveSmallIntegerField()
     details = JSONField()
@@ -285,14 +316,16 @@ class Performance(models.Model):
 
 
 def make_rencontre_resultat(statnuts_meeting):
-    dom = {'buts_pour': statnuts_meeting['home_result'], 'buts_contre': statnuts_meeting['away_result']}
-    ext = {'buts_pour': statnuts_meeting['away_result'], 'buts_contre': statnuts_meeting['home_result']}
+    dom = {'buts_pour': statnuts_meeting['home_result'],
+           'buts_contre': statnuts_meeting['away_result']}
+    ext = {'buts_pour': statnuts_meeting['away_result'],
+           'buts_contre': statnuts_meeting['home_result']}
     # récupérer les penaltys
     peno_dom = 0
     peno_ext = 0
     for roster in statnuts_meeting['roster']:
         if roster['stats'] is not None and roster['stats']['penalties_scored'] is not None and roster['stats'][
-            'penalties_scored'] > 0:
+                'penalties_scored'] > 0:
             if roster['played_for'] == statnuts_meeting['home_team']['uuid']:
                 peno_dom += roster['stats']['penalties_scored']
             elif roster['played_for'] == statnuts_meeting['away_team']['uuid']:

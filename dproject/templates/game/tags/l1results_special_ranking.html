@@ -1,0 +1,33 @@
+{% load l1results %}
+{% load getattribute %}
+
+<div>
+<h2>{{ title }}</h2>
+    <p class="smalltext">{{ subtitle }}</p>
+    <div class="header_table">
+        <div class="cell_table" style="width:5%;"></div>
+        <div class="cell_table"></div>
+        <div class="cell_table center">Club</div>
+        <div class="cell_table center" style="width:5%;">{% bonus col None %}</div>
+    </div>
+    {% for joueur in players %}
+        <div class="line_table">
+             <div class="cell_table">
+             {{forloop.counter}}.
+             </div>
+            <div class="cell_table">
+                <a href="{% url 'stat_joueur-detail' joueur.pk %}">{{ joueur.display_name }}</a>
+            </div>
+            <div class="cell_table center">
+                {% if joueur.club %}
+                    <a href="{% url 'club-detail' joueur.club.pk %}">{{ joueur.display_club }}</a>
+                {% else %}
+                    -
+                {% endif %}
+            </div>
+            <div class="cell_table center">
+                {{ joueur.bonuscol }}
+            </div>
+        </div>
+    {% endfor %}
+</div>

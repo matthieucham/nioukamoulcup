@@ -12,12 +12,12 @@
         <h1>{{ joueur.display_name }}</h1>
         <p><span class="bonus-list">
             {{ note }}
-            {% if total_bonuses is not None %}
+            {% comment %} {% if total_bonuses is not None %}
                 + {{ total_bonuses }}
             {% endif %}
             {% for bk, bv in bonus.items %}
                 {% bonus bk joueur.poste bv %}
-            {% endfor %}
+            {% endfor %} {% endcomment %}
         </span>
         </p>
         <a class="navlink" href="{% url 'stat_joueur-detail' joueur.pk %}">fiche</a>
