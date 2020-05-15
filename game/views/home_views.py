@@ -1,6 +1,7 @@
 from django.views.generic import TemplateView, DetailView
 from django.utils import timezone
-from django.db.models import Q, F, Case, When, NullBooleanField
+from django.db.models import Q, F, Case, When, NullBooleanField, PositiveSmallIntegerField
+from django.db.models.functions import Cast, Coalesce
 from django.contrib.postgres.fields.jsonb import KeyTextTransform
 from graphos.sources.model import SimpleDataSource
 from graphos.renderers.morris import AreaChart
@@ -219,7 +220,8 @@ class StatView(DetailView):
 
     def get_special_ranking(self, limit, criteriacol, restrictedpos=None, worst=False):
         q = l1models.Joueur.objects.filter(sjscore__saison_scoring__saison=self.object) \
-            .annotate(bonuscol=KeyTextTransform(criteriacol, 'sjscore__details')).filter(bonuscol__gt=0)
+            .annotate(bonuscol=Cast(KeyTextTransform(criteriacol, 'sjscore__details'),
+                                    output_field=PositiveSmallIntegerField())).filter(bonuscol__gt=0)
         if restrictedpos:
             q = q.filter(poste__in=restrictedpos)
         if worst:
