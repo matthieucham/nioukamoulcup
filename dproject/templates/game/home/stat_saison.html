@@ -34,20 +34,12 @@
         {% endfor %}
     </ol>
 </section>
-<section>
-    <h1>Journées</h1>
-    <ul>
-        {% for j in object.journees.all %}
-        <li><a href="{% url 'result_journee-detail' j.pk %}">{{ j }}</a></li>
-        {% endfor %}
-    </ul>
-</section>
 {% endblock content-right %}
 
 {% block content-center %}
 <article id="home-main">
-    <section id="section-title">
-        <h1 class="center">Statistiques {{ object }}</h1>
+    <section class="section-title">
+        <h1 class="center">Equipes types {{ object }}</h1>
     </section>
     <section id="saison_stat">
         <div>
@@ -59,11 +51,17 @@
             {% include 'game/home/composition.html' with selection=worst %}
         </div>
     </section>
+    <section class="section-title">
+        <h1 class="center">Meilleurs joueurs par poste</h1>
+    </section>
     <section id="classements">
-        {% bests_at_position annotated_g 'Meilleurs gardiens' extra_g %}
-        {% bests_at_position annotated_d 'Meilleurs défenseurs' extra_d %}
-        {% bests_at_position annotated_m 'Meilleurs milieux' extra_m %}
-        {% bests_at_position annotated_a 'Meilleurs attaquants' extra_a %}
+        {% bests_at_position annotated_g 'Meilleurs gardiens' %}
+        {% bests_at_position annotated_d 'Meilleurs défenseurs' %}
+        {% bests_at_position annotated_m 'Meilleurs milieux' %}
+        {% bests_at_position annotated_a 'Meilleurs attaquants' %}
+    </section>
+    <section class="section-title">
+        <h1 class="center">Mais aussi...</h1>
     </section>
     <section id="special">
         {% special_ranking players_CSC 'CSC' 'Prix Barbados-Granada' 'Meilleurs marqueurs de CSC' %}

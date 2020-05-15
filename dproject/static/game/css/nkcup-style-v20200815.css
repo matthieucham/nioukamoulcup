@@ -637,21 +637,22 @@ dl.kvgroup {
     padding-left: 8px;
 }
 
+
 #home-main section form {
     padding: 5px 5px;
 }
 
-#section-title {
+.section-title {
     display: flex;
     flex: 1;
     align-items: center;
 }
 
-#section-title > * {
+.section-title > * {
     margin: 0 20px;
 }
 
-#section-title > h1 {
+.section-title > h1 {
     flex-grow: 1;
 }
 
@@ -815,6 +816,29 @@ dl.kvgroup {
 
 .bestofentry .bestofplayer {
     flex: 1;
+}
+
+#home-main #classements {
+    display: flex;
+    justify-content: space-between;
+    align-items: stretch;
+    flex-flow: row wrap;
+}
+
+#home-main #classements .medium_ranking {
+    flex: 1;
+}
+
+#home-main #special {
+    display: flex;
+    justify-content: space-between;
+    align-items: stretch;
+    flex-flow: row wrap;
+}
+
+#home-main #special .small_ranking {
+    flex: 1;
+    width: 33%;
 }
 
 /********************************************************/

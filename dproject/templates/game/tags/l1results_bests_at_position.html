@@ -1,15 +1,15 @@
 {% load l1results %}
 {% load getattribute %}
 
-<div>
+<div class="medium_ranking">
 <h2>{{ title }}</h2>
     <div class="header_table">
         <div class="cell_table" style="width:5%;"></div>
-        <div class="cell_table"></div>
+        <div class="cell_table" style="width:40%;"></div>
         <div class="cell_table center">Club</div>
-        <div class="cell_table center" style="width:15%;">Note moyenne</div>
-        <div class="cell_table center" style="width:15%;">Nombre de notes</div>
-        <div class="cell_table center" style="width:15%;">Total bonus</div>
+        <div class="cell_table center" style="width:11%;">Note moyenne</div>
+        <div class="cell_table center" style="width:11%;">Nombre de notes</div>
+        <div class="cell_table center" style="width:11%;">Total bonus</div>
         {% for ec in extra_cols %}
             <div class="cell_table center" style="width:5%;">{% bonus ec None %}</div>
         {% endfor %}

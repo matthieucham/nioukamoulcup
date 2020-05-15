@@ -201,7 +201,7 @@ def compo_player(jjs):
 
 
 @register.inclusion_tag('game/tags/l1results_bests_at_position.html')
-def bests_at_position(players, title, extra_cols):
+def bests_at_position(players, title, extra_cols=[]):
     return {
         'players': players,
         'title': title,
