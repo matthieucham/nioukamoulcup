@@ -261,7 +261,7 @@ class StatView(DetailView):
         context['worst'] = compute_team(
             selection['worst'], False, criteria='avg_note')
 
-        context['annotated_g'] = self.get_bests(5, 'G', nb_notes_min)
+        context['annotated_g'] = self.get_bests(20, 'G', nb_notes_min)
         context['extra_g'] = ['CLEANSHEET', 'LEADER', 'PENALSTOP']
 
         context['annotated_d'] = self.get_bests(20, 'D', nb_notes_min)
@@ -270,14 +270,16 @@ class StatView(DetailView):
         context['annotated_m'] = self.get_bests(20, 'M', nb_notes_min)
         context['extra_m'] = ['PASS', 'CLEANSHEET', 'LEADER', 'OFFENSIVE']
 
-        context['annotated_a'] = self.get_bests(10, 'A', nb_notes_min)
+        context['annotated_a'] = self.get_bests(20, 'A', nb_notes_min)
         context['extra_a'] = ['GOAL', 'PASS', 'OFFENSIVE']
 
         context['players_LEADER'] = self.get_special_ranking(
-            5, 'LEADER', restrictedpos=('D', 'M',))
+            10, 'LEADER', restrictedpos=('D', 'M',))
         context['players_OFFENSIVE'] = self.get_special_ranking(
-            5, 'OFFENSIVE', restrictedpos=('A', 'M',))
-        for bkey in ('GOAL', 'PENALTY', 'PASS', 'HALFPASS', 'PENALSTOP', 'CLEANSHEET', 'CSC'):
-            context['players_%s' % bkey] = self.get_special_ranking(5, bkey)
+            10, 'OFFENSIVE', restrictedpos=('A', 'M',))
+        context['players_CLEANSHEET'] = self.get_special_ranking(
+            10, 'CLEANSHEET', restrictedpos=('D', 'M', 'G'))
+        for bkey in ('GOAL', 'PENALTY', 'PASS', 'HALFPASS', 'PENALSTOP', 'CSC'):
+            context['players_%s' % bkey] = self.get_special_ranking(10, bkey)
 
         return context
