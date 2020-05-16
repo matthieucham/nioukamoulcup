@@ -9,7 +9,7 @@
 </div>
 <div class="cell_table center">
     {% if stat.rating > 0 %}
-        {{ stat.rating }}
+        {{ stat.rating|stringformat:'0.1f' }}
     {% else %}
         -
     {% endif %}

@@ -186,7 +186,7 @@ def compo_player(jjs):
             note = '-'
     else:
         # note = '%0.1f [%dn]' % (jjs.avg_note, jjs.nb_notes)
-        note = '%0.1f' % jjs.avg_note
+        note = '%0.2f' % jjs.avg_note
     if hasattr(jjs, 'total_bonuses'):
         tb = '%0.1f' % jjs.total_bonuses
     else:
