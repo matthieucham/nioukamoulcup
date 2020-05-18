@@ -10,24 +10,37 @@
 
     <h2>Meilleures perfs</h2>
     <ol>
-        {% for jjs in bestofall %}
+        {% for jjs in bestofperfs %}
         <li class="bestofentry">
             <div class="bestofplayer">
                 <p class="smalltext center">{{ jjs.rencontre.date }}</p>
-                <h2>{{ jjs.joueur.display_name }}: <strong>{{ jjs.note|stringformat:'0.2f' }}</strong></h2>
+                <h2>{{ jjs.joueur.display_name }}: <strong>{{ jjs.perf|stringformat:'0.2f' }} pts</strong></h2>
                 {% rencontre_score jjs.rencontre %}
             </div>
         </li>
         {% endfor %}
     </ol>
 
-    <h2>Pires perfs</h2>
+    <h2>Meilleures notes</h2>
+    <ol>
+        {% for jjs in bestofall %}
+        <li class="bestofentry">
+            <div class="bestofplayer">
+                <p class="smalltext center">{{ jjs.rencontre.date }}</p>
+                <h2>{{ jjs.joueur.display_name }}: <strong>{{ jjs.note }}</strong></h2>
+                {% rencontre_score jjs.rencontre %}
+            </div>
+        </li>
+        {% endfor %}
+    </ol>
+
+    <h2>Pires notes</h2>
     <ol>
         {% for jjs in worstofall %}
         <li class="bestofentry">
             <div class="bestofplayer">
                 <p class="smalltext center">{{ jjs.rencontre.date }}</p>
-                <h2>{{ jjs.joueur.display_name }}: <strong>{{ jjs.note|stringformat:'0.2f' }}</strong></h2>
+                <h2>{{ jjs.joueur.display_name }}: <strong>{{ jjs.note }}</strong></h2>
                 {% rencontre_score jjs.rencontre %}
             </div>
         </li>

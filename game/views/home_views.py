@@ -259,6 +259,8 @@ class StatView(DetailView):
         context['worstofall'] = JJScore.objects.get_n_best_or_worst(5, self.object, best=False,
                                                                     poste=self.request.GET.get(
                                                                         'position') or None)
+        context['bestofperfs'] = JJScore.objects.get_n_best_perfs(
+            5, self.object)
         context['best'] = compute_team(selection['best'], criteria='avg_note')
         context['worst'] = compute_team(
             selection['worst'], False, criteria='avg_note')

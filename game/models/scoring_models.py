@@ -22,18 +22,21 @@ class SaisonScoringManager(models.Manager):
 
 
 class SaisonScoring(models.Model):
-    saison = models.ForeignKey(l1models.Saison, on_delete=models.CASCADE, null=False)
+    saison = models.ForeignKey(
+        l1models.Saison, on_delete=models.CASCADE, null=False)
     computed_at = models.DateTimeField(auto_now=True)
 
     def compute(self):
-        journees = l1models.Journee.objects.filter(saison=self.saison).order_by('numero')
+        journees = l1models.Journee.objects.filter(
+            saison=self.saison).order_by('numero')
         journees_to_recompute = []
         # delete obsolete journeescorings
         # si une journée antérieure est mise à jour tardivement, on se force à tout recalculer à partir de là
         # pour garder des progressions cohérentes
         recompute_all_from_there = False
         for j in journees:
-            js = JourneeScoring.objects.filter(saison_scoring=self, journee=j).first()
+            js = JourneeScoring.objects.filter(
+                saison_scoring=self, journee=j).first()
             if js:
                 if recompute_all_from_there or js.computed_at < j.derniere_maj:
                     journees_to_recompute.append(j)
@@ -62,9 +65,12 @@ class SaisonScoring(models.Model):
 class JourneeScoring(models.Model):
     STATUS_CHOICES = (('OPEN', 'Open'), ('LOCKED', 'locked'),)
 
-    status = models.CharField(max_length=10, blank=False, default='OPEN', choices=STATUS_CHOICES)
-    journee = models.ForeignKey(l1models.Journee, on_delete=models.CASCADE, null=False)
-    saison_scoring = models.ForeignKey(SaisonScoring, on_delete=models.CASCADE, null=False)
+    status = models.CharField(
+        max_length=10, blank=False, default='OPEN', choices=STATUS_CHOICES)
+    journee = models.ForeignKey(
+        l1models.Journee, on_delete=models.CASCADE, null=False)
+    saison_scoring = models.ForeignKey(
+        SaisonScoring, on_delete=models.CASCADE, null=False)
     computed_at = models.DateTimeField(null=True)
     locked_at = models.DateTimeField(null=True)
 
@@ -94,11 +100,13 @@ class JJScoreManager(models.Manager):
         computed_joueurs = []
         for r in journee_scoring.journee.rencontres.all():
             computed_club_pks.extend([r.club_domicile.pk, r.club_exterieur.pk])
-            all_perfs = r.performances.select_related('joueur').select_related('rencontre').all()
+            all_perfs = r.performances.select_related(
+                'joueur').select_related('rencontre').all()
             if all_perfs:  # perform queryset
                 bbp = scoring.compute_comparative_bonuses(all_perfs)
                 for perf in all_perfs:
-                    note, bonus, comp, earned_bonuses = scoring.compute_score_performance(perf, bbp)
+                    note, bonus, comp, earned_bonuses = scoring.compute_score_performance(
+                        perf, bbp)
                     jjscores.append(
                         JJScore(journee_scoring=journee_scoring,
                                 joueur=perf.joueur,
@@ -113,7 +121,8 @@ class JJScoreManager(models.Manager):
                     computed_joueurs.append(perf.joueur.pk)
         # "pour les joueurs qui n'ont pas joué lors de cette journée insert 0":
         for j in l1models.Joueur.objects.exclude(pk__in=computed_joueurs):
-            jjscores.append(JJScore(journee_scoring=journee_scoring, joueur=j, compensation=0, bonus=0))
+            jjscores.append(
+                JJScore(journee_scoring=journee_scoring, joueur=j, compensation=0, bonus=0))
         JJScore.objects.filter(journee_scoring=journee_scoring).delete()
         JJScore.objects.bulk_create(jjscores)
 
@@ -127,15 +136,20 @@ class JJScoreManager(models.Manager):
         queryset = self.filter(joueur__in=joueur_ids, journee_scoring__saison_scoring__saison=saison,
                                note__isnull=False)
         if journee_first:
-            queryset = queryset.filter(journee_scoring__journee__numero__gte=journee_first)
+            queryset = queryset.filter(
+                journee_scoring__journee__numero__gte=journee_first)
         if journee_last:
-            queryset = queryset.filter(journee_scoring__journee__numero__lte=journee_last)
-        queryset = queryset.values('joueur').annotate(notes_notnull=notes_notnull)
-        result = sum([min(n, max_by_joueur) for n in queryset.values_list('notes_notnull', flat=True)])
+            queryset = queryset.filter(
+                journee_scoring__journee__numero__lte=journee_last)
+        queryset = queryset.values('joueur').annotate(
+            notes_notnull=notes_notnull)
+        result = sum([min(n, max_by_joueur)
+                      for n in queryset.values_list('notes_notnull', flat=True)])
         return result
 
     def get_n_best_or_worst(self, numberof, saison, journee=None, poste=None, best=True):
-        ofjournee = self.filter(journee_scoring__saison_scoring__saison=saison, note__isnull=False).filter(note__gt=0)
+        ofjournee = self.filter(
+            journee_scoring__saison_scoring__saison=saison, note__isnull=False).filter(note__gt=0)
         if journee is not None:
             ofjournee = ofjournee.filter(journee_scoring__journee=journee)
         if poste is not None:
@@ -155,15 +169,32 @@ class JJScoreManager(models.Manager):
         ordering = '-bonus'
         return ofjournee.order_by(ordering)[:numberof]
 
+    def get_n_best_perfs(self, numberof, saison, journee=None, poste=None):
+        ofjournee = self.filter(journee_scoring__saison_scoring__saison=saison)
+        if journee is not None:
+            ofjournee = ofjournee.filter(journee_scoring__journee=journee)
+        if poste is not None:
+            ofjournee = ofjournee.filter(joueur__poste=poste)
+        ofjournee = ofjournee.annotate(
+            perf=models.F('note') + models.F('bonus')).filter(perf__gt=0)
+        ordering = '-perf'
+        return ofjournee.order_by(ordering)[:numberof]
+
 
 class JJScore(models.Model):
     computed_at = models.DateTimeField(auto_now=True, null=False)
-    journee_scoring = models.ForeignKey(JourneeScoring, on_delete=models.CASCADE, null=False)
-    joueur = models.ForeignKey(l1models.Joueur, on_delete=models.CASCADE, null=False)
-    rencontre = models.ForeignKey(l1models.Rencontre, on_delete=models.CASCADE, null=True)
-    note = models.DecimalField(max_digits=5, decimal_places=3, blank=True, null=True)
-    bonus = models.DecimalField(max_digits=5, decimal_places=3, blank=False, null=False, default=0)
-    compensation = models.DecimalField(max_digits=5, decimal_places=3, blank=True, null=True)
+    journee_scoring = models.ForeignKey(
+        JourneeScoring, on_delete=models.CASCADE, null=False)
+    joueur = models.ForeignKey(
+        l1models.Joueur, on_delete=models.CASCADE, null=False)
+    rencontre = models.ForeignKey(
+        l1models.Rencontre, on_delete=models.CASCADE, null=True)
+    note = models.DecimalField(
+        max_digits=5, decimal_places=3, blank=True, null=True)
+    bonus = models.DecimalField(
+        max_digits=5, decimal_places=3, blank=False, null=False, default=0)
+    compensation = models.DecimalField(
+        max_digits=5, decimal_places=3, blank=True, null=True)
     details = JSONField(default=dict)
 
     objects = JJScoreManager()
@@ -199,15 +230,18 @@ class SJScoreManager(models.Manager):
                     agg[bk] += jjs.details['bonuses'][bk]
         notes = [jjs.note for jjs in jjscores if jjs.note is not None]
         bonus = [jjs.bonus for jjs in jjscores if jjs.bonus is not None]
-        compensations = [jjs.compensation for jjs in jjscores if jjs.compensation is not None]
-        agg['AVGNOTE'] = round(sum(notes) / len(notes), 2) if len(notes) > 0 else None
+        compensations = [
+            jjs.compensation for jjs in jjscores if jjs.compensation is not None]
+        agg['AVGNOTE'] = round(sum(notes) / len(notes),
+                               2) if len(notes) > 0 else None
         agg['NBNOTE'] = len(notes)
         agg['BONUS'] = sum(bonus)
         agg['SUMCOMP'] = sum(compensations)
         return agg
 
     def get_n_best_or_worst(self, saison, numberof, poste=None, best=True, criteria='avg_note', nb_notes_min=1):
-        ofsaison = self.filter(saison_scoring__saison=saison, avg_note__gt=0).filter(nb_notes__gte=nb_notes_min)
+        ofsaison = self.filter(saison_scoring__saison=saison, avg_note__gt=0).filter(
+            nb_notes__gte=nb_notes_min)
         if poste is not None:
             ofsaison = ofsaison.filter(joueur__poste=poste)
         if best:
@@ -226,12 +260,17 @@ class SJScoreManager(models.Manager):
 
 class SJScore(models.Model):
     computed_at = models.DateTimeField(auto_now=True, null=False)
-    saison_scoring = models.ForeignKey(SaisonScoring, on_delete=models.CASCADE, null=False)
-    joueur = models.ForeignKey(l1models.Joueur, on_delete=models.CASCADE, null=False)
-    avg_note = models.DecimalField(max_digits=5, decimal_places=3, blank=True, null=True)
+    saison_scoring = models.ForeignKey(
+        SaisonScoring, on_delete=models.CASCADE, null=False)
+    joueur = models.ForeignKey(
+        l1models.Joueur, on_delete=models.CASCADE, null=False)
+    avg_note = models.DecimalField(
+        max_digits=5, decimal_places=3, blank=True, null=True)
     nb_notes = models.PositiveIntegerField(null=False, default=0)
-    total_bonuses = models.DecimalField(max_digits=6, decimal_places=3, blank=False, null=False, default=0)
-    sum_compensations = models.DecimalField(max_digits=6, decimal_places=3, blank=True, null=True)
+    total_bonuses = models.DecimalField(
+        max_digits=6, decimal_places=3, blank=False, null=False, default=0)
+    sum_compensations = models.DecimalField(
+        max_digits=6, decimal_places=3, blank=True, null=True)
     details = JSONField(default=dict)
 
     objects = SJScoreManager()
