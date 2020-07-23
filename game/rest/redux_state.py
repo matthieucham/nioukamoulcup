@@ -1,3 +1,4 @@
+import logging
 from rest_framework.reverse import reverse
 import requests
 import simplejson as json
@@ -20,6 +21,9 @@ class StateInitializerMixin:
 
     @timed
     def _init_common(self, request):
+        # Get an instance of a logger
+        logger = logging.getLogger('django')
+        logger.info('Request is_secure()= %s ' % request.is_secure())
         self.initial_state = {
             'clubs': list(),
             'players': list(),
@@ -61,8 +65,10 @@ class StateInitializerMixin:
     @timed
     def init_from_league(self, request, league):
         self._init_common(request)
-        self.initial_state.update({'ranking': self._init_get_ranking(request, league)})
-        self.initial_state.update({'teams': self._init_get_teaminfo(request, league)})
+        self.initial_state.update(
+            {'ranking': self._init_get_ranking(request, league)})
+        self.initial_state.update(
+            {'teams': self._init_get_teaminfo(request, league)})
         self.initial_state.update({'league_id': league.id})
         return self.initial_state
 
@@ -75,7 +81,8 @@ class StateInitializerMixin:
             self.initial_state.update(
                 {'posts_endpoint': reverse("wall-posts", request=request,
                                            kwargs={"pk": league.id, "group": league.wall_group.id})})
-            resp = requests.get(self.initial_state['posts_endpoint'])
+            resp = requests.get(
+                self.initial_state['posts_endpoint'], verify=False)
             if resp.status_code == requests.codes['ok']:
                 self.initial_state.update(
                     {'wallposts': json.loads(resp.content)}
@@ -103,15 +110,19 @@ class StateInitializerMixin:
     @timed
     def init_from_merkatosession(self, request, session):
         self._init_common(request)
-        session_serializer = serializers.MerkatoSessionSerializer(session, context={'request': request})
-        self.initial_state.update({'merkatosession': self._to_json(session_serializer)})
+        session_serializer = serializers.MerkatoSessionSerializer(
+            session, context={'request': request})
+        self.initial_state.update(
+            {'merkatosession': self._to_json(session_serializer)})
         return self.initial_state
 
     @timed
     def init_from_draftsession(self, request, session):
         self._init_common(request)
-        session_serializer = serializers.DraftSessionSerializer(session, context={'request': request})
-        self.initial_state.update({'draftsession': self._to_json(session_serializer)})
+        session_serializer = serializers.DraftSessionSerializer(
+            session, context={'request': request})
+        self.initial_state.update(
+            {'draftsession': self._to_json(session_serializer)})
         return self.initial_state
 
     @timed
@@ -122,7 +133,8 @@ class StateInitializerMixin:
                                                                   context={'request': request, 'team': team})
         team_serializer = serializers.TeamDetailSerializer(team, context={'request': request,
                                                                           'current': True})
-        self.initial_state.update({'merkatos': self._to_json(merkato_serializer)})
+        self.initial_state.update(
+            {'merkatos': self._to_json(merkato_serializer)})
         self.initial_state.update({'team': self._to_json(team_serializer)})
         return self.initial_state
 
@@ -134,8 +146,10 @@ class StateInitializerMixin:
                 models.Palmares.objects.filter(league=league).get(pk=palmares_pk), context={'request': request})
         else:
             palmares_serializer = serializers.PalmaresSerializer(
-                models.Palmares.objects.filter(league=league).order_by('-league_instance_end').first(),
+                models.Palmares.objects.filter(league=league).order_by(
+                    '-league_instance_end').first(),
                 context={'request': request})
-        self.initial_state.update({'palmares': self._to_json(palmares_serializer)})
+        self.initial_state.update(
+            {'palmares': self._to_json(palmares_serializer)})
         self.initial_state.update({'league_id': league.id})
         return self.initial_state
