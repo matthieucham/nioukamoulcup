@@ -13,7 +13,8 @@ import sys
 import environ
 from django.contrib import messages
 
-ROOT_DIR = environ.Path(__file__) - 3  # (base_dir/config/settings/common.py - 3 = base_dir/)
+# (base_dir/config/settings/common.py - 3 = base_dir/)
+ROOT_DIR = environ.Path(__file__) - 3
 APPS_DIR = ROOT_DIR.path('dproject')
 
 env = environ.Env()
@@ -26,7 +27,7 @@ env.read_env()
 SECRET_KEY = env('DJANGO_SECRET_KEY')
 
 # This ensures that Django will be able to detect a secure connection
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTOCOL', 'https')
 
 # APP CONFIGURATION
 # ------------------------------------------------------------------------------
@@ -103,7 +104,8 @@ DEBUG = env.bool('DJANGO_DEBUG', False)
 
 # EMAIL CONFIGURATION
 # ------------------------------------------------------------------------------
-EMAIL_BACKEND = env('DJANGO_EMAIL_BACKEND', default='django.core.mail.backends.smtp.EmailBackend')
+EMAIL_BACKEND = env('DJANGO_EMAIL_BACKEND',
+                    default='django.core.mail.backends.smtp.EmailBackend')
 
 DEFAULT_FROM_EMAIL = env(
     'DJANGO_DEFAULT_FROM_EMAIL', default='django app <app@django.group>'

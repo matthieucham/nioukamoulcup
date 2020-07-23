@@ -21,15 +21,6 @@ class StateInitializerMixin:
 
     @timed
     def _init_common(self, request):
-        # Get an instance of a logger
-        logger = logging.getLogger('django')
-        logger.info('Request is_secure()= %s ' % request.is_secure())
-        logger.info('Request META header HTTP_X_FORWARDED_PROTO=%s' %
-                    request.META.get('HTTP_X_FORWARDED_PROTO', None))
-        for k in request.META:
-            if k.startswith('HTTP_'):
-                logger.info('%s= %s' % (k, request.META.get(k)))
-
         self.initial_state = {
             'clubs': list(),
             'players': list(),

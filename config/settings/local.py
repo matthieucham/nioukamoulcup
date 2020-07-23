@@ -14,6 +14,9 @@ import os
 from .common import *  # noqa
 
 
+# INSTALLED APP SPECIFIC TO THIS ENV
+INSTALLED_APPS += ('sslserver',)
+
 # DEBUG
 # ------------------------------------------------------------------------------
 DEBUG = env.bool('DJANGO_DEBUG', default=True)
