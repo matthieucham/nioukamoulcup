@@ -15,7 +15,8 @@ from .common import *  # noqa
 
 
 # INSTALLED APP SPECIFIC TO THIS ENV
-INSTALLED_APPS += ('sslserver',)
+# TODO pourquoi c'est chargé en prod ?
+# INSTALLED_APPS += ('sslserver',)
 
 # DEBUG
 # ------------------------------------------------------------------------------
