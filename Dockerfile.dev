@@ -23,6 +23,7 @@ RUN apk update \
 
 # install dependencies
 RUN python -m pip install pip==19.3.1
+COPY ./requirements/base.txt /usr/src/app/base.txt
 COPY ./requirements/dev.txt /usr/src/app/requirements.dev.txt
 RUN pip install -r requirements.dev.txt
 
