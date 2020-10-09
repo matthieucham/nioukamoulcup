@@ -115,6 +115,7 @@ class RegisterOffersForm(forms.Form):
 class RegisterDraftChoicesForm(forms.Form):
     def __init__(self, *args, **kwargs):
         self.team = kwargs.pop('team')
+        self.request = kwargs.pop('request')
         self.draft_session = kwargs.pop('draft_session')
         super(RegisterDraftChoicesForm, self).__init__(*args, **kwargs)
         for rk in range(self.draft_session.draftsessionrank_set.get(team=self.team).rank):
@@ -151,6 +152,7 @@ class RegisterTransitionForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         self.team = kwargs.pop('team')
+        self.request = kwargs.pop('request')
         self.transition_session = kwargs.pop('transition_session')
         super(RegisterTransitionForm, self).__init__(*args, **kwargs)
         for sig in self.team.signing_set.filter(league_instance=self.transition_session.merkato.league_instance).filter(
