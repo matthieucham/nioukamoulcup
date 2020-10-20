@@ -467,7 +467,7 @@ class Signing(models.Model):
     team = models.ForeignKey(Team, on_delete=models.CASCADE)
     league_instance = models.ForeignKey(LeagueInstance, on_delete=models.CASCADE)
     begin = models.DateTimeField(auto_now_add=True, db_index=True)
-    end = models.DateTimeField(null=True, db_index=True)
+    end = models.DateTimeField(null=True, blank=True db_index=True)
     attributes = JSONField(default=default_signing_attributes)
 
     objects = SigningManager()
