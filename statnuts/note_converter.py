@@ -52,10 +52,11 @@ def harmonize_notes(statnuts_roster):
         for pl in statnuts_roster:
             pl['hnote'] = None
         return statnuts_roster
-    for_hnotes = {'MEAN': mean(temp_notes), 'STDEV': stdev(temp_notes)}
+    # for_hnotes = {'MEAN': mean(temp_notes), 'STDEV': stdev(temp_notes)}
     # calcul de la note finale:
     for pl in statnuts_roster:
-        converted = conv_func(pl.pop('temp_note'), for_hnotes['MEAN'], for_hnotes['STDEV'])
+        # converted = conv_func(pl.pop('temp_note'), for_hnotes['MEAN'], for_hnotes['STDEV'])
+        converted = pl.get('temp_note', None)
         if converted is not None:
             pl['hnote'] = round(converted, 1)
         else:
