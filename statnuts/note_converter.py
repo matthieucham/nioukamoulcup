@@ -20,7 +20,7 @@ def harmonize_notes(statnuts_roster):
     by_src = dict()
     for src in _extract_sources(statnuts_roster):
         notes = [
-            (CONVERSION_FUNCTIONS.get(r['source']) or (lambda n: n))(float(r['rating'])) for ros in statnuts_roster for
+            (CONVERSION_FUNCTIONS.get(r['source'],lambda n: n))(float(r['rating'])) for ros in statnuts_roster for
             r in ros['ratings'] if r['source'] == src
         ]
         if len(notes) > 1:
@@ -40,7 +40,7 @@ def harmonize_notes(statnuts_roster):
     for pl in statnuts_roster:
         try:
             pl['temp_note'] = mean(
-                [conv_func(float(r['rating']), by_src[r['source']]['MEAN'], by_src[r['source']]['STDEV']) for r in
+                [conv_func((CONVERSION_FUNCTIONS.get(r['source'],lambda n: n))(float(r['rating'])), by_src[r['source']]['MEAN'], by_src[r['source']]['STDEV']) for r in
                  pl['ratings'] if r['source'] in by_src])
         except StatisticsError:
             pl['temp_note'] = None
@@ -85,5 +85,43 @@ def _conv_ws(raw):
     y = round(round((d + (a - d) / (1 + pow(10 * float(raw) / c, b))) / 5) / 2, 1)
     return y
 
+def _conv_ws_new(raw):
+    if raw < 3:
+        return 1.1
+    if raw < 4:
+        return 1.6
+    if raw < 4.3:
+        return 2.1
+    if raw < 4.8:
+        return 2.6
+    if raw < 5.2:
+        return 3.1
+    if raw < 5.6:
+        return 3.6
+    if raw < 6:
+        return 4.1
+    if raw < 6.4:
+        return 4.6
+    if raw < 6.7:
+        return 5.1
+    if raw < 7.1:
+        return 5.6
+    if raw < 7.4:
+        return 6.1
+    if raw < 7.8:
+        return 6.6
+    if raw < 8.1:
+        return 7.1
+    if raw < 8.4:
+        return 7.6
+    if raw < 8.8:
+        return 8.1
+    if raw < 9.1:
+        return 8.6
+    if raw < 9.5:
+        return 9.1
+    if raw < 9.9:
+        return 9.6
+    return 10.0
 
-CONVERSION_FUNCTIONS = {'KICK': _conv_kicker, 'WHOSC': _conv_ws}
+CONVERSION_FUNCTIONS = {'KICK': _conv_kicker, 'WHOSC': _conv_ws_new}
