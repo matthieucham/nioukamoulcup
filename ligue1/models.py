@@ -26,7 +26,7 @@ class SaisonManager(models.Manager):
         if force_import or saison.derniere_maj is None or instance_update > saison.derniere_maj:
             for step in statnuts_instance['steps']:
                 Journee.objects.import_from_statnuts(
-                    saison, sn_client.get_step(step['uuid']), sn_client)
+                    saison, sn_client.get_step(step['uuid']), sn_client, force_import=force_import)
         saison.derniere_maj = instance_update
         saison.save()
 
