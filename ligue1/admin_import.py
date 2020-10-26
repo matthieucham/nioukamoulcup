@@ -106,15 +106,25 @@ class JourneeAdmin(InlineActionsModelAdminMixin, admin.ModelAdmin):
 
 
 class SaisonAdmin(admin.ModelAdmin):
-    actions = ['import_instance_action', 'delete_selected']
+    actions = ['import_instance_action', 'import_instance_deep_action', 'delete_selected']
     list_display = ['nom', 'sn_instance_uuid', 'debut', 'fin', 'derniere_maj']
 
     def has_delete_permission(self, request, obj=None):
         if obj is not None:
             return obj.journees.count() == 0
         return False
-
+    
     def import_instance_action(self, request, queryset):
+        # appeler Statnuts ici
+        client = StatnutsClient(settings.STATNUTS_CLIENT_ID, settings.STATNUTS_SECRET, settings.STATNUTS_URL,
+                                settings.STATNUTS_NKCUP_USER, settings.STATNUTS_NKCUP_PWD)
+        for saison in queryset:
+            models.Saison.objects.import_from_statnuts(client.get_tournament_instance(saison.sn_instance_uuid), client,
+                                                       force_import=False)
+        self.message_user(request, "Import effectué")
+        return HttpResponseRedirect(reverse('import_statnuts:ligue1_journee_changelist'))
+
+    def import_instance_deep_action(self, request, queryset):
         # appeler Statnuts ici
         client = StatnutsClient(settings.STATNUTS_CLIENT_ID, settings.STATNUTS_SECRET, settings.STATNUTS_URL,
                                 settings.STATNUTS_NKCUP_USER, settings.STATNUTS_NKCUP_PWD)
@@ -124,7 +134,7 @@ class SaisonAdmin(admin.ModelAdmin):
         self.message_user(request, "Import effectué")
         return HttpResponseRedirect(reverse('import_statnuts:ligue1_journee_changelist'))
 
-    import_instance_action.short_description = "Importer les données de ces saisons"
+    import_instance_action.short_description = "Importer TOUTES les données de ces saisons"
 
     def changelist_view(self, request, extra_context=None):
         extra_context = extra_context or {}
