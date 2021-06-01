@@ -41,5 +41,5 @@ rules==1.2.1
 simplejson==3.13.2
 six==1.10.0
 sqlparse==0.2.3
-urllib3==1.21.1
+urllib3==1.26.5
 webencodings==0.5.1
