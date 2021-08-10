@@ -1,12 +1,12 @@
 BONUS = {
     'COLLECTIVE': {
-        'CLEANSHEET': {'G': 3.4, 'D': 2.5, 'M': 1.0, 'A': 0},
-        'HALFCLEANSHEET': {'G': 1.7, 'D': 1.25, 'M': 0.5, 'A': 0},
-        'OFFENSIVE': {'G': 0, 'D': 0, 'M': 0.4, 'A': 1},
-        'HALFOFFENSIVE': {'G': 0, 'D': 0, 'M': 0.2, 'A': 0.5}
+        'CLEANSHEET': {'G': 3.4, 'D': 2.5, 'M': 1.6, 'A': 0},
+        'HALFCLEANSHEET': {'G': 1.7, 'D': 1.25, 'M': 0.8, 'A': 0},
+        'OFFENSIVE': {'G': 0, 'D': 0, 'M': 0.9, 'A': 1.2},
+        'HALFOFFENSIVE': {'G': 0, 'D': 0, 'M': 0.45, 'A': 0.6}
     },
     'PERSONAL': {
-        'LEADER': {'G': 0.9, 'D': 1.2, 'M': 0.6, 'A': 0},
+        'LEADER': {'G': 0.9, 'D': 1.2, 'M': 1.2, 'A': 0},
         'PENALSTOP': {'G': 3, 'D': 3, 'M': 3, 'A': 3},
         'GOAL': {'G': 3, 'D': 3, 'M': 3, 'A': 3},
         'PENALTY': {'G': 1.5, 'D': 1.5, 'M': 1.5, 'A': 1.5},
