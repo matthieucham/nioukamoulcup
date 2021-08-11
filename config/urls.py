@@ -33,7 +33,7 @@ urlpatterns = [
     path('notifications/', include('django_nyt.urls')),
     path('wiki/', include('wiki.urls')),
     url(r'^import/', admin_import_site.urls, name='import'),
-    url(r'^contact/', include('contact_form.urls')),
+    #url(r'^contact/', include('contact_form.urls')),
 ]
 
 if settings.DEBUG:
