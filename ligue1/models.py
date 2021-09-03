@@ -191,6 +191,7 @@ class Joueur(Importe):
     club = models.ForeignKey(
         Club, on_delete=models.SET_NULL, related_name='joueurs', null=True, blank=True)
     poste = models.CharField(max_length=1, choices=POSTES, null=True)
+    indraftable = models.NullBooleanField(blank=True, null=True)
 
     objects = JoueurManager()
 

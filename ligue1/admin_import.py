@@ -134,7 +134,8 @@ class SaisonAdmin(admin.ModelAdmin):
         self.message_user(request, "Import effectué")
         return HttpResponseRedirect(reverse('import_statnuts:ligue1_journee_changelist'))
 
-    import_instance_action.short_description = "Importer TOUTES les données de ces saisons"
+    import_instance_action.short_description = "Importer les données fraîches de ces saisons"
+    import_instance_deep_action.short_description = "Importer TOUTES les données de ces saisons"
 
     def changelist_view(self, request, extra_context=None):
         extra_context = extra_context or {}
@@ -154,7 +155,7 @@ class SaisonCouranteAdmin(admin.ModelAdmin):
 class ClubJoueurInline(admin.TabularInline):
     model = models.Joueur
     can_delete = False
-    fields = ('__str__', 'poste', 'sn_person_uuid',)
+    fields = ('__str__', 'poste', 'sn_person_uuid', 'indraftable')
     readonly_fields = ('__str__', 'poste', 'sn_person_uuid',)
     ordering = ('poste', 'nom',)
 

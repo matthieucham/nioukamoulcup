@@ -222,7 +222,7 @@ class SigningAdmin(admin.ModelAdmin):
 
 
 
-admin.site.register(Entry, EntryLeagueAdmin)
+# admin.site.register(Entry, EntryLeagueAdmin)
 admin_import_site.register(models.League, LeagueAdmin)
 admin_import_site.register(models.LeagueInstance)
 admin_import_site.register(models.LeagueInstancePhase)

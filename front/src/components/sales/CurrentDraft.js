@@ -87,7 +87,7 @@ export class CurrentMerkatoDraftSession extends React.Component {
       <div>
         <PlayerPicker
           key={`pick_${index}`}
-          playersResource="playersformerkato"
+          playersResource="playersfordraft"
           initialPickedPlayer={picked}
           pickedOrder={index}
           onPlayerPicked={this.assignPlayerToChoice}
