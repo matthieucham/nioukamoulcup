@@ -356,7 +356,7 @@ class PlayersForDraftView(CurrentLeagueInstanceMixin, generics.ListAPIView):
 
     @timed
     def get_serializer_context(self):
-        base_context = super(PlayersForMerkatoView, self).get_serializer_context()
+        base_context = super(PlayersForDraftView, self).get_serializer_context()
         league_pk = self.kwargs["league_pk"]
         user = base_context.get("request").user
         team = (
