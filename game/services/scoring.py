@@ -101,7 +101,7 @@ def _compute_bonus(perf, best_note_by_position):
     if (
         "note" in perf.details
         and perf.details["note"] is not None
-        and perf.temps_de_jeu >= PLAYTIME["MAX_LONG"]
+        and perf.temps_de_jeu >= PLAYTIME["MIN_BONUS"]
     ):
         if poste == "G":
             note_to_beat = max(
