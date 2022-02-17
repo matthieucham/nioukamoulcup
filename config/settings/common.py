@@ -62,7 +62,7 @@ THIRD_PARTY_APPS = (
     "webpack_loader",
     "rest_framework",
     "dry_rest_permissions",
-    "contact_form",
+    #"contact_form",
     "sekizai",
     "sorl.thumbnail",
     "wiki.apps.WikiConfig",
@@ -184,7 +184,7 @@ TEMPLATES = [
             # See: https://docs.djangoproject.com/en/dev/ref/settings/#template-loaders
             # https://docs.djangoproject.com/en/dev/ref/templates/api/#loader-types
             "loaders": [
-                "app_namespace.Loader",
+                # "app_namespace.Loader",
                 "django.template.loaders.filesystem.Loader",
                 "django.template.loaders.app_directories.Loader",
             ],

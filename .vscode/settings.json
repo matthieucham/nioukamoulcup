@@ -1,3 +1,10 @@
 {
-    "python.pythonPath": "/usr/local/bin/python"
+    "editor.formatOnSave": true,
+    "python.linting.enabled": true,
+    "python.linting.pylintEnabled": true,
+    "python.defaultInterpreterPath": "/Users/matthieu.grandrie/.pyenv/versions/3.9.2/envs/nioukamoulcup-39/bin/python",
+    "python.formatting.provider": "black",
+    "python.linting.pydocstyleArgs": [
+        "--ignore=D400"
+    ]
 }
