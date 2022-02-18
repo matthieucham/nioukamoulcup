@@ -18,22 +18,23 @@ from django.conf.urls.static import static
 from django.conf.urls import url, include
 from django.urls import path
 from django.contrib import admin
+
 # from wiki.urls import get_pattern as get_wiki_pattern
 # from django_nyt.urls import get_pattern as get_nyt_pattern
 from ligue1.admin_import import admin_import_site
 from game.views import LandingPage, MentionsPage
 
 urlpatterns = [
-    url(r'^$', LandingPage.as_view()),
-    url(r'^mentions/', MentionsPage.as_view(), name='mentions'),
-    url(r'^game/', include('game.urls')),
-    url(r'^admin/', admin.site.urls),
-    url(r'^accounts/', include('userena.urls')),
-    url(r'^comments/', include('django_comments.urls')),
-    path('notifications/', include('django_nyt.urls')),
-    path('wiki/', include('wiki.urls')),
-    url(r'^import/', admin_import_site.urls, name='import'),
-    #url(r'^contact/', include('contact_form.urls')),
+    url(r"^$", LandingPage.as_view()),
+    url(r"^mentions/", MentionsPage.as_view(), name="mentions"),
+    url(r"^game/", include("game.urls")),
+    url(r"^admin/", admin.site.urls),
+    url(r"^accounts/", include("userena.urls")),
+    # url(r'^comments/', include('django_comments.urls')),
+    path("notifications/", include("django_nyt.urls")),
+    path("wiki/", include("wiki.urls")),
+    url(r"^import/", admin_import_site.urls, name="import"),
+    # url(r'^contact/', include('contact_form.urls')),
 ]
 
 if settings.DEBUG:
@@ -42,5 +43,5 @@ if settings.DEBUG:
     import debug_toolbar
 
     urlpatterns += [
-        url(r'^__debug__/', include(debug_toolbar.urls)),
+        url(r"^__debug__/", include(debug_toolbar.urls)),
     ]
