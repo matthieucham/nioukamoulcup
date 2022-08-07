@@ -177,8 +177,8 @@ class ClubAdmin(admin.ModelAdmin):
         return HttpResponseRedirect(reverse('import_statnuts:ligue1_club_changelist'))
 
 class JoueurAdmin(admin.ModelAdmin):
-    list_display = ['prenom', 'nom', 'surnom', 'sn_joueur_uuid', 'derniere_maj']
-    search_fields = ('nom', 'surnom', 'sn_joueur_uuid')
+    list_display = ['prenom', 'nom', 'surnom', 'sn_person_uuid', 'derniere_maj']
+    search_fields = ('nom', 'surnom', 'sn_person_uuid')
 
 
 admin_import_site = ImportStatnutsSite('import_statnuts')
