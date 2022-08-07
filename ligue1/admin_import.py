@@ -176,6 +176,11 @@ class ClubAdmin(admin.ModelAdmin):
         self.message_user(request, "Import effectué")
         return HttpResponseRedirect(reverse('import_statnuts:ligue1_club_changelist'))
 
+class JoueurAdmin(admin.ModelAdmin):
+    model = models.Joueur
+    list_display = ['prenom', 'nom', 'surnom', 'sn_joueur_uuid', 'derniere_maj']
+    search_fields = ('nom', 'surnom', 'sn_joueur_uuid')
+
 
 admin_import_site = ImportStatnutsSite('import_statnuts')
 admin_import_site.disable_action('delete_selected')
