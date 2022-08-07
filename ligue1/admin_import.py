@@ -177,7 +177,6 @@ class ClubAdmin(admin.ModelAdmin):
         return HttpResponseRedirect(reverse('import_statnuts:ligue1_club_changelist'))
 
 class JoueurAdmin(admin.ModelAdmin):
-    model = models.Joueur
     list_display = ['prenom', 'nom', 'surnom', 'sn_joueur_uuid', 'derniere_maj']
     search_fields = ('nom', 'surnom', 'sn_joueur_uuid')
 
@@ -189,3 +188,4 @@ admin_import_site.register(models.Saison, SaisonAdmin)
 admin_import_site.register(models.Journee, JourneeAdmin)
 admin_import_site.register(models.Club, ClubAdmin)
 admin_import_site.register(models.Rencontre, RencontreAdmin)
+admin_import_site.register(models.Joueur, JoueurAdmin)
