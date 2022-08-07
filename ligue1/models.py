@@ -1,3 +1,4 @@
+import logging
 import re
 from django.db import models
 from django.contrib.postgres.fields import JSONField
@@ -9,6 +10,8 @@ from colorful.fields import RGBColorField
 from utils.timer import timed
 from statnuts import note_converter
 
+# Get an instance of a logger
+logger = logging.getLogger('django')
 
 class Importe(models.Model):
     derniere_maj = models.DateTimeField(null=True)
@@ -186,6 +189,7 @@ class JoueurManager(models.Manager):
             "surnom": statnuts_data["usual_name"],
             "poste": statnuts_data["position"],
         }
+        logger.debug(statnuts_data["uuid"])
         return self.update_or_create(
             sn_person_uuid=statnuts_data["uuid"], defaults=defaults
         )
