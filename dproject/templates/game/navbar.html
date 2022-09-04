@@ -22,7 +22,9 @@
             <a href="#">{{ user.get_username }}&nbsp;<i class="fa fa fa-gear"></i></a>
             <input type="checkbox" id="drop-2"/>
             <ul>
+                {% if user.get_username %}
                 <li><a href="{% url 'userena_profile_detail' user.get_username %}">Mon compte</a></li>
+                {% endif %}
                 <li><a href="{% url 'userena_signout' %}">Déconnexion</a></li>
             </ul>
         </li>

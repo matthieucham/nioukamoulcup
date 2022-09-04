@@ -1,6 +1,8 @@
 {% load game %}
 {% block left-menu %}
+{% if user.get_username %}
 <a href="{% url 'userena_profile_detail' user.get_username %}"
    class="{% is_navbar_active request user.get_username %}">Profil</a>
+{% endif %}
 <a href="{% url 'user-teams-list' %}" class="{% is_navbar_active request 'team' %}">Equipes</a>
 {% endblock left-menu %}
