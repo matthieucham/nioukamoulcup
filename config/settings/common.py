@@ -332,7 +332,7 @@ MESSAGE_TAGS = {
 }
 
 # Required by Userena
-# AUTH_PROFILE_MODULE = "accounts.KcupUserProfile"
+AUTH_PROFILE_MODULE = "accounts.KcupUserProfile"
 USERENA_SIGNIN_REDIRECT_URL = "/accounts/%(username)s/"
 USERENA_REDIRECT_ON_SIGNOUT = "/game/home/info/"
 
