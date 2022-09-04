@@ -45,7 +45,7 @@ DJANGO_APPS = (
 THIRD_PARTY_APPS = (
     "rules.apps.AutodiscoverRulesConfig",
     "inline_actions",
-    "userena",
+    #"userena",
     "guardian",
     "easy_thumbnails",
     "django_nyt.apps.DjangoNytConfig",
@@ -268,7 +268,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # ------------------------------------------------------------------------------
 
 AUTHENTICATION_BACKENDS = (
-    "userena.backends.UserenaAuthenticationBackend",
+    #"userena.backends.UserenaAuthenticationBackend",
     "guardian.backends.ObjectPermissionBackend",
     "rules.permissions.ObjectPermissionBackend",
     "django.contrib.auth.backends.ModelBackend",
@@ -332,9 +332,9 @@ MESSAGE_TAGS = {
 }
 
 # Required by Userena
-AUTH_PROFILE_MODULE = "accounts.KcupUserProfile"
-USERENA_SIGNIN_REDIRECT_URL = "/accounts/%(username)s/"
-USERENA_REDIRECT_ON_SIGNOUT = "/game/home/info/"
+# AUTH_PROFILE_MODULE = "accounts.KcupUserProfile"
+# USERENA_SIGNIN_REDIRECT_URL = "/accounts/%(username)s/"
+# USERENA_REDIRECT_ON_SIGNOUT = "/game/home/info/"
 
 # Required by Guardian
 ANONYMOUS_USER_NAME = "AnonymousUser"
