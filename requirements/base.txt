@@ -1,5 +1,5 @@
 Django==2.2.17
-django-userena-ce>=4.1.1
+#django-userena-ce>=4.1.1
 easy-thumbnails>=2.7.0
 django-debug-toolbar==3.2
 django-environ>=0.6.0

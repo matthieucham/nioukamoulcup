@@ -29,7 +29,7 @@ urlpatterns = [
     url(r"^mentions/", MentionsPage.as_view(), name="mentions"),
     url(r"^game/", include("game.urls")),
     url(r"^admin/", admin.site.urls),
-    url(r"^accounts/", include("userena.urls")),
+    # url(r"^accounts/", include("userena.urls")),
     # url(r'^comments/', include('django_comments.urls')),
     path("notifications/", include("django_nyt.urls")),
     path("wiki/", include("wiki.urls")),
